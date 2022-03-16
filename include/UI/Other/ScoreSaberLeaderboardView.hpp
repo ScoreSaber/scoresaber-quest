@@ -31,5 +31,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     void DirectionalButtonClicked(PageDirection direction);
     void SetPlayButtonState(bool state);
+    void SetUploadState(bool state, bool success);
     void CheckPage();
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView

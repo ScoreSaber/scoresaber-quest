@@ -53,15 +53,13 @@ namespace ScoreSaber::UI::Other
         std::string url = string_format("https://scoresaber.com/api/player/%s/full", playerId.c_str());
         INFO("Getting player data from url %s", url.c_str());
         UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(url));
-        co_yield reinterpret_cast<System::Collections::IEnumerator*>(
-            CRASH_UNLESS(webRequest->SendWebRequest()));
+        co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
         if (!webRequest->get_isNetworkError())
         {
             std::u16string response = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
             rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> doc;
             doc.Parse(response.c_str());
             ScoreSaber::Data::Player player(doc.GetObject());
-
             SetPlayerData(player);
         }
         co_return;

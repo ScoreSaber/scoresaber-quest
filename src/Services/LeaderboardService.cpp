@@ -78,7 +78,6 @@ namespace ScoreSaber::Services::LeaderboardService
         WebUtils::GetAsync(
             url, [=](long code, std::string result) {
                 Data::InternalLeaderboard data;
-
                 switch (code)
                 {
                     case 200:
@@ -91,7 +90,6 @@ namespace ScoreSaber::Services::LeaderboardService
                         data = GetLeaderboardError("Received invalid response from server");
                         break;
                 }
-
                 finished(data);
             });
     }

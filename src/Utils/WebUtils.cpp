@@ -176,7 +176,6 @@ struct Gif
 
 namespace WebUtils
 {
-
     // https://stackoverflow.com/a/55660581
 
     std::string cookie;
@@ -184,7 +183,6 @@ namespace WebUtils
     std::string query_encode(const std::string& s)
     {
         std::string ret;
-
 #define IS_BETWEEN(ch, low, high) (ch >= low && ch <= high)
 #define IS_ALPHA(ch) (IS_BETWEEN(ch, 'A', 'Z') || IS_BETWEEN(ch, 'a', 'z'))
 #define IS_DIGIT(ch) IS_BETWEEN(ch, '0', '9')
@@ -355,7 +353,7 @@ namespace WebUtils
 
             curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
 
-            if (cookie != "")
+            if (!cookie.empty())
             {
                 curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
             }
@@ -408,6 +406,11 @@ namespace WebUtils
                 // headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
 
                 curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+
+                if (!cookie.empty())
+                {
+                    curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+                }
 
                 // Set headers
                 curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);

@@ -9,6 +9,7 @@
 
 namespace WebUtils
 {
+    extern std::string cookie;
 
     std::optional<rapidjson::Document> GetJSON(std::string url);
 
@@ -27,9 +28,6 @@ namespace WebUtils
     /// @param finished the callback for when we're done downloading
     /// @param progressUpdate callback to give a progressupdate bar or something
     void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished);
-
-    std::vector<unsigned char> Swap(std::vector<unsigned char> panda1, std::vector<unsigned char> panda2);
-    std::string ConvertToHex(const std::vector<unsigned char>& v);
 
     /// @brief gets texture @ url and applies it to out->set_sprite() after downloading
     custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out);

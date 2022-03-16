@@ -30,7 +30,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     DECLARE_INSTANCE_FIELD(bool, initialized);
     DECLARE_INSTANCE_FIELD(bool, isLoading);
     DECLARE_INSTANCE_FIELD(int, page);
-    DECLARE_INSTANCE_FIELD(int, page2);
     DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
     DECLARE_INSTANCE_FIELD(HMUI::ViewController*, globalViewController);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
@@ -62,9 +61,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
         Friends,
         Country};
 
-    std::string myCountry;
     LeaderboardType leaderboardType = Global;
     void set_leaderboardType(LeaderboardType type);
     std::string get_leaderboardURL();
-    void StartRefresh(bool redownload = false);
-    custom_types::Helpers::Coroutine Refresh(bool redownload = false);)
+    void StartRefresh();
+    custom_types::Helpers::Coroutine Refresh();)

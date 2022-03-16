@@ -17,6 +17,7 @@
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/StandardLevelDetailViewController.hpp"
+#include "Services/UploadService.hpp"
 
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
@@ -184,6 +185,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl,
                             std::string refreshId)
     {
+
+        if (ScoreSaber::Services::UploadService::uploading)
+        {
+            return;
+        }
         // UMBY: Check uploading
         if (!_activated)
         {
@@ -243,6 +249,10 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
                             }
                         }
+                    }
+                    else
+                    {
+                        SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
                     }
                 });
             },
@@ -350,6 +360,32 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         {
             _playButton->get_gameObject()->set_active(state);
         }
+    }
+
+    void SetUploadState(bool state, bool success)
+    {
+        QuestUI::MainThreadScheduler::Schedule([=]() {
+            if (true)
+            {
+                _platformLeaderboardViewController->loadingControl->ShowLoading(System::String::_get_Empty());
+                ScoreSaberBanner->set_loading(true);
+                ScoreSaberBanner->Prompt("Uploading Score", true, 5.0f,
+                                         nullptr);
+            }
+            else
+            {
+                _platformLeaderboardViewController->Refresh(true, true);
+                if (success)
+                {
+                    ScoreSaberBanner->Prompt("<color=#89fc81>Score uploaded successfully</color>", false, 5.0f,
+                                             nullptr);
+                }
+                else
+                {
+                    ScoreSaberBanner->Prompt("<color=#89fc81>Upload failed</color>", false, 5.0f, nullptr);
+                }
+            }
+        });
     }
 
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView

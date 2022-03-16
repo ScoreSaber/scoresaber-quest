@@ -39,16 +39,22 @@ custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components
 {
     std::string url = self->get_leaderboardURL();
     INFO("Getting player data from url %s", url.c_str());
-    UnityEngine::Networking::UnityWebRequest* webRequest =
-        UnityEngine::Networking::UnityWebRequest::Get(StringUtils::StrToIl2cppStr(url));
+    UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(StringUtils::StrToIl2cppStr(url));
+    webRequest->SetRequestHeader(il2cpp_utils::newcsstr("Cookie"), il2cpp_utils::newcsstr(WebUtils::cookie));
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(
         CRASH_UNLESS(webRequest->SendWebRequest()));
     if (!webRequest->get_isNetworkError())
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document
+
         auto s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
+
+        // INFO("cock %s", s.c_str());
+
         // implicit constructor poggers
         playerCollection = webRequest->get_downloadHandler()->get_text();
+
+        INFO("112233 cock");
         self->initialized = true;
     }
     co_return;
@@ -59,9 +65,7 @@ namespace ScoreSaber::CustomTypes::Components
     void GlobalLeaderboardTableData::ctor()
     {
         page = 1;
-        page2 = 0;
         reuseIdentifier = il2cpp_utils::newcsstr("CustomPlayerCellList");
-        myCountry = "NL";
         leaderboardType = Global;
     }
 
@@ -73,7 +77,7 @@ namespace ScoreSaber::CustomTypes::Components
     int GlobalLeaderboardTableData::NumberOfCells()
     {
         // if we have less than 50 players in the playerCollection for SOME reason, this will make sure that if we reach the end of the list it won't overextend
-        int size = playerCollection.size() - (page2 * 5);
+        int size = playerCollection.size();
         return size < 5 ? size : 5;
     }
 
@@ -85,32 +89,29 @@ namespace ScoreSaber::CustomTypes::Components
         leaderboardType = type;
         // scroll back to top always
         page = 1;
-        page2 = 0;
         // refresh the content only if we were not on page one, or if the new type is different from the old one
-        StartRefresh(!wasPage1 || !sameType);
+        StartRefresh();
     }
 
     std::string GlobalLeaderboardTableData::get_leaderboardURL()
     {
+        std::string baseUrl = "http://192.168.1.8:9999/api/game/players";
         switch (leaderboardType)
         {
             default:
                 [[fallthrough]];
             case LeaderboardType::Global:
                 // Global leaderboard
-                return string_format("https://scoresaber.com/api/players?page=%d&withMetadata=false", page);
+                return string_format("%s?page=%d", baseUrl.c_str(), page);
                 break;
             case LeaderboardType::AroundYou:
-                // Not sure how to implement rn, just use Global for now
-                return string_format("https://scoresaber.com/api/players?page=%d&withMetadata=false", page);
+                return string_format("%s/around-player", baseUrl.c_str());
                 break;
             case LeaderboardType::Friends:
-                // Friends is not possible on quest? just use country for now until we decide what to do
-                return string_format("https://scoresaber.com/api/players?page=%d&countries=%s&withMetadata=false", page, myCountry.c_str());
+                return string_format("%s/around-friends?page=%d", baseUrl.c_str(), page);
                 break;
             case LeaderboardType::Country:
-                // Country is country filter lets gooo
-                return string_format("https://scoresaber.com/api/players?page=%d&countries=%s&withMetadata=false", page, myCountry.c_str());
+                return string_format("%s/around-country?page=%d", baseUrl.c_str(), page);
                 break;
         }
     }
@@ -122,20 +123,8 @@ namespace ScoreSaber::CustomTypes::Components
             return;
         }
 
-        INFO("Before page: %d, subpage: %d", page, page2);
-        page2++;
-        if (page2 > 9)
-        {
-            // we went out of bounds for this page, get page changed!
-            page++;
-            page2 = 0;
-            StartRefresh(true);
-        }
-        else
-        {
-            StartRefresh();
-        }
-        INFO("After page: %d, subpage: %d", page, page2);
+        page++;
+        StartRefresh();
     }
 
     void GlobalLeaderboardTableData::UpButtonWasPressed()
@@ -145,47 +134,15 @@ namespace ScoreSaber::CustomTypes::Components
             return;
         }
 
-        INFO("Before page: %d, subpage: %d", page, page2);
-        // on up press:
-        // page controls the SS page,
-        // page2 controls locally the 5 people we see within the 50 we get on a page
-        page2--;
-        if (page2 >= 0)
-        {
-            StartRefresh();
-            INFO("After page: %d, subpage: %d", page, page2);
-            return;
-        }
-
         page--;
-        if (page < 1)
-        {
-            // we went over the top of the first page, this means we went too far, revert changes
-            page = 1;
-            page2 = 0;
-        }
-        else
-        {
-            // page could be lowered, so we start at the bottom of of this new page
-            page2 = 9; // end of page of 50 = page2 * 5 = 45 + the 5 we can see now
-            StartRefresh(true);
-        }
-        /*
-    else
-    {
-        // we could lower page 2 without entering a new SS page, we can refresh normally
-    }
-    */
-        INFO("After page: %d, subpage: %d", page, page2);
+        StartRefresh();
     }
 
-    void GlobalLeaderboardTableData::StartRefresh(bool redownload)
+    void GlobalLeaderboardTableData::StartRefresh()
     {
         if (isLoading)
             return;
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(Refresh(redownload))));
+        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(reinterpret_cast<System::Collections::IEnumerator*>(custom_types::Helpers::CoroutineHelper::New(Refresh())));
     }
 
     /// really just here because of the way it reloads twice by doing ReloadData and then RefreshCells(true, true), now it's combined
@@ -232,18 +189,13 @@ namespace ScoreSaber::CustomTypes::Components
         }
     }
 
-    custom_types::Helpers::Coroutine GlobalLeaderboardTableData::Refresh(bool redownload)
+    custom_types::Helpers::Coroutine GlobalLeaderboardTableData::Refresh()
     {
         isLoading = true;
-        if (redownload || !initialized)
-        {
-            playerCollection.clear();
-            ReloadTableViewData(tableView);
-            reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
-            co_yield reinterpret_cast<System::Collections::IEnumerator*>(custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
-        }
-        // co_yield reinterpret_cast<System::Collections::IEnumerator*>(
-        //     CRASH_UNLESS(WaitForSeconds::New_ctor(2.0f)));
+        playerCollection.clear();
+        ReloadTableViewData(tableView);
+        reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
+        co_yield reinterpret_cast<System::Collections::IEnumerator*>(custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
         ReloadTableViewData(tableView);
         isLoading = false;
         reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(false);
@@ -252,8 +204,7 @@ namespace ScoreSaber::CustomTypes::Components
 
     HMUI::TableCell* GlobalLeaderboardTableData::CellForIdx(HMUI::TableView* tableView, int idx)
     {
-        GlobalLeaderboardTableCell* playerCell = reinterpret_cast<GlobalLeaderboardTableCell*>(
-            tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
+        GlobalLeaderboardTableCell* playerCell = reinterpret_cast<GlobalLeaderboardTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
 
         if (!playerCell)
         {
@@ -265,10 +216,8 @@ namespace ScoreSaber::CustomTypes::Components
         playerCell->set_reuseIdentifier(reuseIdentifier);
         if (initialized)
         {
-            int playerIDX = (page2 * 5) + idx;
-            INFO("Getting player %d", playerIDX);
-            playerCell->Refresh(playerCollection[playerIDX], leaderboardType);
+            playerCell->Refresh(playerCollection[idx], leaderboardType);
         }
         return playerCell;
     }
-}
+} // namespace ScoreSaber::CustomTypes::Components

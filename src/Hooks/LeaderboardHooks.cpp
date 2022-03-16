@@ -3,6 +3,13 @@
 
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 
+// LeaderboardScoreUploader
+
+#include "GlobalNamespace/GameplayModifiers.hpp"
+#include "GlobalNamespace/IDifficultyBeatmap.hpp"
+#include "GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp"
+#include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
+
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/LeaderboardTableView_ScoreData.hpp"
 #include "GlobalNamespace/LoadingControl.hpp"
@@ -10,6 +17,7 @@
 #include "GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "HMUI/SegmentedControl.hpp"
+#include "Services/UploadService.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
@@ -55,8 +63,7 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(self->difficultyBeatmap, self->leaderboardTableView, self->_get__scoresScope(), loadingControl, "lol");
 }
 
-MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell,
-                     &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
+MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell, &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
                      PlatformLeaderboardViewController* self, SegmentedControl* segmentedControl, int cellNumber)
 {
 
@@ -86,4 +93,18 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedContr
     _lastScopeIndex = cellNumber;
 
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ChangeScope(filterAroundCountry);
+}
+
+MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
+                     static_cast<void (GlobalNamespace::PlatformLeaderboardsModel::*)(GlobalNamespace::IDifficultyBeatmap*, int, int, bool, int, int, int, int, float, GlobalNamespace::GameplayModifiers*)>(&GlobalNamespace::PlatformLeaderboardsModel::UploadScore),
+                     void, GlobalNamespace::PlatformLeaderboardsModel* self, GlobalNamespace::IDifficultyBeatmap* beatmap, int rawScore,
+                     int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
+                     float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
+{
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
+
+    std::string encryptedPacket = ScoreSaber::Services::UploadService::CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
+    ScoreSaber::Services::UploadService::UploadScore(encryptedPacket, [&](bool success) {
+        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
+    });
 }

@@ -57,8 +57,7 @@ namespace ScoreSaber::UI::ViewControllers
                 "/sdcard/ModData/com.beatgames.beatsaber/"
                 "Mods/ScoreSaber/Icons/";
 
-            VerticalLayoutGroup* vertical =
-                BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
+            VerticalLayoutGroup* vertical = BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
             vertical->set_spacing(2.0f);
             vertical->set_childControlHeight(false);
             vertical->set_childAlignment(TextAnchor::MiddleCenter);
@@ -195,7 +194,7 @@ namespace ScoreSaber::UI::ViewControllers
 
             leaderboardList = CreateCustomSourceList<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData*>(playersHost->get_transform(), Vector2(sizeDelta.x, sizeDelta.y), nullptr);
             leaderboardList->globalViewController = this;
-            leaderboardList->StartRefresh(true);
+            leaderboardList->StartRefresh();
 
             playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(get_transform());
             leaderboardList->playerProfileModal = playerProfileModal;
