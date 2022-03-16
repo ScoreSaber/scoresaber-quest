@@ -30,6 +30,8 @@ namespace ScoreSaber::Services::LeaderboardService
 {
     std::string GetLeaderboardUrl(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry)
     {
+        // std::string url = "https://scoresaber.com/api/game/leaderboard";
+
         std::string url = "http://192.168.1.8:9999/api/game/leaderboard";
 
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
@@ -72,7 +74,7 @@ namespace ScoreSaber::Services::LeaderboardService
                             bool filterAroundCountry)
     {
         std::string url = GetLeaderboardUrl(difficultyBeatmap, scope, page, filterAroundCountry);
-        INFO("Leaderboard Url: %s", url.c_str());
+        // INFO("Leaderboard Url: %s", url.c_str());
         WebUtils::GetAsync(
             url, [=](long code, std::string result) {
                 Data::InternalLeaderboard data;
@@ -121,10 +123,12 @@ namespace ScoreSaber::Services::LeaderboardService
                 {
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
                     std::u16string coloredName = to_utf16("0");
+
                     if (leaderboardPlayerInfo.role.has_value() && leaderboardPlayerInfo.name.has_value())
                     {
                         coloredName = Colorize(leaderboardPlayerInfo.name.value(), GetRoleColor(leaderboardPlayerInfo.role.value()));
                     }
+
                     std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
                     std::u16string result = Resize(coloredName + formattedScore + formattedPP, 80);

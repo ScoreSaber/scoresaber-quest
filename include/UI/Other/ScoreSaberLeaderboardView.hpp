@@ -17,6 +17,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         Down,
     };
 
+    void ResetPage();
     void DidActivate(PlatformLeaderboardViewController* self,
                      bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
     void ChangeScope(bool filterAroundCountry);

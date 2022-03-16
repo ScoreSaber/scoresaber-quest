@@ -81,10 +81,14 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     bool _filterAroundCountry = false;
     std::string _currentLeaderboardRefreshId;
 
+    void ResetPage()
+    {
+        _leaderboardPage = 1;
+    }
+
     void DidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy,
                      bool screenSystemEnabling)
     {
-        _leaderboardPage = 1;
         if (firstActivation)
         {
             StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
@@ -232,7 +236,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             }
                             else
                             {
-                                SetErrorState(loadingControl, "no scores on this leaderboard, be the first!");
+                                SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
                             }
                         }
                     }
@@ -244,8 +248,12 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     int GetPlayerScoreIndex(std::vector<Data::Score> scores)
     {
+
+        // INFO("Local playerId: %s", PlayerService::playerInfo.localPlayerData.id.c_str());
+
         for (int i = 0; i < scores.size(); i++)
         {
+            // INFO("playerId on leaderboard: %s", scores[i].leaderboardPlayerInfo.id->c_str());
             if (scores[i].leaderboardPlayerInfo.id == PlayerService::playerInfo.localPlayerData.id)
             {
                 return i;
@@ -265,6 +273,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         if (_activated)
         {
+            INFO("Resetting leaderboard page");
             _leaderboardPage = 1;
             _filterAroundCountry = filterAroundCountry;
             _platformLeaderboardViewController->Refresh(true, true);

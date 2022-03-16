@@ -1,4 +1,3 @@
-
 #include "Sprites.hpp"
 #include "hooks.hpp"
 
@@ -32,6 +31,8 @@ MAKE_AUTO_HOOK_MATCH(
     bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling)
 {
 
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ResetPage();
+
     PlatformLeaderboardViewController_DidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
 
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::DidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
@@ -54,12 +55,15 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(self->difficultyBeatmap, self->leaderboardTableView, self->_get__scoresScope(), loadingControl, "lol");
 }
 
-MAKE_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell,
-                &PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
-                PlatformLeaderboardViewController* self, SegmentedControl* segmentedControl, int cellNumber)
+MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell,
+                     &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
+                     PlatformLeaderboardViewController* self, SegmentedControl* segmentedControl, int cellNumber)
 {
 
     bool filterAroundCountry = false;
+
+    INFO("Scope clicked: %d", cellNumber);
+
     switch (cellNumber)
     {
         case 0: {
@@ -79,5 +83,7 @@ MAKE_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDid
             break;
         }
     }
+    _lastScopeIndex = cellNumber;
+
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ChangeScope(filterAroundCountry);
 }

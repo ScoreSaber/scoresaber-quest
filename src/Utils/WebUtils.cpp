@@ -31,7 +31,8 @@ using namespace StringUtils;
         .c_str()
 
 #include "gif-lib/shared/gif_lib.h"
-struct Gif {
+struct Gif
+{
     Gif(std::string& text)
         : data(text), datastream(&this->data){};
     Gif(std::vector<uint8_t>& vec)
@@ -42,26 +43,31 @@ struct Gif {
         : data(array), datastream(&this->data){};
     Gif(Array<uint8_t>* array)
         : Gif(reinterpret_cast<Array<char>*>(array)){};
-    ~Gif() {
+    ~Gif()
+    {
         int error = 0;
         DGifCloseFile(gif, &error);
     }
-    int Parse() {
+    int Parse()
+    {
         int error = 0;
         gif = DGifOpen(this, &Gif::read, &error);
         return error;
     }
 
-    int Slurp() {
+    int Slurp()
+    {
         return DGifSlurp(gif);
     }
 
-    static int read(GifFileType* pGifHandle, GifByteType* dest, int toRead) {
+    static int read(GifFileType* pGifHandle, GifByteType* dest, int toRead)
+    {
         Gif& dataWrapper = *(Gif*)pGifHandle->UserData;
         return dataWrapper.datastream.readsome(reinterpret_cast<char*>(dest), toRead);
     }
 
-    Texture2D* get_frame(int idx) {
+    Texture2D* get_frame(int idx)
+    {
         if (!gif || idx > get_length())
             return nullptr;
 
@@ -76,14 +82,19 @@ struct Gif {
 
         frameInfo = &(frame->ImageDesc);
 
-        if (frameInfo->ColorMap) {
+        if (frameInfo->ColorMap)
+        {
             colorMap = frameInfo->ColorMap;
-        } else {
+        }
+        else
+        {
             colorMap = gif->SColorMap;
         }
 
-        for (j = 0; j < frame->ExtensionBlockCount; ++j) {
-            if (frame->ExtensionBlocks[j].Function == GRAPHICS_EXT_FUNC_CODE) {
+        for (j = 0; j < frame->ExtensionBlockCount; ++j)
+        {
+            if (frame->ExtensionBlocks[j].Function == GRAPHICS_EXT_FUNC_CODE)
+            {
                 ext = &(frame->ExtensionBlocks[j]);
                 break;
             }
@@ -103,10 +114,13 @@ struct Gif {
         // if directly setting in the color array, the loc is y inverted
         // A frame only describes part of a picture
         long pixelDataOffset = frameInfo->Top * width + frameInfo->Left;
-        for (y = 0; y < frameInfo->Height; ++y) {
-            for (x = 0; x < frameInfo->Width; ++x) {
+        for (y = 0; y < frameInfo->Height; ++y)
+        {
+            for (x = 0; x < frameInfo->Width; ++x)
+            {
                 loc = y * frameInfo->Width + x;
-                if (frame->RasterBits[loc] == ext->Bytes[3] && ext->Bytes[0]) {
+                if (frame->RasterBits[loc] == ext->Bytes[3] && ext->Bytes[0])
+                {
                     continue;
                 }
 
@@ -119,32 +133,39 @@ struct Gif {
         texture->Apply();
         return texture;
     }
-    int get_width() {
+    int get_width()
+    {
         return gif ? gif->SWidth : 0;
     };
-    int get_height() {
+    int get_height()
+    {
         return gif ? gif->SHeight : 0;
     };
-    int get_length() {
+    int get_length()
+    {
         return gif ? gif->ImageCount : 0;
     };
 
-   public:
+  public:
     GifFileType* gif = nullptr;
 
-   private:
+  private:
     template <typename CharT, typename TraitsT = std::char_traits<CharT>>
-    class vectorwrapbuf : public std::basic_streambuf<CharT, TraitsT> {
-       public:
-        vectorwrapbuf(std::string& text) {
+    class vectorwrapbuf : public std::basic_streambuf<CharT, TraitsT>
+    {
+      public:
+        vectorwrapbuf(std::string& text)
+        {
             this->std::basic_streambuf<CharT, TraitsT>::setg(text.data(), text.data(), text.data() + text.size());
         }
 
-        vectorwrapbuf(std::vector<CharT>& vec) {
+        vectorwrapbuf(std::vector<CharT>& vec)
+        {
             this->std::basic_streambuf<CharT, TraitsT>::setg(vec.data(), vec.data(), vec.data() + vec.size());
         }
 
-        vectorwrapbuf(Array<CharT>*& arr) {
+        vectorwrapbuf(Array<CharT>*& arr)
+        {
             this->std::basic_streambuf<CharT, TraitsT>::setg(arr->values, arr->values, arr->values + arr->Length());
         }
     };
@@ -153,13 +174,15 @@ struct Gif {
     vectorwrapbuf<char> data;
 };
 
-namespace WebUtils {
+namespace WebUtils
+{
 
     // https://stackoverflow.com/a/55660581
 
     std::string cookie;
 
-    std::string query_encode(const std::string& s) {
+    std::string query_encode(const std::string& s)
+    {
         std::string ret;
 
 #define IS_BETWEEN(ch, low, high) (ch >= low && ch <= high)
@@ -168,16 +191,23 @@ namespace WebUtils {
 #define IS_HEXDIG(ch) \
     (IS_DIGIT(ch) || IS_BETWEEN(ch, 'A', 'F') || IS_BETWEEN(ch, 'a', 'f'))
 
-        for (size_t i = 0; i < s.size();) {
+        for (size_t i = 0; i < s.size();)
+        {
             char ch = s[i++];
 
-            if (IS_ALPHA(ch) || IS_DIGIT(ch)) {
+            if (IS_ALPHA(ch) || IS_DIGIT(ch))
+            {
                 ret += ch;
-            } else if ((ch == '%') && IS_HEXDIG(s[i + 0]) && IS_HEXDIG(s[i + 1])) {
+            }
+            else if ((ch == '%') && IS_HEXDIG(s[i + 0]) && IS_HEXDIG(s[i + 1]))
+            {
                 ret += s.substr(i - 1, 3);
                 i += 2;
-            } else {
-                switch (ch) {
+            }
+            else
+            {
+                switch (ch)
+                {
                     case '-':
                     case '.':
                     case '_':
@@ -219,11 +249,15 @@ namespace WebUtils {
 
     std::size_t CurlWrite_CallbackFunc_StdString(void* contents, std::size_t size,
                                                  std::size_t nmemb,
-                                                 std::string* s) {
+                                                 std::string* s)
+    {
         std::size_t newLength = size * nmemb;
-        try {
+        try
+        {
             s->append((char*)contents, newLength);
-        } catch (std::bad_alloc& e) {
+        }
+        catch (std::bad_alloc& e)
+        {
             // handle memory problem
             getLogger().critical("Failed to allocate string of size: %lu", newLength);
             return 0;
@@ -231,7 +265,8 @@ namespace WebUtils {
         return newLength;
     }
 
-    std::optional<rapidjson::Document> GetJSON(std::string url) {
+    std::optional<rapidjson::Document> GetJSON(std::string url)
+    {
         std::string data;
         Get(url, data);
         rapidjson::Document document;
@@ -241,11 +276,13 @@ namespace WebUtils {
         return document;
     }
 
-    long Get(std::string url, std::string& val) {
+    long Get(std::string url, std::string& val)
+    {
         return Get(url, TIMEOUT, val);
     }
 
-    long Get(std::string url, long timeout, std::string& val) {
+    long Get(std::string url, long timeout, std::string& val)
+    {
         // Init curl
         auto* curl = curl_easy_init();
         struct curl_slist* headers = NULL;
@@ -276,7 +313,8 @@ namespace WebUtils {
 
         auto res = curl_easy_perform(curl);
         /* Check for errors */
-        if (res != CURLE_OK) {
+        if (res != CURLE_OK)
+        {
             getLogger().critical("curl_easy_perform() failed: %u: %s", res,
                                  curl_easy_strerror(res));
         }
@@ -286,15 +324,18 @@ namespace WebUtils {
         return httpCode;
     }
 
-    void GetAsync(std::string url, std::function<void(long, std::string)> finished) {
+    void GetAsync(std::string url, std::function<void(long, std::string)> finished)
+    {
         GetAsync(url, TIMEOUT, finished);
     }
 
-    size_t hdf(char* b, size_t size, size_t nitems, void* userdata) {
+    size_t hdf(char* b, size_t size, size_t nitems, void* userdata)
+    {
         size_t numbytes = size * nitems;
         std::string header(b, numbytes);
 
-        if (header.starts_with("Set-Cookie")) {
+        if (header.starts_with("Set-Cookie"))
+        {
             replace(header, "Set-Cookie: ", "");
             header = split(header, ';')[0];
             cookie = header;
@@ -302,14 +343,18 @@ namespace WebUtils {
         return numbytes;
     }
 
-    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished) {
+    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished)
+    {
         std::thread t([url, timeout, finished] {
                           std::string val;
                           // Init curl
                           auto* curl = curl_easy_init();
                           struct curl_slist* headers = NULL;
                           headers = curl_slist_append(headers, "Accept: */*");
+                        //   headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
+
                           curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+                          
                           if (cookie != "")
                           {
                               curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
@@ -349,7 +394,8 @@ namespace WebUtils {
         t.detach();
     }
 
-    void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished) {
+    void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished)
+    {
         std::thread t(
             [url, postData, timeout, finished] {
                 std::string val;
@@ -358,6 +404,7 @@ namespace WebUtils {
                 struct curl_slist* headers = NULL;
                 headers = curl_slist_append(headers, "Accept: */*");
                 headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+                // headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
 
                 curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
 
@@ -387,7 +434,8 @@ namespace WebUtils {
 
                 auto res = curl_easy_perform(curl);
                 /* Check for errors */
-                if (res != CURLE_OK) {
+                if (res != CURLE_OK)
+                {
                     getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
                 }
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
@@ -397,17 +445,20 @@ namespace WebUtils {
         t.detach();
     }
 
-    std::vector<unsigned char> Swap(std::vector<unsigned char> panda1, std::vector<unsigned char> panda2) {
+    std::vector<unsigned char> Swap(std::vector<unsigned char> panda1, std::vector<unsigned char> panda2)
+    {
         int N1 = 11;
         int N2 = 13;
         int NS = 257;
 
-        for (int i = 0; i <= panda2.size() - 1; i++) {
+        for (int i = 0; i <= panda2.size() - 1; i++)
+        {
             NS += NS % (panda2[i] + 1);
         }
 
         std::vector<unsigned char> T(panda1.size());
-        for (int i = 0; i <= panda1.size() - 1; i++) {
+        for (int i = 0; i <= panda1.size() - 1; i++)
+        {
             NS = panda2[i % panda2.size()] + NS;
             N1 = (NS + 5) * (N1 & 255) + (N1 >> 8);
             N2 = (NS + 7) * (N2 & 255) + (N2 >> 8);
@@ -419,16 +470,19 @@ namespace WebUtils {
         return T;
     }
 
-    std::string ConvertToHex(const std::vector<unsigned char>& v) {
+    std::string ConvertToHex(const std::vector<unsigned char>& v)
+    {
         std::stringstream buffer;
-        for (int i = 0; i < v.size(); i++) {
+        for (int i = 0; i < v.size(); i++)
+        {
             buffer << std::hex << std::setfill('0');
             buffer << std::setw(2) << static_cast<unsigned>(v[i]);
         }
         return buffer.str();
     }
 
-    custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out) {
+    custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
+    {
         UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
         auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
@@ -438,7 +492,8 @@ namespace WebUtils {
         co_return;
     }
 
-    custom_types::Helpers::Coroutine WaitForGifDownload(std::string url, HMUI::ImageView* out) {
+    custom_types::Helpers::Coroutine WaitForGifDownload(std::string url, HMUI::ImageView* out)
+    {
         UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(url));
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
         auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->get_downloadHandler());
@@ -446,15 +501,18 @@ namespace WebUtils {
         Gif gif(gifDataArr);
         int error = gif.Parse();
         co_yield nullptr;
-        if (!error && gif.Slurp()) {
+        if (!error && gif.Slurp())
+        {
             co_yield nullptr;
             auto texture = gif.get_frame(0);
             auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)gif.get_width(), (float)gif.get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
             out->set_sprite(sprite);
-        } else {
+        }
+        else
+        {
             INFO("Failed to read gif with error code %d", error);
         }
         co_return;
     }
 
-}  // namespace WebUtils
+} // namespace WebUtils

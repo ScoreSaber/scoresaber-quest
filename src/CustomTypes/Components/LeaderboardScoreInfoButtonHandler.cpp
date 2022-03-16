@@ -38,7 +38,7 @@ namespace ScoreSaber::CustomTypes::Components
         for (int i = 0; i < 10; i++)
         {
             bool active = i < count;
-            INFO("Setting button %d %s", i, active ? "Active" : "Inactive");
+            // INFO("Setting button %d %s", i, active ? "Active" : "Inactive");
             buttons->values[i]->get_gameObject()->SetActive(active);
         }
     }
