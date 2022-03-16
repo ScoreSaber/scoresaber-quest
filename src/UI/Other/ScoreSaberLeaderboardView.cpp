@@ -33,7 +33,7 @@
 #include "Sprites.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
-#include "UI/Other/Banner.hpp"
+
 #include "UI/Other/PanelView.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Rect.hpp"
@@ -64,8 +64,9 @@ using namespace ScoreSaber::Services;
 
 namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
+    ScoreSaber::UI::Other::Banner* ScoreSaberBanner;
+
     ScoreSaber::UI::Other::PanelView* view;
-    ScoreSaber::UI::Other::Banner* scoreSaberBanner;
     ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
 
     PlatformLeaderboardViewController* _platformLeaderboardViewController;
@@ -144,11 +145,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             // RedBrumbler top panel
 
-            scoreSaberBanner = ::ScoreSaber::UI::Other::Banner::Create(self->get_transform());
+            ScoreSaberBanner = ::ScoreSaber::UI::Other::Banner::Create(self->get_transform());
             auto playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(self->get_transform());
-            scoreSaberBanner->playerProfileModal = playerProfileModal;
+            ScoreSaberBanner->playerProfileModal = playerProfileModal;
 
-            scoreSaberBanner->Prompt("Signing into ScoreSaber...", false, 5.0f, nullptr);
+            ScoreSaberBanner->Prompt("Signing into ScoreSaber...", false, 5.0f, nullptr);
             auto newGo = GameObject::New_ctor();
             auto t = newGo->get_transform();
             t->get_transform()->SetParent(self->get_transform(), false);
@@ -165,13 +166,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 switch (loginStatus)
                 {
                     case PlayerService::LoginStatus::Success: {
-                        scoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
+                        ScoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
                                                  nullptr);
                         _platformLeaderboardViewController->Refresh(true, true);
                         break;
                     }
                     case PlayerService::LoginStatus::Error: {
-                        scoreSaberBanner->Prompt("<color=#89fc81>Authentication failed</color>", false, 5.0f, nullptr);
+                        ScoreSaberBanner->Prompt("<color=#89fc81>Authentication failed</color>", false, 5.0f, nullptr);
                         break;
                     }
                 }
@@ -227,6 +228,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 loadingControl->Hide();
                                 leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores);
                                 SetPlayButtonState(true);
+                                SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
                                 // UMBY: If upload daemon is uploading, disable panel view
                             }
                         }
@@ -246,6 +248,35 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             },
             _filterAroundCountry);
         // }
+    }
+
+    void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo)
+    {
+        if (leaderboardInfo.ranked)
+        {
+            if (leaderboardInfo.positiveModifiers)
+            {
+                ScoreSaberBanner->set_status("Ranked (DA = +0.02, GN +0.04)", leaderboardInfo.id);
+            }
+            else
+            {
+                ScoreSaberBanner->set_status("Ranked (modifiers disabled)", leaderboardInfo.id);
+            }
+            return;
+        }
+
+        if (leaderboardInfo.qualified)
+        {
+            ScoreSaberBanner->set_status("Qualified", leaderboardInfo.id);
+            return;
+        }
+
+        if (leaderboardInfo.loved)
+        {
+            ScoreSaberBanner->set_status("Loved", leaderboardInfo.id);
+            return;
+        }
+        ScoreSaberBanner->set_status("Unranked", leaderboardInfo.id);
     }
 
     int GetPlayerScoreIndex(std::vector<Data::Score> scores)

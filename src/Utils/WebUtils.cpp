@@ -346,51 +346,52 @@ namespace WebUtils
     void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished)
     {
         std::thread t([url, timeout, finished] {
-                          std::string val;
-                          // Init curl
-                          auto* curl = curl_easy_init();
-                          struct curl_slist* headers = NULL;
-                          headers = curl_slist_append(headers, "Accept: */*");
-                        //   headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
+            std::string val;
+            // Init curl
+            auto* curl = curl_easy_init();
+            struct curl_slist* headers = NULL;
+            headers = curl_slist_append(headers, "Accept: */*");
+            //   headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
 
-                          curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-                          
-                          if (cookie != "")
-                          {
-                              curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
-                          }
-                          // Set headers
-                          curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
 
-                          curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
+            if (cookie != "")
+            {
+                curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+            }
+            // Set headers
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-                          // Don't wait forever, time out after TIMEOUT seconds.
-                          curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+            curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
 
-                          // Follow HTTP redirects if necessary.
-                          curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            // Don't wait forever, time out after TIMEOUT seconds.
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
 
-                          curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-                          curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
-                                           CurlWrite_CallbackFunc_StdString);
+            // Follow HTTP redirects if necessary.
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-                          long httpCode(0);
-                          curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
-                          curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
-                          curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+                             CurlWrite_CallbackFunc_StdString);
 
-                          curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+            long httpCode(0);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
-                          auto res = curl_easy_perform(curl);
-                          /* Check for errors */
-                          if (res != CURLE_OK)
-                          {
-                              getLogger().critical("curl_easy_perform() failed: %u: %s", res,
-                                                   curl_easy_strerror(res));
-                          }
-                          curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-                          curl_easy_cleanup(curl);
-                          finished(httpCode, val); });
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+            auto res = curl_easy_perform(curl);
+            /* Check for errors */
+            if (res != CURLE_OK)
+            {
+                getLogger().critical("curl_easy_perform() failed: %u: %s", res,
+                                     curl_easy_strerror(res));
+            }
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+            curl_easy_cleanup(curl);
+            finished(httpCode, val);
+        });
         t.detach();
     }
 

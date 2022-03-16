@@ -51,9 +51,7 @@ DECLARE_CLASS_CODEGEN(
     void set_bottomText(std::string_view newText) { set_bottomText(to_utf16(newText)); };
 
     private
-    :
-
-    bool rainbow = false;
+    : bool rainbow = false;
     bool wasRainbow = false;
     float colorAngle = 0.0f;
     int scoreboardId;

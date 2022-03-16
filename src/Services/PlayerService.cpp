@@ -3,10 +3,13 @@
 
 #include "Data/Private/AuthResponse.hpp"
 #include "System/IO/Directory.hpp"
+#include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <chrono>
 
 #define STEAM_KEY_PATH "/sdcard/ModData/Mods/ScoreSaber/scoresaber_DO_NOT_SHARE.scary"
 #define SCORESABER_DATA_PATH "/sdcard/ModData/Mods/ScoreSaber"
@@ -38,7 +41,6 @@ namespace ScoreSaber::Services::PlayerService
         }
 
         // UMBY: Check if steam key is null (for release)
-
         // UMBY: Obfuscate auth url
         // UMBY: Friends
 
@@ -56,19 +58,11 @@ namespace ScoreSaber::Services::PlayerService
                 playerInfo.playerKey = authResponse.a;
                 playerInfo.serverKey = authResponse.e;
 
-                GetPlayerInfo(playerId, true, [=](std::optional<Data::Player> playerData) {
-                    if (playerData.has_value())
-                    {
-                        playerInfo.localPlayerData = playerData.value();
-                    }
-                    else
-                    {
-                        playerInfo.localPlayerData = Data::Player(playerId);
-                        INFO("Failed to get players info");
-                    }
-                    playerInfo.loginStatus = LoginStatus::Success;
-                    finished(LoginStatus::Success);
-                });
+                playerInfo.localPlayerData = Data::Player(playerId);
+
+                playerInfo.loginStatus = LoginStatus::Success;
+                finished(LoginStatus::Success);
+                UpdatePlayerInfoThread();
             }
             else
             {
@@ -113,6 +107,34 @@ namespace ScoreSaber::Services::PlayerService
             else
             {
                 finished(std::nullopt);
+            }
+        });
+    }
+
+    void UpdatePlayerInfoThread()
+    {
+        std::thread t([] {
+            while (true)
+            {
+                UpdatePlayerInfo();
+                std::this_thread::sleep_for(std::chrono::seconds(300));
+            }
+        });
+        t.detach();
+    }
+
+    void UpdatePlayerInfo()
+    {
+        QuestUI::MainThreadScheduler::Schedule([=]() {
+            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
+        });
+        GetPlayerInfo(playerInfo.localPlayerData.id, true, [=](std::optional<Data::Player> playerData) {
+            if (playerData.has_value())
+            {
+                playerInfo.localPlayerData = playerData.value();
+                QuestUI::MainThreadScheduler::Schedule([=]() {
+                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_ranking(playerInfo.localPlayerData.rank, playerInfo.localPlayerData.pp);
+                });
             }
         });
     }

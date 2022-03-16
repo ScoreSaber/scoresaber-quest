@@ -24,4 +24,7 @@ namespace ScoreSaber::Services::PlayerService
     // void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished)
     void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished);
 
+    void UpdatePlayerInfo();
+    void UpdatePlayerInfoThread();
+
 } // namespace ScoreSaber::Services::PlayerService

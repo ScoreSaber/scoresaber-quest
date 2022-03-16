@@ -4,6 +4,7 @@
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
+#include "Services/PlayerService.hpp"
 #include "Sprites.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
@@ -123,8 +124,7 @@ namespace ScoreSaber::UI::Other
         UIUtils::CreateLoadingIndicator(loadingHorizontal->get_transform());
         SetPreferredSize(loadingHorizontal, 10, 10);
 
-        auto promptRoot =
-            BeatSaberUI::CreateHorizontalLayoutGroup(get_transform());
+        auto promptRoot = BeatSaberUI::CreateHorizontalLayoutGroup(get_transform());
         promptRoot->set_childAlignment(TextAnchor::UpperLeft);
         promptRoot->set_childForceExpandWidth(false);
         promptRoot->set_spacing(1.0f);
@@ -136,16 +136,14 @@ namespace ScoreSaber::UI::Other
         promptElement->set_preferredHeight(7.0f);
         promptElement->set_preferredWidth(87.0f);
 
-        ContentSizeFitter* promptFitter =
-            promptRoot->GetComponent<ContentSizeFitter*>();
+        ContentSizeFitter* promptFitter = promptRoot->GetComponent<ContentSizeFitter*>();
         promptFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
 
         HorizontalLayoutGroup* textGroup =
             BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
         textGroup->get_rectTransform()->set_anchoredPosition({0.0f, 10.0f});
 
-        promptText =
-            BeatSaberUI::CreateText(textGroup->get_transform(), "...", false);
+        promptText = BeatSaberUI::CreateText(textGroup->get_transform(), "...", false);
         promptText->set_alignment(TMPro::TextAlignmentOptions::BottomLeft);
     }
 
@@ -169,7 +167,7 @@ namespace ScoreSaber::UI::Other
         // just make sure to have this actually assigned
         if (playerProfileModal && Object::IsNativeObjectAlive(playerProfileModal))
         {
-            playerProfileModal->Show("");
+            playerProfileModal->Show(ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id);
         }
     }
 
