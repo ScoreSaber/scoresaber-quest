@@ -1,0 +1,141 @@
+name: NDK build
+
+on:
+   workflow_dispatch:
+   push:
+      branches: [master, RedBrumbler-branch]
+      paths-ignore:
+         - '**.yml'
+         - '!.github/workflows/build-ndk.yml'
+         - '**.json'
+         - '!qpm.json'
+         - '!mod.template.json'
+         - '**.txt'
+         - '!CMakeLists.txt'
+         - '**.ps1'
+         - '!build.ps1'
+         - '!createqmod.ps1'
+         - '**.md'
+         - '.gitignore'
+   pull_request:
+      branches: master
+
+env:
+   ndkname: android-ndk-r22
+   module_id: scoresaber
+   qmodName: ScoreSaber
+
+jobs:
+   build:
+      runs-on: ubuntu-latest
+
+      steps:
+         - uses: actions/checkout@v2
+           name: Checkout
+           with:
+              submodules: true
+              lfs: true
+
+         - uses: seanmiddleditch/gha-setup-ninja@v3
+
+         - name: Create ndkpath.txt
+           run: |
+              echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
+              cat ${GITHUB_WORKSPACE}/ndkpath.txt
+
+         - name: Get QPM
+           if: steps.cache-qpm.outputs.cache-hit != 'true'
+           uses: dawidd6/action-download-artifact@v2
+           with:
+              github_token: ${{secrets.GITHUB_TOKEN}}
+              workflow: cargo-build.yml
+              name: linux-qpm-rust
+              path: QPM
+              repo: RedBrumbler/QuestPackageManager-Rust
+
+         - name: QPM Collapse
+           run: |
+              chmod +x ./QPM/qpm-rust
+              ./QPM/qpm-rust collapse
+
+         - name: QPM Dependencies Cache
+           id: cache-qpm-deps
+           uses: actions/cache@v2
+           env:
+              cache-name: cache-qpm-deps
+           with:
+              path: /home/runner/.local/share/QPM-Rust/cache
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
+
+         - name: QPM Restore
+           run: |
+              ./QPM/qpm-rust restore
+
+         - name: List Post Restore
+           run: |
+              echo includes:
+              ls -la ${GITHUB_WORKSPACE}/extern/includes
+              echo libs:
+              ls -la ${GITHUB_WORKSPACE}/extern/libs
+              echo cache:
+              ls -la $HOME/.local/share/QPM-Rust/cache
+
+         - name: Apply Legacy fix
+           run: |
+              ./QPM/qpm-rust cache legacy-fix
+
+         - name: Build
+           run: |
+              cd ${GITHUB_WORKSPACE}
+              ./QPM/qpm-rust qmod build --include_libs "lib${module_id}.so"
+              pwsh -Command ./build.ps1
+
+         - name: Create Qmod
+           run: |
+              pwsh -Command ./createqmod.ps1 ${{env.qmodName}}
+
+         - name: Get Library Name
+           id: libname
+           run: |
+              cd ./build/
+              pattern="lib${module_id}*.so"
+              files=( $pattern )
+              echo ::set-output name=NAME::"${files[0]}"
+
+         - name: Upload non-debug artifact
+           uses: actions/upload-artifact@v2
+           with:
+              name: ${{ steps.libname.outputs.NAME }}
+              path: ./build/${{ steps.libname.outputs.NAME }}
+              if-no-files-found: error
+
+         #    - name: Upload debug artifact
+         #      uses: actions/upload-artifact@v2
+         #      with:
+         #        name: debug_${{ steps.libname.outputs.NAME }}
+         #        path: ./build/debug/${{ steps.libname.outputs.NAME }}
+         #        if-no-files-found: error
+
+         - name: Upload qmod artifact
+           uses: actions/upload-artifact@v2
+           with:
+              name: ${{env.qmodName}}.qmod
+              path: ./${{ env.qmodName }}.qmod
+              if-no-files-found: error
+#    - name: Check if webhook secret set
+#      id: webhook-set
+#      run: echo ::set-output name=EXISTS::"${{secrets.DISCORD_WEBHOOK_URL != ''}}"
+#
+#    - name: Publish qmod to webhook
+#      if: ${{ steps.webhook-set.outputs.EXISTS }}
+#      uses: tsickert/discord-webhook@v3.2.0
+#      with:
+#        webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+#        content: "${{ env.CI_SHA_SHORT }} - `${{ github.event.head_commit.message }}`"
+#        username: "${{ github.repository }}"
+#        avatar-url: "http://github.com/${{ env.CI_REPOSITORY_OWNER }}.png"
+#        filename: ./${{ env.qmodName }}.qmod

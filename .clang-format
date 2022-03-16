@@ -1,0 +1,10 @@
+{ 
+    BasedOnStyle: Microsoft, 
+    IndentWidth: 4, 
+    TabWidth: 4, 
+    PointerAlignment: Left,
+    ColumnLimit: 0, 
+    NamespaceIndentation: All, 
+    IndentCaseLabels: true,
+    Language: Cpp,
+}
