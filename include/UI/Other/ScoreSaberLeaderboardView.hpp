@@ -25,6 +25,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     int GetPlayerScoreIndex(std::vector<Data::Score> scores);
     void SetErrorState(LoadingControl* loadingControl, std::string errorText = "Failed to load leaderboard, score won't upload", bool showRefreshButton = true);
 
-        void DirectionalButtonClicked(PageDirection direction);
+    void DirectionalButtonClicked(PageDirection direction);
+    void SetPlayButtonState(bool state);
     void CheckPage();
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView

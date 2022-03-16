@@ -92,6 +92,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         if (firstActivation)
         {
             StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
+
             _playButton = _standardLevelDetailViewController->standardLevelDetailView->actionButton;
 
             _platformLeaderboardViewController = self;
@@ -188,13 +189,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             return;
         }
 
-        // _playButton->get_gameObject()->set_active(false);
+        SetPlayButtonState(false);
 
         leaderboardScoreInfoButtonHandler->set_buttonCount(0);
         if (PlayerService::playerInfo.loginStatus == PlayerService::LoginStatus::Error)
         {
             SetErrorState(loadingControl, "ScoreSaber authentication failed, please restart Beat Saber", false);
-            // _playButton->get_gameObject()->set_active(true);
+            SetPlayButtonState(true);
             return;
         }
 
@@ -225,6 +226,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 loadingControl->ShowText(System::String::_get_Empty(), false);
                                 loadingControl->Hide();
                                 leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores);
+                                SetPlayButtonState(true);
                                 // UMBY: If upload daemon is uploading, disable panel view
                             }
                         }
@@ -266,6 +268,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         loadingControl->Hide();
         loadingControl->ShowText(il2cpp_utils::newcsstr(errorText), showRefreshButton);
+        SetPlayButtonState(true);
         // UMBY: set play button active
     }
 
@@ -309,4 +312,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         _platformLeaderboardViewController->Refresh(true, true);
         CheckPage();
     }
+
+    void SetPlayButtonState(bool state)
+    {
+        if (_playButton != nullptr)
+        {
+            _playButton->get_gameObject()->set_active(state);
+        }
+    }
+
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
