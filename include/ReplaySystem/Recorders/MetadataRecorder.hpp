@@ -1,5 +1,4 @@
-
-
+#pragma once
 #include "Data/Metadata.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/BeatmapObjectSpawnController_InitData.hpp"

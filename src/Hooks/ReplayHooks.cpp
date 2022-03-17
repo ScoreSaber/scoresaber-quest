@@ -6,9 +6,12 @@
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include "GlobalNamespace/PlayerTransforms.hpp"
+#include "GlobalNamespace/SaberManager.hpp"
 #include "GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/StandardLevelGameplayManager.hpp"
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
+#include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "System/Action.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
@@ -27,14 +30,24 @@ static ReplayFile* replay;
 
 GlobalNamespace::GameplayCoreSceneSetupData* _gameplayCoreSceneSetupData;
 BeatmapObjectSpawnController::InitData* _beatmapObjectSpawnControllerInitData;
+AudioTimeSyncController* _audioTimeSyncController;
 
 MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::Start, void, AudioTimeSyncController* self)
 {
     AudioTimeSyncController_Start(self);
+
+    _audioTimeSyncController = self;
+
     MainSettingsModelSO* mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
+    SaberManager* saberManager = ArrayUtil::First(Resources::FindObjectsOfTypeAll<SaberManager*>());
+
+    INFO("mainCamera address: %p", mainCamera);
+    INFO("Saber manager address: %p", saberManager);
+
     Recorders::MetadataRecorder::LevelStarted(_gameplayCoreSceneSetupData->difficultyBeatmap, mainSettingsModelSO,
-                                              _gameplayCoreSceneSetupData->previewBeatmapLevel, self,
+                                              _gameplayCoreSceneSetupData->previewBeatmapLevel, _audioTimeSyncController,
                                               _gameplayCoreSceneSetupData, _beatmapObjectSpawnControllerInitData);
+    Recorders::PoseRecorder::LevelStarted(saberManager, _audioTimeSyncController);
 }
 
 MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameplayCoreSceneSetupData_ctor, "", "GameplayCoreSceneSetupData", ".ctor", void,
@@ -56,6 +69,16 @@ MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(BeatmapObjectSpawnControllerInitData_c
     INFO("BeatmapObjectSpawnControllerInitData ctor hit");
     BeatmapObjectSpawnControllerInitData_ctor(self, beatsPerMinute, noteLinesCount, noteJumpMovementSpeed, noteJumpStartBeatOffset, jumpOffsetY);
     _beatmapObjectSpawnControllerInitData = self;
+}
+
+MAKE_AUTO_HOOK_MATCH(PlayerTransforms_Update, &PlayerTransforms::Update, void, PlayerTransforms* self)
+{
+    PlayerTransforms_Update(self);
+
+    if (_audioTimeSyncController != nullptr)
+    {
+        Recorders::PoseRecorder::Tick(self->get_headPseudoLocalPos(), self->get_headPseudoLocalRot());
+    }
 }
 
 MAKE_AUTO_HOOK_MATCH(StandardLevelGameplayManager_HandleGameEnergyDidReach0, &StandardLevelGameplayManager::HandleGameEnergyDidReach0, void,
