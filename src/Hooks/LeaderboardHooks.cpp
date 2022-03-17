@@ -18,6 +18,8 @@
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "HMUI/SegmentedControl.hpp"
 #include "Services/UploadService.hpp"
+#include "System/Guid.hpp"
+#include "Utils/StringUtils.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
@@ -60,7 +62,8 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
     self->leaderboardTableView->SetScores(System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor(), -1);
     LoadingControl* loadingControl = self->loadingControl;
     loadingControl->ShowLoading(System::String::_get_Empty());
-    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(self->difficultyBeatmap, self->leaderboardTableView, self->_get__scoresScope(), loadingControl, "lol");
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(self->difficultyBeatmap, self->leaderboardTableView, self->_get__scoresScope(), loadingControl,
+                                                                         StringUtils::Il2cppStrToStr(System::Guid::NewGuid().ToString()));
 }
 
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell, &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,

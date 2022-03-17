@@ -50,6 +50,7 @@
 #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/QuestUI.hpp"
+#include <chrono>
 
 using namespace HMUI;
 using namespace QuestUI;
@@ -190,7 +191,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         {
             return;
         }
-        // UMBY: Check uploading
+
         if (!_activated)
         {
             return;
@@ -211,53 +212,58 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             return;
         }
 
-        // UMBY: Implement delay to prevent leaderboard spam
-        // if (_currentLeaderboardRefreshId == refreshId)
-        // {
-        LeaderboardService::GetLeaderboardData(
-            difficultyBeatmap, scope, _leaderboardPage,
-            [=](Data::InternalLeaderboard internalLeaderboard) {
-                QuestUI::MainThreadScheduler::Schedule([=]() {
-                    if (internalLeaderboard.leaderboard.has_value())
-                    {
-                        int playerScoreIndex = GetPlayerScoreIndex(internalLeaderboard.leaderboard.value().scores);
-                        if (internalLeaderboard.leaderboardItems->get_Count() != 0)
-                        {
-                            if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && playerScoreIndex == -1)
+        _currentLeaderboardRefreshId = refreshId;
+
+        std::thread t([difficultyBeatmap, scope, loadingControl, tableView, refreshId] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            if (_currentLeaderboardRefreshId == refreshId)
+            {
+                LeaderboardService::GetLeaderboardData(
+                    difficultyBeatmap, scope, _leaderboardPage,
+                    [=](Data::InternalLeaderboard internalLeaderboard) {
+                        QuestUI::MainThreadScheduler::Schedule([=]() {
+                            if (internalLeaderboard.leaderboard.has_value())
                             {
-                                SetErrorState(loadingControl, "You haven't set a score on this leaderboard", true);
+                                int playerScoreIndex = GetPlayerScoreIndex(internalLeaderboard.leaderboard.value().scores);
+                                if (internalLeaderboard.leaderboardItems->get_Count() != 0)
+                                {
+                                    if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && playerScoreIndex == -1)
+                                    {
+                                        SetErrorState(loadingControl, "You haven't set a score on this leaderboard", true);
+                                    }
+                                    else
+                                    {
+                                        tableView->SetScores(internalLeaderboard.leaderboardItems, playerScoreIndex);
+                                        loadingControl->ShowText(System::String::_get_Empty(), false);
+                                        loadingControl->Hide();
+                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores);
+                                        SetPlayButtonState(true);
+                                        SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
+                                        // UMBY: If upload daemon is uploading, disable panel view
+                                    }
+                                }
+                                else
+                                {
+                                    if (_leaderboardPage > 1)
+                                    {
+                                        SetErrorState(loadingControl, "No scores on this page");
+                                    }
+                                    else
+                                    {
+                                        SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
+                                    }
+                                }
                             }
                             else
                             {
-                                tableView->SetScores(internalLeaderboard.leaderboardItems, playerScoreIndex);
-                                loadingControl->ShowText(System::String::_get_Empty(), false);
-                                loadingControl->Hide();
-                                leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores);
-                                SetPlayButtonState(true);
-                                SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
-                                // UMBY: If upload daemon is uploading, disable panel view
+                                SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
                             }
-                        }
-                        else
-                        {
-                            if (_leaderboardPage > 1)
-                            {
-                                SetErrorState(loadingControl, "No scores on this page");
-                            }
-                            else
-                            {
-                                SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
-                    }
-                });
-            },
-            _filterAroundCountry);
-        // }
+                        });
+                    },
+                    _filterAroundCountry);
+            }
+        });
+        t.detach();
     }
 
     void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo)
