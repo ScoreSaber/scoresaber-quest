@@ -297,12 +297,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     int GetPlayerScoreIndex(std::vector<Data::Score> scores)
     {
-
-        // INFO("Local playerId: %s", PlayerService::playerInfo.localPlayerData.id.c_str());
-
         for (int i = 0; i < scores.size(); i++)
         {
-            // INFO("playerId on leaderboard: %s", scores[i].leaderboardPlayerInfo.id->c_str());
             if (scores[i].leaderboardPlayerInfo.id == PlayerService::playerInfo.localPlayerData.id)
             {
                 return i;
