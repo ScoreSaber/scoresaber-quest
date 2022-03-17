@@ -26,7 +26,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::PoseRecorder
 
     void LevelStarted(SaberManager* saberManager, AudioTimeSyncController* audioTimeSyncController)
     {
-        _vrPoseGroup.empty();
+        _vrPoseGroup.clear();
         _audioTimeSyncController = audioTimeSyncController;
         _controllerLeft = saberManager->leftSaber->GetComponentInParent<VRController*>();
         _controllerRight = saberManager->rightSaber->GetComponentInParent<VRController*>();

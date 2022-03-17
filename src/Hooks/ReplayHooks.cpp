@@ -14,6 +14,7 @@
 #include "ReplaySystem/Recorders/HeightEventRecorder.hpp"
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
+#include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
 #include "System/Action.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
@@ -43,12 +44,14 @@ MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::St
     MainSettingsModelSO* mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
     SaberManager* saberManager = ArrayUtil::First(Resources::FindObjectsOfTypeAll<SaberManager*>());
     PlayerHeightDetector* playerHeightDetector = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlayerHeightDetector*>());
+    ScoreController* scoreController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreController*>());
 
     Recorders::MetadataRecorder::LevelStarted(_gameplayCoreSceneSetupData->difficultyBeatmap, mainSettingsModelSO,
                                               _gameplayCoreSceneSetupData->previewBeatmapLevel, _audioTimeSyncController,
                                               _gameplayCoreSceneSetupData, _beatmapObjectSpawnControllerInitData);
     Recorders::PoseRecorder::LevelStarted(saberManager, _audioTimeSyncController);
     Recorders::HeightEventRecorder::LevelStarted(playerHeightDetector, _audioTimeSyncController);
+    Recorders::ScoreEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
 }
 
 MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameplayCoreSceneSetupData_ctor, "", "GameplayCoreSceneSetupData", ".ctor", void,

@@ -16,13 +16,12 @@ using namespace ScoreSaber::Data::Private;
 namespace ScoreSaber::ReplaySystem::Recorders::HeightEventRecorder
 {
     AudioTimeSyncController* _audioTimeSyncController;
-
     PlayerHeightDetector* _playerHeightDetector;
     vector<HeightEvent> _heightKeyframes;
 
     void LevelStarted(PlayerHeightDetector* playerHeightDetector, AudioTimeSyncController* audioTimeSyncController)
     {
-        _heightKeyframes.empty();
+        _heightKeyframes.clear();
         _audioTimeSyncController = audioTimeSyncController;
         _playerHeightDetector = playerHeightDetector;
         std::function<void(float)> fun = [&](float x) {
