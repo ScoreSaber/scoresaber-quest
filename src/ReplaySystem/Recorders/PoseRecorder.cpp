@@ -34,19 +34,25 @@ namespace ScoreSaber::ReplaySystem::Recorders::PoseRecorder
 
     void Tick(Vector3 headPos, Quaternion headRot)
     {
+        Vector3 leftControllerPosition = _controllerLeft->get_position();
+        Quaternion leftControllerRotation = _controllerLeft->get_rotation();
+
+        Vector3 rightControllerPosition = _controllerRight->get_position();
+        Quaternion rightControllerRotation = _controllerRight->get_rotation();
+
         int fps = (int)(1 / Time::get_unscaledDeltaTime());
         _vrPoseGroup.push_back(VRPoseGroup(
             VRPose(VRPosition(headPos.x, headPos.y,
                               headPos.z),
                    VRRotation(headRot.x,
                               headRot.y, headRot.z, headRot.w)),
-            VRPose(VRPosition(_controllerLeft->get_position().x, _controllerLeft->get_position().y,
-                              _controllerLeft->get_position().z),
-                   VRRotation(_controllerLeft->get_rotation().x,
-                              _controllerLeft->get_rotation().y, _controllerLeft->get_rotation().z, _controllerLeft->get_rotation().w)),
-            VRPose(VRPosition(_controllerRight->get_position().x, _controllerRight->get_position().y, _controllerRight->get_position().z),
-                   VRRotation(_controllerRight->get_rotation().x, _controllerRight->get_rotation().y, _controllerRight->get_rotation().z,
-                              _controllerRight->get_rotation().w)),
+            VRPose(VRPosition(leftControllerPosition.x, leftControllerPosition.y,
+                              leftControllerPosition.z),
+                   VRRotation(leftControllerRotation.x,
+                              leftControllerRotation.y, leftControllerRotation.z, leftControllerRotation.w)),
+            VRPose(VRPosition(rightControllerPosition.x, rightControllerPosition.y, rightControllerPosition.z),
+                   VRRotation(rightControllerRotation.x, rightControllerRotation.y, rightControllerRotation.z,
+                              rightControllerRotation.w)),
             fps, _audioTimeSyncController->songTime));
     }
 
