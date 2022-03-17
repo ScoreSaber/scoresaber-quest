@@ -89,6 +89,10 @@ namespace ScoreSaber::Services::UploadService
         {
             results.push_back("NF");
         }
+        if (gameplayModifiers->noFailOn0Energy && energy == -1)
+        {
+            results.push_back("NF");
+        }
         if (gameplayModifiers->instaFail)
         {
             results.push_back("IF");

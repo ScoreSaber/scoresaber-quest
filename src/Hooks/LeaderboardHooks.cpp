@@ -21,6 +21,8 @@
 #include "System/Guid.hpp"
 #include "Utils/StringUtils.hpp"
 
+#include "Data/Private/ReplayFile.hpp"
+#include "ReplaySystem/Recorders/MetadataRecorder.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
 #include "logging.hpp"
@@ -31,6 +33,8 @@ using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber;
 using namespace ScoreSaber::UI::Other;
+using namespace ScoreSaber::ReplaySystem;
+using namespace ScoreSaber::Data::Private;
 
 int _lastScopeIndex = 0;
 
@@ -104,6 +108,8 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
                      int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
                      float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
 {
+    Metadata* metadata = Recorders::MetadataRecorder::Export();
+
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
 
     std::string encryptedPacket = ScoreSaber::Services::UploadService::CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
