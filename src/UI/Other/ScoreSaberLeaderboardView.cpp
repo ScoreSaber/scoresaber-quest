@@ -365,24 +365,23 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     void SetUploadState(bool state, bool success)
     {
         QuestUI::MainThreadScheduler::Schedule([=]() {
-            if (true)
+            if (state)
             {
                 _platformLeaderboardViewController->loadingControl->ShowLoading(System::String::_get_Empty());
                 ScoreSaberBanner->set_loading(true);
-                ScoreSaberBanner->Prompt("Uploading Score", true, 5.0f,
-                                         nullptr);
+                ScoreSaberBanner->set_prompt("Uploading score...", -1);
+                // ScoreSaberBanner->Prompt("Uploading Score", true, 5.0f, nullptr);
             }
             else
             {
                 _platformLeaderboardViewController->Refresh(true, true);
                 if (success)
                 {
-                    ScoreSaberBanner->Prompt("<color=#89fc81>Score uploaded successfully</color>", false, 5.0f,
-                                             nullptr);
+                    ScoreSaberBanner->set_prompt("<color=#89fc81>Score uploaded successfully</color>", 5);
                 }
                 else
                 {
-                    ScoreSaberBanner->Prompt("<color=#89fc81>Upload failed</color>", false, 5.0f, nullptr);
+                    ScoreSaberBanner->set_prompt("<color=#89fc81>Upload failed</color>", 5);
                 }
             }
         });

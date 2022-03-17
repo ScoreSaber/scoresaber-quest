@@ -104,7 +104,7 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
 
     std::string encryptedPacket = ScoreSaber::Services::UploadService::CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
-    ScoreSaber::Services::UploadService::UploadScore(encryptedPacket, [&](bool success) {
-        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
+    ScoreSaber::Services::UploadService::UploadScore(encryptedPacket, [=](bool success) {
+        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, success);
     });
 }

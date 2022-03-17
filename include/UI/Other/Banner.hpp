@@ -36,6 +36,7 @@ DECLARE_CLASS_CODEGEN(
     void OpenSongInBrowser();
 
     void set_rainbow(bool value);
+    void set_prompt(std::string text, int dismissTime);
     void set_color(UnityEngine::Color color);
 
     void set_ranking(int rank, float pp);

@@ -22,6 +22,8 @@
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <chrono>
 
 DEFINE_TYPE(ScoreSaber::UI::Other, Banner);
 
@@ -255,6 +257,21 @@ namespace ScoreSaber::UI::Other
         co_return;
     }
 
+    void Banner::set_prompt(std::string text, int dismissTime)
+    {
+        promptText->set_text(il2cpp_utils::newcsstr(text));
+        if (dismissTime != -1)
+        {
+            std::thread t([dismissTime, this] {
+                std::this_thread::sleep_for(std::chrono::seconds(dismissTime));
+                QuestUI::MainThreadScheduler::Schedule([=]() {
+                    this->promptText->set_text(il2cpp_utils::newcsstr(""));
+                });
+            });
+            t.detach();
+        }
+    }
+
     void Banner::set_color(UnityEngine::Color color)
     {
         bgImage->set_color(color);
@@ -263,11 +280,8 @@ namespace ScoreSaber::UI::Other
     void Banner::set_loading(bool value)
     {
         loadingVertical->get_gameObject()->SetActive(value);
-        if (value)
-        {
-            set_topText("");
-            set_bottomText("");
-        }
+        topText->get_gameObject()->SetActive(!value);
+        bottomText->get_gameObject()->SetActive(!value);
     }
 
     void Banner::set_ranking(int rank, float pp)
@@ -286,10 +300,12 @@ namespace ScoreSaber::UI::Other
     void Banner::set_topText(std::u16string_view newText)
     {
         topText->set_text(il2cpp_utils::newcsstr(u"<i>" + std::u16string(newText) + u"</i>"));
+        topText->get_gameObject()->SetActive(true);
     }
 
     void Banner::set_bottomText(std::u16string_view newText)
     {
         bottomText->set_text(il2cpp_utils::newcsstr(u"<i>" + std::u16string(newText) + u"</i>"));
+        bottomText->get_gameObject()->SetActive(true);
     }
 } // namespace ScoreSaber::UI::Other

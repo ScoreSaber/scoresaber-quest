@@ -29,12 +29,10 @@ namespace ScoreSaber::Services::UploadService
         WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
             if (code == 200)
             {
-                INFO("Calling uploadscore.finished(true)");
                 finished(true);
             }
             else
             {
-                INFO("Calling uploadscore.finished(false)");
                 finished(false);
             }
             uploading = false;
