@@ -15,6 +15,7 @@ namespace ScoreSaber::Data::Private
     {
         VRPosition();
         VRPosition(float X, float Y, float Z);
+        VRPosition(UnityEngine::Vector3 vector);
         float X;
         float Y;
         float Z;
@@ -24,6 +25,7 @@ namespace ScoreSaber::Data::Private
     {
         VRRotation();
         VRRotation(float X, float Y, float Z, float W);
+        VRRotation(UnityEngine::Quaternion quaternion);
         float X;
         float Y;
         float Z;

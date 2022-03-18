@@ -2,9 +2,12 @@
 #include "hooks.hpp"
 #include "logging.hpp"
 
+#include "GlobalNamespace/CutScoreBuffer.hpp"
 #include "GlobalNamespace/GameScenesManager.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator_InitData.hpp"
+#include "GlobalNamespace/ISaberSwingRatingCounterDidFinishReceiver.hpp"
+#include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "questui/shared/QuestUI.hpp"
 
 #include "UI/Other/Banner.hpp"
@@ -53,7 +56,6 @@ extern "C" __attribute((visibility("default"))) void load()
     il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
     QuestUI::Init();
     custom_types::Register::AutoRegister();
-
     Hooks::InstallHooks(ScoreSaber::Logging::getLogger());
     TeamUtils::Download();
 }

@@ -10,6 +10,13 @@ namespace ScoreSaber::Data::Private
         Z = _Z;
     }
 
+    VRPosition::VRPosition(UnityEngine::Vector3 vector)
+    {
+        X = vector.x;
+        Y = vector.y;
+        Z = vector.z;
+    }
+
     VRPosition::VRPosition(){};
 
     VRRotation::VRRotation(float _X, float _Y, float _Z, float _W)
@@ -18,6 +25,14 @@ namespace ScoreSaber::Data::Private
         Y = _Y;
         Z = _Z;
         W = _W;
+    }
+
+    VRRotation::VRRotation(UnityEngine::Quaternion quaternion)
+    {
+        X = quaternion.x;
+        Y = quaternion.y;
+        Z = quaternion.z;
+        W = quaternion.w;
     }
 
     VRRotation::VRRotation(){};

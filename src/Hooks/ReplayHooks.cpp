@@ -15,14 +15,15 @@
 #include "ReplaySystem/Recorders/EnergyEventRecorder.hpp"
 #include "ReplaySystem/Recorders/HeightEventRecorder.hpp"
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
-// #include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
+#include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
 #include "System/Action.hpp"
 #include "UnityEngine/Resources.hpp"
-// #include "Zenject/DiContainer.hpp"
-// #include "Zenject/MemoryPool_1.hpp"
-// #include "Zenject/SceneContext.hpp"
+#include "Zenject/DiContainer.hpp"
+#include "Zenject/MemoryPoolIdInitialSizeMaxSizeBinder_1.hpp"
+#include "Zenject/MemoryPool_1.hpp"
+#include "Zenject/SceneContext.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "hooks.hpp"
 #include "logging.hpp"
@@ -31,6 +32,7 @@
 
 using namespace UnityEngine;
 using namespace QuestUI;
+using namespace Zenject;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 using namespace ScoreSaber::ReplaySystem;
@@ -60,6 +62,7 @@ MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::St
     Recorders::HeightEventRecorder::LevelStarted(playerHeightDetector, _audioTimeSyncController);
     Recorders::ScoreEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
     Recorders::EnergyEventRecorder::LevelStarted(gameEnergyCountry, _audioTimeSyncController);
+    Recorders::NoteEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
 }
 
 MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameplayCoreSceneSetupData_ctor, "", "GameplayCoreSceneSetupData", ".ctor", void,
@@ -83,14 +86,14 @@ MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(BeatmapObjectSpawnControllerInitData_c
     _beatmapObjectSpawnControllerInitData = self;
 }
 
-// MAKE_AUTO_HOOK_MATCH(StandardGameplayInstaller_InstallBindings, &StandardGameplayInstaller::InstallBindings, void, StandardGameplayInstaller* self)
-// {
-//     StandardGameplayInstaller_InstallBindings(self);
-//     Zenject::DiContainer* container = self->get_Container();
-
-//     container->BindMemoryPool(classof(Recorders::NoteEventRecorder::SwingFinisher), Zenject::MemoryPool_1<Recorders::NoteEventRecorder::SwingFinisher*>)
-//     container->Inject()
-// }
+MAKE_AUTO_HOOK_MATCH(StandardGameplayInstaller_InstallBindings, &StandardGameplayInstaller::InstallBindings, void, StandardGameplayInstaller* self)
+{
+    StandardGameplayInstaller_InstallBindings(self);
+    DiContainer* container = self->get_Container();
+    container->BindMemoryPool<Recorders::NoteEventRecorder::SwingFinisher*, MemoryPool_1<Recorders::NoteEventRecorder::SwingFinisher*>*>()->WithInitialSize(64);
+    auto finisherPool = container->Resolve<MemoryPool_1<Recorders::NoteEventRecorder::SwingFinisher*>*>();
+    Recorders::NoteEventRecorder::SetPool(finisherPool);
+}
 
 MAKE_AUTO_HOOK_MATCH(PlayerTransforms_Update, &PlayerTransforms::Update, void, PlayerTransforms* self)
 {
