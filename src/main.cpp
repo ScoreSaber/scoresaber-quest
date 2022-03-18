@@ -2,12 +2,9 @@
 #include "hooks.hpp"
 #include "logging.hpp"
 
-#include "GlobalNamespace/CutScoreBuffer.hpp"
 #include "GlobalNamespace/GameScenesManager.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator_InitData.hpp"
-#include "GlobalNamespace/ISaberSwingRatingCounterDidFinishReceiver.hpp"
-#include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "questui/shared/QuestUI.hpp"
 
 #include "UI/Other/Banner.hpp"

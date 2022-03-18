@@ -14,6 +14,4 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::FlowCoordinators, ScoreSaberFlowCoordinato
 
                       DECLARE_INSTANCE_FIELD_DEFAULT(ScoreSaber::UI::ViewControllers::GlobalViewController*, globalViewController, nullptr);
                       DECLARE_INSTANCE_FIELD_DEFAULT(ScoreSaber::UI::ViewControllers::FAQViewController*, faqViewController, nullptr);
-                      DECLARE_INSTANCE_FIELD_DEFAULT(ScoreSaber::UI::ViewControllers::TeamViewController*, teamViewController, nullptr);
-
-)
+                      DECLARE_INSTANCE_FIELD_DEFAULT(ScoreSaber::UI::ViewControllers::TeamViewController*, teamViewController, nullptr);)

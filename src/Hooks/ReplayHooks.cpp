@@ -72,7 +72,6 @@ MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameplayCoreSceneSetupData_ctor, "", "
                                           GlobalNamespace::PracticeSettings* practiceSettings, bool useTestNoteCutSoundEffects,
                                           GlobalNamespace::EnvironmentInfoSO* environmentInfo, GlobalNamespace::ColorScheme* colorScheme)
 {
-    INFO("GameplayCoreSceneSetupData ctor hit");
     GameplayCoreSceneSetupData_ctor(self, difficultyBeatmap, previewBeatmapLevel, gameplayModifiers, playerSpecificSettings, practiceSettings, useTestNoteCutSoundEffects, environmentInfo, colorScheme);
     _gameplayCoreSceneSetupData = self;
 }
@@ -81,7 +80,6 @@ MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(BeatmapObjectSpawnControllerInitData_c
                                           BeatmapObjectSpawnController::InitData* self, float beatsPerMinute,
                                           int noteLinesCount, float noteJumpMovementSpeed, float noteJumpStartBeatOffset, float jumpOffsetY)
 {
-    INFO("BeatmapObjectSpawnControllerInitData ctor hit");
     BeatmapObjectSpawnControllerInitData_ctor(self, beatsPerMinute, noteLinesCount, noteJumpMovementSpeed, noteJumpStartBeatOffset, jumpOffsetY);
     _beatmapObjectSpawnControllerInitData = self;
 }

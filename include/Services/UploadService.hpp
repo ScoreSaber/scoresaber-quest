@@ -1,3 +1,4 @@
+#pragma once
 #include "GlobalNamespace/GameplayModifiers.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 

@@ -24,6 +24,7 @@ using namespace ScoreSaber::Data::Private;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder, SwingFinisher);
 
+// Swing Finisher
 namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 {
 
@@ -49,6 +50,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
 } // namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
+// NoteEventRecorder
 namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 {
 
@@ -93,7 +95,6 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
         NoteID noteID = NoteID(noteData->time, noteData->lineIndex, (int)noteData->noteLineLayer, (int)noteData->colorType, (int)noteData->cutDirection);
         if (noteData->colorType == ColorType::None)
         {
-            INFO("adding bomb cut");
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Bomb, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
                                                (int)noteCutInfo.heldRef.directionOK, (int)noteCutInfo.heldRef.cutDirDeviation,
                                                0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
@@ -116,16 +117,12 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
     void SwingFinisher_didFinish(SwingFinisher* swingFinisher)
     {
-        INFO("SwingFinisher_didFinish: %.1f", swingFinisher->noteCutInfo.cutPoint.x);
         _noteKeyframes.push_back(NoteEvent(swingFinisher->noteId, NoteEventType::GoodCut, VRPosition(swingFinisher->noteCutInfo.cutPoint),
                                            VRPosition(swingFinisher->noteCutInfo.cutNormal), VRPosition(swingFinisher->noteCutInfo.saberDir),
                                            (int)swingFinisher->noteCutInfo.saberType,
                                            (int)swingFinisher->noteCutInfo.directionOK, (int)swingFinisher->noteCutInfo.cutDirDeviation,
                                            0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
-
-        INFO("about to Despawn from _finisherPool");
         _finisherPool->Despawn(swingFinisher);
-        INFO("_finisherPool despawned");
     }
 
     void ScoreController_noteWasMissedEvent(NoteData* noteData, int multiplier)
