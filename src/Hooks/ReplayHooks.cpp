@@ -10,14 +10,19 @@
 #include "GlobalNamespace/PlayerTransforms.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
 #include "GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp"
+#include "GlobalNamespace/StandardGameplayInstaller.hpp"
 #include "GlobalNamespace/StandardLevelGameplayManager.hpp"
 #include "ReplaySystem/Recorders/EnergyEventRecorder.hpp"
 #include "ReplaySystem/Recorders/HeightEventRecorder.hpp"
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
+// #include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
 #include "System/Action.hpp"
 #include "UnityEngine/Resources.hpp"
+// #include "Zenject/DiContainer.hpp"
+// #include "Zenject/MemoryPool_1.hpp"
+// #include "Zenject/SceneContext.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "hooks.hpp"
 #include "logging.hpp"
@@ -77,6 +82,15 @@ MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(BeatmapObjectSpawnControllerInitData_c
     BeatmapObjectSpawnControllerInitData_ctor(self, beatsPerMinute, noteLinesCount, noteJumpMovementSpeed, noteJumpStartBeatOffset, jumpOffsetY);
     _beatmapObjectSpawnControllerInitData = self;
 }
+
+// MAKE_AUTO_HOOK_MATCH(StandardGameplayInstaller_InstallBindings, &StandardGameplayInstaller::InstallBindings, void, StandardGameplayInstaller* self)
+// {
+//     StandardGameplayInstaller_InstallBindings(self);
+//     Zenject::DiContainer* container = self->get_Container();
+
+//     container->BindMemoryPool(classof(Recorders::NoteEventRecorder::SwingFinisher), Zenject::MemoryPool_1<Recorders::NoteEventRecorder::SwingFinisher*>)
+//     container->Inject()
+// }
 
 MAKE_AUTO_HOOK_MATCH(PlayerTransforms_Update, &PlayerTransforms::Update, void, PlayerTransforms* self)
 {

@@ -35,7 +35,6 @@ namespace ScoreSaber::ReplaySystem::Recorders::EnergyEventRecorder
 
     void GameEnergyCounter_gameEnergyDidChangeEvent(float energy)
     {
-        INFO("energy event: %.1f", energy);
         _energyKeyFrames.push_back(EnergyEvent(energy, _audioTimeSyncController->songTime));
     }
 
