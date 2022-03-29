@@ -9,6 +9,7 @@
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "static.hpp"
 #include <chrono>
 
 #define STEAM_KEY_PATH "/sdcard/ModData/Mods/ScoreSaber/scoresaber_DO_NOT_SHARE.scary"
@@ -46,10 +47,9 @@ namespace ScoreSaber::Services::PlayerService
 
         std::string postData = "at=2&playerId=" + playerId + "&nonce=" + steamKey + "&friends=3692740027462863,76561198064659288,76561198283584459,76561198278902434,76561198353781972,76561199210789241&name=nah";
 
-        std::string url = "http://192.168.1.8:9999/api/game/auth";
-        // std::string url = "https://scoresaber.com/api/game/auth";
+        std::string authUrl = ScoreSaber::Static::baseUrl + "/api/game/auth";
 
-        WebUtils::PostAsync(url, postData, 6000, [=](long code, std::string result) {
+        WebUtils::PostAsync(authUrl, postData, 6000, [=](long code, std::string result) {
             if (code == 200)
             {
                 rapidjson::Document jsonDocument;
@@ -76,7 +76,7 @@ namespace ScoreSaber::Services::PlayerService
     void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished)
     {
 
-        std::string url = string_format("http://192.168.1.8:4000/api/player/%s", playerId.c_str());
+        std::string url = string_format("%s/api/player/%s", ScoreSaber::Static::baseUrl.c_str(), playerId.c_str());
 
         // std::string url = string_format("https://scoresaber.com/api/player/%s", playerId.c_str());
 

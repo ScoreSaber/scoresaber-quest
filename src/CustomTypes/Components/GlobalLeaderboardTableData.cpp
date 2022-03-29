@@ -16,6 +16,7 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/QuestUI.hpp"
+#include "static.hpp"
 
 #include "Data/PlayerCollection.hpp"
 #include "UI/ViewControllers/GlobalViewController.hpp"
@@ -95,23 +96,23 @@ namespace ScoreSaber::CustomTypes::Components
 
     std::string GlobalLeaderboardTableData::get_leaderboardURL()
     {
-        std::string baseUrl = "http://192.168.1.8:9999/api/game/players";
+        std::string playersUrl = ScoreSaber::Static::baseUrl + "/api/game/players";
         switch (leaderboardType)
         {
             default:
                 [[fallthrough]];
             case LeaderboardType::Global:
                 // Global leaderboard
-                return string_format("%s?page=%d", baseUrl.c_str(), page);
+                return string_format("%s?page=%d", playersUrl.c_str(), page);
                 break;
             case LeaderboardType::AroundYou:
-                return string_format("%s/around-player", baseUrl.c_str());
+                return string_format("%s/around-player", playersUrl.c_str());
                 break;
             case LeaderboardType::Friends:
-                return string_format("%s/around-friends?page=%d", baseUrl.c_str(), page);
+                return string_format("%s/around-friends?page=%d", playersUrl.c_str(), page);
                 break;
             case LeaderboardType::Country:
-                return string_format("%s/around-country?page=%d", baseUrl.c_str(), page);
+                return string_format("%s/around-country?page=%d", playersUrl.c_str(), page);
                 break;
         }
     }
