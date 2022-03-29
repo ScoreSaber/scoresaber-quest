@@ -19,6 +19,7 @@
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "logging.hpp"
+#include "static.hpp"
 
 // #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp" //MAIN THREAD SCHEDULER POG
 
@@ -32,8 +33,9 @@ namespace ScoreSaber::Services::LeaderboardService
     {
         // std::string url = "https://scoresaber.com/api/game/leaderboard";
 
-        std::string url = "http://192.168.1.8:9999/api/game/leaderboard";
+        std::string url = ScoreSaber::Static::baseUrl + "/api/game/leaderboard";
 
+        INFO("%s", url.c_str());
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
         Il2CppString* levelId = previewBeatmapLevel->get_levelID();
         levelId = levelId->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty());

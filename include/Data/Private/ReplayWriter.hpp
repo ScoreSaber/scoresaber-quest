@@ -1,9 +1,9 @@
 #include "Data/Private/ReplayFile.hpp"
 #include <fstream>
-namespace ScoreSaber::Data::Private
+namespace ScoreSaber::Data::Private::ReplayWriter
 {
-    void Write(ReplayFile file);
-    int WriteMetadata(Metadata metadata, ofstream& outputStream);
+    void Write(ReplayFile* file);
+    int WriteMetadata(Metadata* metadata, ofstream& outputStream);
     int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, ofstream& outputStream);
     int WriteVRPose(VRPose vrPose, ofstream& outputStream);
     int WriteHeightEvent(HeightEvent heightEvent, ofstream& outputStream);
@@ -27,4 +27,4 @@ namespace ScoreSaber::Data::Private
     int WriteBool(float value, ofstream& outputStream);
     int WriteVRPosition(VRPosition position, ofstream& outputStream);
     int WriteVRRotation(VRRotation rotation, ofstream& outputStream);
-} // namespace ScoreSaber::Data::Private
+} // namespace ScoreSaber::Data::Private::ReplayWriter

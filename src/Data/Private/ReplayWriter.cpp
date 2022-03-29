@@ -13,43 +13,38 @@ extern "C"
 #include "logging.hpp"
 using namespace std;
 
-namespace ScoreSaber::Data::Private
+namespace ScoreSaber::Data::Private::ReplayWriter
 {
     int _pointerSize = 38;
-    void Write(ReplayFile file)
+    void Write(ReplayFile* file)
     {
-
-        INFO("1");
-        ofstream outputStream = ofstream("replay.tmp", ios::binary);
-        INFO("2");
+        ofstream outputStream = ofstream("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios::binary);
         std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
         outputStream.imbue(utf8_locale);
-        INFO("3");
-        int pointerLocation = outputStream.tellp();
 
+        int pointerLocation = outputStream.tellp();
         for (int i = 0; i < _pointerSize; i += 4)
         {
             WriteInt(0, outputStream);
         }
-        INFO("4");
+
         int metadataPointer = outputStream.tellp();
-        WriteMetadata(file.metadata, outputStream);
+        WriteMetadata(file->metadata, outputStream);
         int poseKeyframePointer = outputStream.tellp();
 
-        WriteVRPoseGroupList(file.poseKeyframes, outputStream);
+        WriteVRPoseGroupList(file->poseKeyframes, outputStream);
         int heightEventsPointer = outputStream.tellp();
-        WriteHeightChangeList(file.heightKeyframes, outputStream);
+        WriteHeightChangeList(file->heightKeyframes, outputStream);
         int noteEventsPointer = outputStream.tellp();
-        WriteNoteEventList(file.noteKeyframes, outputStream);
+        WriteNoteEventList(file->noteKeyframes, outputStream);
         int scoreEventsPointer = outputStream.tellp();
-        WriteScoreEventList(file.scoreKeyframes, outputStream);
+        WriteScoreEventList(file->scoreKeyframes, outputStream);
         int comboEventsPointer = outputStream.tellp();
-        WriteComboEventList(file.comboKeyframes, outputStream);
+        WriteComboEventList(file->comboKeyframes, outputStream);
         int multiplierEventsPointer = outputStream.tellp();
-        WriteMultiplierEventList(file.multiplierKeyframes, outputStream);
+        WriteMultiplierEventList(file->multiplierKeyframes, outputStream);
         int energyEventsPointer = outputStream.tellp();
-        WriteEnergyEventList(file.energyKeyframes, outputStream);
-        INFO("5");
+        WriteEnergyEventList(file->energyKeyframes, outputStream);
         outputStream.seekp(pointerLocation);
 
         WriteInt(metadataPointer, outputStream);
@@ -60,52 +55,46 @@ namespace ScoreSaber::Data::Private
         WriteInt(comboEventsPointer, outputStream);
         WriteInt(multiplierEventsPointer, outputStream);
         WriteInt(energyEventsPointer, outputStream);
-        INFO("6");
+
         outputStream.flush();
-        INFO("7");
+
         vector<unsigned char> bytes;
-        INFO("8");
-        ifstream tmpFile("replay.tmp", ios::binary);
+        ifstream tmpFile("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios::binary);
         unsigned char ch = tmpFile.get();
-        INFO("9");
+
         while (tmpFile.good())
         {
             bytes.push_back(ch);
             ch = tmpFile.get();
         }
-        INFO("10");
         size_t size = bytes.size();
         // unlink("replay.tmp");
-        INFO("11");
         unsigned char* uncompressed = new unsigned char[bytes.size()];
         std::copy(bytes.begin(), bytes.end(), uncompressed);
         unsigned char* compressed;
         size_t sz;
-        INFO("12");
 
         int result = simpleCompress(ELZMA_lzma, uncompressed, sizeof(uncompressed), &compressed, &sz);
-        INFO("13");
         if (result == ELZMA_E_OK)
         {
-            INFO("14");
-        }
+                }
     }
 
-    int WriteMetadata(Metadata metadata, ofstream& outputStream)
+    int WriteMetadata(Metadata* metadata, ofstream& outputStream)
     {
         int bytesWritten = 0;
-        bytesWritten += WriteString(metadata.Version, outputStream);
-        bytesWritten += WriteString(metadata.LevelID, outputStream);
-        bytesWritten += WriteInt(metadata.Difficulty, outputStream);
-        bytesWritten += WriteString(metadata.Characteristic, outputStream);
-        bytesWritten += WriteString(metadata.Environment, outputStream);
-        bytesWritten += WriteStringArray(metadata.Modifiers, outputStream);
-        bytesWritten += WriteFloat(metadata.NoteSpawnOffset, outputStream);
-        bytesWritten += WriteBool(metadata.LeftHanded, outputStream);
-        bytesWritten += WriteFloat(metadata.InitialHeight, outputStream);
-        bytesWritten += WriteFloat(metadata.RoomRotation, outputStream);
-        bytesWritten += WriteVRPosition(metadata.RoomCenter, outputStream);
-        bytesWritten += WriteFloat(metadata.FailTime, outputStream);
+        bytesWritten += WriteString(metadata->Version, outputStream);
+        bytesWritten += WriteString(metadata->LevelID, outputStream);
+        bytesWritten += WriteInt(metadata->Difficulty, outputStream);
+        bytesWritten += WriteString(metadata->Characteristic, outputStream);
+        bytesWritten += WriteString(metadata->Environment, outputStream);
+        bytesWritten += WriteStringArray(metadata->Modifiers, outputStream);
+        bytesWritten += WriteFloat(metadata->NoteSpawnOffset, outputStream);
+        bytesWritten += WriteBool(metadata->LeftHanded, outputStream);
+        bytesWritten += WriteFloat(metadata->InitialHeight, outputStream);
+        bytesWritten += WriteFloat(metadata->RoomRotation, outputStream);
+        bytesWritten += WriteVRPosition(metadata->RoomCenter, outputStream);
+        bytesWritten += WriteFloat(metadata->FailTime, outputStream);
         return bytesWritten;
     }
 
@@ -299,7 +288,7 @@ namespace ScoreSaber::Data::Private
         const char* cString = value.c_str();
         size_t stringLength = strlen(cString);
 
-        // bytesWritten += WriteInt((int)stringLength, stream);
+        bytesWritten += WriteInt((int)stringLength, outputStream);
         outputStream.write(cString, stringLength);
         bytesWritten += stringLength;
         return bytesWritten;
@@ -341,4 +330,4 @@ namespace ScoreSaber::Data::Private
         bytesWritten += WriteFloat(rotation.W, outputStream);
         return bytesWritten;
     }
-} // namespace ScoreSaber::Data::Private
+} // namespace ScoreSaber::Data::Private::ReplayWriter

@@ -108,7 +108,6 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
         }
         else
         {
-            INFO("adding bad cut");
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::BadCut, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
                                                (int)noteCutInfo.heldRef.directionOK, (int)noteCutInfo.heldRef.cutDirDeviation,
                                                0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));

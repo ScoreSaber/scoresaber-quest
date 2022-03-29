@@ -22,7 +22,7 @@
 #include "Utils/StringUtils.hpp"
 
 #include "Data/Private/ReplayFile.hpp"
-#include "ReplaySystem/Recorders/MetadataRecorder.hpp"
+#include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
 #include "logging.hpp"
@@ -108,10 +108,7 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
                      int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
                      float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
 {
-    Metadata* metadata = Recorders::MetadataRecorder::Export();
-
-    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
-
+    Recorders::MainRecorder::ExportCurrentReplay();
     std::string encryptedPacket = ScoreSaber::Services::UploadService::CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
     ScoreSaber::Services::UploadService::UploadScore(encryptedPacket, [=](bool success) {
         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, success);
