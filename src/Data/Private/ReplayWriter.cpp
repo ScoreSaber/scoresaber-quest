@@ -57,9 +57,10 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         WriteInt(energyEventsPointer, outputStream);
 
         outputStream.flush();
+        outputStream.close();
 
         vector<unsigned char> bytes;
-        ifstream tmpFile("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios::binary);
+        ifstream tmpFile("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios_base::in | ios::binary);
         unsigned char ch = tmpFile.get();
 
         while (tmpFile.good())
@@ -67,17 +68,25 @@ namespace ScoreSaber::Data::Private::ReplayWriter
             bytes.push_back(ch);
             ch = tmpFile.get();
         }
-        size_t size = bytes.size();
-        // unlink("replay.tmp");
-        unsigned char* uncompressed = new unsigned char[bytes.size()];
-        std::copy(bytes.begin(), bytes.end(), uncompressed);
+        size_t uncompressedSize = bytes.size();
+
+        INFO("bytes.size: %zu", uncompressedSize);
+        unlink("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp");
+
+        unsigned char* uncompressed = bytes.data();
         unsigned char* compressed;
         size_t sz;
-
-        int result = simpleCompress(ELZMA_lzma, uncompressed, sizeof(uncompressed), &compressed, &sz);
+        int result = simpleCompress(ELZMA_lzma, uncompressed, uncompressedSize, &compressed, &sz);
         if (result == ELZMA_E_OK)
         {
-                }
+            ofstream finalOutputStream = ofstream("/sdcard/Android/data/com.beatgames.beatsaber/files/76561198283584459-Chug Jug With You-Expert-Standard-4D5D4F9D86C8FD56610D0D157E6EAABFABA9B1C9.dat", ios::binary);
+            std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
+            finalOutputStream.imbue(utf8_locale);
+            WriteRawString("ScoreSaber Replay 👌🤠\r\n", finalOutputStream);
+            finalOutputStream.write(reinterpret_cast<char*>(compressed), sz);
+            finalOutputStream.flush();
+            finalOutputStream.close();
+        }
     }
 
     int WriteMetadata(Metadata* metadata, ofstream& outputStream)
@@ -294,6 +303,17 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
+    int WriteRawString(string value, ofstream& outputStream)
+    {
+        int bytesWritten = 0;
+        const char* cString = value.c_str();
+        size_t stringLength = strlen(cString);
+
+        outputStream.write(cString, stringLength);
+        bytesWritten += stringLength;
+        return bytesWritten;
+    }
+
     int WriteInt(int value, ofstream& outputStream)
     {
         outputStream.write(reinterpret_cast<const char*>(&value), sizeof(int));
@@ -330,4 +350,5 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         bytesWritten += WriteFloat(rotation.W, outputStream);
         return bytesWritten;
     }
+
 } // namespace ScoreSaber::Data::Private::ReplayWriter

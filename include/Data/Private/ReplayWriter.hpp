@@ -22,6 +22,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
     int WriteMultiplierEventList(vector<MultiplierEvent> values, ofstream& outputStream);
     int WriteEnergyEventList(vector<EnergyEvent> values, ofstream& outputStream);
     int WriteString(string value, ofstream& outputStream);
+    int WriteRawString(string value, ofstream& outputStream);
     int WriteInt(int value, ofstream& outputStream);
     int WriteFloat(float value, ofstream& outputStream);
     int WriteBool(float value, ofstream& outputStream);
