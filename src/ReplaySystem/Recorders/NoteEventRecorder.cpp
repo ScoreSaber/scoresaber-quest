@@ -96,7 +96,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
         if (noteData->colorType == ColorType::None)
         {
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Bomb, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
-                                               (int)noteCutInfo.heldRef.directionOK, (int)noteCutInfo.heldRef.cutDirDeviation,
+                                               noteCutInfo.heldRef.directionOK, noteCutInfo.heldRef.cutDirDeviation,
                                                0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
             return;
         }
@@ -109,7 +109,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
         else
         {
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::BadCut, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
-                                               (int)noteCutInfo.heldRef.directionOK, (int)noteCutInfo.heldRef.cutDirDeviation,
+                                               noteCutInfo.heldRef.directionOK, noteCutInfo.heldRef.cutDirDeviation,
                                                0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
         }
     }
@@ -119,7 +119,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
         _noteKeyframes.push_back(NoteEvent(swingFinisher->noteId, NoteEventType::GoodCut, VRPosition(swingFinisher->noteCutInfo.cutPoint),
                                            VRPosition(swingFinisher->noteCutInfo.cutNormal), VRPosition(swingFinisher->noteCutInfo.saberDir),
                                            (int)swingFinisher->noteCutInfo.saberType,
-                                           (int)swingFinisher->noteCutInfo.directionOK, (int)swingFinisher->noteCutInfo.cutDirDeviation,
+                                           swingFinisher->noteCutInfo.directionOK, swingFinisher->noteCutInfo.cutDirDeviation,
                                            0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
         _finisherPool->Despawn(swingFinisher);
     }

@@ -28,10 +28,10 @@ namespace ScoreSaber::Data::Private::ReplayWriter
             WriteInt(0, outputStream);
         }
 
+        // Write Data
         int metadataPointer = outputStream.tellp();
         WriteMetadata(file->metadata, outputStream);
         int poseKeyframePointer = outputStream.tellp();
-
         WriteVRPoseGroupList(file->poseKeyframes, outputStream);
         int heightEventsPointer = outputStream.tellp();
         WriteHeightChangeList(file->heightKeyframes, outputStream);
@@ -45,8 +45,9 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         WriteMultiplierEventList(file->multiplierKeyframes, outputStream);
         int energyEventsPointer = outputStream.tellp();
         WriteEnergyEventList(file->energyKeyframes, outputStream);
-        outputStream.seekp(pointerLocation);
 
+        // Write pointers
+        outputStream.seekp(pointerLocation);
         WriteInt(metadataPointer, outputStream);
         WriteInt(poseKeyframePointer, outputStream);
         WriteInt(heightEventsPointer, outputStream);
@@ -59,21 +60,19 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         outputStream.flush();
         outputStream.close();
 
-        vector<unsigned char> bytes;
-        ifstream tmpFile("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios_base::in | ios::binary);
-        unsigned char ch = tmpFile.get();
-
-        while (tmpFile.good())
+        ifstream readStream("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios_base::in | ios::binary);
+        vector<unsigned char> uncompressedReplayBytes;
+        unsigned char currentChar = readStream.get();
+        while (readStream.good())
         {
-            bytes.push_back(ch);
-            ch = tmpFile.get();
+            uncompressedReplayBytes.push_back(currentChar);
+            currentChar = readStream.get();
         }
-        size_t uncompressedSize = bytes.size();
+        size_t uncompressedSize = uncompressedReplayBytes.size();
 
-        INFO("bytes.size: %zu", uncompressedSize);
         unlink("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp");
 
-        unsigned char* uncompressed = bytes.data();
+        unsigned char* uncompressed = uncompressedReplayBytes.data();
         unsigned char* compressed;
         size_t sz;
         int result = simpleCompress(ELZMA_lzma, uncompressed, uncompressedSize, &compressed, &sz);
