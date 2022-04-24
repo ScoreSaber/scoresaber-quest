@@ -7,6 +7,7 @@
 #include "GlobalNamespace/HealthWarningFlowCoordinator_InitData.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+#include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
 #include "Utils/TeamUtils.hpp"
 
@@ -55,4 +56,5 @@ extern "C" __attribute((visibility("default"))) void load()
     custom_types::Register::AutoRegister();
     Hooks::InstallHooks(ScoreSaber::Logging::getLogger());
     TeamUtils::Download();
+    ScoreSaber::Services::FileService::EnsurePaths();
 }

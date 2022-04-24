@@ -31,9 +31,7 @@ namespace ScoreSaber::Services::LeaderboardService
 {
     std::string GetLeaderboardUrl(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry)
     {
-        // std::string url = "https://scoresaber.com/api/game/leaderboard";
-
-        std::string url = ScoreSaber::Static::baseUrl + "/api/game/leaderboard";
+        std::string url = ScoreSaber::Static::BASE_URL + "/api/game/leaderboard";
 
         INFO("%s", url.c_str());
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());

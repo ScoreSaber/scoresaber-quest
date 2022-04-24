@@ -96,7 +96,7 @@ namespace ScoreSaber::CustomTypes::Components
 
     std::string GlobalLeaderboardTableData::get_leaderboardURL()
     {
-        std::string playersUrl = ScoreSaber::Static::baseUrl + "/api/game/players";
+        std::string playersUrl = ScoreSaber::Static::BASE_URL + "/api/game/players";
         switch (leaderboardType)
         {
             default:

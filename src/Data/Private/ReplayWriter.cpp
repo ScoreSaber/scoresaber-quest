@@ -10,7 +10,11 @@ extern "C"
 #include <stdlib.h>
 #include <string>
 
+#include "Services/PlayerService.hpp"
+
 #include "logging.hpp"
+#include "static.hpp"
+
 using namespace std;
 
 namespace ScoreSaber::Data::Private::ReplayWriter
@@ -18,7 +22,10 @@ namespace ScoreSaber::Data::Private::ReplayWriter
     int _pointerSize = 38;
     void Write(ReplayFile* file)
     {
-        ofstream outputStream = ofstream("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios::binary);
+        std::string tmpFilePath = ScoreSaber::Static::REPLAY_TMP_DIR + "/b2dbeb695fa205804b1e5e72650ad2bb.tmp";
+
+        // Open tmp replay file
+        ofstream outputStream = ofstream(tmpFilePath, ios::binary);
         std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
         outputStream.imbue(utf8_locale);
 
@@ -60,7 +67,8 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         outputStream.flush();
         outputStream.close();
 
-        ifstream readStream("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp", ios_base::in | ios::binary);
+        // Read tmp replay file into memory
+        ifstream readStream(tmpFilePath, ios_base::in | ios::binary);
         vector<unsigned char> uncompressedReplayBytes;
         unsigned char currentChar = readStream.get();
         while (readStream.good())
@@ -68,17 +76,21 @@ namespace ScoreSaber::Data::Private::ReplayWriter
             uncompressedReplayBytes.push_back(currentChar);
             currentChar = readStream.get();
         }
+
         size_t uncompressedSize = uncompressedReplayBytes.size();
-
-        unlink("/sdcard/Android/data/com.beatgames.beatsaber/files/replay.tmp");
-
         unsigned char* uncompressed = uncompressedReplayBytes.data();
+
+        // Delete tmp replay file
+        unlink(tmpFilePath.c_str());
+
+        // Compress replay file
         unsigned char* compressed;
         size_t sz;
         int result = simpleCompress(ELZMA_lzma, uncompressed, uncompressedSize, &compressed, &sz);
         if (result == ELZMA_E_OK)
         {
-            ofstream finalOutputStream = ofstream("/sdcard/Android/data/com.beatgames.beatsaber/files/76561198283584459-Chug Jug With You-Expert-Standard-4D5D4F9D86C8FD56610D0D157E6EAABFABA9B1C9.dat", ios::binary);
+            // If compression went okay, add file header to compressed replay and write to disk
+            ofstream finalOutputStream = ofstream(ScoreSaber::Static::REPLAY_DIR + "/76561198283584459-Chug Jug With You-Expert-Standard-4D5D4F9D86C8FD56610D0D157E6EAABFABA9B1C9.dat", ios::binary);
             std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
             finalOutputStream.imbue(utf8_locale);
             WriteRawString("ScoreSaber Replay 👌🤠\r\n", finalOutputStream);

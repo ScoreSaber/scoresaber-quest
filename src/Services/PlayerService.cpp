@@ -12,9 +12,6 @@
 #include "static.hpp"
 #include <chrono>
 
-#define STEAM_KEY_PATH "/sdcard/ModData/Mods/ScoreSaber/scoresaber_DO_NOT_SHARE.scary"
-#define SCORESABER_DATA_PATH "/sdcard/ModData/Mods/ScoreSaber"
-
 using namespace StringUtils;
 
 namespace ScoreSaber::Services::PlayerService
@@ -22,23 +19,19 @@ namespace ScoreSaber::Services::PlayerService
     playerInfo_t playerInfo;
     void AuthenticateUser(std::function<void(LoginStatus)> finished)
     {
-        if (!direxists(SCORESABER_DATA_PATH))
-        {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(SCORESABER_DATA_PATH));
-        }
 
         std::string steamKey = "fb6580ef414bf07";
         std::string playerId = "76561198283584459";
 
-        if (fileexists(STEAM_KEY_PATH))
+        if (fileexists(ScoreSaber::Static::STEAM_KEY_PATH))
         {
-            std::string rawSteamThing = readfile(STEAM_KEY_PATH);
+            std::string rawSteamThing = readfile(ScoreSaber::Static::STEAM_KEY_PATH);
             std::vector<std::string> splitRawSteamThing = split(rawSteamThing, ':');
 
             steamKey = splitRawSteamThing[0];
             playerId = splitRawSteamThing[1];
 
-            std::string steamKey = readfile(STEAM_KEY_PATH);
+            // std::string steamKey = readfile(ScoreSaber::Static::STEAM_KEY_PATH);
         }
 
         // UMBY: Check if steam key is null (for release)
@@ -47,7 +40,7 @@ namespace ScoreSaber::Services::PlayerService
 
         std::string postData = "at=2&playerId=" + playerId + "&nonce=" + steamKey + "&friends=3692740027462863,76561198064659288,76561198283584459,76561198278902434,76561198353781972,76561199210789241&name=nah";
 
-        std::string authUrl = ScoreSaber::Static::baseUrl + "/api/game/auth";
+        std::string authUrl = ScoreSaber::Static::BASE_URL + "/api/game/auth";
 
         WebUtils::PostAsync(authUrl, postData, 6000, [=](long code, std::string result) {
             if (code == 200)
@@ -76,7 +69,7 @@ namespace ScoreSaber::Services::PlayerService
     void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished)
     {
 
-        std::string url = string_format("%s/api/player/%s", ScoreSaber::Static::baseUrl.c_str(), playerId.c_str());
+        std::string url = string_format("%s/api/player/%s", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
 
         // std::string url = string_format("https://scoresaber.com/api/player/%s", playerId.c_str());
 

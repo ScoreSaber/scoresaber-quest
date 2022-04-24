@@ -26,7 +26,7 @@ namespace ScoreSaber::Services::UploadService
     bool uploading;
     void UploadScore(std::string scorePacket, std::function<void(bool)> finished)
     {
-        std::string url = baseUrl + "/api/game/upload";
+        std::string url = BASE_URL + "/api/game/upload";
         std::string postData = "data=" + scorePacket;
         WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
             if (code == 200)

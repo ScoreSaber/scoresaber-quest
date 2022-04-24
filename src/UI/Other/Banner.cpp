@@ -254,6 +254,7 @@ namespace ScoreSaber::UI::Other
         {
             callback();
         }
+
         co_return;
     }
 
