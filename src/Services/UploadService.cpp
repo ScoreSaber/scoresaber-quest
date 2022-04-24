@@ -12,11 +12,13 @@
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
 #include "logging.hpp"
+#include "static.hpp"
 
 using namespace StringUtils;
 
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
+using namespace ScoreSaber::Static;
 
 namespace ScoreSaber::Services::UploadService
 {
@@ -24,7 +26,7 @@ namespace ScoreSaber::Services::UploadService
     bool uploading;
     void UploadScore(std::string scorePacket, std::function<void(bool)> finished)
     {
-        std::string url = "http://192.168.1.8:9999/api/game/upload";
+        std::string url = baseUrl + "/api/game/upload";
         std::string postData = "data=" + scorePacket;
         WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
             if (code == 200)
