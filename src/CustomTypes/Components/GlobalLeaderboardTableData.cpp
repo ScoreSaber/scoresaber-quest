@@ -50,12 +50,9 @@ custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components
 
         auto s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
 
-        // INFO("cock %s", s.c_str());
-
         // implicit constructor poggers
         playerCollection = webRequest->get_downloadHandler()->get_text();
 
-        INFO("112233 cock");
         self->initialized = true;
     }
     co_return;

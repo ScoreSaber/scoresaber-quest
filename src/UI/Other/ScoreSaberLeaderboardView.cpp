@@ -317,7 +317,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         if (_activated)
         {
-            INFO("Resetting leaderboard page");
             _leaderboardPage = 1;
             _filterAroundCountry = filterAroundCountry;
             _platformLeaderboardViewController->Refresh(true, true);

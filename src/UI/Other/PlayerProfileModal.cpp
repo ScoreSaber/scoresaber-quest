@@ -21,6 +21,7 @@
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include "static.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::Other, PlayerProfileModal);
 
@@ -50,8 +51,7 @@ namespace ScoreSaber::UI::Other
     {
         if (playerId == "")
             co_return;
-        std::string url = string_format("https://scoresaber.com/api/player/%s/full", playerId.c_str());
-        INFO("Getting player data from url %s", url.c_str());
+        std::string url = string_format("%s/api/player/%s/full", ScoreSaber::Static::BASE_URL, playerId.c_str());
         UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(url));
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
         if (!webRequest->get_isNetworkError())
@@ -102,11 +102,8 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::Show(std::string playerId)
     {
-        INFO("Showing modal: %p", modal);
         modal->Show(true, true, nullptr);
-        INFO("Clearing badges: %p", badgeParent);
         ClearBadges();
-        INFO("Starting getting player data for player %s", playerId.c_str());
         BeginCoroutine(FetchPlayerData(playerId));
     }
 
@@ -208,15 +205,11 @@ namespace ScoreSaber::UI::Other
         if (!badgeParent)
             return;
         auto transform = badgeParent->get_transform();
-        INFO("Badge transform: %p", transform);
         int childCount = transform->get_childCount();
-        INFO("childCount: %d", childCount);
         for (int i = childCount - 1; i >= 0; i--)
         {
             auto child = transform->GetChild(i);
-            INFO("child: %p", child);
             auto go = child->get_gameObject();
-            INFO("child GO: %p", go);
             Object::DestroyImmediate(go);
         }
     }

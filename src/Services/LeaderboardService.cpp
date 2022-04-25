@@ -33,7 +33,6 @@ namespace ScoreSaber::Services::LeaderboardService
     {
         std::string url = ScoreSaber::Static::BASE_URL + "/api/game/leaderboard";
 
-        INFO("%s", url.c_str());
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
         Il2CppString* levelId = previewBeatmapLevel->get_levelID();
         levelId = levelId->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty());

@@ -74,7 +74,6 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     stopProfileRoutine();
     stopFlagRoutine();
 
-    INFO("Getting profile picture @ %s", player.profilePicture.c_str());
     profile->set_sprite(Base64ToSprite(oculus_base64));
 
     // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
@@ -90,24 +89,18 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
         }
     }
 
-    // INFO("Setting playername %s", ::to_utf8(player.name).c_str());
     this->name->set_text(il2cpp_utils::newcsstr(player.name));
 
     if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
-        // INFO("Setting rank %d", player.rank);
         this->rank->set_text(StrToIl2cppStr(string_format("#%d", player.rank)));
     }
     else
     {
-        // INFO("Setting rank %d, (%d)", player.countryRank, player.rank);
         this->rank->set_text(StrToIl2cppStr(string_format("#%d (#%d)", player.countryRank, player.rank)));
     }
 
-    // INFO("Setting pp %.2f", player.pp);
     this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp</color>", player.pp)));
-
-    // INFO("Setting country %s", player.country.c_str());
     flag->set_sprite(Base64ToSprite(country_base64));
     flagRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(flag_url(player.country), flag));
     this->country->set_text(StrToIl2cppStr(player.country));

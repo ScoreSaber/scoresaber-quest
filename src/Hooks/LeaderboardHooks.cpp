@@ -81,8 +81,6 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedContr
 
     bool filterAroundCountry = false;
 
-    INFO("Scope clicked: %d", cellNumber);
-
     switch (cellNumber)
     {
         case 0: {
@@ -114,13 +112,4 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
     INFO("StandardLevelScenesTransitionSetupDataSO_Finish hit");
     ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
     StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
-}
-
-MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
-                     static_cast<void (GlobalNamespace::PlatformLeaderboardsModel::*)(GlobalNamespace::IDifficultyBeatmap*, int, int, bool, int, int, int, int, float, GlobalNamespace::GameplayModifiers*)>(&GlobalNamespace::PlatformLeaderboardsModel::UploadScore),
-                     void, GlobalNamespace::PlatformLeaderboardsModel* self, GlobalNamespace::IDifficultyBeatmap* beatmap, int rawScore,
-                     int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
-                     float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
-{
-    // ScoreSaber::Services::UploadService::PrepareAndUploadScore(beatmap, rawScore, modifiedScore, fullCombo, goodCutsCount, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
 }

@@ -65,7 +65,7 @@ namespace ScoreSaber::Services::PlayerService
             }
             else
             {
-                INFO("Authentication error");
+                ERROR("Authentication error");
                 playerInfo.loginStatus = LoginStatus::Error;
                 finished(LoginStatus::Error);
             }
