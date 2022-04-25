@@ -92,7 +92,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
     void ScoreController_noteWasCutEvent(NoteData* noteData, ByRef<NoteCutInfo> noteCutInfo, int multiplier)
     {
 
-        NoteID noteID = NoteID(noteData->time, noteData->lineIndex, (int)noteData->noteLineLayer, (int)noteData->colorType, (int)noteData->cutDirection);
+        NoteID noteID = NoteID(noteData->time, (int)noteData->noteLineLayer, noteData->lineIndex, (int)noteData->colorType, (int)noteData->cutDirection);
         if (noteData->colorType == ColorType::None)
         {
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Bomb, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
@@ -116,11 +116,15 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
     void SwingFinisher_didFinish(SwingFinisher* swingFinisher)
     {
+        INFO("allIsOK: %d", swingFinisher->noteCutInfo.get_allIsOK());
+        INFO("directionOK: %d", swingFinisher->noteCutInfo.directionOK);
         _noteKeyframes.push_back(NoteEvent(swingFinisher->noteId, NoteEventType::GoodCut, VRPosition(swingFinisher->noteCutInfo.cutPoint),
                                            VRPosition(swingFinisher->noteCutInfo.cutNormal), VRPosition(swingFinisher->noteCutInfo.saberDir),
-                                           (int)swingFinisher->noteCutInfo.saberType,
-                                           swingFinisher->noteCutInfo.directionOK, swingFinisher->noteCutInfo.cutDirDeviation,
-                                           0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
+                                           (int)swingFinisher->noteCutInfo.saberType, swingFinisher->noteCutInfo.directionOK,
+                                           swingFinisher->noteCutInfo.saberSpeed, swingFinisher->noteCutInfo.cutAngle,
+                                           swingFinisher->noteCutInfo.cutDistanceToCenter, swingFinisher->noteCutInfo.cutDirDeviation,
+                                           swingFinisher->saberSwingRatingCounter->get_beforeCutRating(), swingFinisher->saberSwingRatingCounter->get_afterCutRating(),
+                                           swingFinisher->timeWasCut, Time::get_timeScale(), _audioTimeSyncController->timeScale));
         _finisherPool->Despawn(swingFinisher);
     }
 
@@ -131,7 +135,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
             return;
         }
 
-        NoteID noteID = NoteID(noteData->time, noteData->lineIndex, (int)noteData->noteLineLayer, (int)noteData->colorType, (int)noteData->cutDirection);
+        NoteID noteID = NoteID(noteData->time, (int)noteData->noteLineLayer, noteData->lineIndex, (int)noteData->colorType, (int)noteData->cutDirection);
         _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Miss, _none, _none, _none, (int)noteData->colorType,
                                            false, 0,
                                            0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));

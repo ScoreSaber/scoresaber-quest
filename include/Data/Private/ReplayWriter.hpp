@@ -25,7 +25,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
     int WriteRawString(string value, ofstream& outputStream);
     int WriteInt(int value, ofstream& outputStream);
     int WriteFloat(float value, ofstream& outputStream);
-    int WriteBool(float value, ofstream& outputStream);
+    int WriteBool(bool value, ofstream& outputStream);
     int WriteVRPosition(VRPosition position, ofstream& outputStream);
     int WriteVRRotation(VRRotation rotation, ofstream& outputStream);
 } // namespace ScoreSaber::Data::Private::ReplayWriter

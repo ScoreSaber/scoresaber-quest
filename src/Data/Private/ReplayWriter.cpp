@@ -337,7 +337,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return 4;
     }
 
-    int WriteBool(float value, ofstream& outputStream)
+    int WriteBool(bool value, ofstream& outputStream)
     {
         outputStream.write(reinterpret_cast<const char*>(&value), sizeof(bool));
         return 1;
