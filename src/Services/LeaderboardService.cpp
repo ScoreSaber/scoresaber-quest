@@ -73,7 +73,6 @@ namespace ScoreSaber::Services::LeaderboardService
                             bool filterAroundCountry)
     {
         std::string url = GetLeaderboardUrl(difficultyBeatmap, scope, page, filterAroundCountry);
-        // INFO("Leaderboard Url: %s", url.c_str());
         WebUtils::GetAsync(
             url, [=](long code, std::string result) {
                 Data::InternalLeaderboard data;
