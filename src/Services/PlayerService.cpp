@@ -20,8 +20,8 @@ namespace ScoreSaber::Services::PlayerService
     void AuthenticateUser(std::function<void(LoginStatus)> finished)
     {
 
-        std::string steamKey = "fb6580ef414bf07";
-        std::string playerId = "76561198283584459";
+        std::string steamKey = "";
+        std::string playerId = "";
 
         if (fileexists(ScoreSaber::Static::STEAM_KEY_PATH))
         {
@@ -30,8 +30,14 @@ namespace ScoreSaber::Services::PlayerService
 
             steamKey = splitRawSteamThing[0];
             playerId = splitRawSteamThing[1];
+        }
 
-            // std::string steamKey = readfile(ScoreSaber::Static::STEAM_KEY_PATH);
+        if (steamKey == "" || playerId == "")
+        {
+            ERROR("Failed to read player authentication data");
+            playerInfo.loginStatus = LoginStatus::Error;
+            finished(LoginStatus::Error);
+            return;
         }
 
         // UMBY: Check if steam key is null (for release)
