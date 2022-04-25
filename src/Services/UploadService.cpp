@@ -114,6 +114,7 @@ namespace ScoreSaber::Services::UploadService
                         if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
                         {
                             ERROR("Didn't beat score not uploading");
+                            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#89fc81>Didn't beat score, not uploading</color>");
                             return;
                         }
                     }

@@ -361,7 +361,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         }
     }
 
-    void SetUploadState(bool state, bool success)
+    void SetUploadState(bool state, bool success, std::string errorMessage)
     {
         QuestUI::MainThreadScheduler::Schedule([=]() {
             if (state)
@@ -380,7 +380,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 }
                 else
                 {
-                    ScoreSaberBanner->set_prompt("<color=#89fc81>Upload failed</color>", 5);
+                    ScoreSaberBanner->set_prompt(errorMessage, 5);
                 }
             }
         });
