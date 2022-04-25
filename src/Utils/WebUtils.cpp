@@ -360,7 +360,6 @@ namespace WebUtils
 
         // Set headers
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
         curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
 
         // Don't wait forever, time out after TIMEOUT seconds.
@@ -401,6 +400,85 @@ namespace WebUtils
         std::thread t(
             [url, postData, timeout, finished] {
                 auto [responseCode, response] = PostSync(url, postData, timeout);
+                finished(responseCode, response);
+            });
+        t.detach();
+    }
+
+    std::tuple<long, std::string> PostWithFileSync(std::string url, std::string filePath, std::string postData, long timeout)
+    {
+        std::string val;
+        // Init curl
+        auto* curl = curl_easy_init();
+
+        struct curl_slist* headers = NULL;
+        headers = curl_slist_append(headers, "Accept: */*");
+        headers = curl_slist_append(headers, "Content-Type: multipart/form-data");
+
+        curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+
+        if (!cookie.empty())
+        {
+            curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+        }
+
+        // Set headers
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
+
+        // Don't wait forever, time out after TIMEOUT seconds.
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+
+        // Follow HTTP redirects if necessary.
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+        // curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_easy_setopt(curl, CURLOPT_POST, 1);
+
+        curl_mime* mime;
+        curl_mimepart* part;
+        mime = curl_mime_init(curl);
+        part = curl_mime_addpart(mime);
+
+        curl_mime_name(part, "data");
+        curl_mime_data(part, postData.c_str(), CURL_ZERO_TERMINATED);
+        part = curl_mime_addpart(mime);
+
+        curl_mime_name(part, "zr");
+        curl_mime_filedata(part, filePath.c_str());
+        curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+
+        // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
+
+        long httpCode(0);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, hdf);
+
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+        auto res = curl_easy_perform(curl);
+
+        /* Check for errors */
+        if (res != CURLE_OK)
+        {
+            getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+        }
+
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+        curl_easy_cleanup(curl);
+        curl_mime_free(mime);
+
+        return std::make_tuple(httpCode, val);
+    }
+
+    void PostWithFileAsync(std::string url, std::string filePath, std::string postData, long timeout, std::function<void(long, std::string)> finished)
+    {
+        std::thread t(
+            [url, filePath, postData, timeout, finished] {
+                auto [responseCode, response] = PostWithFileSync(url, filePath, postData, timeout);
                 finished(responseCode, response);
             });
         t.detach();

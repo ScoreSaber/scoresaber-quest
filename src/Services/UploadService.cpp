@@ -45,7 +45,7 @@ namespace ScoreSaber::Services::UploadService
         {
             if (Il2cppStrToStr(standardLevelScenesTransitionSetupData->gameMode) == "Solo")
             {
-                if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr) // UMBY: Check this check
+                if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
                 {
                     // We are in practice mode
                     return;
@@ -115,7 +115,7 @@ namespace ScoreSaber::Services::UploadService
                         if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
                         {
                             // UMBY: Didn't beat score, not uploading
-                            INFO("Didn't beat score not uploading");
+                            ERROR("Didn't beat score not uploading");
                             return;
                         }
                     }
@@ -125,14 +125,11 @@ namespace ScoreSaber::Services::UploadService
                     ERROR("Failed to get leaderboards ranked status");
                 }
 
-                INFO("Getting replay pointer");
                 ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
 
                 std::thread t([replay, replayFileName, uploadPacket, ranked] {
-                    INFO("Serializing replay");
                     std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
 
-                    INFO("Constructing post data");
                     std::string url = BASE_URL + "/api/game/upload";
                     std::string postData = "data=" + uploadPacket;
 
@@ -145,7 +142,6 @@ namespace ScoreSaber::Services::UploadService
                         uploading = true;
                         if (!ranked)
                         {
-                            INFO("Uploading unranked score...");
                             auto [responseCode, response] = WebUtils::PostSync(url, postData, 30000);
                             if (responseCode == 200)
                             {
@@ -161,8 +157,19 @@ namespace ScoreSaber::Services::UploadService
                         }
                         else
                         {
-                            INFO("Detected ranked song, score uploading disabled for that sadge");
-                            // Ranked upload (disabled)
+                            INFO("Uploading ranked score...");
+                            auto [responseCode, response] = WebUtils::PostWithFileSync(url, serializedReplayPath, uploadPacket, 30000);
+                            if (responseCode == 200)
+                            {
+                                INFO("Score uploaded successfully");
+                                done = true;
+                            }
+                            if (responseCode == 403)
+                            {
+                                INFO("Player banned, score didn't upload");
+                                done = true;
+                                failed = true;
+                            }
                         }
 
                         if (!done)
@@ -188,6 +195,7 @@ namespace ScoreSaber::Services::UploadService
                         // Score uploaded successfully
                         // Save local replay
                         INFO("Score uploaded");
+                        MoveReplay(serializedReplayPath, replayFileName);
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
                     }
 
@@ -207,8 +215,17 @@ namespace ScoreSaber::Services::UploadService
         // Check online player modifiedScore against to upload modifiedScore ✓
         // Get serialized replay tmp path ✓
         // Implement unranked uploading ✓
-        // If ranked attempt to upload with replay file
-        // If done SaveLocalReplay (moving tmp replay to main replays folder)
+        // If ranked attempt to upload with replay file ✓
+        // If done SaveLocalReplay (moving tmp replay to main replays folder) ✓
+    }
+
+    void MoveReplay(std::string replayPath, std::string replayFileName)
+    {
+        std::string newFilePath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
+        if (std::rename(replayPath.c_str(), newFilePath.c_str()) != 0)
+        {
+            ERROR("Failed to save local replay");
+        }
     }
 
     std::string CreateScorePacket(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, int rawScore,

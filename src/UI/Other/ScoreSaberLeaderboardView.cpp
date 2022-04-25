@@ -239,7 +239,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                         leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores);
                                         SetPlayButtonState(true);
                                         SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
-                                        // UMBY: If upload daemon is uploading, disable panel view
                                     }
                                 }
                                 else
@@ -312,7 +311,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         loadingControl->Hide();
         loadingControl->ShowText(il2cpp_utils::newcsstr(errorText), showRefreshButton);
         SetPlayButtonState(true);
-        // UMBY: set play button active
     }
 
     void ChangeScope(bool filterAroundCountry)

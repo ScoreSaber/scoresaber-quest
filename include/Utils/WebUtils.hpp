@@ -23,6 +23,9 @@ namespace WebUtils
     /// @param finished the callback for when we're done downloading
     void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished);
 
+    std::tuple<long, std::string> PostWithFileSync(std::string url, std::string filePath, std::string postData, long timeout);
+    void PostWithFileAsync(std::string url, std::string filePath, std::string postData, long timeout, std::function<void(long, std::string)> finished);
+
     /// @brief gets texture @ url and applies it to out->set_sprite() after downloading
     custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out);
     /// @brief gets gif @ url and applies it's first frame to out->set_sprite() after downloading
