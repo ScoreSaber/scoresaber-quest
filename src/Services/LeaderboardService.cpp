@@ -21,8 +21,6 @@
 #include "logging.hpp"
 #include "static.hpp"
 
-// #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp" //MAIN THREAD SCHEDULER POG
-
 using namespace GlobalNamespace;
 using namespace StringUtils;
 using namespace ScoreSaber;
