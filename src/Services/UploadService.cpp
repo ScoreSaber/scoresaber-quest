@@ -1,4 +1,5 @@
 #include "Services/UploadService.hpp"
+#include "Data/InternalLeaderboard.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ScoreSaberUploadData.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
@@ -7,15 +8,22 @@
 #include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
+#include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
+#include "GlobalNamespace/PracticeViewController.hpp"
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "Services/FileService.hpp"
+#include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
+#include "UnityEngine/Resources.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
 #include "logging.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
+#include "questui/shared/QuestUI.hpp"
 #include "static.hpp"
+#include <thread>
 
 using namespace StringUtils;
 
@@ -29,11 +37,57 @@ namespace ScoreSaber::Services::UploadService
 {
     bool uploading;
 
-    void PrepareAndUploadScore(GlobalNamespace::IDifficultyBeatmap* beatmap, int rawScore,
-                               int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
-                               float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
+    void Five(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupData,
+              GlobalNamespace::LevelCompletionResults* levelCompletionResults)
     {
-        ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
+        PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
+        if (!practiceViewController->get_isInViewControllerHierarchy())
+        {
+            if (Il2cppStrToStr(standardLevelScenesTransitionSetupData->gameMode) == "Solo")
+            {
+                if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr) // UMBY: Check this check
+                {
+                    // We are in practice mode
+                    return;
+                }
+
+                if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None)
+                {
+                    // Write replay
+                    return;
+                }
+
+                if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndStateType::Cleared)
+                {
+                    if (levelCompletionResults->gameplayModifiers->noFailOn0Energy)
+                    {
+                        Six(standardLevelScenesTransitionSetupData->difficultyBeatmap, levelCompletionResults);
+                        return;
+                    }
+                    else
+                    {
+                        // Player failed level, write replay don't continue to upload phase
+                        return;
+                    }
+                }
+
+                // Continue to upload phase
+                INFO("2");
+                Six(standardLevelScenesTransitionSetupData->difficultyBeatmap, levelCompletionResults);
+            }
+        }
+        else
+        {
+            // We are in practice mode, still write the replay
+        }
+    }
+
+    void Six(GlobalNamespace::IDifficultyBeatmap* beatmap, GlobalNamespace::LevelCompletionResults* levelCompletionResults)
+    {
+
+        std::string encryptedPacket = CreateScorePacket(beatmap, levelCompletionResults->rawScore, levelCompletionResults->modifiedScore,
+                                                        levelCompletionResults->fullCombo, levelCompletionResults->badCutsCount, levelCompletionResults->missedCount,
+                                                        levelCompletionResults->maxCombo, levelCompletionResults->energy, levelCompletionResults->gameplayModifiers);
 
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level());
         std::string levelHash = Il2cppStrToStr(previewBeatmapLevel->get_levelID()->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty())->ToUpper());
@@ -43,18 +97,123 @@ namespace ScoreSaber::Services::UploadService
 
         std::string replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic,
                                                                                           ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id, songName);
+        Seven(beatmap, levelCompletionResults->modifiedScore, encryptedPacket, replayFileName);
+    }
 
-        ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
+    void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, std::string uploadPacket, std::string replayFileName)
+    {
+        INFO("Getting current leaderboard data for leaderboard");
+        LeaderboardService::GetLeaderboardData(
+            beatmap, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
+                bool ranked = true;
 
-        std::string encryptedPacket = CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
+                if (internalLeaderboard.leaderboard.has_value())
+                {
+                    ranked = internalLeaderboard.leaderboard.value().leaderboardInfo.ranked;
+                    if (internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.has_value())
+                    {
+                        if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
+                        {
+                            // UMBY: Didn't beat score, not uploading
+                            INFO("Didn't beat score not uploading");
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    ERROR("Failed to get leaderboards ranked status");
+                }
 
-        // UploadScore(encryptedPacket, [=](bool success) {
-        //     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, success);
-        // });
+                INFO("Getting replay pointer");
+                ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
+
+                std::thread t([replay, replayFileName, uploadPacket, ranked] {
+                    INFO("Serializing replay");
+                    std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
+
+                    INFO("Constructing post data");
+                    std::string url = BASE_URL + "/api/game/upload";
+                    std::string postData = "data=" + uploadPacket;
+
+                    int attempts = 0;
+                    bool done = false;
+                    bool failed = false;
+
+                    while (!done)
+                    {
+                        uploading = true;
+                        if (!ranked)
+                        {
+                            INFO("Uploading unranked score...");
+                            auto [responseCode, response] = WebUtils::PostSync(url, postData, 30000);
+                            if (responseCode == 200)
+                            {
+                                INFO("Score uploaded successfully");
+                                done = true;
+                            }
+                            if (responseCode == 403)
+                            {
+                                INFO("Player banned, score didn't upload");
+                                done = true;
+                                failed = true;
+                            }
+                        }
+                        else
+                        {
+                            INFO("Detected ranked song, score uploading disabled for that sadge");
+                            // Ranked upload (disabled)
+                        }
+
+                        if (!done)
+                        {
+                            if (attempts < 4)
+                            {
+                                // Failed but retry
+                                INFO("Score failed to upload, retrying");
+                                attempts++;
+                                std::this_thread::sleep_for(2000ms);
+                            }
+                            else
+                            {
+                                done = true;
+                                failed = true;
+                            }
+                        }
+
+                    } // We out the loop now
+
+                    if (done && !failed)
+                    {
+                        // Score uploaded successfully
+                        // Save local replay
+                        INFO("Score uploaded");
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
+                    }
+
+                    if (failed)
+                    {
+                        INFO("Failed to upload score");
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false);
+                        // Failed to upload score, tell user
+                    }
+
+                    uploading = false;
+                });
+                t.detach();
+            },
+            false);
+        // Check ranked status  ✓
+        // Check online player modifiedScore against to upload modifiedScore ✓
+        // Get serialized replay tmp path ✓
+        // Implement unranked uploading ✓
+        // If ranked attempt to upload with replay file
+        // If done SaveLocalReplay (moving tmp replay to main replays folder)
     }
 
     std::string CreateScorePacket(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, int rawScore,
-                                  int modifiedScore, bool fullCombo, int badCutsCount, int missedCount, int maxCombo, float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
+                                  int modifiedScore, bool fullCombo, int badCutsCount, int missedCount, int maxCombo, float energy,
+                                  GlobalNamespace::GameplayModifiers* gameplayModifiers)
     {
         uploading = true;
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
@@ -79,33 +238,33 @@ namespace ScoreSaber::Services::UploadService
 
         std::string uploadData = data.serialize();
 
-        // TODO: Obfuscate
+        // UMBY: Obfuscate
         std::string key = md5("f0b4a81c9bd3ded1081b365f7628781f-" + ScoreSaber::Services::PlayerService::playerInfo.playerKey + "-" + playerId + "-f0b4a81c9bd3ded1081b365f7628781f");
 
         std::vector<unsigned char> keyBytes(key.begin(), key.end());
         std::vector<unsigned char> uploadDataBytes(uploadData.begin(), uploadData.end());
         std::vector<unsigned char> encrypted = Swap(uploadDataBytes, keyBytes);
         std::string result = ConvertToHex(encrypted);
-        transform(result.begin(), result.end(), result.begin(), ::toupper);
+        std::transform(result.begin(), result.end(), result.begin(), ::toupper);
         return result;
     }
 
-    void UploadScore(std::string scorePacket, std::function<void(bool)> finished)
-    {
-        std::string url = BASE_URL + "/api/game/upload";
-        std::string postData = "data=" + scorePacket;
-        WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
-            if (code == 200)
-            {
-                finished(true);
-            }
-            else
-            {
-                finished(false);
-            }
-            uploading = false;
-        });
-    }
+    // void UploadScore(std::string scorePacket, std::function<void(bool)> finished)
+    // {
+    //     std::string url = BASE_URL + "/api/game/upload";
+    //     std::string postData = "data=" + scorePacket;
+    //     WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
+    //         if (code == 200)
+    //         {
+    //             finished(true);
+    //         }
+    //         else
+    //         {
+    //             finished(false);
+    //         }
+    //         uploading = false;
+    //     });
+    // }
 
     std::vector<std::string> GetModifierList(GlobalNamespace::GameplayModifiers* gameplayModifiers, float energy)
     {

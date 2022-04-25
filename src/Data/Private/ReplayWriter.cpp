@@ -91,18 +91,16 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         {
             // If compression went okay, add file header to compressed replay and write to disk
 
-            std::string outputDirectory = ScoreSaber::Static::REPLAY_DIR + "/" + fileName + ".dat";
-
-            ofstream finalOutputStream = ofstream(outputDirectory, ios::binary);
+            ofstream finalOutputStream = ofstream(tmpFilePath, ios::binary);
             std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
             finalOutputStream.imbue(utf8_locale);
             WriteRawString("ScoreSaber Replay 👌🤠\r\n", finalOutputStream);
             finalOutputStream.write(reinterpret_cast<char*>(compressed), sz);
             finalOutputStream.flush();
             finalOutputStream.close();
-            return outputDirectory;
+            return tmpFilePath;
         }
-        return NULL;
+        return "-1";
     }
 
     int WriteMetadata(Metadata* metadata, ofstream& outputStream)

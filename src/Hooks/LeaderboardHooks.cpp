@@ -10,6 +10,11 @@
 #include "GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
 
+// StandardLevelScenesTransitionSetupDataSO
+
+#include "GlobalNamespace/LevelCompletionResults.hpp"
+#include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp"
+
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/LeaderboardTableView_ScoreData.hpp"
 #include "GlobalNamespace/LoadingControl.hpp"
@@ -102,11 +107,20 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedContr
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ChangeScope(filterAroundCountry);
 }
 
+MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNamespace::StandardLevelScenesTransitionSetupDataSO::Finish, void,
+                     GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
+                     GlobalNamespace::LevelCompletionResults* levelCompletionResults)
+{
+    INFO("StandardLevelScenesTransitionSetupDataSO_Finish hit");
+    ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
+    StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
+}
+
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
                      static_cast<void (GlobalNamespace::PlatformLeaderboardsModel::*)(GlobalNamespace::IDifficultyBeatmap*, int, int, bool, int, int, int, int, float, GlobalNamespace::GameplayModifiers*)>(&GlobalNamespace::PlatformLeaderboardsModel::UploadScore),
                      void, GlobalNamespace::PlatformLeaderboardsModel* self, GlobalNamespace::IDifficultyBeatmap* beatmap, int rawScore,
                      int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
                      float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
 {
-    ScoreSaber::Services::UploadService::PrepareAndUploadScore(beatmap, rawScore, modifiedScore, fullCombo, goodCutsCount, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
+    // ScoreSaber::Services::UploadService::PrepareAndUploadScore(beatmap, rawScore, modifiedScore, fullCombo, goodCutsCount, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
 }

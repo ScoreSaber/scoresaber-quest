@@ -16,6 +16,7 @@
 #include "libcurl/shared/easy.h"
 #include "logging.hpp"
 #include "main.hpp"
+#include <tuple>
 
 //#include "gif_read.h"
 
@@ -263,29 +264,34 @@ namespace WebUtils
         return newLength;
     }
 
-    std::optional<rapidjson::Document> GetJSON(std::string url)
+    size_t hdf(char* b, size_t size, size_t nitems, void* userdata)
     {
-        std::string data;
-        Get(url, data);
-        rapidjson::Document document;
-        document.Parse(data);
-        if (document.HasParseError() || !document.IsObject())
-            return std::nullopt;
-        return document;
+        size_t numbytes = size * nitems;
+        std::string header(b, numbytes);
+
+        if (header.starts_with("Set-Cookie"))
+        {
+            replace(header, "Set-Cookie: ", "");
+            header = split(header, ';')[0];
+            cookie = header;
+        }
+        return numbytes;
     }
 
-    long Get(std::string url, std::string& val)
+    std::tuple<long, std::string> GetSync(std::string url, long timeout)
     {
-        return Get(url, TIMEOUT, val);
-    }
-
-    long Get(std::string url, long timeout, std::string& val)
-    {
+        std::string val;
         // Init curl
         auto* curl = curl_easy_init();
         struct curl_slist* headers = NULL;
         headers = curl_slist_append(headers, "Accept: */*");
 
+        curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+
+        if (!cookie.empty())
+        {
+            curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+        }
         // Set headers
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -302,8 +308,7 @@ namespace WebUtils
                          CurlWrite_CallbackFunc_StdString);
 
         long httpCode(0);
-
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(&val));
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -319,7 +324,7 @@ namespace WebUtils
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
         curl_easy_cleanup(curl);
 
-        return httpCode;
+        return std::make_tuple(httpCode, val);
     }
 
     void GetAsync(std::string url, std::function<void(long, std::string)> finished)
@@ -327,124 +332,76 @@ namespace WebUtils
         GetAsync(url, TIMEOUT, finished);
     }
 
-    size_t hdf(char* b, size_t size, size_t nitems, void* userdata)
-    {
-        size_t numbytes = size * nitems;
-        std::string header(b, numbytes);
-
-        if (header.starts_with("Set-Cookie"))
-        {
-            replace(header, "Set-Cookie: ", "");
-            header = split(header, ';')[0];
-            cookie = header;
-        }
-        return numbytes;
-    }
-
     void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished)
     {
         std::thread t([url, timeout, finished] {
-            std::string val;
-            // Init curl
-            auto* curl = curl_easy_init();
-            struct curl_slist* headers = NULL;
-            headers = curl_slist_append(headers, "Accept: */*");
-            //   headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
-
-            curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-
-            if (!cookie.empty())
-            {
-                curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
-            }
-            // Set headers
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-            curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
-
-            // Don't wait forever, time out after TIMEOUT seconds.
-            curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
-
-            // Follow HTTP redirects if necessary.
-            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-
-            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
-                             CurlWrite_CallbackFunc_StdString);
-
-            long httpCode(0);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
-            curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-
-            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-
-            auto res = curl_easy_perform(curl);
-            /* Check for errors */
-            if (res != CURLE_OK)
-            {
-                getLogger().critical("curl_easy_perform() failed: %u: %s", res,
-                                     curl_easy_strerror(res));
-            }
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-            curl_easy_cleanup(curl);
-            finished(httpCode, val);
+            auto [responseCode, response] = GetSync(url, timeout);
+            finished(responseCode, response);
         });
         t.detach();
+    }
+
+    std::tuple<long, std::string> PostSync(std::string url, std::string postData, long timeout)
+    {
+        std::string val;
+        // Init curl
+        auto* curl = curl_easy_init();
+        struct curl_slist* headers = NULL;
+        headers = curl_slist_append(headers, "Accept: */*");
+        headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+        // headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
+
+        curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+
+        if (!cookie.empty())
+        {
+            curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+        }
+
+        // Set headers
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+        curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
+
+        // Don't wait forever, time out after TIMEOUT seconds.
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+
+        // Follow HTTP redirects if necessary.
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+        // curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_easy_setopt(curl, CURLOPT_POST, 1);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
+
+        long httpCode(0);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, hdf);
+
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+        auto res = curl_easy_perform(curl);
+
+        /* Check for errors */
+        if (res != CURLE_OK)
+        {
+            getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+        }
+
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+        curl_easy_cleanup(curl);
+
+        return std::make_tuple(httpCode, val);
     }
 
     void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished)
     {
         std::thread t(
             [url, postData, timeout, finished] {
-                std::string val;
-                // Init curl
-                auto* curl = curl_easy_init();
-                struct curl_slist* headers = NULL;
-                headers = curl_slist_append(headers, "Accept: */*");
-                headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-                // headers = curl_slist_append(headers, "Authorization: 87f0b8e55aad995e96288e0cab45dc73");
-
-                curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-
-                if (!cookie.empty())
-                {
-                    curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
-                }
-
-                // Set headers
-                curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-                curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
-
-                // Don't wait forever, time out after TIMEOUT seconds.
-                curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
-
-                // Follow HTTP redirects if necessary.
-                curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-
-                // curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-                curl_easy_setopt(curl, CURLOPT_POST, 1);
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
-
-                long httpCode(0);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &val);
-                curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
-                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-                curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, hdf);
-
-                curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-
-                auto res = curl_easy_perform(curl);
-                /* Check for errors */
-                if (res != CURLE_OK)
-                {
-                    getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
-                }
-                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-                curl_easy_cleanup(curl);
-                finished(httpCode, val);
+                auto [responseCode, response] = PostSync(url, postData, timeout);
+                finished(responseCode, response);
             });
         t.detach();
     }

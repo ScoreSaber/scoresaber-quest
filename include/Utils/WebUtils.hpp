@@ -6,27 +6,21 @@
 
 #include <functional>
 #include <string>
+#include <tuple>
 
 namespace WebUtils
 {
     extern std::string cookie;
-
-    std::optional<rapidjson::Document> GetJSON(std::string url);
-
-    long Get(std::string url, std::string& val);
-
-    long Get(std::string url, long timeout, std::string& val);
-
+    std::tuple<long, std::string> GetSync(std::string url, long timeout);
     void GetAsync(std::string url, std::function<void(long, std::string)> finished);
-
     void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished);
 
-    /// @brief posts to url and passes them into the finished callback along with the http response code, calls progressUpdate with progressupdates if given
+    std::tuple<long, std::string> PostSync(std::string url, std::string postData, long timeout);
+    /// @brief posts to url and passes them into the finished callback along with the http response code
     /// @param url the url to query
     /// @param postData the postData to send
     /// @param timeout the timeout for the query
     /// @param finished the callback for when we're done downloading
-    /// @param progressUpdate callback to give a progressupdate bar or something
     void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished);
 
     /// @brief gets texture @ url and applies it to out->set_sprite() after downloading

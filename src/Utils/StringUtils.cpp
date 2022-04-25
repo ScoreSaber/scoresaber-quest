@@ -228,6 +228,15 @@ namespace StringUtils
         return str;
     }
 
+    bool Contains(std::string haystack, std::string needle)
+    {
+        if (haystack.find(needle) != std::string::npos)
+        {
+            return true;
+        }
+        return false;
+    }
+
     std::string Il2cppStrToStr(Il2CppString* s)
     {
         return to_utf8(csstrtostr(s));

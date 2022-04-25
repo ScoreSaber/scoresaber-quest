@@ -28,6 +28,7 @@ namespace StringUtils
     std::u16string Resize(std::u16string s, int sizePercent);
 
     std::string Truncate(std::string str, size_t width, bool show_ellipsis);
+    bool Contains(std::string haystack, std::string needle);
 
     std::string RemoveTrailingZeros(std::string s, int zeros);
 

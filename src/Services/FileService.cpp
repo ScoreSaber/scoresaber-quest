@@ -25,7 +25,7 @@ namespace ScoreSaber::Services::FileService
     std::string GetReplayFileName(std::string levelId, std::string difficultyName, std::string characteristic, std::string playerId, std::string songName)
     {
         songName = StringUtils::ReplaceInvalidChars(StringUtils::Truncate(songName, 155, false));
-        std::string replayPath = playerId + "-" + songName + "-" + difficultyName + "-" + characteristic + +levelId;
+        std::string replayPath = playerId + "-" + songName + "-" + difficultyName + "-" + characteristic + "-" + levelId;
         return replayPath;
     }
 } // namespace ScoreSaber::Services::FileService
