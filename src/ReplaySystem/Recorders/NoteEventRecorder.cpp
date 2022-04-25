@@ -116,8 +116,6 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
     void SwingFinisher_didFinish(SwingFinisher* swingFinisher)
     {
-        INFO("allIsOK: %d", swingFinisher->noteCutInfo.get_allIsOK());
-        INFO("directionOK: %d", swingFinisher->noteCutInfo.directionOK);
         _noteKeyframes.push_back(NoteEvent(swingFinisher->noteId, NoteEventType::GoodCut, VRPosition(swingFinisher->noteCutInfo.cutPoint),
                                            VRPosition(swingFinisher->noteCutInfo.cutNormal), VRPosition(swingFinisher->noteCutInfo.saberDir),
                                            (int)swingFinisher->noteCutInfo.saberType, swingFinisher->noteCutInfo.directionOK,

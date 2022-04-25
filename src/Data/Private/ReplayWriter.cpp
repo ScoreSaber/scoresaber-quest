@@ -20,9 +20,9 @@ using namespace std;
 namespace ScoreSaber::Data::Private::ReplayWriter
 {
     int _pointerSize = 38;
-    void Write(ReplayFile* file)
+    std::string Write(ReplayFile* file, std::string fileName)
     {
-        std::string tmpFilePath = ScoreSaber::Static::REPLAY_TMP_DIR + "/b2dbeb695fa205804b1e5e72650ad2bb.tmp";
+        std::string tmpFilePath = ScoreSaber::Static::REPLAY_TMP_DIR + "/" + fileName + ".tmp";
 
         // Open tmp replay file
         ofstream outputStream = ofstream(tmpFilePath, ios::binary);
@@ -90,14 +90,19 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         if (result == ELZMA_E_OK)
         {
             // If compression went okay, add file header to compressed replay and write to disk
-            ofstream finalOutputStream = ofstream(ScoreSaber::Static::REPLAY_DIR + "/76561198283584459-Chug Jug With You-Expert-Standard-4D5D4F9D86C8FD56610D0D157E6EAABFABA9B1C9.dat", ios::binary);
+
+            std::string outputDirectory = ScoreSaber::Static::REPLAY_DIR + "/" + fileName + ".dat";
+
+            ofstream finalOutputStream = ofstream(outputDirectory, ios::binary);
             std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
             finalOutputStream.imbue(utf8_locale);
             WriteRawString("ScoreSaber Replay 👌🤠\r\n", finalOutputStream);
             finalOutputStream.write(reinterpret_cast<char*>(compressed), sz);
             finalOutputStream.flush();
             finalOutputStream.close();
+            return outputDirectory;
         }
+        return NULL;
     }
 
     int WriteMetadata(Metadata* metadata, ofstream& outputStream)

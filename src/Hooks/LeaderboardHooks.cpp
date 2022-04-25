@@ -108,14 +108,5 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardsModel_UploadScore,
                      int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
                      float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
 {
-    INFO("Writing raw replay");
-    ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
-
-    INFO("Writing replay binary");
-    ScoreSaber::Data::Private::ReplayWriter::Write(replay);
-
-    std::string encryptedPacket = ScoreSaber::Services::UploadService::CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
-    ScoreSaber::Services::UploadService::UploadScore(encryptedPacket, [=](bool success) {
-        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, success);
-    });
+    ScoreSaber::Services::UploadService::PrepareAndUploadScore(beatmap, rawScore, modifiedScore, fullCombo, goodCutsCount, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
 }

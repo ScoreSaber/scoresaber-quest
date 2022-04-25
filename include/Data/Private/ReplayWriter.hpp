@@ -1,8 +1,9 @@
 #include "Data/Private/ReplayFile.hpp"
 #include <fstream>
+
 namespace ScoreSaber::Data::Private::ReplayWriter
 {
-    void Write(ReplayFile* file);
+    std::string Write(ReplayFile* file, std::string fileName);
     int WriteMetadata(Metadata* metadata, ofstream& outputStream);
     int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, ofstream& outputStream);
     int WriteVRPose(VRPose vrPose, ofstream& outputStream);

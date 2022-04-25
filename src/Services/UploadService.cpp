@@ -1,13 +1,16 @@
-
-
 #include "Services/UploadService.hpp"
+#include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ScoreSaberUploadData.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
+#include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
+#include "ReplaySystem/Recorders/MainRecorder.hpp"
+#include "Services/FileService.hpp"
 #include "Services/PlayerService.hpp"
+#include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
@@ -19,26 +22,35 @@ using namespace StringUtils;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 using namespace ScoreSaber::Static;
+using namespace ScoreSaber::ReplaySystem;
+using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::Services::UploadService
 {
-
     bool uploading;
-    void UploadScore(std::string scorePacket, std::function<void(bool)> finished)
+
+    void PrepareAndUploadScore(GlobalNamespace::IDifficultyBeatmap* beatmap, int rawScore,
+                               int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
+                               float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers)
     {
-        std::string url = BASE_URL + "/api/game/upload";
-        std::string postData = "data=" + scorePacket;
-        WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
-            if (code == 200)
-            {
-                finished(true);
-            }
-            else
-            {
-                finished(false);
-            }
-            uploading = false;
-        });
+        ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
+
+        auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level());
+        std::string levelHash = Il2cppStrToStr(previewBeatmapLevel->get_levelID()->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty())->ToUpper());
+        std::string characteristic = Il2cppStrToStr(beatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
+        std::string songName = Il2cppStrToStr(previewBeatmapLevel->get_songName());
+        std::string difficultyName = Il2cppStrToStr(BeatmapDifficultySerializedMethods::SerializedName(beatmap->get_difficulty()));
+
+        std::string replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic,
+                                                                                          ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id, songName);
+
+        ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
+
+        std::string encryptedPacket = CreateScorePacket(beatmap, rawScore, modifiedScore, fullCombo, badCutsCount, missedCount, maxCombo, energy, gameplayModifiers);
+
+        // UploadScore(encryptedPacket, [=](bool success) {
+        //     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, success);
+        // });
     }
 
     std::string CreateScorePacket(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, int rawScore,
@@ -46,10 +58,7 @@ namespace ScoreSaber::Services::UploadService
     {
         uploading = true;
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
-        Il2CppString* levelId = previewBeatmapLevel->get_levelID();
-        levelId = levelId->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty());
-
-        std::string levelHash = Il2cppStrToStr(levelId);
+        std::string levelHash = Il2cppStrToStr(previewBeatmapLevel->get_levelID()->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty())->ToUpper());
         std::string gameMode = string_format("Solo%s", Il2cppStrToStr(difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName).c_str());
         int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
 
@@ -61,6 +70,7 @@ namespace ScoreSaber::Services::UploadService
 
         std::u16string playerName = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name;
         std::string playerId = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id;
+
         auto modifiers = GetModifierList(gameplayModifiers, energy);
         int hmd = 32;
 
@@ -78,6 +88,23 @@ namespace ScoreSaber::Services::UploadService
         std::string result = ConvertToHex(encrypted);
         transform(result.begin(), result.end(), result.begin(), ::toupper);
         return result;
+    }
+
+    void UploadScore(std::string scorePacket, std::function<void(bool)> finished)
+    {
+        std::string url = BASE_URL + "/api/game/upload";
+        std::string postData = "data=" + scorePacket;
+        WebUtils::PostAsync(url, postData, 30000, [=](long code, std::string result) {
+            if (code == 200)
+            {
+                finished(true);
+            }
+            else
+            {
+                finished(false);
+            }
+            uploading = false;
+        });
     }
 
     std::vector<std::string> GetModifierList(GlobalNamespace::GameplayModifiers* gameplayModifiers, float energy)
@@ -189,5 +216,4 @@ namespace ScoreSaber::Services::UploadService
         }
         return buffer.str();
     }
-
 } // namespace ScoreSaber::Services::UploadService

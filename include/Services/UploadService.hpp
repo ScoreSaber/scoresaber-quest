@@ -9,6 +9,9 @@
 namespace ScoreSaber::Services::UploadService
 {
     extern bool uploading;
+    void PrepareAndUploadScore(GlobalNamespace::IDifficultyBeatmap* beatmap, int rawScore,
+                               int modifiedScore, bool fullCombo, int goodCutsCount, int badCutsCount, int missedCount, int maxCombo,
+                               float energy, GlobalNamespace::GameplayModifiers* gameplayModifiers);
     void UploadScore(std::string scorePacket, std::function<void(bool)> finished);
     std::string CreateScorePacket(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, int rawScore,
                                   int modifiedScore, bool fullCombo, int badCutsCount, int missedCount, int maxCombo, float energy,

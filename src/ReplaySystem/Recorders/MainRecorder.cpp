@@ -15,26 +15,15 @@ namespace ScoreSaber::ReplaySystem::Recorders::MainRecorder
 {
     ReplayFile* ExportCurrentReplay()
     {
-        INFO("metadata");
         Metadata* metadata = Recorders::MetadataRecorder::Export();
-        INFO("poseKeyFrames");
         vector<VRPoseGroup> poseKeyFrames = Recorders::PoseRecorder::Export();
-        INFO("heightKeyframes");
         vector<HeightEvent> heightKeyframes = Recorders::HeightEventRecorder::Export();
-        INFO("noteKeyframes");
         vector<NoteEvent> noteKeyframes = Recorders::NoteEventRecorder::Export();
-        INFO("scoreKeyframes");
         vector<ScoreEvent> scoreKeyframes = Recorders::ScoreEventRecorder::ExportScoreKeyframes();
-        INFO("comboKeyframes");
         vector<ComboEvent> comboKeyframes = Recorders::ScoreEventRecorder::ExportComboKeyframes();
-        INFO("multiplierKeyframes");
         vector<MultiplierEvent> multiplierKeyframes = Recorders::ScoreEventRecorder::ExportMultiplierKeyframes();
-        INFO("energyKeyframes");
         vector<EnergyEvent> energyKeyframes = Recorders::EnergyEventRecorder::Export();
-        INFO("replayFile");
         auto replayFile = new ReplayFile(metadata, poseKeyFrames, heightKeyframes, noteKeyframes, scoreKeyframes, comboKeyframes, multiplierKeyframes, energyKeyframes);
-        INFO("ScoreSaber::Data::Private::ReplayWriter::Write(replayFile);");
-        ScoreSaber::Data::Private::ReplayWriter::Write(replayFile);
         return replayFile;
     }
-} // namespace ScoreSaber::ReplaySystem::Recorders
+} // namespace ScoreSaber::ReplaySystem::Recorders::MainRecorder

@@ -37,8 +37,6 @@ using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 using namespace ScoreSaber::ReplaySystem;
 
-static ReplayFile* replay;
-
 GlobalNamespace::GameplayCoreSceneSetupData* _gameplayCoreSceneSetupData;
 BeatmapObjectSpawnController::InitData* _beatmapObjectSpawnControllerInitData;
 AudioTimeSyncController* _audioTimeSyncController;
@@ -46,7 +44,6 @@ AudioTimeSyncController* _audioTimeSyncController;
 MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::Start, void, AudioTimeSyncController* self)
 {
     AudioTimeSyncController_Start(self);
-
     _audioTimeSyncController = self;
 
     MainSettingsModelSO* mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
@@ -106,7 +103,6 @@ MAKE_AUTO_HOOK_MATCH(PlayerTransforms_Update, &PlayerTransforms::Update, void, P
 MAKE_AUTO_HOOK_MATCH(StandardLevelGameplayManager_HandleGameEnergyDidReach0, &StandardLevelGameplayManager::HandleGameEnergyDidReach0, void,
                      StandardLevelGameplayManager* self)
 {
-    INFO("levelFailed hit");
     StandardLevelGameplayManager_HandleGameEnergyDidReach0(self);
     Recorders::MetadataRecorder::LevelFailed();
 }

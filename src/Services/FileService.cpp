@@ -4,23 +4,28 @@
 #include "logging.hpp"
 #include "static.hpp"
 
-using namespace ScoreSaber::Static;
-
 namespace ScoreSaber::Services::FileService
 {
     void EnsurePaths()
     {
-        if (!direxists(DATA_DIR))
+        if (!direxists(ScoreSaber::Static::DATA_DIR))
         {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(DATA_DIR));
+            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(ScoreSaber::Static::DATA_DIR));
         }
-        if (!direxists(REPLAY_DIR))
+        if (!direxists(ScoreSaber::Static::REPLAY_DIR))
         {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(REPLAY_DIR));
+            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(ScoreSaber::Static::REPLAY_DIR));
         }
-        if (!direxists(REPLAY_TMP_DIR))
+        if (!direxists(ScoreSaber::Static::REPLAY_TMP_DIR))
         {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(REPLAY_TMP_DIR));
+            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(ScoreSaber::Static::REPLAY_TMP_DIR));
         }
+    }
+
+    std::string GetReplayFileName(std::string levelId, std::string difficultyName, std::string characteristic, std::string playerId, std::string songName)
+    {
+        songName = StringUtils::ReplaceInvalidChars(StringUtils::Truncate(songName, 155, false));
+        std::string replayPath = playerId + "-" + songName + "-" + difficultyName + "-" + characteristic + +levelId;
+        return replayPath;
     }
 } // namespace ScoreSaber::Services::FileService

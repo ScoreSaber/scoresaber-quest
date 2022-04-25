@@ -10,6 +10,8 @@ namespace StringUtils
 
     std::string to_utf8(std::u16string_view view);
 
+    std::string ReplaceInvalidChars(std::string fileName);
+
     std::string GetRoleColor(std::string role);
 
     std::string FormatScore(std::string percent);
@@ -24,6 +26,8 @@ namespace StringUtils
 
     std::string Resize(std::string s, int sizePercent);
     std::u16string Resize(std::u16string s, int sizePercent);
+
+    std::string Truncate(std::string str, size_t width, bool show_ellipsis);
 
     std::string RemoveTrailingZeros(std::string s, int zeros);
 

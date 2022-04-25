@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#include "System/IO/Path.hpp"
+#include "System/String.hpp"
+
 static std::string color_prefix = "<color=";
 static std::string color_suffix = "</color>";
 static std::string size_prefix = "<size=";
@@ -25,6 +28,14 @@ namespace StringUtils
     {
         return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
             .to_bytes(view.data());
+    }
+
+    std::string ReplaceInvalidChars(std::string fileName)
+    {
+        auto fileNameCstr = StrToIl2cppStr(fileName);
+        auto splitChars = fileNameCstr->Split(System::IO::Path::GetInvalidFileNameChars());
+        auto result = System::String::Join(StrToIl2cppStr("_"), splitChars);
+        return Il2cppStrToStr(result);
     }
 
     std::string GetRoleColor(std::string role)
@@ -207,6 +218,16 @@ namespace StringUtils
         return size_prefix_u16 + to_utf16(to_string(sizePercent)) + u"\%>" + s + size_suffix_u16;
     }
 
+    std::string Truncate(std::string str, size_t width, bool show_ellipsis = true)
+    {
+        if (str.length() > width)
+            if (show_ellipsis)
+                return str.substr(0, width) + "...";
+            else
+                return str.substr(0, width);
+        return str;
+    }
+
     std::string Il2cppStrToStr(Il2CppString* s)
     {
         return to_utf8(csstrtostr(s));
@@ -216,6 +237,7 @@ namespace StringUtils
     {
         return il2cpp_utils::newcsstr(s);
     }
+
     Il2CppString* StrToIl2cppStr(std::string_view s)
     {
         return il2cpp_utils::newcsstr(s);
