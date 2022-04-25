@@ -51,7 +51,7 @@ namespace ScoreSaber::UI::Other
     {
         if (playerId == "")
             co_return;
-        std::string url = string_format("%s/api/player/%s/full", ScoreSaber::Static::BASE_URL, playerId.c_str());
+        std::string url = string_format("%s/api/player/%s/full", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
         UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(url));
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
         if (!webRequest->get_isNetworkError())

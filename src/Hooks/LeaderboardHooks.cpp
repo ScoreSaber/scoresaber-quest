@@ -109,7 +109,6 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
                      GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::LevelCompletionResults* levelCompletionResults)
 {
-    INFO("StandardLevelScenesTransitionSetupDataSO_Finish hit");
     ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
     StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
 }
