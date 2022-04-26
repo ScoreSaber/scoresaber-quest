@@ -19,6 +19,7 @@
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
+#include "Utils/obfuscation.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -43,7 +44,7 @@ namespace ScoreSaber::Services::UploadService
         PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
         if (!practiceViewController->get_isInViewControllerHierarchy())
         {
-            if (Il2cppStrToStr(standardLevelScenesTransitionSetupData->gameMode) == "Solo")
+            if (Il2cppStrToStr(standardLevelScenesTransitionSetupData->gameMode) == ENCRYPT_STRING_AUTO_A(encoder, "Solo"))
             {
                 if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
                 {
@@ -101,7 +102,7 @@ namespace ScoreSaber::Services::UploadService
 
     void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, std::string uploadPacket, std::string replayFileName)
     {
-        INFO("Getting current leaderboard data for leaderboard");
+        // INFO(encoder, "Getting current leaderboard data for leaderboard");
         LeaderboardService::GetLeaderboardData(
             beatmap, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
                 bool ranked = true;
@@ -113,15 +114,15 @@ namespace ScoreSaber::Services::UploadService
                     {
                         if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
                         {
-                            ERROR("Didn't beat score not uploading");
-                            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#89fc81>Didn't beat score, not uploading</color>");
+                            //  ERROR("Didn't beat score not uploading");
+                            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#89fc81>Didn't beat score, not uploading</color>"));
                             return;
                         }
                     }
                 }
                 else
                 {
-                    ERROR("Failed to get leaderboards ranked status");
+                    // ERROR("Failed to get leaderboards ranked status");
                 }
 
                 ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
@@ -129,8 +130,8 @@ namespace ScoreSaber::Services::UploadService
                 std::thread t([replay, replayFileName, uploadPacket, ranked] {
                     std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
 
-                    std::string url = BASE_URL + "/api/game/upload";
-                    std::string postData = "data=" + uploadPacket;
+                    std::string url = BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/upload");
+                    std::string postData = ENCRYPT_STRING_AUTO_A(encoder, "data=") + uploadPacket;
 
                     int attempts = 0;
                     bool done = false;
@@ -144,28 +145,28 @@ namespace ScoreSaber::Services::UploadService
                             auto [responseCode, response] = WebUtils::PostSync(url, postData, 30000);
                             if (responseCode == 200)
                             {
-                                INFO("Score uploaded successfully");
+                                //  INFO("Score uploaded successfully");
                                 done = true;
                             }
                             if (responseCode == 403)
                             {
-                                INFO("Player banned, score didn't upload");
+                                // INFO("Player banned, score didn't upload");
                                 done = true;
                                 failed = true;
                             }
                         }
                         else
                         {
-                            INFO("Uploading ranked score...");
+                            //  INFO("Uploading ranked score...");
                             auto [responseCode, response] = WebUtils::PostWithFileSync(url, serializedReplayPath, uploadPacket, 30000);
                             if (responseCode == 200)
                             {
-                                INFO("Score uploaded successfully");
+                                // INFO("Score uploaded successfully");
                                 done = true;
                             }
                             if (responseCode == 403)
                             {
-                                INFO("Player banned, score didn't upload");
+                                // INFO("Player banned, score didn't upload");
                                 done = true;
                                 failed = true;
                             }
@@ -176,7 +177,7 @@ namespace ScoreSaber::Services::UploadService
                             if (attempts < 4)
                             {
                                 // Failed but retry
-                                ERROR("Score failed to upload, retrying");
+                                // ERROR("Score failed to upload, retrying");
                                 attempts++;
                                 std::this_thread::sleep_for(2000ms);
                             }
@@ -193,14 +194,14 @@ namespace ScoreSaber::Services::UploadService
                     {
                         // Score uploaded successfully
                         // Save local replay
-                        INFO("Score uploaded");
+                        // INFO("Score uploaded");
                         MoveReplay(serializedReplayPath, replayFileName);
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
                     }
 
                     if (failed)
                     {
-                        ERROR("Failed to upload score");
+                        // ERROR("Failed to upload score");
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false);
                         // Failed to upload score, tell user
                     }
@@ -217,7 +218,7 @@ namespace ScoreSaber::Services::UploadService
         std::string newFilePath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
         if (std::rename(replayPath.c_str(), newFilePath.c_str()) != 0)
         {
-            ERROR("Failed to save local replay");
+            // ERROR("Failed to save local replay");
         }
     }
 
@@ -243,12 +244,12 @@ namespace ScoreSaber::Services::UploadService
         int hmd = 32;
 
         ScoreSaberUploadData data(playerName, playerId, rawScore, levelHash, songName, songSubName, levelAuthorName, songAuthorName, bpm,
-                                  difficulty, "infoHash", modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, hmd);
+                                  difficulty, ENCRYPT_STRING_AUTO_A(encoder, "infoHash"), modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, hmd);
 
         std::string uploadData = data.serialize();
 
         // UMBY: Obfuscate
-        std::string key = md5("f0b4a81c9bd3ded1081b365f7628781f-" + ScoreSaber::Services::PlayerService::playerInfo.playerKey + "-" + playerId + "-f0b4a81c9bd3ded1081b365f7628781f");
+        std::string key = md5(ENCRYPT_STRING_AUTO_A(encoder, "f0b4a81c9bd3ded1081b365f7628781f-") + ScoreSaber::Services::PlayerService::playerInfo.playerKey + "-" + playerId + ENCRYPT_STRING_AUTO_A(encoder, "-f0b4a81c9bd3ded1081b365f7628781f"));
 
         std::vector<unsigned char> keyBytes(key.begin(), key.end());
         std::vector<unsigned char> uploadDataBytes(uploadData.begin(), uploadData.end());
@@ -263,71 +264,71 @@ namespace ScoreSaber::Services::UploadService
         std::vector<std::string> results;
         if (gameplayModifiers->energyType == GameplayModifiers::EnergyType::Battery)
         {
-            results.push_back("BE");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "BE"));
         }
         if (gameplayModifiers->noFailOn0Energy && energy == 0)
         {
-            results.push_back("NF");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NF"));
         }
         if (gameplayModifiers->noFailOn0Energy && energy == -1)
         {
-            results.push_back("NF");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NF"));
         }
         if (gameplayModifiers->instaFail)
         {
-            results.push_back("IF");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "IF"));
         }
         if (gameplayModifiers->failOnSaberClash)
         {
-            results.push_back("SC");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SC"));
         }
         if (gameplayModifiers->enabledObstacleType == GameplayModifiers::EnabledObstacleType::NoObstacles)
         {
-            results.push_back("NO");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NO"));
         }
         if (gameplayModifiers->noBombs)
         {
-            results.push_back("NB");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NB"));
         }
         if (gameplayModifiers->strictAngles)
         {
-            results.push_back("SA");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SA"));
         }
         if (gameplayModifiers->disappearingArrows)
         {
-            results.push_back("DA");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "DA"));
         }
         if (gameplayModifiers->ghostNotes)
         {
-            results.push_back("GN");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "GN"));
         }
         if (gameplayModifiers->songSpeed == GameplayModifiers::SongSpeed::Slower)
         {
-            results.push_back("SS");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SS"));
         }
         if (gameplayModifiers->songSpeed == GameplayModifiers::SongSpeed::Faster)
         {
-            results.push_back("FS");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "FS"));
         }
         if (gameplayModifiers->songSpeed == GameplayModifiers::SongSpeed::SuperFast)
         {
-            results.push_back("SF");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SF"));
         }
         if (gameplayModifiers->smallCubes)
         {
-            results.push_back("SC");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SC"));
         }
         if (gameplayModifiers->strictAngles)
         {
-            results.push_back("SA");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SA"));
         }
         if (gameplayModifiers->proMode)
         {
-            results.push_back("PM");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "PM"));
         }
         if (gameplayModifiers->noArrows)
         {
-            results.push_back("NA");
+            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NA"));
         }
         return results;
     }

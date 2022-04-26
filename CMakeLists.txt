@@ -21,8 +21,11 @@ add_compile_options(-ffunction-sections)
 # add_compile_options(-fvisibility-inlines-hidden)
 # add_compile_options(-fvisibility=hidden)
 # add_compile_options(-DHAVE_NEON=1)
-# add_compile_options(-DNDEBUG)
 # add_compile_options(-Wno-inaccessible-base)
+
+# RELEASE FLAGS
+add_compile_options(-DNDEBUG)
+
 # compile definitions used
 add_compile_definitions(VERSION=\"${MOD_VERSION}\")
 add_compile_definitions(ID=\"${MOD_ID}\")

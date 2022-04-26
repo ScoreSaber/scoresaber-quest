@@ -5,6 +5,7 @@
 #include "System/IO/Directory.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/StringUtils.hpp"
+#include "Utils/obfuscation.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
@@ -44,7 +45,8 @@ namespace ScoreSaber::Services::PlayerService
         // UMBY: Obfuscate auth url
         // UMBY: Friends
 
-        std::string postData = "at=2&playerId=" + playerId + "&nonce=" + steamKey + "&friends=3692740027462863,76561198064659288,76561198283584459,76561198278902434,76561198353781972,76561199210789241&name=nah";
+        std::string postData = string_format(ENCRYPT_STRING_AUTO_A(encoder, "at=2&playerId=%s&nonce=%s&friends=3692740027462863,76561198064659288&name=nah"),
+                                             playerId.c_str(), steamKey.c_str());
 
         std::string authUrl = ScoreSaber::Static::BASE_URL + "/api/game/auth";
 
@@ -65,7 +67,7 @@ namespace ScoreSaber::Services::PlayerService
             }
             else
             {
-                ERROR("Authentication error");
+                // ERROR("Authentication error");
                 playerInfo.loginStatus = LoginStatus::Error;
                 finished(LoginStatus::Error);
             }
@@ -75,17 +77,15 @@ namespace ScoreSaber::Services::PlayerService
     void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished)
     {
 
-        std::string url = string_format("%s/api/player/%s", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
-
-        // std::string url = string_format("https://scoresaber.com/api/player/%s", playerId.c_str());
+        std::string url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/api/player/%s"), ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
 
         if (full)
         {
-            url = string_format("%s/full", url.c_str());
+            url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/full"), url.c_str());
         }
         else
         {
-            url = string_format("%s/basic", url.c_str());
+            url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/basic"), url.c_str());
         }
 
         WebUtils::GetAsync(url, [&, finished](long code, std::string result) {

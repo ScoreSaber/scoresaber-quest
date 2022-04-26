@@ -65,8 +65,6 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
                      void, GlobalNamespace::PlatformLeaderboardViewController* self,
                      bool showLoadingIndicator, bool clear)
 {
-
-    // PlatformLeaderboardViewController_Refresh(self, showLoadingIndicator, clear);
     self->hasScoresData = false;
     self->leaderboardTableView->SetScores(System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor(), -1);
     LoadingControl* loadingControl = self->loadingControl;

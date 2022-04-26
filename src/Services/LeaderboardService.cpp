@@ -17,6 +17,7 @@
 
 #include "Services/PlayerService.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
+#include "Utils/obfuscation.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "logging.hpp"
 #include "static.hpp"
@@ -29,7 +30,7 @@ namespace ScoreSaber::Services::LeaderboardService
 {
     std::string GetLeaderboardUrl(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry)
     {
-        std::string url = ScoreSaber::Static::BASE_URL + "/api/game/leaderboard";
+        std::string url = ScoreSaber::Static::BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/leaderboard");
 
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
         Il2CppString* levelId = previewBeatmapLevel->get_levelID();
@@ -43,22 +44,22 @@ namespace ScoreSaber::Services::LeaderboardService
             switch (scope)
             {
                 case PlatformLeaderboardsModel::ScoresScope::Global: {
-                    url = string_format("%s/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                    url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/%s/mode/%s/difficulty/%d?page=%d"), url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
                     break;
                 }
                 case PlatformLeaderboardsModel::ScoresScope::AroundPlayer: {
-                    url = string_format("%s/around-player/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                    url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/around-player/%s/mode/%s/difficulty/%d?page=%d"), url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
                     break;
                 }
                 case PlatformLeaderboardsModel::ScoresScope::Friends: {
-                    url = string_format("%s/around-friends/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                    url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/around-friends/%s/mode/%s/difficulty/%d?page=%d"), url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
                     break;
                 }
             }
         }
         else
         {
-            url = string_format("%s/around-country/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+            url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/around-country/%s/mode/%s/difficulty/%d?page=%d"), url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
         }
 
         return url;
