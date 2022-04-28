@@ -58,7 +58,7 @@ namespace ScoreSaber::Services::UploadService
                     return;
                 }
 
-                if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndStateType::Cleared)
+                if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared)
                 {
                     if (levelCompletionResults->gameplayModifiers->noFailOn0Energy)
                     {
@@ -88,7 +88,6 @@ namespace ScoreSaber::Services::UploadService
         std::string encryptedPacket = CreateScorePacket(beatmap, levelCompletionResults->rawScore, levelCompletionResults->modifiedScore,
                                                         levelCompletionResults->fullCombo, levelCompletionResults->badCutsCount, levelCompletionResults->missedCount,
                                                         levelCompletionResults->maxCombo, levelCompletionResults->energy, levelCompletionResults->gameplayModifiers);
-
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level());
         std::string levelHash = Il2cppStrToStr(previewBeatmapLevel->get_levelID()->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty())->ToUpper());
         std::string characteristic = Il2cppStrToStr(beatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
@@ -106,7 +105,6 @@ namespace ScoreSaber::Services::UploadService
         LeaderboardService::GetLeaderboardData(
             beatmap, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
                 bool ranked = true;
-
                 if (internalLeaderboard.leaderboard.has_value())
                 {
                     ranked = internalLeaderboard.leaderboard.value().leaderboardInfo.ranked;
@@ -124,15 +122,12 @@ namespace ScoreSaber::Services::UploadService
                 {
                     // ERROR("Failed to get leaderboards ranked status");
                 }
-
                 ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
 
                 std::thread t([replay, replayFileName, uploadPacket, ranked] {
                     std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
-
                     std::string url = BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/upload");
                     std::string postData = ENCRYPT_STRING_AUTO_A(encoder, "data=") + uploadPacket;
-
                     int attempts = 0;
                     bool done = false;
                     bool failed = false;

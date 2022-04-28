@@ -113,7 +113,6 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
                      GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::LevelCompletionResults* levelCompletionResults)
 {
-
     if (StringUtils::GetEnv(ENCRYPT_STRING_AUTO_A(encoder, "disable_ss_upload")) != "1")
     {
         ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
