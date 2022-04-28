@@ -99,7 +99,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
 
             _playButton = _standardLevelDetailViewController->standardLevelDetailView->actionButton;
-
             _platformLeaderboardViewController = self;
             Sprite* globalLeaderboardIcon = self->globalLeaderboardIcon;
             Sprite* friendsLeaderboardIcon = self->friendsLeaderboardIcon;
@@ -184,6 +183,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         }
     }
 
+    void DidDeactivate()
+    {
+        _activated = false;
+        _pageUpButton = nullptr;
+        _pageDownButton = nullptr;
+    }
+
     void RefreshLeaderboard(IDifficultyBeatmap* difficultyBeatmap, LeaderboardTableView* tableView,
                             PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl,
                             std::string refreshId)
@@ -200,8 +206,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         }
 
         SetPlayButtonState(false);
-
         leaderboardScoreInfoButtonHandler->set_buttonCount(0);
+
         if (PlayerService::playerInfo.loginStatus == PlayerService::LoginStatus::Error)
         {
             SetErrorState(loadingControl, "ScoreSaber authentication failed, please restart Beat Saber", false);

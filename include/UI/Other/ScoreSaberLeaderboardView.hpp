@@ -23,6 +23,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     void ResetPage();
     void DidActivate(PlatformLeaderboardViewController* self,
                      bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
+    void DidDeactivate();
     void ChangeScope(bool filterAroundCountry);
     void RefreshLeaderboard(IDifficultyBeatmap* difficultyBeatmap, LeaderboardTableView* tableView, PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl, std::string refreshId);
     void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo);

@@ -30,6 +30,9 @@
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
+#include "GlobalNamespace/MenuTransitionsHelper.hpp"
+
+#include "Utils/obfuscation.hpp"
 #include "logging.hpp"
 
 using namespace HMUI;
@@ -51,13 +54,16 @@ MAKE_AUTO_HOOK_MATCH(
 {
 
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ResetPage();
-
     PlatformLeaderboardViewController_DidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
-
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::DidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
-
     auto segmentedControl = reinterpret_cast<SegmentedControl*>(self->scopeSegmentedControl);
     segmentedControl->SelectCellWithNumber(_lastScopeIndex);
+}
+
+MAKE_AUTO_HOOK_MATCH(MenuTransitionsHelper_RestartGame, &GlobalNamespace::MenuTransitionsHelper::RestartGame, void, GlobalNamespace::MenuTransitionsHelper* self, System::Action_1<Zenject::DiContainer*>* finishCallback)
+{
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::DidDeactivate();
+    MenuTransitionsHelper_RestartGame(self, finishCallback);
 }
 
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
@@ -107,6 +113,10 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
                      GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::LevelCompletionResults* levelCompletionResults)
 {
-    ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
+
+    if (StringUtils::GetEnv(ENCRYPT_STRING_AUTO_A(encoder, "disable_ss_upload")) != "1")
+    {
+        ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
+    }
     StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
 }

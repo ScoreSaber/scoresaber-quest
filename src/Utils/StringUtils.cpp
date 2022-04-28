@@ -24,6 +24,19 @@ using namespace std;
 namespace StringUtils
 {
 
+    std::string GetEnv(const std::string& var)
+    {
+        const char* val = std::getenv(var.c_str());
+        if (val == nullptr)
+        { // invalid to assign nullptr to std::string
+            return "";
+        }
+        else
+        {
+            return val;
+        }
+    }
+
     std::string to_utf8(std::u16string_view view)
     {
         return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
