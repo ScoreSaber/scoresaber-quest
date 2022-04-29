@@ -244,12 +244,13 @@ namespace ScoreSaber::Services::UploadService
         auto modifiers = GetModifierList(gameplayModifiers, energy);
         int hmd = 32;
 
+        std::string infoHash = md5(readfile(ScoreSaber::Static::MOD_DIR + "/libscoresaber.so"));
+
         ScoreSaberUploadData data(playerName, playerId, rawScore, levelHash, songName, songSubName, levelAuthorName, songAuthorName, bpm,
-                                  difficulty, ENCRYPT_STRING_AUTO_A(encoder, "infoHash"), modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, hmd);
+                                  difficulty, infoHash, modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, hmd);
 
         std::string uploadData = data.serialize();
 
-        // UMBY: Obfuscate
         std::string key = md5(ENCRYPT_STRING_AUTO_A(encoder, "f0b4a81c9bd3ded1081b365f7628781f-") + ScoreSaber::Services::PlayerService::playerInfo.playerKey + "-" + playerId + ENCRYPT_STRING_AUTO_A(encoder, "-f0b4a81c9bd3ded1081b365f7628781f"));
 
         std::vector<unsigned char> keyBytes(key.begin(), key.end());
