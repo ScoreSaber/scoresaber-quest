@@ -34,9 +34,8 @@ namespace ScoreSaber::Services::LeaderboardService
 
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
         Il2CppString* levelId = previewBeatmapLevel->get_levelID();
-        levelId = levelId->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty());
+        std::string levelHash = StringUtils::GetFormattedHash(levelId);
 
-        std::string levelHash = Il2cppStrToStr(levelId);
         std::string gameMode = string_format("Solo%s", Il2cppStrToStr(difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName).c_str());
         int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
         if (!filterAroundCountry)

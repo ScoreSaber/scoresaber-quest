@@ -8,6 +8,7 @@
 
 #include "System/IO/Path.hpp"
 #include "System/String.hpp"
+#include "logging.hpp"
 
 static std::string color_prefix = "<color=";
 static std::string color_suffix = "</color>";
@@ -23,6 +24,20 @@ using namespace std;
 
 namespace StringUtils
 {
+
+    std::string GetFormattedHash(Il2CppString* levelId)
+    {
+        std::string thing = Il2cppStrToStr(levelId);
+        if (!Contains(thing, "custom_level_"))
+        {
+            return "ost_" + thing;
+        }
+        else
+        {
+            levelId = levelId->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty());
+            return Il2cppStrToStr(levelId);
+        }
+    }
 
     std::string GetEnv(const std::string& var)
     {

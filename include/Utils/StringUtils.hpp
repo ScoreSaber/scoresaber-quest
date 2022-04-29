@@ -8,6 +8,8 @@
 namespace StringUtils
 {
 
+    std::string GetFormattedHash(Il2CppString* levelId);
+
     std::string GetEnv(const std::string& var);
 
     std::string to_utf8(std::u16string_view view);

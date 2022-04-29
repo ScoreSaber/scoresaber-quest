@@ -89,7 +89,9 @@ namespace ScoreSaber::Services::UploadService
                                                         levelCompletionResults->fullCombo, levelCompletionResults->badCutsCount, levelCompletionResults->missedCount,
                                                         levelCompletionResults->maxCombo, levelCompletionResults->energy, levelCompletionResults->gameplayModifiers);
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level());
-        std::string levelHash = Il2cppStrToStr(previewBeatmapLevel->get_levelID()->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty())->ToUpper());
+
+        std::string levelHash = GetFormattedHash(previewBeatmapLevel->get_levelID());
+
         std::string characteristic = Il2cppStrToStr(beatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
         std::string songName = Il2cppStrToStr(previewBeatmapLevel->get_songName());
         std::string difficultyName = Il2cppStrToStr(BeatmapDifficultySerializedMethods::SerializedName(beatmap->get_difficulty()));
@@ -222,7 +224,9 @@ namespace ScoreSaber::Services::UploadService
                                   GlobalNamespace::GameplayModifiers* gameplayModifiers)
     {
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
-        std::string levelHash = Il2cppStrToStr(previewBeatmapLevel->get_levelID()->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty())->ToUpper());
+
+        std::string levelHash = GetFormattedHash(previewBeatmapLevel->get_levelID());
+
         std::string gameMode = string_format("Solo%s", Il2cppStrToStr(difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName).c_str());
         int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
 
