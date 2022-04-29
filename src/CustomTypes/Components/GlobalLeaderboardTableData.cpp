@@ -39,7 +39,6 @@ Data::PlayerCollection playerCollection;
 custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData* self)
 {
     std::string url = self->get_leaderboardURL();
-    INFO("Getting player data from url %s", url.c_str());
     UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(StringUtils::StrToIl2cppStr(url));
     webRequest->SetRequestHeader(il2cpp_utils::newcsstr("Cookie"), il2cpp_utils::newcsstr(WebUtils::cookie));
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(

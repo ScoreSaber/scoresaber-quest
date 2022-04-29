@@ -36,7 +36,7 @@ Logger& getLogger()
 }
 
 // Called at the early stages of game loading
-extern "C" void setup(ModInfo& info)
+extern "C" __attribute((visibility("default"))) void setup(ModInfo& info)
 {
     info = modInfo;
 

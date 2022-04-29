@@ -55,7 +55,7 @@ namespace ScoreSaber::Services::PlayerService
         std::string postData = string_format(ENCRYPT_STRING_AUTO_A(encoder, "at=2&playerId=%s&nonce=%s&friends=%s&name="),
                                              playerId.c_str(), steamKey.c_str(), friends.c_str());
 
-        std::string authUrl = ScoreSaber::Static::BASE_URL + "/api/game/auth";
+        std::string authUrl = ScoreSaber::Static::BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/auth");
 
         WebUtils::PostAsync(authUrl, postData, 6000, [=](long code, std::string result) {
             if (code == 200)
