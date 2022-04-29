@@ -52,8 +52,6 @@ namespace ScoreSaber::Services::PlayerService
             friends = readfile(ScoreSaber::Static::FRIENDS_PATH);
         }
 
-        // UMBY: Friends
-
         std::string postData = string_format(ENCRYPT_STRING_AUTO_A(encoder, "at=2&playerId=%s&nonce=%s&friends=%s&name="),
                                              playerId.c_str(), steamKey.c_str(), friends.c_str());
 
