@@ -32,6 +32,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     void DirectionalButtonClicked(PageDirection direction);
     void SetPlayButtonState(bool state);
-    void SetUploadState(bool state, bool success, std::string errorMessage = "<color=#89fc81>Upload failed</color>");
+    void SetUploadState(bool state, bool success, std::string errorMessage = "<color=#fc8181>Upload failed</color>");
     void CheckPage();
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView

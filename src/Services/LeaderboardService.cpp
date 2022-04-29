@@ -115,17 +115,13 @@ namespace ScoreSaber::Services::LeaderboardService
                 int length = currentLeaderboard.scores.size();
                 for (auto& score : currentLeaderboard.scores)
                 {
-                    auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
-                    std::u16string coloredName = to_utf16("0");
 
-                    if (leaderboardPlayerInfo.role.has_value() && leaderboardPlayerInfo.name.has_value())
-                    {
-                        coloredName = Colorize(leaderboardPlayerInfo.name.value(), GetRoleColor(leaderboardPlayerInfo.role.value()));
-                    }
+                    auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
+                    INFO("%s", leaderboardPlayerInfo.name.value().c_str());
 
                     std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
-                    std::u16string result = Resize(coloredName + formattedScore + formattedPP, 80);
+                    std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 80);
 
                     scores->Add(LeaderboardTableView::ScoreData::New_ctor(score.modifiedScore, StrToIl2cppStr(result), score.rank, false));
                     // self->mapRanked = score.pp > 0.0f;

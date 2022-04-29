@@ -103,6 +103,7 @@ namespace ScoreSaber::Services::UploadService
 
     void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, std::string uploadPacket, std::string replayFileName)
     {
+        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
         // INFO(encoder, "Getting current leaderboard data for leaderboard");
         LeaderboardService::GetLeaderboardData(
             beatmap, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
@@ -115,7 +116,8 @@ namespace ScoreSaber::Services::UploadService
                         if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
                         {
                             //  ERROR("Didn't beat score not uploading");
-                            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#89fc81>Didn't beat score, not uploading</color>"));
+                            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>Didn't beat score, not uploading</color>"));
+                            uploading = false;
                             return;
                         }
                     }
