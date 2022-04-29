@@ -23,6 +23,7 @@ namespace ScoreSaber::Services::PlayerService
 
         std::string steamKey = "";
         std::string playerId = "";
+        std::string friends = "";
 
         if (fileexists(ScoreSaber::Static::STEAM_KEY_PATH))
         {
@@ -41,12 +42,20 @@ namespace ScoreSaber::Services::PlayerService
             return;
         }
 
-        // UMBY: Check if steam key is null (for release)
-        // UMBY: Obfuscate auth url
+        if (fileexists(ScoreSaber::Static::FRIENDS_PATH))
+        {
+            friends = readfile(ScoreSaber::Static::FRIENDS_PATH);
+        }
+        else
+        {
+            writefile(ScoreSaber::Static::FRIENDS_PATH, "76561198283584459," + playerId);
+            friends = readfile(ScoreSaber::Static::FRIENDS_PATH);
+        }
+
         // UMBY: Friends
 
-        std::string postData = string_format(ENCRYPT_STRING_AUTO_A(encoder, "at=2&playerId=%s&nonce=%s&friends=3692740027462863,76561198064659288&name=nah"),
-                                             playerId.c_str(), steamKey.c_str());
+        std::string postData = string_format(ENCRYPT_STRING_AUTO_A(encoder, "at=2&playerId=%s&nonce=%s&friends=%s&name="),
+                                             playerId.c_str(), steamKey.c_str(), friends.c_str());
 
         std::string authUrl = ScoreSaber::Static::BASE_URL + "/api/game/auth";
 
