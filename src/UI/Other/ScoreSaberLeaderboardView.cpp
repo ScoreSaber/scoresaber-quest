@@ -175,7 +175,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                         break;
                     }
                     case PlayerService::LoginStatus::Error: {
-                        ScoreSaberBanner->Prompt(ENCRYPT_STRING_AUTO_A(encoder, "<color=#89fc81>Authentication failed</color>"), false, 5.0f, nullptr);
+                        ScoreSaberBanner->Prompt(ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>Authentication failed</color>"), false, 5.0f, nullptr);
                         break;
                     }
                 }
