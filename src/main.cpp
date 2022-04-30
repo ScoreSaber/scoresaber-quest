@@ -21,13 +21,6 @@ Configuration& getConfig()
     return config;
 }
 
-// HACK: Move to the next scene upon health and safety loading
-// just here to make loading faster, can be removed in the final version
-// MAKE_AUTO_HOOK_MATCH(HealthWarningFlowCoordinator_DidActivate, &GlobalNamespace::HealthWarningFlowCoordinator::DidActivate, void, GlobalNamespace::HealthWarningFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-// {
-//     self->gameScenesManager->ReplaceScenes(self->initData->nextScenesTransitionSetupData, 0.0f, nullptr, nullptr);
-// }
-
 // Returns a logger, useful for printing debug messages
 Logger& getLogger()
 {

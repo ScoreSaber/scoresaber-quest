@@ -1,14 +1,19 @@
 {
    "_QPVersion": "0.1.1",
-   "name": "${mod_name}",
-   "id": "${mod_id}",
+   "name": "ScoreSaber",
+   "id": "scoresaber",
    "author": "Umbranox, Optimus, RedBrumbler",
-   "version": "${version}",
+   "version": "1.0.0",
    "coverImage": "logo.jpg",
    "packageId": "com.beatgames.beatsaber",
    "packageVersion": "1.17.1",
-   "description": "ScoreSaber UI implementation for the Oculus Quest",
-   "modFiles": [],
-   "libraryFiles": [],
-   "fileCopies": []
+   "description": "Allows you to upload scores to an online leaderboard at https://scoresaber.com. Earn PP from ranked maps and compare scores with others.",
+   "modFiles": ["libscoresaber.so"],
+   "libraryFiles": ["libbeatsaber-hook_2_3_2.so"],
+   "fileCopies": [
+      {
+         "name": "scoresaber_DO_NOT_SHARE.scary",
+         "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaber/scoresaber_DO_NOT_SHARE.scary"
+      }
+   ]
 }
