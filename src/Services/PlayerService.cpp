@@ -122,18 +122,26 @@ namespace ScoreSaber::Services::PlayerService
         std::thread t([] {
             while (true)
             {
-                UpdatePlayerInfo();
+                UpdatePlayerInfo(false);
                 std::this_thread::sleep_for(std::chrono::seconds(300));
             }
         });
         t.detach();
     }
 
-    void UpdatePlayerInfo()
+    void UpdatePlayerInfo(bool fromMainThread)
     {
-        QuestUI::MainThreadScheduler::Schedule([=]() {
+        if (!fromMainThread)
+        {
+            QuestUI::MainThreadScheduler::Schedule([=]() {
+                ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
+            });
+        }
+        else
+        {
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
-        });
+        }
+
         GetPlayerInfo(playerInfo.localPlayerData.id, true, [=](std::optional<Data::Player> playerData) {
             if (playerData.has_value())
             {

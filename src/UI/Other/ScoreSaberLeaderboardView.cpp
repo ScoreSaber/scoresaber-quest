@@ -381,9 +381,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             else
             {
                 _platformLeaderboardViewController->Refresh(true, true);
+
                 if (success)
                 {
                     ScoreSaberBanner->set_prompt(ENCRYPT_STRING_AUTO_A(encoder, "<color=#89fc81>Score uploaded successfully</color>"), 5);
+                    PlayerService::UpdatePlayerInfo(true);
                 }
                 else
                 {
