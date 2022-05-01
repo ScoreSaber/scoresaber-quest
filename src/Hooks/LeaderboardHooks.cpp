@@ -84,7 +84,6 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedContr
 {
 
     bool filterAroundCountry = false;
-
     switch (cellNumber)
     {
         case 0: {
@@ -100,12 +99,12 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedContr
             break;
         }
         case 3: {
+            self->_set__scoresScope(PlatformLeaderboardsModel::ScoresScope::Global);
             filterAroundCountry = true;
             break;
         }
     }
     _lastScopeIndex = cellNumber;
-
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ChangeScope(filterAroundCountry);
 }
 

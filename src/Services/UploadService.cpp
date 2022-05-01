@@ -24,6 +24,7 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
 #include "static.hpp"
+#include <chrono>
 #include <thread>
 
 using namespace StringUtils;
@@ -129,6 +130,7 @@ namespace ScoreSaber::Services::UploadService
                 ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
 
                 std::thread t([replay, replayFileName, uploadPacket, ranked] {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
                     std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
                     std::string url = BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/upload");
                     std::string postData = ENCRYPT_STRING_AUTO_A(encoder, "data=") + uploadPacket;

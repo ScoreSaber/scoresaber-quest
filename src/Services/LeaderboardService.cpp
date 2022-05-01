@@ -30,9 +30,28 @@ namespace ScoreSaber::Services::LeaderboardService
 {
     std::string GetLeaderboardUrl(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry)
     {
+        if (difficultyBeatmap == nullptr)
+        {
+            return "";
+        }
+
         std::string url = ScoreSaber::Static::BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/leaderboard");
 
-        auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
+        GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel;
+
+        try
+        {
+            previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
+        }
+        catch (const std::exception& e)
+        {
+            return "";
+        }
+        if (previewBeatmapLevel == nullptr)
+        {
+            return "";
+        }
+
         Il2CppString* levelId = previewBeatmapLevel->get_levelID();
         std::string levelHash = StringUtils::GetFormattedHash(levelId);
 
@@ -71,6 +90,12 @@ namespace ScoreSaber::Services::LeaderboardService
                             bool filterAroundCountry)
     {
         std::string url = GetLeaderboardUrl(difficultyBeatmap, scope, page, filterAroundCountry);
+
+        if (url == "")
+        {
+            finished(GetLeaderboardError("Failed to get beatmap data! Please refresh"));
+        }
+
         WebUtils::GetAsync(
             url, [=](long code, std::string result) {
                 Data::InternalLeaderboard data;

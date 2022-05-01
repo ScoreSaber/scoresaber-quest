@@ -194,7 +194,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl,
                             std::string refreshId)
     {
-
         if (ScoreSaber::Services::UploadService::uploading)
         {
             return;
