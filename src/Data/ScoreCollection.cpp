@@ -95,11 +95,14 @@ namespace ScoreSaber::Data
         }
     }
 
-    ScoreCollection::ScoreCollection(Il2CppString* string) : ScoreCollection(getdoc(csstrtostr(string))){};
+    ScoreCollection::ScoreCollection(StringW string)
+        : ScoreCollection(getdoc(csstrtostr(string))){};
 
-    ScoreCollection::ScoreCollection(std::string_view string) : ScoreCollection(getdoc(string)){};
+    ScoreCollection::ScoreCollection(std::string_view string)
+        : ScoreCollection(getdoc(string)){};
 
-    ScoreCollection::ScoreCollection(std::u16string_view string) : ScoreCollection(getdoc(string)){};
+    ScoreCollection::ScoreCollection(std::u16string_view string)
+        : ScoreCollection(getdoc(string)){};
 
     ScoreCollection::ScoreCollection(){};
-}
+} // namespace ScoreSaber::Data

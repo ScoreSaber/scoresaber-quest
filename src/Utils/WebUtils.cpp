@@ -44,6 +44,8 @@ struct Gif
         : data(array), datastream(&this->data){};
     Gif(Array<uint8_t>* array)
         : Gif(reinterpret_cast<Array<char>*>(array)){};
+    Gif(ArrayW<uint8_t> array)
+        : Gif(static_cast<Array<uint8_t>*>(array)){};
     ~Gif()
     {
         int error = 0;
@@ -106,7 +108,7 @@ struct Gif
         int height = get_height();
         auto texture = Texture2D::New_ctor(width, height);
         // entire texture
-        Array<Color32>* pixelData = texture->GetPixels32();
+        auto pixelData = texture->GetPixels32();
         uint8_t* px = reinterpret_cast<uint8_t*>(pixelData->values);
         // top -> top + height
 

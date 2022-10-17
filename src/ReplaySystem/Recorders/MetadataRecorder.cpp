@@ -63,12 +63,12 @@ namespace ScoreSaber::ReplaySystem::Recorders::MetadataRecorder
     {
         auto metadata = new Metadata();
         metadata->Version = ENCRYPT_STRING_AUTO_A(encoder, "2.0.0");
-        metadata->LevelID = StringUtils::Il2cppStrToStr(_previewBeatmapLevel->get_levelID());
+        metadata->LevelID = static_cast<std::string>(_previewBeatmapLevel->get_levelID());
         metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_difficultyBeatmap->get_difficulty());
-        metadata->Characteristic = StringUtils::Il2cppStrToStr(_difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
-        metadata->Environment = StringUtils::Il2cppStrToStr(_gameplayCoreSceneSetupData->environmentInfo->serializedName);
+        metadata->Characteristic = static_cast<std::string>(_difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
+        metadata->Environment = static_cast<std::string>(_gameplayCoreSceneSetupData->environmentInfo->serializedName);
         metadata->Modifiers = ScoreSaber::Services::UploadService::GetModifierList(_gameplayCoreSceneSetupData->gameplayModifiers, -1);
-        metadata->NoteSpawnOffset = _beatmapObjectSpawnControllerInitData->noteJumpStartBeatOffset;
+        metadata->NoteSpawnOffset = _beatmapObjectSpawnControllerInitData->noteJumpValue;
         metadata->LeftHanded = _gameplayCoreSceneSetupData->playerSpecificSettings->leftHanded;
         metadata->InitialHeight = _gameplayCoreSceneSetupData->playerSpecificSettings->playerHeight;
         metadata->RoomRotation = _mainSettingsModelSO->roomRotation->value;

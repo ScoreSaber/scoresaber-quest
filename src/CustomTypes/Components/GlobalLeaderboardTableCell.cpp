@@ -37,8 +37,7 @@ using LeaderboardType = ScoreSaber::CustomTypes::Components::GlobalLeaderboardTa
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
-        reinterpret_cast<System::Collections::IEnumerator*>(                 \
-            custom_types::Helpers::CoroutineHelper::New(method)));
+        custom_types::Helpers::CoroutineHelper::New(method));
 
 void GlobalLeaderboardTableCell::ctor()
 {
@@ -93,17 +92,17 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
 
     if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
-        this->rank->set_text(StrToIl2cppStr(string_format("#%d", player.rank)));
+        this->rank->set_text(string_format("#%d", player.rank));
     }
     else
     {
-        this->rank->set_text(StrToIl2cppStr(string_format("#%d (#%d)", player.countryRank, player.rank)));
+        this->rank->set_text(string_format("#%d (#%d)", player.countryRank, player.rank));
     }
 
-    this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp</color>", player.pp)));
+    this->pp->set_text(string_format("<color=#6872e5>%.0fpp</color>", player.pp));
     flag->set_sprite(Base64ToSprite(country_base64));
     flagRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(flag_url(player.country), flag));
-    this->country->set_text(StrToIl2cppStr(player.country));
+    this->country->set_text(player.country);
 
     auto& histories = player.histories;
     auto length = histories.size();
@@ -136,7 +135,7 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     {
         result = string_format("%d", weeklyChange);
     }
-    weekly->set_text(StrToIl2cppStr(result));
+    weekly->set_text(result);
 
     playerId = player.id;
 }

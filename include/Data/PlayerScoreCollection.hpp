@@ -2,15 +2,15 @@
 
 #include "Data/Metadata.hpp"
 #include "Data/PlayerScore.hpp"
+#include "beatsaber-hook/shared/utils/typedefs.h"
 #include <optional>
-struct Il2CppString;
 
 namespace ScoreSaber::Data
 {
     struct PlayerScoreCollection : std::vector<PlayerScore>
     {
         PlayerScoreCollection();
-        PlayerScoreCollection(Il2CppString* string);
+        PlayerScoreCollection(StringW string);
         PlayerScoreCollection(std::string_view string);
         PlayerScoreCollection(std::u16string_view string);
         PlayerScoreCollection(const rapidjson::Document&& doc);

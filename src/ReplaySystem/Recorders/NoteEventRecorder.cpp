@@ -5,7 +5,7 @@
 #include "GlobalNamespace/ISaberSwingRatingCounter.hpp"
 #include "GlobalNamespace/NoteCutInfo.hpp"
 #include "GlobalNamespace/NoteData.hpp"
-#include "GlobalNamespace/NoteWasCutDelegate.hpp"
+// #include "GlobalNamespace/NoteWasCutDelegate.hpp"
 #include "GlobalNamespace/ScoreController.hpp"
 #include "System/Action_1.hpp"
 #include "System/Action_2.hpp"
@@ -34,12 +34,12 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
     void SwingFinisher::Init(NoteID noteID, ByRef<NoteCutInfo> noteCutInfo, std::function<void(SwingFinisher*)> didFinish, float timeWasCut)
     {
-        this->noteId = noteID;
-        this->_didFinish = didFinish;
-        this->noteCutInfo = noteCutInfo.heldRef;
-        this->timeWasCut = timeWasCut;
-        this->saberSwingRatingCounter = noteCutInfo.heldRef.swingRatingCounter;
-        this->saberSwingRatingCounter->RegisterDidFinishReceiver(reinterpret_cast<ISaberSwingRatingCounterDidFinishReceiver*>(this));
+        // this->noteId = noteID;
+        // this->_didFinish = didFinish;
+        // this->noteCutInfo = noteCutInfo.heldRef;
+        // this->timeWasCut = timeWasCut;
+        // this->saberSwingRatingCounter = noteCutInfo.heldRef.swingRatingCounter;
+        // this->saberSwingRatingCounter->RegisterDidFinishReceiver(reinterpret_cast<ISaberSwingRatingCounterDidFinishReceiver*>(this));
     }
 
     void SwingFinisher::HandleSaberSwingRatingCounterDidFinish(ISaberSwingRatingCounter* saberSwingRatingCounter)
@@ -67,26 +67,26 @@ namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 
     void LevelStarted(ScoreController* scoreController, AudioTimeSyncController* audioTimeSyncController)
     {
-        _none = VRPosition(0, 0, 0);
-        _noteKeyframes.clear();
-        _audioTimeSyncController = audioTimeSyncController;
-        _scoreController = scoreController;
+        // _none = VRPosition(0, 0, 0);
+        // _noteKeyframes.clear();
+        // _audioTimeSyncController = audioTimeSyncController;
+        // _scoreController = scoreController;
 
-        // noteWasCutCallback
-        std::function<void(NoteData*, ByRef<NoteCutInfo>, int)> noteWasCutCallback = [&](NoteData* noteData, ByRef<NoteCutInfo> noteCutInfo, int multiplier) {
-            ScoreController_noteWasCutEvent(noteData, noteCutInfo, multiplier);
-        };
+        // // noteWasCutCallback
+        // std::function<void(NoteData*, ByRef<NoteCutInfo>, int)> noteWasCutCallback = [&](NoteData* noteData, ByRef<NoteCutInfo> noteCutInfo, int multiplier) {
+        //     ScoreController_noteWasCutEvent(noteData, noteCutInfo, multiplier);
+        // };
 
-        auto noteWasCutDelegate = il2cpp_utils::MakeDelegate<NoteWasCutDelegate*>(classof(NoteWasCutDelegate*), noteWasCutCallback);
-        _scoreController->add_noteWasCutEvent(noteWasCutDelegate);
+        // auto noteWasCutDelegate = il2cpp_utils::MakeDelegate<NoteWasCutDelegate*>(classof(NoteWasCutDelegate*), noteWasCutCallback);
+        // _scoreController->add_noteWasCutEvent(noteWasCutDelegate);
 
-        // noteWasMissedCallback
-        std::function<void(NoteData*, int)> noteWasMissedCallback = [&](NoteData* noteData, int multiplier) {
-            ScoreController_noteWasMissedEvent(noteData, multiplier);
-        };
+        // // noteWasMissedCallback
+        // std::function<void(NoteData*, int)> noteWasMissedCallback = [&](NoteData* noteData, int multiplier) {
+        //     ScoreController_noteWasMissedEvent(noteData, multiplier);
+        // };
 
-        auto noteWasMissedDelegate = il2cpp_utils::MakeDelegate<System::Action_2<NoteData*, int>*>(classof(System::Action_2<NoteData*, int>*), noteWasMissedCallback);
-        _scoreController->add_noteWasMissedEvent(noteWasMissedDelegate);
+        // auto noteWasMissedDelegate = il2cpp_utils::MakeDelegate<System::Action_2<NoteData*, int>*>(classof(System::Action_2<NoteData*, int>*), noteWasMissedCallback);
+        // _scoreController->add_noteWasMissedEvent(noteWasMissedDelegate);
     }
 
     void ScoreController_noteWasCutEvent(NoteData* noteData, ByRef<NoteCutInfo> noteCutInfo, int multiplier)

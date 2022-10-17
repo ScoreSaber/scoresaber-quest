@@ -19,7 +19,8 @@ inline rapidjson::Document getdoc(std::string_view string)
 
 namespace ScoreSaber::Data
 {
-    LeaderboardInfo::LeaderboardInfo(const rapidjson::Document&& doc) : difficulty(doc["difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(const rapidjson::Document&& doc)
+        : difficulty(doc["difficulty"].GetObject())
     {
         id = doc["id"].GetInt();
         songHash = to_utf16(doc["songHash"].GetString());
@@ -70,7 +71,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(const rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>&& doc) : difficulty(doc[u"difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(const rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>&& doc)
+        : difficulty(doc[u"difficulty"].GetObject())
     {
         id = doc[u"id"].GetInt();
         songHash = std::u16string(doc[u"songHash"].GetString());
@@ -121,7 +123,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(const rapidjson::Value&& value) : difficulty(value["difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(const rapidjson::Value&& value)
+        : difficulty(value["difficulty"].GetObject())
     {
         id = value["id"].GetInt();
         songHash = to_utf16(value["songHash"].GetString());
@@ -178,7 +181,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value) : difficulty(value[u"difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value)
+        : difficulty(value[u"difficulty"].GetObject())
     {
         id = value[u"id"].GetInt();
         songHash = std::u16string(value[u"songHash"].GetString());
@@ -235,7 +239,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<true, rapidjson::Value> value) : difficulty(value["difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<true, rapidjson::Value> value)
+        : difficulty(value["difficulty"].GetObject())
     {
         id = value["id"].GetInt();
         songHash = to_utf16(value["songHash"].GetString());
@@ -292,7 +297,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value) : difficulty(value[u"difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value)
+        : difficulty(value[u"difficulty"].GetObject())
     {
         id = value[u"id"].GetInt();
         songHash = std::u16string(value[u"songHash"].GetString());
@@ -348,7 +354,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::Value> value) : difficulty(value["difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::Value> value)
+        : difficulty(value["difficulty"].GetObject())
     {
 
         // This is the one that gets called
@@ -408,7 +415,8 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value) : difficulty(value[u"difficulty"].GetObject())
+    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value)
+        : difficulty(value[u"difficulty"].GetObject())
     {
         id = value[u"id"].GetInt();
         songHash = std::u16string(value[u"songHash"].GetString());
@@ -466,11 +474,14 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfo::LeaderboardInfo(Il2CppString* string) : LeaderboardInfo(getdoc(csstrtostr(string))){};
+    LeaderboardInfo::LeaderboardInfo(StringW string)
+        : LeaderboardInfo(getdoc(csstrtostr(string))){};
 
-    LeaderboardInfo::LeaderboardInfo(std::string_view string) : LeaderboardInfo(getdoc(string)){};
+    LeaderboardInfo::LeaderboardInfo(std::string_view string)
+        : LeaderboardInfo(getdoc(string)){};
 
-    LeaderboardInfo::LeaderboardInfo(std::u16string_view string) : LeaderboardInfo(getdoc(string)){};
+    LeaderboardInfo::LeaderboardInfo(std::u16string_view string)
+        : LeaderboardInfo(getdoc(string)){};
 
     LeaderboardInfo::LeaderboardInfo(){};
-}
+} // namespace ScoreSaber::Data

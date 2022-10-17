@@ -28,7 +28,7 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 
 custom_types::Helpers::Coroutine WaitForInit(
-    SafePtr<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>
+    SafePtrUnity<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>
         leaderboard,
     std::function<void()> callback)
 {
@@ -94,7 +94,7 @@ namespace ScoreSaber::UI::ViewControllers
 
             auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
             headerBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
-            auto headerImageView = headerBG->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>()->dyn__skew() = 0.18f;
+            auto headerImageView = headerBG->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>()->skew = 0.18f;
 
             HorizontalLayoutGroup* globalHost = BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
             globalHost->set_spacing(1.0f);

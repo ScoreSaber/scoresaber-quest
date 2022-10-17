@@ -69,11 +69,14 @@ namespace ScoreSaber::Data
         }
     }
 
-    LeaderboardInfoCollection::LeaderboardInfoCollection(Il2CppString* string) : LeaderboardInfoCollection(getdoc(csstrtostr(string))){};
+    LeaderboardInfoCollection::LeaderboardInfoCollection(StringW string)
+        : LeaderboardInfoCollection(getdoc(csstrtostr(string))){};
 
-    LeaderboardInfoCollection::LeaderboardInfoCollection(std::string_view string) : LeaderboardInfoCollection(getdoc(string)){};
+    LeaderboardInfoCollection::LeaderboardInfoCollection(std::string_view string)
+        : LeaderboardInfoCollection(getdoc(string)){};
 
-    LeaderboardInfoCollection::LeaderboardInfoCollection(std::u16string_view string) : LeaderboardInfoCollection(getdoc(string)){};
+    LeaderboardInfoCollection::LeaderboardInfoCollection(std::u16string_view string)
+        : LeaderboardInfoCollection(getdoc(string)){};
 
     LeaderboardInfoCollection::LeaderboardInfoCollection(){};
-}
+} // namespace ScoreSaber::Data

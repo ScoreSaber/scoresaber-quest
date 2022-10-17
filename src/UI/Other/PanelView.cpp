@@ -30,10 +30,9 @@ using namespace UnityEngine::UI;
 using namespace UnityEngine::Events;
 using namespace GlobalNamespace;
 
-#define BeginCoroutine(method)                               \
-    SharedCoroutineStarter::get_instance()->StartCoroutine(  \
-        reinterpret_cast<System::Collections::IEnumerator*>( \
-            custom_types::Helpers::CoroutineHelper::New(method)));
+#define BeginCoroutine(method)                                               \
+    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
+        custom_types::Helpers::CoroutineHelper::New(method))
 
 void PanelView::Init(PlatformLeaderboardViewController* viewController)
 {

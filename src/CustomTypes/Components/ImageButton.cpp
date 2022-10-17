@@ -45,9 +45,8 @@ custom_types::Helpers::Coroutine Update(ImageButton* self)
         }
         if (self->button->isPointerInside)
         {
-            ::Array<HMUI::ImageView*>* images =
-                self->button->GetComponentsInChildren<HMUI::ImageView*>();
-            for (int i = 0; i < images->get_Length(); i++)
+            auto images = self->button->GetComponentsInChildren<HMUI::ImageView*>();
+            for (int i = 0; i < images->Length(); i++)
             {
                 HMUI::ImageView* image = images->get(i);
                 image->set_color(UnityEngine::Color(self->r * 0.6, self->g * 0.8f,
@@ -56,11 +55,10 @@ custom_types::Helpers::Coroutine Update(ImageButton* self)
         }
         else
         {
-            ::Array<HMUI::ImageView*>* images =
-                self->button->GetComponentsInChildren<HMUI::ImageView*>();
+            auto images = self->button->GetComponentsInChildren<HMUI::ImageView*>();
             if (images->get(0)->get_color().r != self->r)
             {
-                for (int i = 0; i < images->get_Length(); i++)
+                for (int i = 0; i < images->Length(); i++)
                 {
                     HMUI::ImageView* image = images->get(i);
                     image->set_color(
@@ -90,17 +88,15 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
 
     if (sizeDelta != Vector2(0.0f, 0.0f))
     {
-        RectTransform* rectTransform =
-            reinterpret_cast<RectTransform*>(button->get_transform()->GetChild(0));
+        RectTransform* rectTransform = reinterpret_cast<RectTransform*>(button->get_transform()->GetChild(0));
         rectTransform->set_sizeDelta(sizeDelta);
     }
 
     this->pointerArray = UnityEngine::Resources::FindObjectsOfTypeAll<VRUIControls::VRPointer*>();
     HMUI::ButtonSpriteSwap* swap = this->GetComponent<HMUI::ButtonSpriteSwap*>();
 
-    ::Array<HMUI::ImageView*>* images =
-        button->GetComponentsInChildren<HMUI::ImageView*>();
-    for (int i = 0; i < images->get_Length(); i++)
+    auto images = button->GetComponentsInChildren<HMUI::ImageView*>();
+    for (int i = 0; i < images->Length(); i++)
     {
         HMUI::ImageView* img = images->get(i);
         this->r = img->get_color().r;
@@ -110,6 +106,5 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
     }
 
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-        reinterpret_cast<System::Collections::IEnumerator*>(
-            custom_types::Helpers::CoroutineHelper::New(Update(this))));
+        custom_types::Helpers::CoroutineHelper::New(Update(this)));
 }

@@ -2,13 +2,14 @@
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
 #include "Data/Score.hpp"
+#include "beatsaber-hook/shared/utils/typedefs.h"
 #include "custom-types/shared/register.hpp"
 #include "custom-types/shared/types.hpp"
 
 namespace StringUtils
 {
 
-    std::string GetFormattedHash(Il2CppString* levelId);
+    std::string GetFormattedHash(StringW levelId);
 
     std::string GetEnv(const std::string& var);
 
@@ -37,11 +38,6 @@ namespace StringUtils
     std::string RemoveTrailingZeros(std::string s, int zeros);
 
     std::string ColorizePosNeg(std::string s);
-
-    std::string Il2cppStrToStr(Il2CppString* s);
-
-    Il2CppString* StrToIl2cppStr(std::u16string_view s);
-    Il2CppString* StrToIl2cppStr(std::string_view s);
 
     std::vector<std::string> split(const std::string& s, char delim);
 

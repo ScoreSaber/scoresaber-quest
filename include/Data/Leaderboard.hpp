@@ -3,16 +3,15 @@
 
 #include "Data/LeaderboardInfo.hpp"
 #include "Data/Score.hpp"
+#include "beatsaber-hook/shared/utils/typedefs.h"
 #include <vector>
-
-struct Il2CppString;
 
 namespace ScoreSaber::Data
 {
     struct Leaderboard
     {
         Leaderboard();
-        Leaderboard(Il2CppString* string);
+        Leaderboard(StringW string);
         Leaderboard(std::string_view string);
         Leaderboard(std::u16string_view string);
         Leaderboard(const rapidjson::Document&& doc);

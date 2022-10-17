@@ -109,10 +109,10 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             IconSegmentedControl* scopeSegmentedControl = self->scopeSegmentedControl;
 
             ::Array<IconSegmentedControl::DataItem*>* array = ::Array<IconSegmentedControl::DataItem*>::New({
-                IconSegmentedControl::DataItem::New_ctor(globalLeaderboardIcon, StrToIl2cppStr("Global")),
-                IconSegmentedControl::DataItem::New_ctor(aroundPlayerLeaderboardIcon, StrToIl2cppStr("Around You")),
-                IconSegmentedControl::DataItem::New_ctor(friendsLeaderboardIcon, StrToIl2cppStr("Friends")),
-                IconSegmentedControl::DataItem::New_ctor(countryLeaderboardIcon, StrToIl2cppStr("Country")),
+                IconSegmentedControl::DataItem::New_ctor(globalLeaderboardIcon, "Global"),
+                IconSegmentedControl::DataItem::New_ctor(aroundPlayerLeaderboardIcon, "Around You"),
+                IconSegmentedControl::DataItem::New_ctor(friendsLeaderboardIcon, "Friends"),
+                IconSegmentedControl::DataItem::New_ctor(countryLeaderboardIcon, "Country"),
             });
 
             scopeSegmentedControl->SetData(array);

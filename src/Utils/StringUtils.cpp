@@ -25,17 +25,17 @@ using namespace std;
 namespace StringUtils
 {
 
-    std::string GetFormattedHash(Il2CppString* levelId)
+    std::string GetFormattedHash(StringW levelId)
     {
-        std::string thing = Il2cppStrToStr(levelId);
+        std::string thing = levelId;
         if (!Contains(thing, "custom_level_"))
         {
             return "ost_" + thing;
         }
         else
         {
-            levelId = levelId->Replace(StrToIl2cppStr("custom_level_"), Il2CppString::_get_Empty());
-            return Il2cppStrToStr(levelId);
+            levelId = levelId->Replace("custom_level_", Il2CppString::_get_Empty());
+            return levelId;
         }
     }
 
@@ -60,10 +60,10 @@ namespace StringUtils
 
     std::string ReplaceInvalidChars(std::string fileName)
     {
-        auto fileNameCstr = StrToIl2cppStr(fileName);
+        auto fileNameCstr = StringW(fileName);
         auto splitChars = fileNameCstr->Split(System::IO::Path::GetInvalidFileNameChars());
-        auto result = System::String::Join(StrToIl2cppStr("_"), splitChars);
-        return Il2cppStrToStr(result);
+        auto result = System::String::Join("_", splitChars);
+        return result;
     }
 
     std::string GetRoleColor(std::string role)
@@ -263,21 +263,6 @@ namespace StringUtils
             return true;
         }
         return false;
-    }
-
-    std::string Il2cppStrToStr(Il2CppString* s)
-    {
-        return to_utf8(csstrtostr(s));
-    }
-
-    Il2CppString* StrToIl2cppStr(std::u16string_view s)
-    {
-        return il2cpp_utils::newcsstr(s);
-    }
-
-    Il2CppString* StrToIl2cppStr(std::string_view s)
-    {
-        return il2cpp_utils::newcsstr(s);
     }
 
     std::vector<std::string> split(const std::string& s, char delim)

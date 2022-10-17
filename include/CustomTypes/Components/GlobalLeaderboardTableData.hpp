@@ -23,14 +23,14 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData,
     Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "ScoreSaber",
     GetInterfaces(), 0, nullptr,
-    DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);
+    DECLARE_INSTANCE_FIELD(StringW, reuseIdentifier);
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
     DECLARE_INSTANCE_FIELD(bool, clickableCells);
     DECLARE_INSTANCE_FIELD(bool, initialized);
     DECLARE_INSTANCE_FIELD(bool, isLoading);
     DECLARE_INSTANCE_FIELD(int, page);
-    DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
+    DECLARE_INSTANCE_FIELD(StringW, cellTemplate);
     DECLARE_INSTANCE_FIELD(HMUI::ViewController*, globalViewController);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
 

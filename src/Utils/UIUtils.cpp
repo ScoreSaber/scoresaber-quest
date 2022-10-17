@@ -56,11 +56,10 @@ using namespace QuestUI::BeatSaberUI;
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
-        reinterpret_cast<System::Collections::IEnumerator*>(                 \
-            custom_types::Helpers::CoroutineHelper::New(method)));
+        custom_types::Helpers::CoroutineHelper::New(method));
 
 using HapticPresetSO = Libraries::HM::HMLib::VR::HapticPresetSO;
-static SafePtr<HapticPresetSO> hapticFeedbackPresetSO;
+static SafePtrUnity<HapticPresetSO> hapticFeedbackPresetSO;
 
 namespace UIUtils
 {
@@ -104,7 +103,7 @@ namespace UIUtils
         gameObj->AddComponent<LayoutElement*>();
 
         auto menuShockWave = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>());
-        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->dyn__buttonClickEvents());
+        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->buttonClickEvents);
         textMesh->buttonClickedSignal = buttonClickedSignal;
 
         if (!hapticFeedbackPresetSO)
@@ -201,7 +200,7 @@ namespace UIUtils
         go->AddComponent<LayoutElement*>();
 
         auto menuShockWave = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>());
-        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->dyn__buttonClickEvents());
+        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->buttonClickEvents);
         image->buttonClickedSignal = buttonClickedSignal;
 
         if (!hapticFeedbackPresetSO)

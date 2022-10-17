@@ -98,10 +98,13 @@ namespace ScoreSaber::Data
         }
     }
 
-    Leaderboard::Leaderboard(Il2CppString* string) : Leaderboard(getdoc(csstrtostr(string))){};
+    Leaderboard::Leaderboard(StringW string)
+        : Leaderboard(getdoc(csstrtostr(string))){};
 
-    Leaderboard::Leaderboard(std::string_view string) : Leaderboard(getdoc(string)){};
+    Leaderboard::Leaderboard(std::string_view string)
+        : Leaderboard(getdoc(string)){};
 
-    Leaderboard::Leaderboard(std::u16string_view string) : Leaderboard(getdoc(string)){};
+    Leaderboard::Leaderboard(std::u16string_view string)
+        : Leaderboard(getdoc(string)){};
     Leaderboard::Leaderboard(){};
-}
+} // namespace ScoreSaber::Data

@@ -2,16 +2,16 @@
 
 #include "Data/Difficulty.hpp"
 #include "Data/Score.hpp"
+#include "beatsaber-hook/shared/utils/typedefs.h"
 #include <optional>
 #include <vector>
-struct Il2CppString;
 
 namespace ScoreSaber::Data
 {
     struct LeaderboardInfo
     {
         LeaderboardInfo();
-        LeaderboardInfo(Il2CppString* string);
+        LeaderboardInfo(StringW string);
         LeaderboardInfo(std::string_view string);
         LeaderboardInfo(std::u16string_view string);
         LeaderboardInfo(const rapidjson::Document&& doc);

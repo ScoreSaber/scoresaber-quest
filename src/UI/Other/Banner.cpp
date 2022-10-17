@@ -83,12 +83,12 @@ namespace ScoreSaber::UI::Other
         bg->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
 
         bgImage = bg->get_gameObject()->GetComponentInChildren<ImageView*>();
-        bgImage->dyn__skew() = 0.18f;
-        bgImage->dyn__gradient() = true;
-        bgImage->dyn__gradientDirection() = 0;
+        bgImage->skew = 0.18f;
+        bgImage->gradient = true;
+        bgImage->gradientDirection = 0;
         bgImage->set_color0(Color(1, 1, 1, 1));
         bgImage->set_color1(Color(1, 1, 1, 0));
-        bgImage->dyn__curvedCanvasSettingsHelper()->Reset();
+        bgImage->curvedCanvasSettingsHelper->Reset();
 
         set_color(defaultColor);
 
@@ -101,7 +101,7 @@ namespace ScoreSaber::UI::Other
         auto scoresaber_inactive = Base64ToSprite(ScoreSaber_Inactive);
         SetButtonSprites(btn, scoresaber_inactive, scoresaber_active);
         auto btnImageView = btn->get_gameObject()->GetComponentInChildren<ImageView*>();
-        btnImageView->dyn__skew() = 0.18f;
+        btnImageView->skew = 0.18f;
         AddHoverHint(btn->get_gameObject(), "Opens the ScoreSaber main menu");
         auto btnLayout = buttonVertical->get_gameObject()->AddComponent<LayoutElement*>();
         btnLayout->set_preferredWidth(buttonSize);
@@ -111,7 +111,7 @@ namespace ScoreSaber::UI::Other
         auto seperatorSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
         auto image = CreateImage(seperatorVertical->get_transform(), seperatorSprite, Vector2(0, 0), Vector2(0, 0));
-        image->dyn__skew() = 0.18f;
+        image->skew = 0.18f;
         auto imageLayout = image->get_gameObject()->AddComponent<LayoutElement*>();
         imageLayout->set_preferredWidth(1.0f);
 
@@ -208,8 +208,8 @@ namespace ScoreSaber::UI::Other
                         std::function<void()> callback)
     {
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(SetPrompt(status, loadingIndicator, dismiss, callback))));
+
+            custom_types::Helpers::CoroutineHelper::New(SetPrompt(status, loadingIndicator, dismiss, callback)));
     }
 
     custom_types::Helpers::Coroutine Banner::SetPrompt(

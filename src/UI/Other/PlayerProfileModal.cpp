@@ -40,8 +40,7 @@ using namespace QuestUI::BeatSaberUI;
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
-        reinterpret_cast<System::Collections::IEnumerator*>(                 \
-            custom_types::Helpers::CoroutineHelper::New(method)))
+        custom_types::Helpers::CoroutineHelper::New(method))
 
 #define WIDTH 90.0f
 #define HEIGHT 60.0f
@@ -120,13 +119,13 @@ namespace ScoreSaber::UI::Other
         bg->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
 
         auto bgImage = bg->get_gameObject()->GetComponentInChildren<ImageView*>();
-        bgImage->dyn__gradient() = false;
+        bgImage->gradient = false;
         bgImage->set_color0(Color(1, 1, 1, 1));
         bgImage->set_color1(Color(1, 1, 1, 1));
 
         // placeholder color
         bgImage->set_color(Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1));
-        bgImage->dyn__curvedCanvasSettingsHelper()->Reset();
+        bgImage->curvedCanvasSettingsHelper->Reset();
 
         headerText = UIUtils::CreateClickableText(headerHorizon->get_transform(), u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
         SetPreferredSize(headerText, 90, -1);

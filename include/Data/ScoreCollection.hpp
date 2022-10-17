@@ -5,14 +5,14 @@
 #include "Data/Score.hpp"
 #include <optional>
 #include <vector>
-struct Il2CppString;
+#include "beatsaber-hook/shared/utils/typedefs.h"
 
 namespace ScoreSaber::Data
 {
     struct ScoreCollection : std::vector<Score>
     {
         ScoreCollection();
-        ScoreCollection(Il2CppString* string);
+        ScoreCollection(StringW string);
         ScoreCollection(std::string_view string);
         ScoreCollection(std::u16string_view string);
         ScoreCollection(const rapidjson::Document&& doc);

@@ -52,10 +52,10 @@ namespace ScoreSaber::Services::LeaderboardService
             return "";
         }
 
-        Il2CppString* levelId = previewBeatmapLevel->get_levelID();
+        auto levelId = previewBeatmapLevel->get_levelID();
         std::string levelHash = StringUtils::GetFormattedHash(levelId);
 
-        std::string gameMode = string_format("Solo%s", Il2cppStrToStr(difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName).c_str());
+        std::string gameMode = "Solo" + difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
         int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
         if (!filterAroundCountry)
         {
@@ -118,7 +118,7 @@ namespace ScoreSaber::Services::LeaderboardService
     Data::InternalLeaderboard GetLeaderboardError(std::string error)
     {
         auto scores = System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor();
-        scores->Add(LeaderboardTableView::ScoreData::New_ctor(0, StrToIl2cppStr(error), 0, false));
+        scores->Add(LeaderboardTableView::ScoreData::New_ctor(0, error, 0, false));
         return Data::InternalLeaderboard(scores);
     }
 
@@ -147,7 +147,7 @@ namespace ScoreSaber::Services::LeaderboardService
                     std::u16string formattedPP = FormatPP(score);
                     std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 80);
 
-                    scores->Add(LeaderboardTableView::ScoreData::New_ctor(score.modifiedScore, StrToIl2cppStr(result), score.rank, false));
+                    scores->Add(LeaderboardTableView::ScoreData::New_ctor(score.modifiedScore, result, score.rank, false));
                     // self->mapRanked = score.pp > 0.0f;
                 }
 

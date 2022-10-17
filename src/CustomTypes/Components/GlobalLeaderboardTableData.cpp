@@ -31,15 +31,14 @@ using namespace ScoreSaber;
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
-        reinterpret_cast<System::Collections::IEnumerator*>(                 \
-            custom_types::Helpers::CoroutineHelper::New(method)));
+        custom_types::Helpers::CoroutineHelper::New(method));
 
 Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData* self)
 {
     std::string url = self->get_leaderboardURL();
-    UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(StringUtils::StrToIl2cppStr(url));
+    UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
     webRequest->SetRequestHeader(il2cpp_utils::newcsstr("Cookie"), il2cpp_utils::newcsstr(WebUtils::cookie));
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(
         CRASH_UNLESS(webRequest->SendWebRequest()));
@@ -139,17 +138,17 @@ namespace ScoreSaber::CustomTypes::Components
     {
         if (isLoading)
             return;
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(reinterpret_cast<System::Collections::IEnumerator*>(custom_types::Helpers::CoroutineHelper::New(Refresh())));
+        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Refresh()));
     }
 
     /// really just here because of the way it reloads twice by doing ReloadData and then RefreshCells(true, true), now it's combined
     void ReloadTableViewData(HMUI::TableView* self)
     {
-        if (!self->dyn__isInitialized())
+        if (!self->isInitialized)
         {
             self->LazyInit();
         }
-        auto visibleCells = self->dyn__visibleCells();
+        auto visibleCells = self->visibleCells;
         int length = visibleCells->get_Count();
         for (int i = 0; i < length; i++)
         {
@@ -158,31 +157,31 @@ namespace ScoreSaber::CustomTypes::Components
             self->AddCellToReusableCells(tableCell);
         }
         self->visibleCells->Clear();
-        if (self->dyn__dataSource() != nullptr)
+        if (self->dataSource != nullptr)
         {
-            self->dyn__numberOfCells() = self->dyn__dataSource()->NumberOfCells();
-            self->dyn__cellSize() = self->dyn__dataSource()->CellSize();
+            self->numberOfCells = self->dataSource->NumberOfCells();
+            self->cellSize = self->dataSource->CellSize();
         }
         else
         {
-            self->dyn__numberOfCells() = 0;
-            self->dyn__cellSize() = 1.0f;
+            self->numberOfCells = 0;
+            self->cellSize = 1.0f;
         }
 
-        self->dyn__scrollView()->dyn__fixedCellSize() = self->dyn__cellSize();
+        self->scrollView->fixedCellSize = self->cellSize;
         self->RefreshContentSize();
         if (!self->get_gameObject()->get_activeInHierarchy())
         {
-            self->dyn__refreshCellsOnEnable() = true;
+            self->refreshCellsOnEnable = true;
         }
         else
         {
             self->RefreshCells(true, true);
         }
 
-        if (self->dyn_didReloadDataEvent())
+        if (self->didReloadDataEvent)
         {
-            self->dyn_didReloadDataEvent()->Invoke(self);
+            self->didReloadDataEvent->Invoke(self);
         }
     }
 
@@ -192,7 +191,7 @@ namespace ScoreSaber::CustomTypes::Components
         playerCollection.clear();
         ReloadTableViewData(tableView);
         reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
-        co_yield reinterpret_cast<System::Collections::IEnumerator*>(custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
+        co_yield custom_types::Helpers::CoroutineHelper::New(GetDocument(this));
         ReloadTableViewData(tableView);
         isLoading = false;
         reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(false);

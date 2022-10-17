@@ -32,25 +32,25 @@ namespace ScoreSaber::ReplaySystem::Recorders::ScoreEventRecorder
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
 
-        std::function<void(int)> comboDidChangeCallback = [&](int combo) {
-            ComboController_comboDidChangeEvent(combo);
-        };
+        // std::function<void(int)> comboDidChangeCallback = [&](int combo) {
+        //     ComboController_comboDidChangeEvent(combo);
+        // };
 
-        std::function<void(int, int)> scoreDidChangeCallback = [&](int rawScore, int score) {
-            ScoreController_scoreDidChangeEvent(rawScore, score);
-        };
+        // std::function<void(int, int)> scoreDidChangeCallback = [&](int rawScore, int score) {
+        //     ScoreController_scoreDidChangeEvent(rawScore, score);
+        // };
 
-        std::function<void(int, float)> multiplierDidChangeCallback = [&](int multiplier, float nextMultiplierProgress) {
-            ScoreController_multiplierDidChangeEvent(multiplier, nextMultiplierProgress);
-        };
+        // std::function<void(int, float)> multiplierDidChangeCallback = [&](int multiplier, float nextMultiplierProgress) {
+        //     ScoreController_multiplierDidChangeEvent(multiplier, nextMultiplierProgress);
+        // };
 
-        auto comboDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), comboDidChangeCallback);
-        auto scoreDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_2<int, int>*>(classof(System::Action_2<int, int>*), scoreDidChangeCallback);
-        auto multiplierDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_2<int, float>*>(classof(System::Action_2<int, float>*), multiplierDidChangeCallback);
+        // auto comboDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), comboDidChangeCallback);
+        // auto scoreDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_2<int, int>*>(classof(System::Action_2<int, int>*), scoreDidChangeCallback);
+        // auto multiplierDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_2<int, float>*>(classof(System::Action_2<int, float>*), multiplierDidChangeCallback);
 
-        scoreController->add_comboDidChangeEvent(comboDidChangeDelegate);
-        scoreController->add_scoreDidChangeEvent(scoreDidChangeDelegate);
-        scoreController->add_multiplierDidChangeEvent(multiplierDidChangeDelegate);
+        // scoreController->add_comboDidChangeEvent(comboDidChangeDelegate);
+        // scoreController->add_scoreDidChangeEvent(scoreDidChangeDelegate);
+        // scoreController->add_multiplierDidChangeEvent(multiplierDidChangeDelegate);
     }
 
     void ComboController_comboDidChangeEvent(int combo)

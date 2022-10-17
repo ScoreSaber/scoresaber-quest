@@ -34,17 +34,6 @@ using namespace HMUI;
     layout##identifier->set_preferredWidth(width);                                          \
     layout##identifier->set_preferredHeight(height)
 
-static std::vector<std::u16string> teamAndContributorsNames = {
-    u"BACKEND",
-    u"FRONTEND",
-    u"MOD",
-    u"PPV3",
-    u"ADMIN",
-    u"NAT",
-    u"RANKING TEAM",
-    u"QAT",
-    u"CAT"};
-
 static std::vector<std::string> teamAndContributorsNamesIdentifiers = {
     "Backend",
     "Frontend",
@@ -83,6 +72,18 @@ namespace ScoreSaber::UI::ViewControllers
 
             segmentedController->overrideCellSize = true;
             segmentedController->fontSize *= 0.75f;
+
+            auto teamAndContributorsNames = ArrayW<StringW>(9);
+            teamAndContributorsNames[0] = "BACKEND";
+            teamAndContributorsNames[1] = "FRONTEND";
+            teamAndContributorsNames[2] = "MOD";
+            teamAndContributorsNames[3] = "PPV3";
+            teamAndContributorsNames[4] = "ADMIN";
+            teamAndContributorsNames[5] = "NAT";
+            teamAndContributorsNames[6] = "RANKING TEAM";
+            teamAndContributorsNames[7] = "QAT";
+            teamAndContributorsNames[8] = "CAT";
+
             segmentedController->set_texts(teamAndContributorsNames);
 
             creditTabs = Array<GameObject*>::NewLength(teamAndContributorsNames.size());
@@ -126,7 +127,7 @@ namespace ScoreSaber::UI::ViewControllers
         auto externalComponents = scrollViewGO->GetComponent<ExternalComponents*>();
         auto scrollView = externalComponents->Get<HMUI::ScrollView*>();
         SetPreferredSize(scrollView, 115, -1);
-        auto viewport = scrollView->dyn__viewport();
+        auto viewport = scrollView->viewport;
         viewport->set_sizeDelta({0, 0});
         auto scrollRectT = scrollViewGO->GetComponent<RectTransform*>();
         scrollRectT->set_sizeDelta({0.0f, 0.0f});
@@ -150,4 +151,4 @@ namespace ScoreSaber::UI::ViewControllers
         }
         return rootTab->get_gameObject();
     }
-}
+} // namespace ScoreSaber::UI::ViewControllers

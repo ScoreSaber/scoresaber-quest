@@ -2,15 +2,15 @@
 
 #include "Data/LeaderboardInfo.hpp"
 #include "Data/Metadata.hpp"
+#include "beatsaber-hook/shared/utils/typedefs.h"
 #include <optional>
-struct Il2CppString;
 
 namespace ScoreSaber::Data
 {
     struct LeaderboardInfoCollection : std::vector<LeaderboardInfo>
     {
         LeaderboardInfoCollection();
-        LeaderboardInfoCollection(Il2CppString* string);
+        LeaderboardInfoCollection(StringW string);
         LeaderboardInfoCollection(std::string_view string);
         LeaderboardInfoCollection(std::u16string_view string);
         LeaderboardInfoCollection(const rapidjson::Document&& doc);
@@ -20,4 +20,4 @@ namespace ScoreSaber::Data
 
         std::optional<Metadata> metadata;
     };
-}
+} // namespace ScoreSaber::Data

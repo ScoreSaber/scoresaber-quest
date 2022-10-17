@@ -76,7 +76,7 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
     LoadingControl* loadingControl = self->loadingControl;
     loadingControl->ShowLoading(System::String::_get_Empty());
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(self->difficultyBeatmap, self->leaderboardTableView, self->_get__scoresScope(), loadingControl,
-                                                                         StringUtils::Il2cppStrToStr(System::Guid::NewGuid().ToString()));
+                                                                         System::Guid::NewGuid().ToString());
 }
 
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell, &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
