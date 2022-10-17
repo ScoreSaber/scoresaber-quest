@@ -15,8 +15,11 @@
 #include "GlobalNamespace/PlatformLeaderboardsModel_GetScoresResult.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/StandardLevelDetailViewController.hpp"
+#include "Utils/BeatmapUtils.hpp"
+
 #include "Services/UploadService.hpp"
 
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"

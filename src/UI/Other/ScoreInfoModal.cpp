@@ -1,8 +1,7 @@
 #include "UI/Other/ScoreInfoModal.hpp"
 
-#include <map>
-
 #include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "Sprites.hpp"
 #include "System/DateTime.hpp"
 #include "System/DayOfWeek.hpp"
@@ -22,8 +21,10 @@
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/UIUtils.hpp"
+#include "logging.hpp"
 #include "main.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
+#include <map>
 
 DEFINE_TYPE(ScoreSaber::UI::Other, ScoreInfoModal);
 
@@ -195,6 +196,7 @@ namespace ScoreSaber::UI::Other
 
     void ScoreInfoModal::Show(ScoreSaber::Data::Score& score)
     {
+        INFO("1");
         if (score.leaderboardPlayerInfo.name.has_value())
         {
             set_player(score.leaderboardPlayerInfo.name.value());
@@ -205,22 +207,24 @@ namespace ScoreSaber::UI::Other
         // but it works
         PlatformLeaderboardViewController* lb = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlatformLeaderboardViewController*>());
 
-        int modifiedScore = score.modifiedScore;
 
-        set_score(modifiedScore, 100 * ((double)modifiedScore / (double)BeatmapUtils::getMaxScore(lb->difficultyBeatmap)));
-        set_pp(score.pp);
-        set_combo(score.maxCombo);
-        set_fullCombo(score.fullCombo);
-        set_badCuts(score.badCuts);
-        set_missedNotes(score.missedNotes);
-        set_modifiers(score.modifiers);
-        set_timeSet(GetDate(score.timeSet));
+        SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(BeatmapUtils::getMaxScoreCoroutine(lb->difficultyBeatmap, [&](int maxScore) {
+      
+            set_score(score.modifiedScore, ((double)score.modifiedScore / (double)maxScore) * 100.0);
+            set_pp(score.pp);
+            set_combo(score.maxCombo);
+            set_fullCombo(score.fullCombo);
+            set_badCuts(score.badCuts);
+            set_missedNotes(score.missedNotes);
+            set_modifiers(score.modifiers);
+            set_timeSet(GetDate(score.timeSet));
 
-        if (score.leaderboardPlayerInfo.id.has_value())
-        {
-            playerId = score.leaderboardPlayerInfo.id.value();
-        }
-        modal->Show(true, true, nullptr);
+            if (score.leaderboardPlayerInfo.id.has_value())
+            {
+                playerId = score.leaderboardPlayerInfo.id.value();
+            }
+            modal->Show(true, true, nullptr);
+        })));
     }
 
     ScoreInfoModal* ScoreInfoModal::Create(UnityEngine::Transform* parent)

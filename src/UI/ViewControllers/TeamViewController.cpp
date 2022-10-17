@@ -68,7 +68,7 @@ namespace ScoreSaber::UI::ViewControllers
             auto segmentedHorizontal = CreateHorizontalLayoutGroup(get_transform());
             SetPreferredSize(segmentedHorizontal, 80.0f, 6.0f);
             segmentedHorizontal->get_rectTransform()->set_anchoredPosition(Vector2(0, 35.0f));
-            auto segmentedController = BeatSaberUI::CreateTextSegmentedControl(segmentedHorizontal->get_transform(), {0, 0}, {0, 0}, {}, std::bind(&TeamViewController::Show, this, std::placeholders::_1));
+            auto segmentedController = BeatSaberUI::CreateTextSegmentedControl(segmentedHorizontal->get_transform(), {0, 0}, {0, 0}, ArrayW<StringW>(il2cpp_array_size_t(0)), std::bind(&TeamViewController::Show, this, std::placeholders::_1));
 
             segmentedController->overrideCellSize = true;
             segmentedController->fontSize *= 0.75f;

@@ -7,6 +7,7 @@
 #include "UnityEngine/Time.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 using namespace UnityEngine;
@@ -27,7 +28,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::HeightEventRecorder
         std::function<void(float)> fun = [&](float x) {
             PlayerHeightDetector_playerHeightDidChangeEvent(x);
         };
-        auto delegate = il2cpp_utils::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), fun);
+        auto delegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), fun);
         playerHeightDetector->add_playerHeightDidChangeEvent(delegate);
     }
 

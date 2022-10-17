@@ -9,6 +9,7 @@
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "Services/LeaderboardService.hpp"
 #include "Utils/BeatmapUtils.hpp"
 
@@ -117,7 +118,7 @@ namespace ScoreSaber::Services::LeaderboardService
 
     Data::InternalLeaderboard GetLeaderboardError(std::string error)
     {
-        auto scores = System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor();
+        auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
         scores->Add(LeaderboardTableView::ScoreData::New_ctor(0, error, 0, false));
         return Data::InternalLeaderboard(scores);
     }
@@ -125,8 +126,8 @@ namespace ScoreSaber::Services::LeaderboardService
     Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope,
                                                    int page, bool filterAroundCountry)
     {
-        auto scores = System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor();
-        auto modifiers = System::Collections::Generic::List_1<GameplayModifierParamsSO*>::New_ctor();
+        auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
+        auto modifiers = List<GameplayModifierParamsSO*>::New_ctor();
         Data::Leaderboard currentLeaderboard;
         rapidjson::Document doc;
         doc.Parse(rawData.data());
@@ -135,20 +136,16 @@ namespace ScoreSaber::Services::LeaderboardService
             auto errorItr = doc.FindMember("errorMessage");
             if (errorItr == doc.MemberEnd())
             {
-                int maxScore = BeatmapUtils::getMaxScore(difficultyBeatmap);
                 currentLeaderboard = Data::Leaderboard(doc.GetObject());
                 int length = currentLeaderboard.scores.size();
+                int maxScore = BeatmapUtils::getMaxScore(difficultyBeatmap);
                 for (auto& score : currentLeaderboard.scores)
                 {
-
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
-
                     std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
                     std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 80);
-
                     scores->Add(LeaderboardTableView::ScoreData::New_ctor(score.modifiedScore, result, score.rank, false));
-                    // self->mapRanked = score.pp > 0.0f;
                 }
 
                 if (scores->size == 0)

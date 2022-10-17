@@ -45,7 +45,7 @@ namespace ScoreSaber::Services::UploadService
         PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
         if (!practiceViewController->get_isInViewControllerHierarchy())
         {
-            if (Il2cppStrToStr(standardLevelScenesTransitionSetupData->gameMode) == ENCRYPT_STRING_AUTO_A(encoder, "Solo"))
+            if (standardLevelScenesTransitionSetupData->gameMode == ENCRYPT_STRING_AUTO_A(encoder, "Solo"))
             {
                 if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
                 {
@@ -86,16 +86,16 @@ namespace ScoreSaber::Services::UploadService
     void Six(GlobalNamespace::IDifficultyBeatmap* beatmap, GlobalNamespace::LevelCompletionResults* levelCompletionResults)
     {
 
-        std::string encryptedPacket = CreateScorePacket(beatmap, levelCompletionResults->rawScore, levelCompletionResults->modifiedScore,
+        std::string encryptedPacket = CreateScorePacket(beatmap, levelCompletionResults->multipliedScore, levelCompletionResults->modifiedScore,
                                                         levelCompletionResults->fullCombo, levelCompletionResults->badCutsCount, levelCompletionResults->missedCount,
                                                         levelCompletionResults->maxCombo, levelCompletionResults->energy, levelCompletionResults->gameplayModifiers);
         auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level());
 
         std::string levelHash = GetFormattedHash(previewBeatmapLevel->get_levelID());
 
-        std::string characteristic = Il2cppStrToStr(beatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
-        std::string songName = Il2cppStrToStr(previewBeatmapLevel->get_songName());
-        std::string difficultyName = Il2cppStrToStr(BeatmapDifficultySerializedMethods::SerializedName(beatmap->get_difficulty()));
+        std::string characteristic = beatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
+        std::string songName = previewBeatmapLevel->get_songName();
+        std::string difficultyName = BeatmapDifficultySerializedMethods::SerializedName(beatmap->get_difficulty());
 
         std::string replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic,
                                                                                           ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id, songName);
@@ -231,13 +231,13 @@ namespace ScoreSaber::Services::UploadService
 
         std::string levelHash = GetFormattedHash(previewBeatmapLevel->get_levelID());
 
-        std::string gameMode = string_format("Solo%s", Il2cppStrToStr(difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName).c_str());
+        std::string gameMode = "Solo" + difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
         int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
 
-        std::string songName = Il2cppStrToStr(previewBeatmapLevel->get_songName());
-        std::string songSubName = Il2cppStrToStr(previewBeatmapLevel->get_songSubName());
-        std::string songAuthorName = Il2cppStrToStr(previewBeatmapLevel->get_songAuthorName());
-        std::string levelAuthorName = Il2cppStrToStr(previewBeatmapLevel->get_levelAuthorName());
+        std::string songName = previewBeatmapLevel->get_songName();
+        std::string songSubName = previewBeatmapLevel->get_songSubName();
+        std::string songAuthorName = previewBeatmapLevel->get_songAuthorName();
+        std::string levelAuthorName = previewBeatmapLevel->get_levelAuthorName();
         int bpm = previewBeatmapLevel->get_beatsPerMinute();
 
         std::u16string playerName = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name;
