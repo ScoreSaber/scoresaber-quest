@@ -1,5 +1,6 @@
 #include "Data/Private/ReplayFile.hpp"
 #include "GlobalNamespace/BeatmapObjectSpawnController_InitData.hpp"
+#include "GlobalNamespace/ComboController.hpp"
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
@@ -50,6 +51,7 @@ MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::St
     SaberManager* saberManager = ArrayUtil::First(Resources::FindObjectsOfTypeAll<SaberManager*>());
     PlayerHeightDetector* playerHeightDetector = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlayerHeightDetector*>());
     ScoreController* scoreController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreController*>());
+    ComboController* comboController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ComboController*>());
     GameEnergyCounter* gameEnergyCountry = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GameEnergyCounter*>());
 
     Recorders::MetadataRecorder::LevelStarted(_gameplayCoreSceneSetupData->difficultyBeatmap, mainSettingsModelSO,
@@ -57,7 +59,7 @@ MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::St
                                               _gameplayCoreSceneSetupData, _beatmapObjectSpawnControllerInitData);
     Recorders::PoseRecorder::LevelStarted(saberManager, _audioTimeSyncController);
     Recorders::HeightEventRecorder::LevelStarted(playerHeightDetector, _audioTimeSyncController);
-    Recorders::ScoreEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
+    Recorders::ScoreEventRecorder::LevelStarted(scoreController, _audioTimeSyncController, comboController);
     Recorders::EnergyEventRecorder::LevelStarted(gameEnergyCountry, _audioTimeSyncController);
     Recorders::NoteEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
 }
