@@ -41,7 +41,6 @@ namespace BeatmapUtils
         ClearVector<int>(&routines);
         auto beatmapDataBasicInfo = il2cpp_utils::try_cast<GlobalNamespace::IBeatmapDataBasicInfo>(data).value_or(nullptr);
         int blockCount = beatmapDataBasicInfo->get_cuttableNotesCount();
-        INFO("Block count: %i", blockCount);
         callback(getMaxScoreFromCuttableNotesCount(blockCount));
         co_return;
     }

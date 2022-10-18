@@ -196,7 +196,6 @@ namespace ScoreSaber::UI::Other
 
     void ScoreInfoModal::Show(ScoreSaber::Data::Score& score)
     {
-        INFO("1");
         if (score.leaderboardPlayerInfo.name.has_value())
         {
             set_player(score.leaderboardPlayerInfo.name.value());
