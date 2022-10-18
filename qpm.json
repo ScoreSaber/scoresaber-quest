@@ -52,6 +52,11 @@
          "id": "gif-lib",
          "versionRange": "^5.2.2",
          "additionalData": {}
+      },
+      {
+         "id": "lapiz",
+         "versionRange": "^0.1.1",
+         "additionalData": {}
       }
    ],
    "additionalData": {}

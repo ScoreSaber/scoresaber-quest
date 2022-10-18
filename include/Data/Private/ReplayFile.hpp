@@ -11,6 +11,22 @@ using namespace std;
 
 namespace ScoreSaber::Data::Private
 {
+
+    struct Pointers
+    {
+        Pointers();
+        Pointers(int metadata, int poseKeyframes, int heightKeyframes, int noteKeyframes, int scoreKeyframes, int comboKeyframes, int multiplierKeyframes, int energyKeyframes, int fpsKeyframes);
+        int metadata;
+        int poseKeyframes;
+        int heightKeyframes;
+        int noteKeyframes;
+        int scoreKeyframes;
+        int comboKeyframes;
+        int multiplierKeyframes;
+        int energyKeyframes;
+        int fpsKeyframes;
+    };
+
     struct VRPosition
     {
         VRPosition();

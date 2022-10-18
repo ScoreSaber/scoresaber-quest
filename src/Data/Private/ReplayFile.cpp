@@ -3,6 +3,21 @@
 namespace ScoreSaber::Data::Private
 {
 
+    Pointers::Pointers(int _metadata, int _poseKeyframes, int _heightKeyframes, int _noteKeyframes, int _scoreKeyframes, int _comboKeyframes, int _multiplierKeyframes, int _energyKeyframes, int _fpsKeyframes)
+    {
+        metadata = _metadata;
+        poseKeyframes = _poseKeyframes;
+        heightKeyframes = _heightKeyframes;
+        noteKeyframes = _noteKeyframes;
+        scoreKeyframes = _scoreKeyframes;
+        comboKeyframes = _comboKeyframes;
+        multiplierKeyframes = _multiplierKeyframes;
+        energyKeyframes = _energyKeyframes;
+        fpsKeyframes = _fpsKeyframes;
+    }
+
+    Pointers::Pointers(){};
+
     VRPosition::VRPosition(float _X, float _Y, float _Z)
     {
         X = _X;
