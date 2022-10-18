@@ -14,5 +14,5 @@ namespace ScoreSaber::Services::LeaderboardService
 
     Data::InternalLeaderboard GetLeaderboardError(std::string error);
     Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope,
-                                                   int page, bool filterAroundCountry);
+                                                   int page, bool filterAroundCountry, int maxScore);
 } // namespace ScoreSaber::Services::LeaderboardService

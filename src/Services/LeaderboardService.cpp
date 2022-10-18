@@ -95,7 +95,20 @@ namespace ScoreSaber::Services::LeaderboardService
         if (url == "")
         {
             finished(GetLeaderboardError("Failed to get beatmap data! Please refresh"));
+            return;
         }
+
+        auto [beatmapDataBasicInfo, readonlyBeatmapData] = BeatmapUtils::getBeatmapData(difficultyBeatmap);
+
+        bool containsV3Stuff = BeatmapUtils::containsV3Stuff(readonlyBeatmapData);
+
+        if (containsV3Stuff)
+        {
+            finished(GetLeaderboardError("Maps with new note types currently not supported"));
+            return;
+        }
+
+        int maxScore = BeatmapUtils::getMaxScore(beatmapDataBasicInfo);
 
         WebUtils::GetAsync(
             url, [=](long code, std::string result) {
@@ -103,7 +116,7 @@ namespace ScoreSaber::Services::LeaderboardService
                 switch (code)
                 {
                     case 200:
-                        data = ParseLeaderboardData(result, difficultyBeatmap, scope, page, filterAroundCountry);
+                        data = ParseLeaderboardData(result, difficultyBeatmap, scope, page, filterAroundCountry, maxScore);
                         break;
                     case 404:
                         data = GetLeaderboardError("No scores on this leaderboard!");
@@ -124,7 +137,7 @@ namespace ScoreSaber::Services::LeaderboardService
     }
 
     Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope,
-                                                   int page, bool filterAroundCountry)
+                                                   int page, bool filterAroundCountry, int maxScore)
     {
         auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
         auto modifiers = List<GameplayModifierParamsSO*>::New_ctor();
@@ -138,7 +151,7 @@ namespace ScoreSaber::Services::LeaderboardService
             {
                 currentLeaderboard = Data::Leaderboard(doc.GetObject());
                 int length = currentLeaderboard.scores.size();
-                int maxScore = BeatmapUtils::getMaxScore(difficultyBeatmap);
+
                 for (auto& score : currentLeaderboard.scores)
                 {
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;

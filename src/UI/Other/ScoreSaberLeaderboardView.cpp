@@ -265,7 +265,14 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             }
                             else
                             {
-                                SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
+                                if (internalLeaderboard.leaderboardItems->get_Item(0) != nullptr)
+                                {
+                                    SetErrorState(loadingControl, internalLeaderboard.leaderboardItems->get_Item(0)->get_playerName(), false);
+                                }
+                                else
+                                {
+                                    SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
+                                }
                             }
                         });
                     },

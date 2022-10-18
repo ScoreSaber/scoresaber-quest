@@ -1,16 +1,24 @@
 #include "Utils/BeatmapUtils.hpp"
+#include "GlobalNamespace/BeatmapDataItem.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/PlayerData.hpp"
 #include "GlobalNamespace/PlayerDataModel.hpp"
 // #include "System::Threading::Tasks::Task_1.hpp"
+// System::Collections::Generic::LinkedListNode_1
+
 #include "GlobalNamespace/BeatmapEnvironmentHelper.hpp"
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "GlobalNamespace/EnvironmentsListSO.hpp"
 #include "GlobalNamespace/IBeatmapDataBasicInfo.hpp"
+#include "GlobalNamespace/SliderData.hpp"
+#include "System/Collections/Generic/LinkedListNode_1.hpp"
+//
+#include "System/Collections/Generic/LinkedList_1.hpp"
 #include "System/Threading/Tasks/Task_1.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "logging.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <tuple>
 
 namespace BeatmapUtils
 {
@@ -45,7 +53,13 @@ namespace BeatmapUtils
         co_return;
     }
 
-    int getMaxScore(GlobalNamespace::IDifficultyBeatmap* beatmap)
+    int getMaxScore(GlobalNamespace::IBeatmapDataBasicInfo* beatmapDataBasicInfo)
+    {
+        int blockCount = beatmapDataBasicInfo->get_cuttableNotesCount();
+        return getMaxScoreFromCuttableNotesCount(blockCount);
+    }
+
+    std::tuple<GlobalNamespace::IBeatmapDataBasicInfo*, GlobalNamespace::IReadonlyBeatmapData*> getBeatmapData(GlobalNamespace::IDifficultyBeatmap* beatmap)
     {
         if (playerDataModel == nullptr)
         {
@@ -62,8 +76,22 @@ namespace BeatmapUtils
         }
         auto data = result->get_ResultOnSuccess();
         auto beatmapDataBasicInfo = il2cpp_utils::try_cast<GlobalNamespace::IBeatmapDataBasicInfo>(data).value_or(nullptr);
-        int blockCount = beatmapDataBasicInfo->get_cuttableNotesCount();
-        return getMaxScoreFromCuttableNotesCount(blockCount);
+        return std::make_tuple(beatmapDataBasicInfo, data);
+    }
+
+    bool containsV3Stuff(GlobalNamespace::IReadonlyBeatmapData* beatmapData)
+    {
+        // iterate over allBeatmapDataItems
+
+        auto list = beatmapData->get_allBeatmapDataItems();
+        for (auto i = list->head; i->next != list->head; i = i->next)
+        {
+            if (i->item->type == 0 && il2cpp_utils::try_cast<GlobalNamespace::SliderData>(i->item).value_or(nullptr))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     int getMaxScoreFromCuttableNotesCount(int cuttableNotesCount)

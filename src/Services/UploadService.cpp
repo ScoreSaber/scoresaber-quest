@@ -16,6 +16,7 @@
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
@@ -104,39 +105,52 @@ namespace ScoreSaber::Services::UploadService
 
     void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, std::string uploadPacket, std::string replayFileName)
     {
-        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
-        // INFO(encoder, "Getting current leaderboard data for leaderboard");
-        LeaderboardService::GetLeaderboardData(
-            beatmap, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
-                bool ranked = true;
-                if (internalLeaderboard.leaderboard.has_value())
-                {
-                    ranked = internalLeaderboard.leaderboard.value().leaderboardInfo.ranked;
-                    if (internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.has_value())
+        std::thread t([beatmap, modifiedScore, uploadPacket, replayFileName] {
+            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
+
+            LeaderboardService::GetLeaderboardData(
+                beatmap, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
+                    bool ranked = true;
+                    if (internalLeaderboard.leaderboard.has_value())
                     {
-                        if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
+                        ranked = internalLeaderboard.leaderboard.value().leaderboardInfo.ranked;
+                        if (internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.has_value())
                         {
-                            //  ERROR("Didn't beat score not uploading");
-                            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>Didn't beat score, not uploading</color>"));
-                            uploading = false;
-                            return;
+                            if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
+                            {
+                                //  ERROR("Didn't beat score not uploading");
+                                ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>Didn't beat score, not uploading</color>"));
+                                uploading = false;
+                                return;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    // ERROR("Failed to get leaderboards ranked status");
-                }
-                ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
+                    else
+                    {
+                        // ERROR("Failed to get leaderboards ranked status");
+                    }
 
-                std::thread t([replay, replayFileName, uploadPacket, ranked] {
+                    ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
+
+                    bool done = false;
+                    bool failed = false;
+                    int attempts = 0;
+
+                    auto [beatmapDataBasicInfo, readonlyBeatmapData] = BeatmapUtils::getBeatmapData(beatmap);
+                    bool containsV3Stuff = BeatmapUtils::containsV3Stuff(readonlyBeatmapData);
+
+                    if (containsV3Stuff)
+                    {
+                        // ERROR("Beatmap contains V3 stuff, not uploading");
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>New note type not supported, not uploading</color>"));
+                        uploading = false;
+                        return;
+                    }
+
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
                     std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
                     std::string url = BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/upload");
                     std::string postData = ENCRYPT_STRING_AUTO_A(encoder, "data=") + uploadPacket;
-                    int attempts = 0;
-                    bool done = false;
-                    bool failed = false;
 
                     while (!done)
                     {
@@ -208,10 +222,10 @@ namespace ScoreSaber::Services::UploadService
                     }
 
                     uploading = false;
-                });
-                t.detach();
-            },
-            false);
+                },
+                false);
+        });
+        t.detach();
     }
 
     void MoveReplay(std::string replayPath, std::string replayFileName)

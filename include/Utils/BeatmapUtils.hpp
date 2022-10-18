@@ -10,7 +10,9 @@
 namespace BeatmapUtils
 {
     int getDiff(GlobalNamespace::IDifficultyBeatmap* beatmap);
-    int getMaxScore(GlobalNamespace::IDifficultyBeatmap* beatmap);
+    int getMaxScore(GlobalNamespace::IBeatmapDataBasicInfo* beatmapDataBasicInfo);
+    std::tuple<GlobalNamespace::IBeatmapDataBasicInfo*, GlobalNamespace::IReadonlyBeatmapData*> getBeatmapData(GlobalNamespace::IDifficultyBeatmap* beatmap);
+    bool containsV3Stuff(GlobalNamespace::IReadonlyBeatmapData* beatmapData);
     custom_types::Helpers::Coroutine getMaxScoreCoroutine(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, std::function<void(int maxScore)> callback);
     int getMaxScoreFromCuttableNotesCount(int cuttableNotesCount);
 
