@@ -1,11 +1,13 @@
 #include "Data/Private/ReplayFile.hpp"
 #include "GlobalNamespace/BeatmapObjectSpawnController_InitData.hpp"
+#include "GlobalNamespace/BeatmapObjectSpawnMovementData.hpp"
 #include "GlobalNamespace/ComboController.hpp"
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
+#include "GlobalNamespace/NoteController.hpp"
 #include "GlobalNamespace/PlayerHeightDetector.hpp"
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"
 #include "GlobalNamespace/PlayerTransforms.hpp"
@@ -38,7 +40,7 @@ using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 using namespace ScoreSaber::ReplaySystem;
 
-GlobalNamespace::GameplayCoreSceneSetupData* _gameplayCoreSceneSetupData;
+GameplayCoreSceneSetupData* _gameplayCoreSceneSetupData;
 BeatmapObjectSpawnController::InitData* _beatmapObjectSpawnControllerInitData;
 AudioTimeSyncController* _audioTimeSyncController;
 
@@ -65,31 +67,21 @@ MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::St
 }
 
 MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameplayCoreSceneSetupData_ctor, "", "GameplayCoreSceneSetupData", ".ctor", void,
-                                          GlobalNamespace::GameplayCoreSceneSetupData* self, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap,
-                                          GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel,
-                                          GlobalNamespace::GameplayModifiers* gameplayModifiers, GlobalNamespace::PlayerSpecificSettings* playerSpecificSettings,
-                                          GlobalNamespace::PracticeSettings* practiceSettings, bool useTestNoteCutSoundEffects,
-                                          GlobalNamespace::EnvironmentInfoSO* environmentInfo, GlobalNamespace::ColorScheme* colorScheme, GlobalNamespace::MainSettingsModelSO mainSettingsModel)
+                                          GameplayCoreSceneSetupData* self, IDifficultyBeatmap* difficultyBeatmap, IPreviewBeatmapLevel* previewBeatmapLevel,
+                                          GameplayModifiers* gameplayModifiers, PlayerSpecificSettings* playerSpecificSettings, PracticeSettings* practiceSettings,
+                                          bool useTestNoteCutSoundEffects, EnvironmentInfoSO* environmentInfo, ColorScheme* colorScheme, MainSettingsModelSO* mainSettingsModel)
 {
-    GameplayCoreSceneSetupData_ctor(self, difficultyBeatmap, previewBeatmapLevel, gameplayModifiers, playerSpecificSettings, practiceSettings, useTestNoteCutSoundEffects, environmentInfo, colorScheme, mainSettingsModel);
+    GameplayCoreSceneSetupData_ctor(self, difficultyBeatmap, previewBeatmapLevel, gameplayModifiers, playerSpecificSettings, practiceSettings, useTestNoteCutSoundEffects,
+                                    environmentInfo, colorScheme, mainSettingsModel);
     _gameplayCoreSceneSetupData = self;
 }
 
 MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(BeatmapObjectSpawnControllerInitData_ctor, "", "BeatmapObjectSpawnController/InitData", ".ctor", void,
                                           BeatmapObjectSpawnController::InitData* self, float beatsPerMinute,
-                                          int noteLinesCount, float noteJumpMovementSpeed, float noteJumpStartBeatOffset, float jumpOffsetY)
+                                          int noteLinesCount, float noteJumpMovementSpeed, BeatmapObjectSpawnMovementData::NoteJumpValueType noteJumpValueType, float noteJumpValue)
 {
-    BeatmapObjectSpawnControllerInitData_ctor(self, beatsPerMinute, noteLinesCount, noteJumpMovementSpeed, noteJumpStartBeatOffset, jumpOffsetY);
+    BeatmapObjectSpawnControllerInitData_ctor(self, beatsPerMinute, noteLinesCount, noteJumpMovementSpeed, noteJumpValueType, noteJumpValue);
     _beatmapObjectSpawnControllerInitData = self;
-}
-
-MAKE_AUTO_HOOK_MATCH(StandardGameplayInstaller_InstallBindings, &StandardGameplayInstaller::InstallBindings, void, StandardGameplayInstaller* self)
-{
-    StandardGameplayInstaller_InstallBindings(self);
-    DiContainer* container = self->get_Container();
-    container->BindMemoryPool<Recorders::NoteEventRecorder::SwingFinisher*, MemoryPool_1<Recorders::NoteEventRecorder::SwingFinisher*>*>()->WithInitialSize(64);
-    auto finisherPool = container->Resolve<MemoryPool_1<Recorders::NoteEventRecorder::SwingFinisher*>*>();
-    Recorders::NoteEventRecorder::SetPool(finisherPool);
 }
 
 MAKE_AUTO_HOOK_MATCH(PlayerTransforms_Update, &PlayerTransforms::Update, void, PlayerTransforms* self)
@@ -107,4 +99,11 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelGameplayManager_HandleGameEnergyDidReach0, &St
 {
     StandardLevelGameplayManager_HandleGameEnergyDidReach0(self);
     Recorders::MetadataRecorder::LevelFailed();
+}
+
+MAKE_AUTO_HOOK_MATCH(ScoreController_HandleNoteWasCut, &ScoreController::HandleNoteWasCut, void, ScoreController* self,
+                     GlobalNamespace::NoteController* noteController, ByRef<GlobalNamespace::NoteCutInfo> noteCutInfo)
+{
+    ScoreController_HandleNoteWasCut(self, noteController, noteCutInfo);
+    Recorders::NoteEventRecorder::BadCutInfoCollector(noteController, noteCutInfo.heldRef);
 }

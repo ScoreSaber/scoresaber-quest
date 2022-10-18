@@ -9,6 +9,7 @@
 #include "UnityEngine/Time.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 using namespace UnityEngine;
@@ -43,9 +44,9 @@ namespace ScoreSaber::ReplaySystem::Recorders::ScoreEventRecorder
             ScoreController_multiplierDidChangeEvent(multiplier, nextMultiplierProgress);
         };
 
-        auto comboDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), comboDidChangeCallback);
-        auto scoreDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_2<int, int>*>(classof(System::Action_2<int, int>*), scoreDidChangeCallback);
-        auto multiplierDidChangeDelegate = il2cpp_utils::MakeDelegate<System::Action_2<int, float>*>(classof(System::Action_2<int, float>*), multiplierDidChangeCallback);
+        auto comboDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), comboDidChangeCallback);
+        auto scoreDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, int>*>(classof(System::Action_2<int, int>*), scoreDidChangeCallback);
+        auto multiplierDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, float>*>(classof(System::Action_2<int, float>*), multiplierDidChangeCallback);
 
         comboController->add_comboDidChangeEvent(comboDidChangeDelegate);
         scoreController->add_scoreDidChangeEvent(scoreDidChangeDelegate);

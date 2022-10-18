@@ -3,143 +3,117 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/CutScoreBuffer.hpp"
 #include "GlobalNamespace/ISaberSwingRatingCounter.hpp"
+#include "GlobalNamespace/NoteController.hpp"
 #include "GlobalNamespace/NoteCutInfo.hpp"
 #include "GlobalNamespace/NoteData.hpp"
-// #include "GlobalNamespace/NoteWasCutDelegate.hpp"
 #include "GlobalNamespace/ScoreController.hpp"
 #include "System/Action_1.hpp"
 #include "System/Action_2.hpp"
+#include "System/Collections/Generic/Dictionary_2.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Vector3.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
+#include <map>
 
 using namespace UnityEngine;
-using namespace Zenject;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
-
-DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder, SwingFinisher);
-
-// Swing Finisher
-namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
-{
-
-    void SwingFinisher::ctor()
-    {
-    }
-
-    void SwingFinisher::Init(NoteID noteID, ByRef<NoteCutInfo> noteCutInfo, std::function<void(SwingFinisher*)> didFinish, float timeWasCut)
-    {
-        // this->noteId = noteID;
-        // this->_didFinish = didFinish;
-        // this->noteCutInfo = noteCutInfo.heldRef;
-        // this->timeWasCut = timeWasCut;
-        // this->saberSwingRatingCounter = noteCutInfo.heldRef.swingRatingCounter;
-        // this->saberSwingRatingCounter->RegisterDidFinishReceiver(reinterpret_cast<ISaberSwingRatingCounterDidFinishReceiver*>(this));
-    }
-
-    void SwingFinisher::HandleSaberSwingRatingCounterDidFinish(ISaberSwingRatingCounter* saberSwingRatingCounter)
-    {
-        _didFinish(this);
-        this->saberSwingRatingCounter->UnregisterDidFinishReceiver(reinterpret_cast<ISaberSwingRatingCounterDidFinishReceiver*>(this));
-    }
-
-} // namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
-
-// NoteEventRecorder
+using namespace System::Collections::Generic;
 namespace ScoreSaber::ReplaySystem::Recorders::NoteEventRecorder
 {
 
     AudioTimeSyncController* _audioTimeSyncController;
     ScoreController* _scoreController;
-    MemoryPool_1<SwingFinisher*>* _finisherPool;
     vector<NoteEvent> _noteKeyframes;
     VRPosition _none;
-
-    void SetPool(MemoryPool_1<SwingFinisher*>* finisherPool)
-    {
-        _finisherPool = finisherPool;
-    }
+    std::map<NoteData*, NoteCutInfo> _collectedBadCutInfos;
+    std::map<GoodCutScoringElement*, float> _scoringStartInfo;
 
     void LevelStarted(ScoreController* scoreController, AudioTimeSyncController* audioTimeSyncController)
     {
-        // _none = VRPosition(0, 0, 0);
-        // _noteKeyframes.clear();
-        // _audioTimeSyncController = audioTimeSyncController;
-        // _scoreController = scoreController;
+        _none = VRPosition(0, 0, 0);
+        _noteKeyframes.clear();
+        _audioTimeSyncController = audioTimeSyncController;
+        _scoreController = scoreController;
+        _collectedBadCutInfos.clear();
+        _scoringStartInfo.clear();
 
-        // // noteWasCutCallback
-        // std::function<void(NoteData*, ByRef<NoteCutInfo>, int)> noteWasCutCallback = [&](NoteData* noteData, ByRef<NoteCutInfo> noteCutInfo, int multiplier) {
-        //     ScoreController_noteWasCutEvent(noteData, noteCutInfo, multiplier);
-        // };
+        // ScoreController_scoringForNoteStartedEvent
+        std::function<void(ScoringElement*)>
+            scoringForNoteStartedCallback = [&](ScoringElement* element) {
+                ScoreController_scoringForNoteStartedEvent(element);
+            };
 
-        // auto noteWasCutDelegate = il2cpp_utils::MakeDelegate<NoteWasCutDelegate*>(classof(NoteWasCutDelegate*), noteWasCutCallback);
-        // _scoreController->add_noteWasCutEvent(noteWasCutDelegate);
+        auto scoringForNoteStartedDelegate = custom_types::MakeDelegate<System::Action_1<ScoringElement*>*>(classof(System::Action_1<ScoringElement*>*), scoringForNoteStartedCallback);
+        _scoreController->add_scoringForNoteStartedEvent(scoringForNoteStartedDelegate);
 
-        // // noteWasMissedCallback
-        // std::function<void(NoteData*, int)> noteWasMissedCallback = [&](NoteData* noteData, int multiplier) {
-        //     ScoreController_noteWasMissedEvent(noteData, multiplier);
-        // };
+        // ScoreController_scoringForNoteFinishedEvent
+        std::function<void(ScoringElement*)> scoringForNoteFinishedCallback = [&](ScoringElement* element) {
+            ScoreController_scoringForNoteFinishedEvent(element);
+        };
 
-        // auto noteWasMissedDelegate = il2cpp_utils::MakeDelegate<System::Action_2<NoteData*, int>*>(classof(System::Action_2<NoteData*, int>*), noteWasMissedCallback);
-        // _scoreController->add_noteWasMissedEvent(noteWasMissedDelegate);
+        auto scoringForNoteFinishedDelegate = custom_types::MakeDelegate<System::Action_1<ScoringElement*>*>(classof(System::Action_1<ScoringElement*>*), scoringForNoteFinishedCallback);
+        _scoreController->add_scoringForNoteFinishedEvent(scoringForNoteFinishedDelegate);
     }
 
-    void ScoreController_noteWasCutEvent(NoteData* noteData, ByRef<NoteCutInfo> noteCutInfo, int multiplier)
+    void ScoreController_scoringForNoteStartedEvent(ScoringElement* element)
     {
+        if (auto goodCut = il2cpp_utils::try_cast<GoodCutScoringElement>(element).value_or(nullptr))
+        {
+            _scoringStartInfo.emplace(goodCut, _audioTimeSyncController->songTime);
+        }
+    }
 
+    void ScoreController_scoringForNoteFinishedEvent(ScoringElement* element)
+    {
+        auto noteData = element->noteData;
         NoteID noteID = NoteID(noteData->time, (int)noteData->noteLineLayer, noteData->lineIndex, (int)noteData->colorType, (int)noteData->cutDirection);
-        if (noteData->colorType == ColorType::None)
+
+        if (auto goodCut = il2cpp_utils::try_cast<GoodCutScoringElement>(element).value_or(nullptr))
         {
-            _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Bomb, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
-                                               noteCutInfo.heldRef.directionOK, noteCutInfo.heldRef.cutDirDeviation,
+            auto cutTime = _scoringStartInfo[goodCut];
+            auto noteCutInfo = goodCut->cutScoreBuffer->noteCutInfo;
+            _scoringStartInfo.erase(goodCut);
+            _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::GoodCut, VRPosition(noteCutInfo.cutPoint),
+                                               VRPosition(noteCutInfo.cutNormal), VRPosition(noteCutInfo.saberDir),
+                                               (int)noteCutInfo.saberType, noteCutInfo.directionOK,
+                                               noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
+                                               noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
+                                               goodCut->cutScoreBuffer->get_beforeCutSwingRating(), goodCut->cutScoreBuffer->get_afterCutSwingRating(),
+                                               cutTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
+        }
+        else if (auto badCut = il2cpp_utils::try_cast<BadCutScoringElement>(element).value_or(nullptr))
+        {
+            auto badCutEventType = noteData->colorType == ColorType::None ? NoteEventType::Bomb : NoteEventType::BadCut;
+            auto noteCutInfo = _collectedBadCutInfos[badCut->noteData];
+            _collectedBadCutInfos.erase(badCut->noteData);
+            _noteKeyframes.push_back(NoteEvent(noteID, badCutEventType, VRPosition(noteCutInfo.cutPoint),
+                                               VRPosition(noteCutInfo.cutNormal), VRPosition(noteCutInfo.saberDir),
+                                               (int)noteCutInfo.saberType, noteCutInfo.directionOK,
+                                               noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
+                                               noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
+                                               0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
+        }
+        else if (noteData->colorType != ColorType::None && il2cpp_utils::try_cast<MissScoringElement>(element).value_or(nullptr))
+        {
+            _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Miss, _none, _none, _none, (int)noteData->colorType,
+                                               false, 0,
                                                0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
-            return;
-        }
-
-        if (noteCutInfo.heldRef.get_allIsOK())
-        {
-            auto finisher = _finisherPool->Spawn();
-            finisher->Init(noteID, noteCutInfo, SwingFinisher_didFinish, _audioTimeSyncController->songTime);
-        }
-        else
-        {
-            _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::BadCut, _none, _none, _none, (int)noteCutInfo.heldRef.saberType,
-                                               noteCutInfo.heldRef.directionOK, noteCutInfo.heldRef.cutDirDeviation,
-                                               0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
         }
     }
 
-    void SwingFinisher_didFinish(SwingFinisher* swingFinisher)
+    void BadCutInfoCollector(NoteController* noteController, const NoteCutInfo& noteCutInfo)
     {
-        _noteKeyframes.push_back(NoteEvent(swingFinisher->noteId, NoteEventType::GoodCut, VRPosition(swingFinisher->noteCutInfo.cutPoint),
-                                           VRPosition(swingFinisher->noteCutInfo.cutNormal), VRPosition(swingFinisher->noteCutInfo.saberDir),
-                                           (int)swingFinisher->noteCutInfo.saberType, swingFinisher->noteCutInfo.directionOK,
-                                           swingFinisher->noteCutInfo.saberSpeed, swingFinisher->noteCutInfo.cutAngle,
-                                           swingFinisher->noteCutInfo.cutDistanceToCenter, swingFinisher->noteCutInfo.cutDirDeviation,
-                                           swingFinisher->saberSwingRatingCounter->get_beforeCutRating(), swingFinisher->saberSwingRatingCounter->get_afterCutRating(),
-                                           swingFinisher->timeWasCut, Time::get_timeScale(), _audioTimeSyncController->timeScale));
-        _finisherPool->Despawn(swingFinisher);
+        _collectedBadCutInfos.emplace(noteController->noteData, noteCutInfo);
     }
 
-    void ScoreController_noteWasMissedEvent(NoteData* noteData, int multiplier)
-    {
-        if (noteData->colorType == ColorType::None)
-        {
-            return;
-        }
-
-        NoteID noteID = NoteID(noteData->time, (int)noteData->noteLineLayer, noteData->lineIndex, (int)noteData->colorType, (int)noteData->cutDirection);
-        _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Miss, _none, _none, _none, (int)noteData->colorType,
-                                           false, 0,
-                                           0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
-    }
-
-    vector<NoteEvent> Export()
+    vector<NoteEvent>
+    Export()
     {
         return _noteKeyframes;
     }
