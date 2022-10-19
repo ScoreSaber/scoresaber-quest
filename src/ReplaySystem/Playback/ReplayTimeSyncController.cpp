@@ -52,4 +52,12 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
     }
 
+    void ReplayTimeSyncController::OverrideTimeScale(float timeScale)
+    {
+    }
+
+    void ReplayTimeSyncController::CancelAllHitSounds()
+    {
+    }
+
 } // namespace ScoreSaber::ReplaySystem::Playback

@@ -120,4 +120,25 @@ namespace BeatmapUtils
             return -1;
         return maxScore;
     }
+
+    int OldMaxRawScoreForNumberOfNotes(int noteCount)
+    {
+        int num = 0;
+        int num2 = 1;
+        while (num2 < 8)
+        {
+            if (noteCount >= num2 * 2)
+            {
+                num += num2 * num2 * 2 + num2;
+                noteCount -= num2 * 2;
+                num2 *= 2;
+                continue;
+            }
+            num += num2 * noteCount;
+            noteCount = 0;
+            break;
+        }
+        num += noteCount * num2;
+        return num * 115;
+    }
 } // namespace BeatmapUtils

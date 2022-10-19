@@ -31,11 +31,9 @@ namespace ScoreSaber::ReplaySystem::Playback
         _gameNotePool = basicBeatmapObjectManager->basicGameNotePoolContainer;
         _bombNotePool = basicBeatmapObjectManager->bombNotePoolContainer;
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
-        INFO("%f", _sortedNoteEvents[0].Time);
         std::sort(_sortedNoteEvents.begin(), _sortedNoteEvents.end(), [](const auto& lhs, const auto& rhs) {
             return lhs.Time < rhs.Time;
         });
-        INFO("%f", _sortedNoteEvents[0].Time);
     }
     void NotePlayer::Tick()
     {

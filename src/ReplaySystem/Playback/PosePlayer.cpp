@@ -29,8 +29,8 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     void PosePlayer::Initialize()
     {
-        _saberManager->leftSaber->get_transform()->GetComponentInChildren<GlobalNamespace::VRController*>()->set_enabled(false);
-        _saberManager->rightSaber->get_transform()->GetComponentInChildren<GlobalNamespace::VRController*>()->set_enabled(false);
+        _saberManager->leftSaber->get_transform()->GetComponentInParent<GlobalNamespace::VRController*>()->set_enabled(false);
+        _saberManager->rightSaber->get_transform()->GetComponentInParent<GlobalNamespace::VRController*>()->set_enabled(false);
     }
     void PosePlayer::Tick()
     {

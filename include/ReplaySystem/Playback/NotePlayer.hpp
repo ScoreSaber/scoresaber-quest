@@ -55,8 +55,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlay
                                     // System::Collections::Generic::Dictionary_2<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> * _recognizedNoteCutInfos;
                                     bool ProcessEvent(Data::Private::NoteEvent activeEvent);
                                     bool HandleEvent(Data::Private::NoteEvent activeEvent, GlobalNamespace::NoteController* noteController);
-                                    bool DoesNoteMatchID(Data::Private::NoteID id, GlobalNamespace::NoteData* noteData);
-
-);
+                                    bool DoesNoteMatchID(Data::Private::NoteID id, GlobalNamespace::NoteData* noteData);)
 
 #undef INTERFACES

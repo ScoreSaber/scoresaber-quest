@@ -15,6 +15,7 @@ namespace BeatmapUtils
     bool containsV3Stuff(GlobalNamespace::IReadonlyBeatmapData* beatmapData);
     custom_types::Helpers::Coroutine getMaxScoreCoroutine(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, std::function<void(int maxScore)> callback);
     int getMaxScoreFromCuttableNotesCount(int cuttableNotesCount);
+    int OldMaxRawScoreForNumberOfNotes(int noteCount);
 
     template <class T>
     void ClearVector(std::vector<T>* vector)
