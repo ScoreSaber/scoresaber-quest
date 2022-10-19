@@ -2,6 +2,7 @@
 
 #include "lapiz/shared/utilities/ZenjectExtensions.hpp"
 
+#include "ReplaySystem/Playback/NotePlayer.hpp"
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "Zenject/ConcreteBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -23,6 +24,7 @@ namespace ScoreSaber::ReplaySystem::Installers
     void PlaybackInstaller::InstallBindings()
     {
         auto container = get_Container();
-        container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
+        // container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
+        container->BindInterfacesTo<Playback::NotePlayer*>()->AsSingle();
     }
 } // namespace ScoreSaber::ReplaySystem::Installers
