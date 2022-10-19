@@ -4,12 +4,15 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/BasicBeatmapObjectManager.hpp"
 #include "GlobalNamespace/BombNoteController.hpp"
+#include "GlobalNamespace/CutScoreBuffer.hpp"
 #include "GlobalNamespace/GameNoteController.hpp"
+#include "GlobalNamespace/GoodCutScoringElement.hpp"
 #include "GlobalNamespace/MemoryPoolContainer_1.hpp"
 #include "GlobalNamespace/NoteController.hpp"
 #include "GlobalNamespace/NoteCutInfo.hpp"
 #include "GlobalNamespace/NoteData.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
+#include "System/Collections/Generic/Dictionary_2.hpp"
 #include "System/IDisposable.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/IInitializable.hpp"
@@ -19,6 +22,16 @@
 #include <map>
 
 // std::map<GoodCutScoringElement*, float> _scoringStartInfo;
+
+struct RecognizedNoteCutInfo
+{
+    RecognizedNoteCutInfo(GlobalNamespace::NoteCutInfo info, ScoreSaber::Data::Private::NoteEvent event)
+        : info(info), event(event)
+    {
+    }
+    GlobalNamespace::NoteCutInfo info;
+    ScoreSaber::Data::Private::NoteEvent event;
+};
 
 #define INTERFACES                   \
     {                                \
@@ -32,11 +45,13 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlay
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::BasicBeatmapObjectManager*, _basicBeatmapObjectManager);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::MemoryPoolContainer_1<GlobalNamespace::GameNoteController*>*, _gameNotePool);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::MemoryPoolContainer_1<GlobalNamespace::BombNoteController*>*, _bombNotePool);
-
+                                    DECLARE_INSTANCE_METHOD(void, ForceCompleteGoodScoringElements, GlobalNamespace::GoodCutScoringElement* scoringElement, GlobalNamespace::NoteCutInfo noteCutInfo, GlobalNamespace::CutScoreBuffer* cutScoreBuffer);
                                     DECLARE_CTOR(ctor, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager);
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
                                     vector<Data::Private::NoteEvent> _sortedNoteEvents;
-                                    std::map<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> _recognizedNoteCutInfos;
+                                    std::vector<RecognizedNoteCutInfo> _recognizedNoteCutInfos;
+                                    // std::map<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> _recognizedNoteCutInfos;
+                                    // System::Collections::Generic::Dictionary_2<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> * _recognizedNoteCutInfos;
                                     bool ProcessEvent(Data::Private::NoteEvent activeEvent);
                                     bool HandleEvent(Data::Private::NoteEvent activeEvent, GlobalNamespace::NoteController* noteController);
                                     bool DoesNoteMatchID(Data::Private::NoteID id, GlobalNamespace::NoteData* noteData);

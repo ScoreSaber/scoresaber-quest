@@ -4,6 +4,7 @@
 #include "GlobalNamespace/ComboController.hpp"
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
+#include "GlobalNamespace/GoodCutScoringElement.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
@@ -115,5 +116,18 @@ MAKE_AUTO_HOOK_MATCH(ScoreController_HandleNoteWasCut, &ScoreController::HandleN
     if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
     {
         Recorders::NoteEventRecorder::BadCutInfoCollector(noteController, noteCutInfo.heldRef);
+    }
+}
+
+// Player Hooks
+
+MAKE_AUTO_HOOK_MATCH(GoodCutScoringElement_Init, &GoodCutScoringElement::Init, void, GoodCutScoringElement* self, NoteCutInfo noteCutInfo)
+{
+
+    GoodCutScoringElement_Init(self, noteCutInfo);
+
+    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        ScoreSaber::ReplaySystem::ReplayLoader::NotePlayerInstance->ForceCompleteGoodScoringElements(self, noteCutInfo, self->cutScoreBuffer);
     }
 }

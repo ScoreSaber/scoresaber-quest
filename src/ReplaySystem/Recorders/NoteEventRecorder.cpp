@@ -8,8 +8,6 @@
 #include "GlobalNamespace/NoteData.hpp"
 #include "GlobalNamespace/ScoreController.hpp"
 #include "System/Action_1.hpp"
-#include "System/Action_2.hpp"
-#include "System/Collections/Generic/Dictionary_2.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Time.hpp"

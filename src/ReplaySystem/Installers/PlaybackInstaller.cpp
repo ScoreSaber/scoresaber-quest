@@ -15,7 +15,6 @@ using namespace Lapiz::Zenject::ZenjectExtensions;
 
 namespace ScoreSaber::ReplaySystem::Installers
 {
-
     void PlaybackInstaller::ctor(GlobalNamespace::GameplayCoreSceneSetupData* gameplayCoreSceneSetupData)
     {
         _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
