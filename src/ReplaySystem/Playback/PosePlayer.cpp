@@ -1,8 +1,10 @@
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "GlobalNamespace/Saber.hpp"
+#include "GlobalNamespace/VRController.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "UnityEngine/Mathf.hpp"
 #include "UnityEngine/Quaternion.hpp"
+#include "UnityEngine/Transform.hpp"
 
 #include "UnityEngine/Vector3.hpp"
 // GlobalNamespace::SaberManager
@@ -29,6 +31,8 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void PosePlayer::Initialize()
     {
+        _saberManager->leftSaber->get_transform()->GetComponentInChildren<GlobalNamespace::VRController*>()->set_enabled(false);
+        _saberManager->rightSaber->get_transform()->GetComponentInChildren<GlobalNamespace::VRController*>()->set_enabled(false);
     }
     void PosePlayer::Tick()
     {
