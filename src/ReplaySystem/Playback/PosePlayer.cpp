@@ -6,9 +6,8 @@
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/Transform.hpp"
 
-#include "UnityEngine/Vector3.hpp"
-// GlobalNamespace::SaberManager
 #include "GlobalNamespace/SaberManager.hpp"
+#include "UnityEngine/Vector3.hpp"
 #include "logging.hpp"
 
 using namespace UnityEngine;

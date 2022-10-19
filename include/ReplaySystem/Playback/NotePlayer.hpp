@@ -48,6 +48,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlay
                                     DECLARE_INSTANCE_METHOD(void, ForceCompleteGoodScoringElements, GlobalNamespace::GoodCutScoringElement* scoringElement, GlobalNamespace::NoteCutInfo noteCutInfo, GlobalNamespace::CutScoreBuffer* cutScoreBuffer);
                                     DECLARE_CTOR(ctor, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager);
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
+                                    DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
                                     vector<Data::Private::NoteEvent> _sortedNoteEvents;
                                     std::vector<RecognizedNoteCutInfo> _recognizedNoteCutInfos;
                                     // std::map<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> _recognizedNoteCutInfos;
@@ -55,8 +56,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlay
                                     bool ProcessEvent(Data::Private::NoteEvent activeEvent);
                                     bool HandleEvent(Data::Private::NoteEvent activeEvent, GlobalNamespace::NoteController* noteController);
                                     bool DoesNoteMatchID(Data::Private::NoteID id, GlobalNamespace::NoteData* noteData);
-                                    void TimeUpdate(float newTime);
 
-)
+);
 
 #undef INTERFACES

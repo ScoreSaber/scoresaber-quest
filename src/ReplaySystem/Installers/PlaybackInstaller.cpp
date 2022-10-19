@@ -4,6 +4,7 @@
 
 #include "ReplaySystem/Playback/NotePlayer.hpp"
 #include "ReplaySystem/Playback/PosePlayer.hpp"
+#include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include "Zenject/ConcreteBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/FromBinderNonGeneric.hpp"
@@ -25,5 +26,6 @@ namespace ScoreSaber::ReplaySystem::Installers
         auto container = get_Container();
         container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
         container->BindInterfacesTo<Playback::NotePlayer*>()->AsSingle();
+        container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
     }
 } // namespace ScoreSaber::ReplaySystem::Installers
