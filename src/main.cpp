@@ -13,6 +13,7 @@
 #include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
 #include "Utils/TeamUtils.hpp"
+#include "lapiz/shared/zenject/Zenjector.hpp"
 #include "static.hpp"
 
 ModInfo modInfo = {MOD_ID, VERSION};
@@ -57,7 +58,7 @@ extern "C" __attribute((visibility("default"))) void load()
 
     ScoreSaber::ReplaySystem::ReplayLoader::LoadReplay();
     ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying = true;
-    // auto zenjector = Lapiz::Zenject::Zenjector::Get();
+    auto zenjector = Lapiz::Zenject::Zenjector::Get();
     //   zenjector->Install<TrickSaber::Installers::GameInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
-    // zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+    zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
 }
