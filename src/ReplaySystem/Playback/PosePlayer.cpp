@@ -28,7 +28,6 @@ namespace ScoreSaber::ReplaySystem::Playback
         _playerTransforms = playerTransforms;
         _audioTimeSyncController = audioTimeSyncController;
     }
-
     void PosePlayer::Initialize()
     {
         _saberManager->leftSaber->get_transform()->GetComponentInChildren<GlobalNamespace::VRController*>()->set_enabled(false);
@@ -72,12 +71,14 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         float lerpTime = (_audioTimeSyncController->get_songTime() - activePose.Time) / Mathf::Max(0.0001f, nextPose.Time - activePose.Time);
 
+        _playerTransforms->headTransform->SetPositionAndRotation(VRVector3(activePose.Head.Position), VRQuaternion(activePose.Head.Rotation));
+
         _saberManager->leftSaber->OverridePositionAndRotation(Vector3::Lerp(VRVector3(activePose.Left.Position), VRVector3(nextPose.Left.Position), lerpTime),
                                                               Quaternion::Lerp(VRQuaternion(activePose.Left.Rotation), VRQuaternion(nextPose.Left.Rotation), lerpTime));
 
         _saberManager->rightSaber->OverridePositionAndRotation(Vector3::Lerp(VRVector3(activePose.Right.Position), VRVector3(nextPose.Right.Position), lerpTime),
                                                                Quaternion::Lerp(VRQuaternion(activePose.Right.Rotation), VRQuaternion(nextPose.Right.Rotation), lerpTime));
-        // TODO: Move head
+        // TODO: Move camera
     }
 
     bool PosePlayer::ReachedEnd()

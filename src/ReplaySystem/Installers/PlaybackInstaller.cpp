@@ -23,7 +23,7 @@ namespace ScoreSaber::ReplaySystem::Installers
     void PlaybackInstaller::InstallBindings()
     {
         auto container = get_Container();
-        // container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
+        container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
         container->BindInterfacesTo<Playback::NotePlayer*>()->AsSingle();
     }
 } // namespace ScoreSaber::ReplaySystem::Installers
