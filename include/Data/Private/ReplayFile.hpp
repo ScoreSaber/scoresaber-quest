@@ -11,7 +11,6 @@ using namespace std;
 
 namespace ScoreSaber::Data::Private
 {
-
     struct Pointers
     {
         Pointers();
@@ -186,5 +185,7 @@ namespace ScoreSaber::Data::Private
         vector<MultiplierEvent> multiplierKeyframes;
         vector<EnergyEvent> energyKeyframes;
     };
+    UnityEngine::Vector3 VRVector3(VRPosition pose);
+    UnityEngine::Quaternion VRQuaternion(VRRotation rotation);
 
 } // namespace ScoreSaber::Data::Private

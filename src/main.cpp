@@ -5,13 +5,17 @@
 #include "GlobalNamespace/GameScenesManager.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator_InitData.hpp"
+#include "ReplaySystem/ReplayLoader.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+#include "Data/Private/ReplayReader.hpp"
+#include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 #include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
 #include "Utils/TeamUtils.hpp"
+#include "static.hpp"
 
-ModInfo modInfo = {ID, VERSION};
+ModInfo modInfo = {MOD_ID, VERSION};
 
 // Loads the config from disk using our modInfo, then returns it for use
 Configuration& getConfig()
@@ -50,4 +54,10 @@ extern "C" __attribute((visibility("default"))) void load()
     Hooks::InstallHooks(ScoreSaber::Logging::getLogger());
     TeamUtils::Download();
     ScoreSaber::Services::FileService::EnsurePaths();
+
+    ScoreSaber::ReplaySystem::ReplayLoader::LoadReplay();
+    ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying = true;
+    // auto zenjector = Lapiz::Zenject::Zenjector::Get();
+    //   zenjector->Install<TrickSaber::Installers::GameInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+    // zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
 }

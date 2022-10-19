@@ -1,7 +1,19 @@
 #include "Data/Private/ReplayFile.hpp"
+#include "UnityEngine/Quaternion.hpp"
+#include "UnityEngine/Vector3.hpp"
 
 namespace ScoreSaber::Data::Private
 {
+
+    UnityEngine::Vector3 VRVector3(Data::Private::VRPosition pose)
+    {
+        return UnityEngine::Vector3(pose.X, pose.Y, pose.Z);
+    }
+
+    UnityEngine::Quaternion VRQuaternion(Data::Private::VRRotation rotation)
+    {
+        return UnityEngine::Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
+    }
 
     Pointers::Pointers(int _metadata, int _poseKeyframes, int _heightKeyframes, int _noteKeyframes, int _scoreKeyframes, int _comboKeyframes, int _multiplierKeyframes, int _energyKeyframes, int _fpsKeyframes)
     {

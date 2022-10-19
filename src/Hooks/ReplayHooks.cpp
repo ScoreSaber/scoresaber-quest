@@ -21,6 +21,7 @@
 #include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
+#include "ReplaySystem/ReplayLoader.hpp"
 #include "System/Action.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -49,21 +50,24 @@ MAKE_AUTO_HOOK_MATCH(AudioTimeSyncController_Start, &AudioTimeSyncController::St
     AudioTimeSyncController_Start(self);
     _audioTimeSyncController = self;
 
-    MainSettingsModelSO* mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
-    SaberManager* saberManager = ArrayUtil::First(Resources::FindObjectsOfTypeAll<SaberManager*>());
-    PlayerHeightDetector* playerHeightDetector = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlayerHeightDetector*>());
-    ScoreController* scoreController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreController*>());
-    ComboController* comboController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ComboController*>());
-    GameEnergyCounter* gameEnergyCountry = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GameEnergyCounter*>());
+    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        MainSettingsModelSO* mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
+        SaberManager* saberManager = ArrayUtil::First(Resources::FindObjectsOfTypeAll<SaberManager*>());
+        PlayerHeightDetector* playerHeightDetector = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlayerHeightDetector*>());
+        ScoreController* scoreController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreController*>());
+        ComboController* comboController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ComboController*>());
+        GameEnergyCounter* gameEnergyCountry = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GameEnergyCounter*>());
 
-    Recorders::MetadataRecorder::LevelStarted(_gameplayCoreSceneSetupData->difficultyBeatmap, mainSettingsModelSO,
-                                              _gameplayCoreSceneSetupData->previewBeatmapLevel, _audioTimeSyncController,
-                                              _gameplayCoreSceneSetupData, _beatmapObjectSpawnControllerInitData);
-    Recorders::PoseRecorder::LevelStarted(saberManager, _audioTimeSyncController);
-    Recorders::HeightEventRecorder::LevelStarted(playerHeightDetector, _audioTimeSyncController);
-    Recorders::ScoreEventRecorder::LevelStarted(scoreController, _audioTimeSyncController, comboController);
-    Recorders::EnergyEventRecorder::LevelStarted(gameEnergyCountry, _audioTimeSyncController);
-    Recorders::NoteEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
+        Recorders::MetadataRecorder::LevelStarted(_gameplayCoreSceneSetupData->difficultyBeatmap, mainSettingsModelSO,
+                                                  _gameplayCoreSceneSetupData->previewBeatmapLevel, _audioTimeSyncController,
+                                                  _gameplayCoreSceneSetupData, _beatmapObjectSpawnControllerInitData);
+        Recorders::PoseRecorder::LevelStarted(saberManager, _audioTimeSyncController);
+        Recorders::HeightEventRecorder::LevelStarted(playerHeightDetector, _audioTimeSyncController);
+        Recorders::ScoreEventRecorder::LevelStarted(scoreController, _audioTimeSyncController, comboController);
+        Recorders::EnergyEventRecorder::LevelStarted(gameEnergyCountry, _audioTimeSyncController);
+        Recorders::NoteEventRecorder::LevelStarted(scoreController, _audioTimeSyncController);
+    }
 }
 
 MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameplayCoreSceneSetupData_ctor, "", "GameplayCoreSceneSetupData", ".ctor", void,
@@ -88,7 +92,7 @@ MAKE_AUTO_HOOK_MATCH(PlayerTransforms_Update, &PlayerTransforms::Update, void, P
 {
     PlayerTransforms_Update(self);
 
-    if (_audioTimeSyncController != nullptr)
+    if (_audioTimeSyncController != nullptr && !ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
     {
         Recorders::PoseRecorder::Tick(self->get_headPseudoLocalPos(), self->get_headPseudoLocalRot());
     }
@@ -98,12 +102,18 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelGameplayManager_HandleGameEnergyDidReach0, &St
                      StandardLevelGameplayManager* self)
 {
     StandardLevelGameplayManager_HandleGameEnergyDidReach0(self);
-    Recorders::MetadataRecorder::LevelFailed();
+    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        Recorders::MetadataRecorder::LevelFailed();
+    }
 }
 
 MAKE_AUTO_HOOK_MATCH(ScoreController_HandleNoteWasCut, &ScoreController::HandleNoteWasCut, void, ScoreController* self,
                      GlobalNamespace::NoteController* noteController, ByRef<GlobalNamespace::NoteCutInfo> noteCutInfo)
 {
     ScoreController_HandleNoteWasCut(self, noteController, noteCutInfo);
-    Recorders::NoteEventRecorder::BadCutInfoCollector(noteController, noteCutInfo.heldRef);
+    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        Recorders::NoteEventRecorder::BadCutInfoCollector(noteController, noteCutInfo.heldRef);
+    }
 }
