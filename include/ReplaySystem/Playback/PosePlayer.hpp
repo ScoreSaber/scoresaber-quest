@@ -4,9 +4,11 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/IReturnToMenuController.hpp"
 #include "GlobalNamespace/MainCamera.hpp"
+#include "GlobalNamespace/MainSettingsModelSO.hpp"
 #include "GlobalNamespace/PlayerTransforms.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
 #include "System/IDisposable.hpp"
+#include "UnityEngine/Camera.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/IInitializable.hpp"
 #include "Zenject/ITickable.hpp"
@@ -25,6 +27,9 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::PlayerTransforms*, _playerTransforms);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
                                     DECLARE_PRIVATE_FIELD(int, _lastIndex);
+                                    DECLARE_PRIVATE_FIELD(UnityEngine::Camera*, _spectatorCamera);
+                                    DECLARE_PRIVATE_FIELD(UnityEngine::Camera*, _desktopCamera);
+                                    DECLARE_PRIVATE_FIELD(GlobalNamespace::MainSettingsModelSO*, _mainSettingsModelSO);
                                     DECLARE_CTOR(ctor, GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController);
                                     DECLARE_OVERRIDE_METHOD(void, Initialize, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::IInitializable::Initialize>::get());
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
@@ -33,6 +38,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     vector<Data::Private::VRPoseGroup> _sortedPoses;
                                     void UpdatePoses(Data::Private::VRPoseGroup activePose, Data::Private::VRPoseGroup nextPose);
                                     bool ReachedEnd();
+                                    void SetupCameras();
 
 );
 
