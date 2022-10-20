@@ -54,6 +54,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             }
         }
     }
+
     void ScorePlayer::TimeUpdate(float newTime)
     {
         for (int c = 0; c < _sortedScoreEvents.size(); c++)
@@ -68,6 +69,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         UpdateScore(_sortedScoreEvents[_sortedScoreEvents.size() - 1].Score, newTime);
     }
+
     void ScorePlayer::UpdateScore(int newScore, float time)
     {
         int postNoteCount = CalculatePostNoteCountForTime(time);

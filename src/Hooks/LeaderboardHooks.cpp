@@ -121,8 +121,5 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
             ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
         }
     }
-    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
-    {
-        StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
-    }
+    StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
 }
