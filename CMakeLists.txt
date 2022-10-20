@@ -1,6 +1,5 @@
 # include some defines automatically made by qpm
 include(qpm_defines.cmake)
-include(assets_include.cmake)
 
 cmake_minimum_required(VERSION 3.22)
 project(${COMPILE_ID})
@@ -100,3 +99,5 @@ foreach(a_file ${a_list})
         COMMAND ${CMAKE_COMMAND} -E copy ${a_file} debug/${file}
         COMMENT "Copy a files for ndk stack")
 endforeach()
+
+include(assets_include.cmake)
