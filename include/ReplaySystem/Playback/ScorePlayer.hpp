@@ -4,8 +4,6 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/IGameEnergyCounter.hpp"
 #include "GlobalNamespace/ScoreController.hpp"
-#include "ReplaySystem/Playback/NotePlayer.hpp"
-#include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/IInitializable.hpp"
 #include "Zenject/ITickable.hpp"

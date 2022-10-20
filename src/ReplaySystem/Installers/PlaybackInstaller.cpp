@@ -1,7 +1,7 @@
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 
-#include "lapiz/shared/utilities/ZenjectExtensions.hpp"
-
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include "ReplaySystem/Playback/HeightPlayer.hpp"
 #include "ReplaySystem/Playback/NotePlayer.hpp"
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
@@ -9,6 +9,7 @@
 #include "Zenject/ConcreteBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/FromBinderNonGeneric.hpp"
+#include "lapiz/shared/utilities/ZenjectExtensions.hpp"
 #include "logging.hpp"
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::Installers, PlaybackInstaller);
@@ -28,6 +29,11 @@ namespace ScoreSaber::ReplaySystem::Installers
         container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
         container->BindInterfacesTo<Playback::NotePlayer*>()->AsSingle();
         container->BindInterfacesTo<Playback::ScorePlayer*>()->AsSingle();
+        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
+        {
+            container->BindInterfacesTo<Playback::HeightPlayer*>()->AsSingle();
+        }
+
         // container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
     }
 } // namespace ScoreSaber::ReplaySystem::Installers
