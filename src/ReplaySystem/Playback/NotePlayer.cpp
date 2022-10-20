@@ -155,8 +155,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             ratingCounter->beforeCutRating = activeEvent.BeforeCutRating;
 
             cutScoreBuffer->HandleSaberSwingRatingCounterDidFinish(il2cpp_utils::try_cast<GlobalNamespace::ISaberSwingRatingCounter>(ratingCounter).value_or(nullptr));
-            auto element = il2cpp_utils::try_cast<GlobalNamespace::ScoringElement>(scoringElement).value_or(nullptr);
-            element->isFinished = true;
+            scoringElement->isFinished = true;
         }
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

@@ -5,6 +5,7 @@
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "GlobalNamespace/GameNoteController.hpp"
 #include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
+#include "GlobalNamespace/GameplayModifiersModelSO.hpp"
 #include "GlobalNamespace/GoodCutScoringElement.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
@@ -19,6 +20,7 @@
 #include "GlobalNamespace/RankModel.hpp"
 #include "GlobalNamespace/RelativeScoreAndImmediateRankCounter.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
+#include "GlobalNamespace/ScoreController.hpp"
 #include "GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/StandardGameplayInstaller.hpp"
 #include "GlobalNamespace/StandardLevelGameplayManager.hpp"
@@ -30,6 +32,8 @@
 #include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "System/Action.hpp"
+#include "System/Action_1.hpp"
+#include "System/Action_2.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/MemoryPoolIdInitialSizeMaxSizeBinder_1.hpp"
@@ -183,4 +187,85 @@ MAKE_AUTO_HOOK_MATCH(PrepareLevelCompletionResults_FillLevelCompletionResults, &
     }
     auto value = PrepareLevelCompletionResults_FillLevelCompletionResults(self, levelEndStateType, levelEndAction);
     return value;
+}
+
+// CancelScoreControllerBufferFinisher
+MAKE_AUTO_HOOK_ORIG_MATCH(ScoreController_LateUpdate, &ScoreController::LateUpdate, void, ScoreController* self)
+{
+    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        ScoreController_LateUpdate(self);
+        return;
+    }
+    float num = (self->sortedNoteTimesWithoutScoringElements->get_Count() > 0) ? self->sortedNoteTimesWithoutScoringElements->get_Item(0) : 3.4028235E+38f;
+    float num2 = self->audioTimeSyncController->songTime + 0.15f;
+
+    int num3 = 0;
+    bool flag = false;
+    for (int i = 0; i < self->sortedScoringElementsWithoutMultiplier->get_Count(); i++)
+    {
+        auto scoringElement = self->sortedScoringElementsWithoutMultiplier->get_Item(i);
+        if (scoringElement->get_time() >= num2 && scoringElement->get_time() <= num)
+        {
+            break;
+        }
+        flag |= self->scoreMultiplierCounter->ProcessMultiplierEvent(scoringElement->get_multiplierEventType());
+        if (scoringElement->get_wouldBeCorrectCutBestPossibleMultiplierEventType() == ScoreMultiplierCounter::MultiplierEventType::Positive)
+        {
+            self->maxScoreMultiplierCounter->ProcessMultiplierEvent(ScoreMultiplierCounter::MultiplierEventType::Positive);
+        }
+        scoringElement->SetMultipliers(self->scoreMultiplierCounter->multiplier, self->maxScoreMultiplierCounter->multiplier);
+        self->scoringElementsWithMultiplier->Add(scoringElement);
+        num3++;
+    }
+    self->sortedScoringElementsWithoutMultiplier->RemoveRange(0, num3);
+    if (flag)
+    {
+        if (self->multiplierDidChangeEvent != nullptr)
+        {
+            self->multiplierDidChangeEvent->Invoke(self->scoreMultiplierCounter->multiplier, self->scoreMultiplierCounter->get_normalizedProgress());
+        }
+    }
+    bool flag2 = false;
+    self->scoringElementsToRemove->Clear();
+    for (int j = 0; j < self->scoringElementsWithMultiplier->get_Count(); j++)
+    {
+        auto scoringElement2 = self->scoringElementsWithMultiplier->get_Item(j);
+        if (scoringElement2->isFinished)
+        {
+            if ((float)scoringElement2->get_maxPossibleCutScore() > 0.0f)
+            {
+                flag2 = true;
+                // self->multipliedScore += scoringElement2->get_cutScore() * scoringElement2->multiplier;
+                self->immediateMaxPossibleMultipliedScore += scoringElement2->get_maxPossibleCutScore() * scoringElement2->maxMultiplier;
+            }
+            self->scoringElementsToRemove->Add(scoringElement2);
+            if (self->scoringForNoteFinishedEvent)
+            {
+                self->scoringForNoteFinishedEvent->Invoke(scoringElement2);
+            }
+        }
+    }
+    for (int k = 0; k < self->scoringElementsToRemove->get_Count(); k++)
+    {
+        auto scoringElement3 = self->scoringElementsToRemove->get_Item(k);
+        self->DespawnScoringElement(scoringElement3);
+        self->scoringElementsWithMultiplier->Remove(scoringElement3);
+    }
+    self->scoringElementsToRemove->Clear();
+    float totalMultiplier = self->gameplayModifiersModel->GetTotalMultiplier(self->gameplayModifierParams, self->gameEnergyCounter->get_energy());
+    if (self->prevMultiplierFromModifiers != totalMultiplier)
+    {
+        self->prevMultiplierFromModifiers = totalMultiplier;
+        flag2 = true;
+    }
+    if (flag2)
+    {
+        self->modifiedScore = ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(self->multipliedScore, totalMultiplier);
+        self->immediateMaxPossibleModifiedScore = ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(self->immediateMaxPossibleMultipliedScore, totalMultiplier);
+        if (self->scoreDidChangeEvent != nullptr)
+        {
+            self->scoreDidChangeEvent->Invoke(self->multipliedScore, self->modifiedScore);
+        }
+    }
 }

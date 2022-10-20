@@ -20,8 +20,8 @@ namespace ScoreSaber::ReplaySystem::Playback
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
         _gameEnergyCounter = gameEnergyCounter;
-        _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         _sortedScoreEvents = ReplayLoader::LoadedReplay->scoreKeyframes;
+        _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         std::sort(_sortedNoteEvents.begin(), _sortedNoteEvents.end(), [](const auto& lhs, const auto& rhs) {
             return lhs.Time < rhs.Time;
         });
@@ -50,7 +50,8 @@ namespace ScoreSaber::ReplaySystem::Playback
 
             if (_scoreController->scoreDidChangeEvent != nullptr)
             {
-                _scoreController->scoreDidChangeEvent->Invoke(recentMultipliedScore, GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(recentMultipliedScore, _scoreController->prevMultiplierFromModifiers));
+                _scoreController->scoreDidChangeEvent->Invoke(recentMultipliedScore,
+                                                              GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(recentMultipliedScore, _scoreController->prevMultiplierFromModifiers));
             }
         }
     }
@@ -88,11 +89,12 @@ namespace ScoreSaber::ReplaySystem::Playback
         int count = 0;
         for (int c = 0; c < _sortedNoteEvents.size(); c++)
         {
-            if (_sortedNoteEvents[c].Time > time)
+            auto noteEvent = _sortedNoteEvents[c];
+            if (noteEvent.Time > time)
             {
                 break;
             }
-            auto eventType = _sortedNoteEvents[c].EventType;
+            auto eventType = noteEvent.EventType;
             if (eventType == NoteEventType::GoodCut || eventType == NoteEventType::BadCut || eventType == NoteEventType::Miss)
             {
                 count++;
