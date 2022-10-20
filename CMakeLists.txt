@@ -1,5 +1,6 @@
 # include some defines automatically made by qpm
 include(qpm_defines.cmake)
+include(assets_include.cmake)
 
 cmake_minimum_required(VERSION 3.22)
 project(${COMPILE_ID})
