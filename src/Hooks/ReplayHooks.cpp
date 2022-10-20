@@ -3,15 +3,21 @@
 #include "GlobalNamespace/BeatmapObjectSpawnMovementData.hpp"
 #include "GlobalNamespace/ComboController.hpp"
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
+#include "GlobalNamespace/GameNoteController.hpp"
 #include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
 #include "GlobalNamespace/GoodCutScoringElement.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
+#include "GlobalNamespace/LevelCompletionResults.hpp"
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
 #include "GlobalNamespace/NoteController.hpp"
+#include "GlobalNamespace/PauseController.hpp"
 #include "GlobalNamespace/PlayerHeightDetector.hpp"
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"
 #include "GlobalNamespace/PlayerTransforms.hpp"
+#include "GlobalNamespace/PrepareLevelCompletionResults.hpp"
+#include "GlobalNamespace/RankModel.hpp"
+#include "GlobalNamespace/RelativeScoreAndImmediateRankCounter.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
 #include "GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/StandardGameplayInstaller.hpp"
@@ -123,11 +129,58 @@ MAKE_AUTO_HOOK_MATCH(ScoreController_HandleNoteWasCut, &ScoreController::HandleN
 
 MAKE_AUTO_HOOK_MATCH(GoodCutScoringElement_Init, &GoodCutScoringElement::Init, void, GoodCutScoringElement* self, NoteCutInfo noteCutInfo)
 {
-
     GoodCutScoringElement_Init(self, noteCutInfo);
 
     if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
     {
         ScoreSaber::ReplaySystem::ReplayLoader::NotePlayerInstance->ForceCompleteGoodScoringElements(self, noteCutInfo, self->cutScoreBuffer);
     }
+}
+
+MAKE_AUTO_HOOK_MATCH(PauseController_HandleHMDUnmounted, &PauseController::HandleHMDUnmounted, void, PauseController* self)
+{
+    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        return;
+    }
+    PauseController_HandleHMDUnmounted(self);
+}
+
+MAKE_AUTO_HOOK_MATCH(GameNoteController_HandleCut_Event, &GameNoteController::HandleCut,
+                     void, GameNoteController* self, GlobalNamespace::Saber* saber, UnityEngine::Vector3 cutPoint, UnityEngine::Quaternion orientation, UnityEngine::Vector3 cutDirVec, bool allowBadCut)
+{
+    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        return;
+    }
+
+    GameNoteController_HandleCut_Event(self, saber, cutPoint, orientation, cutDirVec, allowBadCut);
+}
+
+MAKE_AUTO_HOOK_MATCH(RelativeScoreAndImmediateRankCounter_UpdateRelativeScoreAndImmediateRank, &RelativeScoreAndImmediateRankCounter::UpdateRelativeScoreAndImmediateRank,
+                     void, RelativeScoreAndImmediateRankCounter* self, int score, int modifiedScore, int maxPossibleScore, int maxPossibleModifiedScore)
+{
+    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        if (score == 0 && maxPossibleScore == 0)
+        {
+            self->relativeScore = 1.0f;
+            self->immediateRank = RankModel::Rank::SS;
+            self->relativeScoreOrImmediateRankDidChangeEvent->Invoke();
+            return;
+        }
+        RelativeScoreAndImmediateRankCounter_UpdateRelativeScoreAndImmediateRank(self, score, modifiedScore, maxPossibleScore, maxPossibleModifiedScore);
+    }
+    RelativeScoreAndImmediateRankCounter_UpdateRelativeScoreAndImmediateRank(self, score, modifiedScore, maxPossibleScore, maxPossibleModifiedScore);
+}
+
+MAKE_AUTO_HOOK_MATCH(PrepareLevelCompletionResults_FillLevelCompletionResults, &PrepareLevelCompletionResults::FillLevelCompletionResults,
+                     LevelCompletionResults*, PrepareLevelCompletionResults* self, LevelCompletionResults::LevelEndStateType levelEndStateType, LevelCompletionResults::LevelEndAction levelEndAction)
+{
+    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        levelEndStateType = LevelCompletionResults::LevelEndStateType::Incomplete;
+    }
+    auto value = PrepareLevelCompletionResults_FillLevelCompletionResults(self, levelEndStateType, levelEndAction);
+    return value;
 }

@@ -5,10 +5,12 @@
 
 // LeaderboardScoreUploader
 
+#include "Data/Private/ReplayFile.hpp"
 #include "GlobalNamespace/GameplayModifiers.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
+#include "ReplaySystem/ReplayLoader.hpp"
 
 // StandardLevelScenesTransitionSetupDataSO
 
@@ -114,7 +116,13 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
 {
     if (StringUtils::GetEnv(ENCRYPT_STRING_AUTO_A(encoder, "disable_ss_upload")) != "1")
     {
-        ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
+        if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+        {
+            ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
+        }
     }
-    StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
+    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
+    }
 }
