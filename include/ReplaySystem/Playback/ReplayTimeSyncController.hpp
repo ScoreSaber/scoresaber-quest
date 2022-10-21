@@ -43,7 +43,22 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, ReplayTi
                                     DECLARE_PRIVATE_FIELD(ScoreSaber::ReplaySystem::Playback::PosePlayer*, _posePlayer);
                                     DECLARE_PRIVATE_FIELD(ScoreSaber::ReplaySystem::Playback::ScorePlayer*, _scorePlayer);
                                     DECLARE_PRIVATE_FIELD(bool, _paused);
-                                    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::AudioTimeSyncController::InitData* audioInitData, GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager, GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager, GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData, GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController, ScoreSaber::ReplaySystem::Playback::ComboPlayer* comboPlayer, ScoreSaber::ReplaySystem::Playback::EnergyPlayer* energyPlayer, ScoreSaber::ReplaySystem::Playback::HeightPlayer* heightPlayer, ScoreSaber::ReplaySystem::Playback::MultiplierPlayer* multiplierPlayer, ScoreSaber::ReplaySystem::Playback::NotePlayer* notePlayer, ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer, ScoreSaber::ReplaySystem::Playback::ScorePlayer* scorePlayer);
+
+                                    DECLARE_CTOR(ctor,
+                                                 GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
+                                                 GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
+                                                 GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
+                                                 GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
+                                                 GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
+                                                 GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
+                                                 ScoreSaber::ReplaySystem::Playback::ComboPlayer* comboPlayer,
+                                                 ScoreSaber::ReplaySystem::Playback::EnergyPlayer* energyPlayer,
+                                                 ScoreSaber::ReplaySystem::Playback::HeightPlayer* heightPlayer,
+                                                 ScoreSaber::ReplaySystem::Playback::MultiplierPlayer* multiplierPlayer,
+                                                 ScoreSaber::ReplaySystem::Playback::NotePlayer* notePlayer,
+                                                 ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer,
+                                                 ScoreSaber::ReplaySystem::Playback::ScorePlayer* scorePlayer);
+
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
                                     DECLARE_INSTANCE_METHOD(void, UpdateTimes);
                                     DECLARE_INSTANCE_METHOD(void, OverrideTime, float time);

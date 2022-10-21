@@ -35,10 +35,7 @@ namespace ScoreSaber::ReplaySystem::Installers
         container->BindInterfacesTo<Playback::ComboPlayer*>()->AsSingle();
         container->BindInterfacesTo<Playback::EnergyPlayer*>()->AsSingle();
         container->BindInterfacesTo<Playback::MultiplierPlayer*>()->AsSingle();
-        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
-        {
-            container->BindInterfacesTo<Playback::HeightPlayer*>()->AsSingle();
-        }
-        container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
+        container->BindInterfacesTo<Playback::HeightPlayer*>()->AsSingle();
+        // container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
     }
 } // namespace ScoreSaber::ReplaySystem::Installers

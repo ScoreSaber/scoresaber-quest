@@ -1,4 +1,5 @@
 #include "ReplaySystem/Playback/HeightPlayer.hpp"
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "System/Action_1.hpp"
 #include "UnityEngine/Mathf.hpp"
@@ -13,50 +14,60 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, HeightPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void HeightPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::PlayerHeightDetector* playerHeightDetector)
+    void HeightPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::PlayerHeightDetector* playerHeightDetector, GlobalNamespace::GameplayCoreSceneSetupData* gameplayCoreSceneSetupData)
     {
         _audioTimeSyncController = audioTimeSyncController;
         _playerHeightDetector = playerHeightDetector;
         _sortedHeightEvents = ReplayLoader::LoadedReplay->heightKeyframes;
+        _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
     }
 
     void HeightPlayer::Initialize()
     {
-        _playerHeightDetector->OnDestroy();
+        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
+        {
+            _playerHeightDetector->OnDestroy();
+        }
     }
 
     void HeightPlayer::Tick()
     {
-        if (_lastIndex >= _sortedHeightEvents.size() - 1)
+        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
         {
-            return;
-        }
-
-        HeightEvent activeEvent = _sortedHeightEvents[_lastIndex];
-        if (_audioTimeSyncController->get_songEndTime() >= activeEvent.Time)
-        {
-            _lastIndex++;
-            if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr)
+            if (_lastIndex >= _sortedHeightEvents.size() - 1)
             {
-                _playerHeightDetector->playerHeightDidChangeEvent->Invoke(activeEvent.Height);
+                return;
+            }
+
+            HeightEvent activeEvent = _sortedHeightEvents[_lastIndex];
+            if (_audioTimeSyncController->get_songEndTime() >= activeEvent.Time)
+            {
+                _lastIndex++;
+                if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr)
+                {
+                    _playerHeightDetector->playerHeightDidChangeEvent->Invoke(activeEvent.Height);
+                }
             }
         }
     }
 
     void HeightPlayer::TimeUpdate(float songTime)
     {
-        for (int c = 0; c < _sortedHeightEvents.size(); c++)
+        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
         {
-            if (_sortedHeightEvents[c].Time >= songTime)
+            for (int c = 0; c < _sortedHeightEvents.size(); c++)
             {
-                _lastIndex = c;
-                Tick();
-                break;
+                if (_sortedHeightEvents[c].Time >= songTime)
+                {
+                    _lastIndex = c;
+                    Tick();
+                    break;
+                }
             }
-        }
-        if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr)
-        {
-            _playerHeightDetector->playerHeightDidChangeEvent->Invoke(_sortedHeightEvents[_sortedHeightEvents.size() - 1].Height);
+            if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr)
+            {
+                _playerHeightDetector->playerHeightDidChangeEvent->Invoke(_sortedHeightEvents[_sortedHeightEvents.size() - 1].Height);
+            }
         }
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

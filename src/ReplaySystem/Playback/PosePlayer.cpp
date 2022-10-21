@@ -125,6 +125,11 @@ namespace ScoreSaber::ReplaySystem::Playback
         _desktopCamera->get_transform()->SetPositionAndRotation(Vector3::Lerp(_desktopCamera->get_transform()->get_position(), pos, t2), Quaternion::Lerp(_desktopCamera->get_transform()->get_rotation(), rot, t2));
 
         // TODO: Move camera
+
+        if (DidUpdatePose != nullptr)
+        {
+            DidUpdatePose(activePose);
+        }
     }
 
     bool PosePlayer::ReachedEnd()
@@ -143,5 +148,9 @@ namespace ScoreSaber::ReplaySystem::Playback
                 return;
             }
         }
+    }
+    void PosePlayer::AddCallback(std::function<void(ScoreSaber::Data::Private::VRPoseGroup)> callback)
+    {
+        DidUpdatePose = callback;
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

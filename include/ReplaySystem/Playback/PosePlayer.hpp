@@ -36,9 +36,12 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
                                     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float newTime);
                                     vector<Data::Private::VRPoseGroup> _sortedPoses;
+                                    std::function<void(ScoreSaber::Data::Private::VRPoseGroup)> DidUpdatePose;
                                     void UpdatePoses(Data::Private::VRPoseGroup activePose, Data::Private::VRPoseGroup nextPose);
                                     bool ReachedEnd();
                                     void SetupCameras();
+                                    public:
+                                    void AddCallback(std::function<void(ScoreSaber::Data::Private::VRPoseGroup)> callback);
 
 );
 
