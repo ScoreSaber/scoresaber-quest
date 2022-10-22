@@ -32,6 +32,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberScrubber,
                                     DECLARE_INSTANCE_METHOD(void, set_loopMode, bool value);
 
                                     DECLARE_INSTANCE_METHOD(bool, get_visibility);
+                                    DECLARE_INSTANCE_METHOD(void, set_visibility, bool value);
 
                                     // mainNodeValue
                                     DECLARE_INSTANCE_METHOD(float, get_mainNodeValue);
