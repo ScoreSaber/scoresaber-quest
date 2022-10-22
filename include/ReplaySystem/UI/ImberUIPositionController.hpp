@@ -4,7 +4,11 @@
 #include "Zenject/DiContainer.hpp"
 
 #include "GlobalNamespace/IGamePause.hpp"
+#include "System/Action.hpp"
+
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
+#include <custom-types/shared/delegate.hpp>
+
 #include "GlobalNamespace/PauseMenuManager.hpp"
 #include "GlobalNamespace/VRController.hpp"
 #include "HMUI/CurvedCanvasSettings.hpp"
@@ -70,7 +74,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberUIPositio
                                     DECLARE_INSTANCE_METHOD(void, SetControllerOffset, UnityEngine::Vector3 offset);
 
                                     DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
-
+                                    System::Action * _didResumeDelegate;
+                                    System::Action *  _didPauseDelegate;
 )
 
 #undef INTERFACES

@@ -1,9 +1,7 @@
 
 #include "ReplaySystem/UI/ImberUIPositionController.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "System/Action.hpp"
 #include "UnityEngine/WaitForEndOfFrame.hpp"
-#include <custom-types/shared/delegate.hpp>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -35,8 +33,10 @@ namespace ScoreSaber::ReplaySystem::UI
         std::function<void()> gameDidPause = [&]() {
             GamePause_didPauseEvent();
         };
-        _gamePause->add_didResumeEvent(custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume));
-        _gamePause->add_didPauseEvent(custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidPause));
+        _didResumeDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume);
+        _didPauseDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidPause);
+        _gamePause->add_didResumeEvent(_didResumeDelegate);
+        _gamePause->add_didPauseEvent(_didPauseDelegate);
         _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
 
         // TODO: Check left hand
@@ -125,5 +125,26 @@ namespace ScoreSaber::ReplaySystem::UI
         _imberScrubber->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
 
         // _mainImberPanelView->get_Transform().SetLocalPosition
+    }
+
+    void ImberUIPositionController::OpenedUI()
+    {
+    }
+
+    void ImberUIPositionController::UpdateTrackingHand(XR::XRNode handTrack)
+    {
+        _handTrack = handTrack;
+    }
+
+    void ImberUIPositionController::SetControllerOffset(Vector3 offset)
+    {
+        _controllerOffset = offset;
+        _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
+    }
+
+    void ImberUIPositionController::Dispose()
+    {
+        _gamePause->remove_didResumeEvent(_didResumeDelegate);
+        _gamePause->remove_didPauseEvent(_didPauseDelegate);
     }
 } // namespace ScoreSaber::ReplaySystem::UI
