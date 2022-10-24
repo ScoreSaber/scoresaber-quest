@@ -14,20 +14,22 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::UI::Components, AmeBar);
 
 namespace ScoreSaber::ReplaySystem::UI::Components
 {
-
-    float AmeBar::get_barFill(float value)
+    float AmeBar::get_barFill()
     {
         return _fillBarTransform->get_anchorMax().x;
     }
+
     void AmeBar::set_barFill(float value)
     {
         _fillBarTransform->set_anchorMax(Vector2(Mathf::Lerp(-1.0f, 1.0f, value), _fillBarTransform->get_anchorMax().y));
     }
+
     void AmeBar::set_currentTime(float value)
     {
         // TODO: Implement properly
         _currentTimeText->set_text(std::to_string(value));
     }
+
     void AmeBar::set_endTime(float value)
     {
         // TODO: Implement properly
@@ -54,24 +56,29 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         _endTimeText->m_text = "0:00";
         _endTimeText->set_name("End Time");
     }
+
     void AmeBar::RegisterNode(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node)
     {
         node->AddCallback([=](ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
             DragCallback(node, x, camera);
         });
     }
+
     void AmeBar::UnregisterNode(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node)
     {
         node->AddCallback(nullptr);
     }
+
     float AmeBar::GetNodePercent(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node)
     {
         return PercentForX(node->get_transform()->get_localPosition().x);
     }
+
     void AmeBar::AssignNodeToPercent(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, float percent)
     {
         node->get_transform()->set_localPosition(Vector3(XForPercent(percent), node->get_transform()->get_localPosition().y, 0.0f));
     }
+
     void AmeBar::DragCallback(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera)
     {
         Vector2 computedVector;
@@ -93,38 +100,30 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         node->get_transform()->set_localPosition(Vector3(computed, node->get_transform()->get_localPosition().y, 0.0f));
         node->SendUpdatePositionCall(PercentForX(computed));
     }
+
     float AmeBar::XForPercent(float percent)
     {
         float maxX = _rectTransform->get_rect().get_width();
         return Mathf::Lerp(-maxX, maxX, percent);
     }
+
     float AmeBar::PercentForX(float x)
     {
         float maxX = _rectTransform->get_rect().get_width();
         return Mathf::InverseLerp(-maxX, maxX, x);
     }
+
     HMUI::CurvedTextMeshPro* AmeBar::CreateText()
     {
         GameObject* textGameObject = GameObject::New_ctor("AmeText");
         textGameObject->get_transform()->SetParent(get_transform(), false);
         HMUI::CurvedTextMeshPro* curvedText = textGameObject->AddComponent<HMUI::CurvedTextMeshPro*>();
         curvedText->set_font(QuestUI::BeatSaberUI::GetMainTextFont());
-        curvedText->set_fontSharedMaterial(GetMainFontMaterial());
+        curvedText->set_fontSharedMaterial(QuestUI::BeatSaberUI::GetMainUIFontMaterial());
         curvedText->set_text("");
         curvedText->m_RectTransform->set_anchorMin(Vector2::get_zero());
         curvedText->m_RectTransform->set_anchorMax(Vector2::get_one());
         return curvedText;
-    }
-
-    Material* AmeBar::GetMainFontMaterial()
-    {
-        if (_mainUIFontMaterial == nullptr)
-        {
-            _mainUIFontMaterial = Resources::FindObjectsOfTypeAll<Material*>().First([&](Material* x) {
-                return x->get_name() == "Teko-Medium SDF No Glow";
-            });
-        }
-        return _mainUIFontMaterial;
     }
 
 } // namespace ScoreSaber::ReplaySystem::UI::Components

@@ -18,7 +18,7 @@
         classof(UnityEngine::EventSystems::IBeginDragHandler*), classof(UnityEngine::EventSystems::IDragHandler*), classof(UnityEngine::EventSystems::IEventSystemHandler*), classof(UnityEngine::EventSystems::IInitializePotentialDragHandler*), classof(UnityEngine::EventSystems::IEndDragHandler*) \
     }
 
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI::Components, AmeHandle, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "ScoreSaber::ReplaySystem::UI", INTERFACES, 0, nullptr,
+___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI::Components, AmeHandle, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "ScoreSaber::ReplaySystem::UI::Components", INTERFACES, 0, nullptr,
                                     DECLARE_INSTANCE_FIELD(bool, dragged);
                                     DECLARE_OVERRIDE_METHOD(void, OnBeginDrag, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IBeginDragHandler::OnBeginDrag>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
                                     DECLARE_OVERRIDE_METHOD(void, OnInitializePotentialDrag, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IInitializePotentialDragHandler::OnInitializePotentialDrag>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
@@ -26,6 +26,5 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI::Components, Am
                                     DECLARE_OVERRIDE_METHOD(void, OnEndDrag, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IEndDragHandler::OnEndDrag>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
                                     public
                                     : void AddCallback(std::function<void(ScoreSaber::ReplaySystem::UI::Components::AmeHandle*, UnityEngine::Vector2, UnityEngine::Camera*)> callback);
-                                    std::function<void(ScoreSaber::ReplaySystem::UI::Components::AmeHandle*, UnityEngine::Vector2, UnityEngine::Camera*)> _handleMoveCallback;
-                                    )
+                                    std::function<void(ScoreSaber::ReplaySystem::UI::Components::AmeHandle*, UnityEngine::Vector2, UnityEngine::Camera*)> _handleMoveCallback;)
 #undef INTERFACES

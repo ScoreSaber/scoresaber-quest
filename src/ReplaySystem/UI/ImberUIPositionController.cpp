@@ -129,6 +129,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberUIPositionController::OpenedUI()
     {
+        // TODO
     }
 
     void ImberUIPositionController::UpdateTrackingHand(XR::XRNode handTrack)

@@ -22,12 +22,11 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeBar, UnityEng
                       DECLARE_INSTANCE_METHOD(void, UnregisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);
                       DECLARE_INSTANCE_METHOD(float, GetNodePercent, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);
                       DECLARE_INSTANCE_METHOD(void, AssignNodeToPercent, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, float percent);
-                      void set_currentTime(float value);
-                      void set_endTime(float value);
-                      float get_barFill(float value);
-                      void set_barFill(float value);
+                      DECLARE_INSTANCE_METHOD(void, set_currentTime, float value);
+                      DECLARE_INSTANCE_METHOD(void, set_endTime, float value);
+                      DECLARE_INSTANCE_METHOD(void, set_barFill, float value);
+                      DECLARE_INSTANCE_METHOD(float, get_barFill);
+                      DECLARE_INSTANCE_METHOD(float, XForPercent, float percent);
+                      DECLARE_INSTANCE_METHOD(float, PercentForX, float x);
                       void DragCallback(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera);
-                      float XForPercent(float percent);
-                      float PercentForX(float x);
-                      HMUI::CurvedTextMeshPro * CreateText();
-                      UnityEngine::Material * GetMainFontMaterial();)
+                      HMUI::CurvedTextMeshPro * CreateText();)
