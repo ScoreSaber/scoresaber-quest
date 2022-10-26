@@ -2,6 +2,7 @@
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "System/Action_1.hpp"
 #include "UnityEngine/Animator.hpp"
+#include "UnityEngine/Resources.hpp"
 #include "logging.hpp"
 #include <algorithm>
 
@@ -12,11 +13,12 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, ComboPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void ComboPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ComboController* comboController, GlobalNamespace::ComboUIController* comboUIController)
+    void ComboPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ComboController* comboController)
     {
         _audioTimeSyncController = audioTimeSyncController;
         _comboController = comboController;
-        _comboUIController = comboUIController;
+        // _comboUIController = comboUIController;
+        _comboUIController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::ComboUIController*>()->values[0];
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         _sortedComboEvents = ReplayLoader::LoadedReplay->comboKeyframes;
     }

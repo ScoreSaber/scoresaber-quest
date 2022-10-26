@@ -8,6 +8,7 @@
 #include "UnityEngine/Mathf.hpp"
 #include "UnityEngine/RectTransformUtility.hpp"
 #include "UnityEngine/Vector2.hpp"
+#include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
@@ -19,14 +20,14 @@ namespace ScoreSaber::ReplaySystem::UI
 {
     void SpectateAreaController::ctor(Zenject::DiContainer* diContainer, Tweening::TimeTweeningManager* timeTweeningManager)
     {
-        int gameplayType = 0;
-        _gameNoteControllerPool = diContainer->ResolveId<GameNoteController::Pool*>(il2cpp_functions::value_box(classof(int), &gameplayType));
+        INVOKE_CTOR();
+        NoteData::GameplayType normal = NoteData::GameplayType::Normal;
+        _gameNoteControllerPool = diContainer->ResolveId<GameNoteController::Pool*>(il2cpp_functions::value_box(classof(NoteData::GameplayType), &normal));
         _timeTweeningManager = timeTweeningManager;
     }
 
     void SpectateAreaController::AnimateTo(StringW poseID)
     {
-
         auto pose = TryGetPose(poseID);
         if (pose == Vector3::get_zero())
         {

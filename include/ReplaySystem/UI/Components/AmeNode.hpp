@@ -16,6 +16,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeNode, UnityEn
                       DECLARE_INSTANCE_METHOD(void, Init, ScoreSaber::ReplaySystem::UI::Components::AmeHandle* handle);
                       DECLARE_INSTANCE_METHOD(void, Callback, ScoreSaber::ReplaySystem::UI::Components::AmeHandle* handle, UnityEngine::Vector2 x, UnityEngine::Camera* camera);
                       DECLARE_INSTANCE_METHOD(void, SendUpdatePositionCall, float percentOnBar);
+                      DECLARE_DEFAULT_CTOR();
                       ScoreSaber::ReplaySystem::UI::Components::AmeHandle * _handle;
                       std::function<void(ScoreSaber::ReplaySystem::UI::Components::AmeNode*, UnityEngine::Vector2, UnityEngine::Camera*)> _callback;
                       public

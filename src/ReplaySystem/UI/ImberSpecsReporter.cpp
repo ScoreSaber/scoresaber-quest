@@ -4,6 +4,7 @@
 #include "UnityEngine/Mathf.hpp"
 #include "UnityEngine/RectTransformUtility.hpp"
 #include "UnityEngine/Vector2.hpp"
+#include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
@@ -15,6 +16,7 @@ namespace ScoreSaber::ReplaySystem::UI
 {
     void ImberSpecsReporter::ctor(ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer, SaberManager* saberManager)
     {
+        INVOKE_CTOR();
         _posePlayer = posePlayer;
         _saberManager = saberManager;
     }
@@ -26,7 +28,10 @@ namespace ScoreSaber::ReplaySystem::UI
     }
     void ImberSpecsReporter::PosePlayer_DidUpdatePose(ScoreSaber::Data::Private::VRPoseGroup pose)
     {
-        DidReport(pose.FPS, _saberManager->leftSaber->movementData->get_bladeSpeed(), _saberManager->rightSaber->movementData->get_bladeSpeed());
+        if (DidReport != nullptr)
+        {
+            DidReport(pose.FPS, _saberManager->leftSaber->movementData->get_bladeSpeed(), _saberManager->rightSaber->movementData->get_bladeSpeed());
+        }
     }
     void ImberSpecsReporter::Dispose()
     {

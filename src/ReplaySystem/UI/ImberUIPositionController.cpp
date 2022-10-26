@@ -2,6 +2,7 @@
 #include "ReplaySystem/UI/ImberUIPositionController.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "UnityEngine/WaitForEndOfFrame.hpp"
+#include "logging.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -12,6 +13,7 @@ namespace ScoreSaber::ReplaySystem::UI
 {
     void ImberUIPositionController::ctor(GlobalNamespace::IGamePause* gamePause, ReplaySystem::UI::ImberScrubber* imberScrubber, GlobalNamespace::PauseMenuManager* pauseMenuManager, ReplaySystem::UI::MainImberPanelView* mainImberPanelView, ReplaySystem::UI::VRControllerAccessor* vrControllerAccessor)
     {
+        INVOKE_CTOR();
         _gamePause = gamePause;
         _imberScrubber = imberScrubber;
         _mainImberPanelView = mainImberPanelView;
@@ -38,7 +40,6 @@ namespace ScoreSaber::ReplaySystem::UI
         _gamePause->add_didResumeEvent(_didResumeDelegate);
         _gamePause->add_didPauseEvent(_didPauseDelegate);
         _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
-
         // TODO: Check left hand
     }
     void ImberUIPositionController::GamePause_didResumeEvent()
@@ -123,7 +124,6 @@ namespace ScoreSaber::ReplaySystem::UI
 
         _imberScrubber->get_transform()->set_localPosition(controller->get_transform()->TransformPoint(scrubberOffset));
         _imberScrubber->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
-
         // _mainImberPanelView->get_Transform().SetLocalPosition
     }
 

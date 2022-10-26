@@ -9,6 +9,8 @@
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/Vector2.hpp"
 #include "VRUIControls/VRGraphicRaycaster.hpp"
+#include "bsml/shared/helpers/utilities.hpp"
+#include "logging.hpp"
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
@@ -49,6 +51,7 @@ namespace ScoreSaber::ReplaySystem::UI
     // ctor
     void ImberScrubber::ctor(MainCamera* mainCamera, Zenject::DiContainer* container, AudioTimeSyncController* audioTimeSyncController)
     {
+        INVOKE_CTOR();
         _mainCamera = mainCamera;
         _container = container;
         _audioTimeSyncController = audioTimeSyncController;
@@ -218,7 +221,6 @@ namespace ScoreSaber::ReplaySystem::UI
         // Create the bar
         auto bar = ameBar->AddComponent<AmeBar*>();
         bar->Setup(progressImage->get_rectTransform(), backgroundImage->get_rectTransform());
-
         return bar;
     }
 
@@ -237,9 +239,8 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         auto imageGameObject = GameObject::New_ctor("ImberImage");
         auto image = imageGameObject->AddComponent<HMUI::ImageView*>();
-        //
         image->set_material(QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return x->get_name() == "UINoGlow"; }));
-        image->set_sprite(QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Image*>(), [](Image* x) { return x->get_sprite()->get_name() == "WhitePixel"; })->get_sprite());
+        image->set_sprite(BSML::Utilities::ImageResources::GetWhitePixel());
         image->get_rectTransform()->SetParent(parent, false);
         return image;
     }
@@ -278,7 +279,6 @@ namespace ScoreSaber::ReplaySystem::UI
 
     AmeNode* ImberScrubber::CreateTextNode(RectTransform* transform, StringW initialText, Color color)
     {
-
         auto nodeGameObject = GameObject::New_ctor("TextNode");
         auto rectTransform = nodeGameObject->AddComponent<RectTransform*>();
         rectTransform->SetParent(transform, false);

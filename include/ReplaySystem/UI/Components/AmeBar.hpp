@@ -28,5 +28,6 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeBar, UnityEng
                       DECLARE_INSTANCE_METHOD(float, get_barFill);
                       DECLARE_INSTANCE_METHOD(float, XForPercent, float percent);
                       DECLARE_INSTANCE_METHOD(float, PercentForX, float x);
+                      DECLARE_DEFAULT_CTOR();
                       void DragCallback(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera);
                       HMUI::CurvedTextMeshPro * CreateText();)

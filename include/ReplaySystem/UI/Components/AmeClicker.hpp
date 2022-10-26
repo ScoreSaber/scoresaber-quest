@@ -13,6 +13,7 @@
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI::Components, AmeClicker, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "ScoreSaber::ReplaySystem::UI::Components", INTERFACES, 0, nullptr,
+                                    DECLARE_DEFAULT_CTOR();
                                     DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _rect);
                                     DECLARE_OVERRIDE_METHOD(void, OnPointerClick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IPointerClickHandler::OnPointerClick>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
                                     std::function<void(float)> _clickCallback;

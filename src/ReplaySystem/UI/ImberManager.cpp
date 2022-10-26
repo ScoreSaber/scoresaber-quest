@@ -5,6 +5,7 @@
 #include "UnityEngine/RectTransformUtility.hpp"
 #include "UnityEngine/Vector2.hpp"
 #include "Utils/StringUtils.hpp"
+#include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
@@ -26,6 +27,7 @@ namespace ScoreSaber::ReplaySystem::UI
                             GlobalNamespace::AudioTimeSyncController::InitData* initData,
                             ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer)
     {
+        INVOKE_CTOR();
         _gamePause = gamePause;
         _imberScrubber = imberScrubber;
         _imberSpecsReporter = imberSpecsReporter;
@@ -89,6 +91,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::CreateWatermark()
     {
+        INFO("CreateWatermark");
         auto _watermarkObject = GameObject::New_ctor("Replay Prompt");
         auto _watermarkObjectTransform = _watermarkObject->get_transform();
         _watermarkObjectTransform->set_localScale(Vector3(0.05f, 0.05f, 0.05f));
@@ -105,6 +108,7 @@ namespace ScoreSaber::ReplaySystem::UI
         curvedTextMeshPro->set_alignment(TMPro::TextAlignmentOptions::Center);
         curvedTextMeshPro->set_fontSize(4.0f);
         curvedTextMeshPro->set_color(Color(0.95f, 0.95f, 0.95f, 0.95f));
+        INFO("CreateWatermark 2");
     }
 
     // UI Callbacks

@@ -5,6 +5,7 @@
 #include "UnityEngine/Rect.hpp"
 #include "UnityEngine/RectTransformUtility.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
@@ -41,17 +42,16 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         _otherTransform = otherTransform;
         _rectTransform = il2cpp_utils::try_cast<RectTransform>(get_transform()).value_or(nullptr);
         _fillBarTransform = fillBarTransform;
-
         _currentTimeText = CreateText();
-        _currentTimeText->m_RectTransform->set_sizeDelta(fillBarTransform->get_sizeDelta());
-        _currentTimeText->m_RectTransform->set_anchorMin(Vector2(0.0f, 0.5f));
+        _currentTimeText->get_rectTransform()->set_sizeDelta(fillBarTransform->get_sizeDelta());
+        _currentTimeText->get_rectTransform()->set_anchorMin(Vector2(0.0f, 0.5f));
         _currentTimeText->set_alignment(TMPro::TextAlignmentOptions::Left);
         _currentTimeText->m_text = "0:00";
         _currentTimeText->set_name("Current Time");
 
         _endTimeText = CreateText();
-        _endTimeText->m_RectTransform->set_sizeDelta(fillBarTransform->get_sizeDelta());
-        _endTimeText->m_RectTransform->set_anchorMin(Vector2(0.0f, 0.5f));
+        _endTimeText->get_rectTransform()->set_sizeDelta(fillBarTransform->get_sizeDelta());
+        _endTimeText->get_rectTransform()->set_anchorMin(Vector2(0.0f, 0.5f));
         _endTimeText->set_alignment(TMPro::TextAlignmentOptions::Right);
         _endTimeText->m_text = "0:00";
         _endTimeText->set_name("End Time");
@@ -121,8 +121,8 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         curvedText->set_font(QuestUI::BeatSaberUI::GetMainTextFont());
         curvedText->set_fontSharedMaterial(QuestUI::BeatSaberUI::GetMainUIFontMaterial());
         curvedText->set_text("");
-        curvedText->m_RectTransform->set_anchorMin(Vector2::get_zero());
-        curvedText->m_RectTransform->set_anchorMax(Vector2::get_one());
+        curvedText->get_rectTransform()->set_anchorMin(Vector2::get_zero());
+        curvedText->get_rectTransform()->set_anchorMax(Vector2::get_one());
         return curvedText;
     }
 

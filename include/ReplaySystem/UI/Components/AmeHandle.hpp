@@ -24,6 +24,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI::Components, Am
                                     DECLARE_OVERRIDE_METHOD(void, OnInitializePotentialDrag, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IInitializePotentialDragHandler::OnInitializePotentialDrag>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
                                     DECLARE_OVERRIDE_METHOD(void, OnDrag, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IDragHandler::OnDrag>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
                                     DECLARE_OVERRIDE_METHOD(void, OnEndDrag, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::UnityEngine::EventSystems::IEndDragHandler::OnEndDrag>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
+                                    DECLARE_DEFAULT_CTOR();
                                     public
                                     : void AddCallback(std::function<void(ScoreSaber::ReplaySystem::UI::Components::AmeHandle*, UnityEngine::Vector2, UnityEngine::Camera*)> callback);
                                     std::function<void(ScoreSaber::ReplaySystem::UI::Components::AmeHandle*, UnityEngine::Vector2, UnityEngine::Camera*)> _handleMoveCallback;)

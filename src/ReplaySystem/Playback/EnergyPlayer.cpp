@@ -3,6 +3,7 @@
 #include "System/Action_1.hpp"
 #include "UnityEngine/Mathf.hpp"
 #include "UnityEngine/Playables/PlayableDirector.hpp"
+#include "UnityEngine/Resources.hpp"
 #include "UnityEngine/UI/Image.hpp"
 #include "logging.hpp"
 #include <algorithm>
@@ -14,11 +15,11 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, EnergyPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* _gameEnergyCounter, GlobalNamespace::GameEnergyUIPanel* _gameEnergyUIPanel)
+    void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* _gameEnergyCounter)
     {
         _audioTimeSyncController = audioTimeSyncController;
         _gameEnergyCounter = _gameEnergyCounter;
-        _gameEnergyUIPanel = _gameEnergyUIPanel;
+        _gameEnergyUIPanel = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::GameEnergyUIPanel*>()->values[0];
         _sortedEnergyEvents = ReplayLoader::LoadedReplay->energyKeyframes;
     }
 

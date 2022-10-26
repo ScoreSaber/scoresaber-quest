@@ -2,6 +2,7 @@
 #include "UnityEngine/Mathf.hpp"
 #include "UnityEngine/Rect.hpp"
 #include "UnityEngine/RectTransformUtility.hpp"
+#include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;

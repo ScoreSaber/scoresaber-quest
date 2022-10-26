@@ -5,6 +5,7 @@
 #include "UnityEngine/Vector2.hpp"
 #include "assets.hpp"
 #include "bsml/shared/BSML.hpp"
+#include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 
@@ -25,23 +26,29 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::set_visibility(bool value)
     {
-        _floatingScreen->SetRootViewController(value ? this : nullptr, value ? HMUI::ViewController::AnimationType::In : HMUI::ViewController::AnimationType::Out);
+        if (_floatingScreen != nullptr)
+        {
+            _floatingScreen->SetRootViewController(value ? this : nullptr, value ? HMUI::ViewController::AnimationType::In : HMUI::ViewController::AnimationType::Out);
+        }
     }
 
     void MainImberPanelView::set_fps(int value)
     {
-        fpsText->set_text(std::to_string(value));
-        if (value > 0.85f * _targetFPS)
+        if (fpsText != nullptr)
         {
-            fpsText->set_color(_goodColor);
-        }
-        else if (value > 0.6f * _targetFPS)
-        {
-            fpsText->set_color(_ehColor);
-        }
-        else
-        {
-            fpsText->set_color(_noColor);
+            fpsText->set_text(std::to_string(value));
+            if (value > 0.85f * _targetFPS)
+            {
+                fpsText->set_color(_goodColor);
+            }
+            else if (value > 0.6f * _targetFPS)
+            {
+                fpsText->set_color(_ehColor);
+            }
+            else
+            {
+                fpsText->set_color(_noColor);
+            }
         }
     }
 
@@ -115,31 +122,39 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::ctor()
     {
+        INFO("MainImberPanelView ctor 1");
         INVOKE_CTOR();
         _playPauseText = "PAUSE";
         _loopText = "LOOP";
         _location = "";
+        INFO("MainImberPanelView ctor 2");
     }
 
     System::Action_2<HMUI::SegmentedControl*, int> tabSelectAction;
 
     void MainImberPanelView::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
+        INFO("1");
         if (!firstActivation)
         {
             return;
         }
+        INFO("2");
         BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, get_transform(), this);
         // tabSelectAction = il2cpp_utils::MakeDelegate<System::Action_2<HMUI::SegmentedControl*, int>*>(classof(System::Action_2<HMUI::SegmentedControl*, int>*), this, [](HMUI::SegmentedControl* segmentedControl, int idx) {
         //     DidSelect(idx);
         // });
         // tabSelector->textSegmentedControl->didSelectCellEvent += tabSelectAction;
+        INFO("3");
         set_didParse(true);
+        INFO("4");
         if (firstActivation)
         {
+            INFO("5");
             Vector3 localScale = tabSelector->get_transform()->get_localScale();
-
+            INFO("6");
             tabSelector->get_transform()->set_localScale(Vector3(localScale.x * 0.9f, localScale.y * 0.9f, localScale.z * 0.9f));
+            INFO("7");
         }
     }
 
@@ -153,12 +168,13 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         // il2cpp_utils::try_cast<GoodCutScoringElement>(element).value_or(nullptr)
         auto rawFloatingScreen = QuestUI::BeatSaberUI::CreateFloatingScreen(Vector2(60.0f, 45.0f), defaultPosition.position, Vector3(defaultPosition.rotation.x, defaultPosition.rotation.y, defaultPosition.rotation.z));
-        _floatingScreen = il2cpp_utils::try_cast<QuestUI::FloatingScreen>(rawFloatingScreen).value_or(nullptr);
-        _floatingScreen->GetComponent<Canvas*>()->set_sortingOrder(31);
-        _floatingScreen->set_name("Imber Replay Panel (Screen)");
+        rawFloatingScreen->GetComponent<Canvas*>()->set_sortingOrder(31);
+        rawFloatingScreen->set_name("Imber Replay Panel (Screen)");
 
-        Vector3 localScale = _floatingScreen->get_transform()->get_localScale();
-        _floatingScreen->get_transform()->set_localScale(Vector3(localScale.x / 2.0f, localScale.y / 2.0f, localScale.z / 2.0f));
+        Vector3 localScale = rawFloatingScreen->get_transform()->get_localScale();
+        rawFloatingScreen->get_transform()->set_localScale(Vector3(localScale.x / 2.0f, localScale.y / 2.0f, localScale.z / 2.0f));
+
+        _floatingScreen = il2cpp_utils::try_cast<QuestUI::FloatingScreen>(rawFloatingScreen).value_or(nullptr);
         set_name("Imber Replay Panel (View)");
     }
 

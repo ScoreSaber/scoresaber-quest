@@ -9,6 +9,7 @@
 #include "questui/shared/QuestUI.hpp"
 
 #include "Data/Private/ReplayReader.hpp"
+#include "ReplaySystem/Installers/ImberInstaller.hpp"
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 #include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
@@ -60,5 +61,6 @@ extern "C" __attribute((visibility("default"))) void load()
     ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying = true;
     auto zenjector = Lapiz::Zenject::Zenjector::Get();
     //   zenjector->Install<TrickSaber::Installers::GameInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+    zenjector->Install<ScoreSaber::ReplaySystem::Installers::ImberInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
 }
