@@ -24,7 +24,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, SpectateAreaCo
                                     DECLARE_INSTANCE_FIELD(GameNoteController::Pool*, _gameNoteControllerPool);
                                     // DidUpdatePlayerSpectatorPose
 
-                                    DECLARE_INSTANCE_FIELD_DEFAULT(GameNoteController*, _activeNote);
+                                    DECLARE_INSTANCE_FIELD(GameNoteController*, _activeNote);
                                     DECLARE_INSTANCE_FIELD(UnityEngine::Quaternion, _initialQuaternion);
                                     DECLARE_INSTANCE_FIELD(Tweening::Tween*, _movementTween);
                                     DECLARE_INSTANCE_FIELD(Tweening::Tween*, _statusTween);
@@ -33,13 +33,13 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, SpectateAreaCo
 
                                     DECLARE_INSTANCE_METHOD(void, AnimateTo, StringW poseID);
                                     DECLARE_INSTANCE_METHOD(void, JumpToCallback, StringW poseID);
-                                    DECLARE_INSTANCE_METHOD(void, Dissmiss);
+                                    DECLARE_INSTANCE_METHOD(void, Dismiss);
 
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
 
-                                    DECLARE_INSTANCE_METHOD(void, UpdateNoteScale(UnityEngine::Vector3 scale));
+                                    DECLARE_INSTANCE_METHOD(void, UpdateNoteScale, UnityEngine::Vector3 scale);
                                     DECLARE_INSTANCE_METHOD(void, DespawnActiveNote);
-                                    // DECLARE_INSTANCE_METHOD(bool, TryGetPose, StringW poseID, &);
+                                    DECLARE_INSTANCE_METHOD(UnityEngine::Vector3, TryGetPose, StringW poseID);
 
                                     DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());)
 
