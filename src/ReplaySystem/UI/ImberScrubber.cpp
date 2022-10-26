@@ -233,12 +233,13 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    HMUI::ImageView* CreateImage(RectTransform* parent)
+    HMUI::ImageView* ImberScrubber::CreateImage(RectTransform* parent)
     {
         auto imageGameObject = GameObject::New_ctor("ImberImage");
         auto image = imageGameObject->AddComponent<HMUI::ImageView*>();
-        image->set_material(QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { x->get_name() == "UINoGlow"; }));
-        image->set_sprite(QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Image*>(), [](Image* x) { x->get_sprite()->get_name() == "WhitePixel"; })->get_sprite());
+        //
+        image->set_material(QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return x->get_name() == "UINoGlow"; }));
+        image->set_sprite(QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Image*>(), [](Image* x) { return x->get_sprite()->get_name() == "WhitePixel"; })->get_sprite());
         image->get_rectTransform()->SetParent(parent, false);
         return image;
     }

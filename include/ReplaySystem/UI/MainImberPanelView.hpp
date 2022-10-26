@@ -1,8 +1,8 @@
 #pragma once
 
-#include "bsml/shared/macros.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "lapiz/shared/macros.hpp"
+#include "bsml/shared/macros.hpp"
 
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ViewController.hpp"
@@ -10,6 +10,7 @@
 #include "UnityEngine/Pose.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/XR/XRNode.hpp"
+#include "beatsaber-hook/shared/utils/typedefs.h"
 
 #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 
@@ -49,7 +50,6 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       /* In DidActivate is when you want to run BSML::parse_and_construct() usually*/
                       DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::il2cpp_type_check::MetadataGetter<&HMUI::ViewController::DidActivate>::get(), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
                       DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::il2cpp_type_check::MetadataGetter<&HMUI::ViewController::DidDeactivate>::get(), bool removedFromHierarchy, bool screenSystemDisabling);
-                      DECLARE_INSTANCE_METHOD(void, Setup, float initialSongTime, int targetFramerate, StringW defaultLocation, ListWrapper<StringW> locations);
                       DECLARE_INSTANCE_METHOD(void, DidSelect, HMUI::SegmentedControl*, int selected);
                       DECLARE_INSTANCE_METHOD(void, SwitchHand, UnityEngine::XR::XRNode xrNode);
                       DECLARE_INSTANCE_METHOD(void, PausePlay);
@@ -74,4 +74,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       std::function<void(void)> DidClickPausePlay;
                       std::function<void(void)> DidClickRestart;
                       std::function<void(void)> DidPositionJump;
-                      std::function<void(void)> DidClickLoop;)
+                      std::function<void(void)> DidClickLoop;
+                      void Setup(float initialSongTime, int targetFramerate, std::string defaultLocation, std::vector<std::string> _locations);
+
+)

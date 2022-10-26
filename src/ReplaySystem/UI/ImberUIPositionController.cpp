@@ -143,6 +143,11 @@ namespace ScoreSaber::ReplaySystem::UI
         _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
     }
 
+    void ImberUIPositionController::SetActiveState(bool value)
+    {
+        _isActive = value;
+    }
+
     void ImberUIPositionController::Dispose()
     {
         _gamePause->remove_didResumeEvent(_didResumeDelegate);

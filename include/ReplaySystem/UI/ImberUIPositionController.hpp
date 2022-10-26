@@ -66,7 +66,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberUIPositio
 
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
 
-                                    DECLARE_INSTANCE_METHOD(custom_types::Helpers::Coroutine, KillMe, GlobalNamespace::VRController* controller);
                                     DECLARE_INSTANCE_METHOD(void, SetUIPosition, GlobalNamespace::VRController* controller);
                                     DECLARE_INSTANCE_METHOD(void, OpenedUI);
                                     DECLARE_INSTANCE_METHOD(void, UpdateTrackingHand, UnityEngine::XR::XRNode node);
@@ -75,7 +74,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberUIPositio
 
                                     DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
                                     System::Action * _didResumeDelegate;
-                                    System::Action *  _didPauseDelegate;
-)
+                                    System::Action * _didPauseDelegate;
+                                    public:
+                                    custom_types::Helpers::Coroutine KillMe(GlobalNamespace::VRController * controller);)
 
 #undef INTERFACES

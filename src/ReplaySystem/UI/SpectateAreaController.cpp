@@ -19,7 +19,8 @@ namespace ScoreSaber::ReplaySystem::UI
 {
     void SpectateAreaController::ctor(Zenject::DiContainer* diContainer, Tweening::TimeTweeningManager* timeTweeningManager)
     {
-        _gameNoteControllerPool = diContainer->ResolveId<GameNoteController::Pool*>(il2cpp_functions::value_box(classof(int), NoteData::GameplayType::Normal));
+        int gameplayType = 0;
+        _gameNoteControllerPool = diContainer->ResolveId<GameNoteController::Pool*>(il2cpp_functions::value_box(classof(int), &gameplayType));
         _timeTweeningManager = timeTweeningManager;
     }
 
