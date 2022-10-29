@@ -25,7 +25,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _canvas = _vrGraphicRaycaster->GetComponent<Canvas*>();
         _curve = _canvas->GetComponent<HMUI::CurvedCanvasSettings*>();
         _mainSettingsModelSO = Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>()->get(0);
-        _controllerOffset = Vector3(0.0f, 0.0f, 0.0f);
+        _controllerOffset = Vector3(0.0f, 0.0f, -2.0f);
     }
     void ImberUIPositionController::Initialize()
     {
@@ -75,9 +75,9 @@ namespace ScoreSaber::ReplaySystem::UI
                     // DID DOUBLE CLICK HERE!!!
                     _isActive = !_isActive;
                     _imberScrubber->set_visibility(_isActive);
+                    _mainImberPanelView->set_visibility(_isActive);
                     OpenedUI();
-                    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-                        custom_types::Helpers::CoroutineHelper::New(KillMe(controller)));
+                    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(KillMe(controller)));
                     if (!_isPaused)
                     {
                         _curve->set_enabled(!_isActive);
@@ -116,14 +116,14 @@ namespace ScoreSaber::ReplaySystem::UI
     }
     void ImberUIPositionController::SetUIPosition(VRController* controller)
     {
-        Vector3 viewOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.25f, 0.25f, 0.25f) : Vector3(-0.25f, 0.25f, 0.25f);
+        Vector3 viewOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.25f, 0.25f, 0.45f) : Vector3(-0.25f, 0.25f, 0.25f);
         Vector3 scrubberOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.46f, -0.06f, 0.25f) : Vector3(-0.46f, -0.06f, 0.25f);
 
-        _mainImberPanelView->get_transform()->set_localPosition(controller->get_transform()->TransformPoint(viewOffset));
-        _mainImberPanelView->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
+        _mainImberPanelView->get_Transform()->set_localPosition(controller->get_transform()->TransformPoint(viewOffset));
+        _mainImberPanelView->get_Transform()->set_localRotation(controller->get_transform()->get_rotation());
 
-        _imberScrubber->get_transform()->set_localPosition(controller->get_transform()->TransformPoint(scrubberOffset));
-        _imberScrubber->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
+        // _imberScrubber->get_transform()->set_localPosition(controller->get_transform()->TransformPoint(scrubberOffset));
+        // _imberScrubber->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
         // _mainImberPanelView->get_Transform().SetLocalPosition
     }
 
