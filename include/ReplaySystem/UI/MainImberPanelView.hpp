@@ -1,8 +1,9 @@
 #pragma once
 
+
 #include "custom-types/shared/macros.hpp"
-#include "lapiz/shared/macros.hpp"
 #include "bsml/shared/macros.hpp"
+#include "lapiz/shared/macros.hpp"
 
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ViewController.hpp"
@@ -12,14 +13,14 @@
 #include "UnityEngine/XR/XRNode.hpp"
 #include "beatsaber-hook/shared/utils/typedefs.h"
 
-#include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
+#include "bsml/shared/BSML/FloatingScreen/FloatingScreen.hpp"
 
 #include "bsml/shared/BSML/Components/TabSelector.hpp"
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::ViewController,
                       DECLARE_INSTANCE_FIELD(UnityEngine::Pose, defaultPosition);
                       /* Fix this with the actual type & include, the project I made this header in doesn't use qui */
-                      DECLARE_PRIVATE_FIELD(QuestUI::FloatingScreen*, _floatingScreen);
+                      DECLARE_PRIVATE_FIELD(BSML::FloatingScreen*, _floatingScreen);
 
                       /* Default field values are only set if you INVOKE_CTOR() in your own ctor */
                       DECLARE_PRIVATE_FIELD_DEFAULT(int, _lastTab, 0);

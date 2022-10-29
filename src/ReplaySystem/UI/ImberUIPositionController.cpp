@@ -1,6 +1,7 @@
 
 #include "ReplaySystem/UI/ImberUIPositionController.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
+#include "UnityEngine/Resources.hpp"
 #include "UnityEngine/WaitForEndOfFrame.hpp"
 #include "logging.hpp"
 

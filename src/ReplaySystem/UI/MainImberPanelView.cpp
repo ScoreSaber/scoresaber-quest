@@ -7,7 +7,7 @@
 #include "bsml/shared/BSML.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
+// #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -157,13 +157,16 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::Construct()
     {
-        // il2cpp_utils::try_cast<GoodCutScoringElement>(element).value_or(nullptr)
-        auto rawFloatingScreen = QuestUI::BeatSaberUI::CreateFloatingScreen({60.0f, 45.0f}, defaultPosition.position, {defaultPosition.rotation.get_eulerAngles().x, defaultPosition.rotation.get_eulerAngles().y, defaultPosition.rotation.get_eulerAngles().z});
 
-        _floatingScreen = rawFloatingScreen->GetComponent<QuestUI::FloatingScreen*>();
-        _floatingScreen->get_gameObject()->set_layer(5);
+        // il2cpp_utils::try_cast<GoodCutScoringElement>(element).value_or(nullptr)
+
+        auto rawFloatingScreen = BSML::FloatingScreen::CreateFloatingScreen({60.0f, 45.0f}, false, defaultPosition.position, defaultPosition.rotation);
+        // auto rawFloatingScreen = QuestUI::BeatSaberUI::CreateFloatingScreen({60.0f, 45.0f}, defaultPosition.position, {defaultPosition.rotation.get_eulerAngles().x, defaultPosition.rotation.get_eulerAngles().y, defaultPosition.rotation.get_eulerAngles().z});
+
+        _floatingScreen = rawFloatingScreen->GetComponent<BSML::FloatingScreen*>();
+        // _floatingScreen->get_gameObject()->set_layer(5);
         auto localScale = _floatingScreen->get_transform()->get_localScale();
-        // _floatingScreen->GetComponent<Canvas*>()->set_sortingOrder(31);
+        _floatingScreen->GetComponent<Canvas*>()->set_sortingOrder(31);
 
         _floatingScreen->get_transform()->set_localScale({localScale.x / 2.0f, localScale.y / 2.0f, localScale.z / 2.0f});
         rawFloatingScreen->set_name("Imber Replay Panel (Screen)");
