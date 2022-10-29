@@ -1,75 +1,73 @@
 {
-  "sharedDir": "shared",
-  "dependenciesDir": "extern",
-  "info": {
-    "name": "ScoreSaber",
-    "id": "scoresaber",
-    "version": "1.0.0",
-    "url": null,
-    "additionalData": {
-      "overrideSoName": "libscoresaber.so"
-    }
-  },
-  "dependencies": [
-    {
-      "id": "beatsaber-hook",
-      "versionRange": "^3.10.0",
+   "sharedDir": "shared",
+   "dependenciesDir": "extern",
+   "info": {
+      "name": "ScoreSaber",
+      "id": "scoresaber",
+      "version": "1.0.0",
+      "url": null,
       "additionalData": {
-        "extraFiles": [
-          "src/inline-hook"
-        ]
+         "overrideSoName": "libscoresaber.so"
       }
-    },
-    {
-      "id": "modloader",
-      "versionRange": "^1.2.3",
-      "additionalData": {}
-    },
-    {
-      "id": "codegen",
-      "versionRange": "^0.25.0",
-      "additionalData": {}
-    },
-    {
-      "id": "questui",
-      "versionRange": "^0.16.4",
-      "additionalData": {}
-    },
-    {
-      "id": "custom-types",
-      "versionRange": "^0.15.18",
-      "additionalData": {}
-    },
-    {
-      "id": "config-utils",
-      "versionRange": "^0.8.0",
-      "additionalData": {}
-    },
-    {
-      "id": "libcurl",
-      "versionRange": "^7.78.0",
-      "additionalData": {}
-    },
-    {
-      "id": "gif-lib",
-      "versionRange": "^5.2.2",
-      "additionalData": {}
-    },
-    {
-      "id": "lapiz",
-      "versionRange": "^0.1.2",
-      "additionalData": {}
-    },
-    {
-      "id": "bsml",
-      "versionRange": "^0.1.7",
-      "additionalData": {}
-    },
-    {
-      "id": "tinyxml2",
-      "versionRange": "^9.0.4",
-      "additionalData": {}
-    }
-  ],
-  "additionalData": {}
+   },
+   "dependencies": [
+      {
+         "id": "beatsaber-hook",
+         "versionRange": "^3.14.0",
+         "additionalData": {
+            "extraFiles": ["src/inline-hook"]
+         }
+      },
+      {
+         "id": "modloader",
+         "versionRange": "^1.2.3",
+         "additionalData": {}
+      },
+      {
+         "id": "codegen",
+         "versionRange": "^0.28.0",
+         "additionalData": {}
+      },
+      {
+         "id": "questui",
+         "versionRange": "^0.17.5",
+         "additionalData": {}
+      },
+      {
+         "id": "custom-types",
+         "versionRange": "^0.15.21",
+         "additionalData": {}
+      },
+      {
+         "id": "config-utils",
+         "versionRange": "^0.8.0",
+         "additionalData": {}
+      },
+      {
+         "id": "libcurl",
+         "versionRange": "^7.78.0",
+         "additionalData": {}
+      },
+      {
+         "id": "gif-lib",
+         "versionRange": "^5.2.2",
+         "additionalData": {}
+      },
+      {
+         "id": "lapiz",
+         "versionRange": "^0.1.2",
+         "additionalData": {}
+      },
+      {
+         "id": "bsml",
+         "versionRange": "^0.0.1",
+         "additionalData": {}
+      },
+      {
+         "id": "tinyxml2",
+         "versionRange": "^9.0.5",
+         "additionalData": {}
+      }
+   ],
+   "additionalData": {}
 }
