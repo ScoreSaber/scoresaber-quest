@@ -143,7 +143,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _watermarkObjectTransform->set_position(Vector3(0.0f, 0.025f, 0.8f));
         _watermarkObjectTransform->set_rotation(Quaternion::Euler(Vector3(90.0f, 0.0f, 0.0f)));
         auto canvas = _watermarkObject->AddComponent<Canvas*>();
-        auto canvasRectTransform = il2cpp_utils::try_cast<RectTransform>(canvas->get_transform()).value_or(nullptr); // NOTE: Might not work
+        auto canvasRectTransform = canvas->get_transform()->GetComponent<RectTransform*>();
         canvasRectTransform->set_sizeDelta(Vector2(100.0f, 50.0f));
 
         auto curvedCanvasSettigns = _watermarkObject->AddComponent<HMUI::CurvedCanvasSettings*>();

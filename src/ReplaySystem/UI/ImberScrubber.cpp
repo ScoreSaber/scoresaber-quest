@@ -70,7 +70,7 @@ namespace ScoreSaber::ReplaySystem::UI
         float initialSongTime = _audioTimeSyncController->get_songTime() / _audioTimeSyncController->get_songEndTime();
         _bar->set_barFill(initialSongTime);
 
-        auto barRectTransform = il2cpp_utils::try_cast<RectTransform>(_bar->get_transform()).value_or(nullptr);
+        auto barRectTransform = _bar->GetComponent<RectTransform*>();
 
         _mainNode = CreateSlideNode(barRectTransform);
         _loopNode = CreateSlideNode(barRectTransform);

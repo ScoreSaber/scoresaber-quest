@@ -14,7 +14,7 @@ namespace ScoreSaber::ReplaySystem::UI::Components
 {
     void AmeClicker::Setup(std::function<void(float)> callback)
     {
-        _rect = il2cpp_utils::try_cast<RectTransform>(get_transform()).value_or(nullptr);
+        _rect = get_transform()->GetComponent<RectTransform*>();
         _clickCallback = callback;
     }
     void AmeClicker::OnPointerClick(UnityEngine::EventSystems::PointerEventData* eventData)

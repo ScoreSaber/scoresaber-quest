@@ -40,7 +40,7 @@ namespace ScoreSaber::ReplaySystem::UI::Components
     void AmeBar::Setup(UnityEngine::RectTransform* fillBarTransform, UnityEngine::RectTransform* otherTransform)
     {
         _otherTransform = otherTransform;
-        _rectTransform = il2cpp_utils::try_cast<RectTransform>(get_transform()).value_or(nullptr);
+        _rectTransform = get_transform()->GetComponent<RectTransform*>();
         _fillBarTransform = fillBarTransform;
         _currentTimeText = CreateText();
         _currentTimeText->get_rectTransform()->set_sizeDelta(fillBarTransform->get_sizeDelta());
