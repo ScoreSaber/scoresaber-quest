@@ -136,7 +136,7 @@ namespace ScoreSaber::ReplaySystem::UI
         float currentAudioProgress = _audioTimeSyncController->get_songTime() / _audioTimeSyncController->get_songEndTime();
         if (!_mainNode->get_isBeingDragged())
         {
-            if (!_loopNode)
+            if (!_loopMode)
             {
                 set_mainNodeValue(currentAudioProgress);
             }
