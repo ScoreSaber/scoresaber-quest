@@ -55,6 +55,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _mainCamera = mainCamera;
         _container = container;
         _audioTimeSyncController = audioTimeSyncController;
+        _scoreSaberBlue = Color(0.0f, 0.4705882f, 0.7254902f, 1.0f);
     }
     void ImberScrubber::Setup(float levelFailTime, bool allowPast)
     {
@@ -261,6 +262,14 @@ namespace ScoreSaber::ReplaySystem::UI
         nodeImageRectTransform->set_anchorMin(Vector2(0.5f, 1.0f));
         nodeImageRectTransform->set_anchorMax(Vector2(0.5f, 1.0f));
         nodeImage->set_name("Marker");
+
+        auto nodeStem = CreateImage(rectTransform);
+        auto nodeStemRectTransform = nodeStem->get_rectTransform();
+        nodeStemRectTransform->set_anchoredPosition(Vector2(0.0f, 15.0f));
+        nodeStemRectTransform->set_sizeDelta(Vector2(2.5f, 75.0f));
+        nodeStemRectTransform->set_anchorMin(Vector2::get_one() / 2.0f);
+        nodeStemRectTransform->set_anchorMax(Vector2::get_one() / 2.0f);
+        nodeStem->set_name("Stem");
 
         auto nodeHandle = CreateImage(rectTransform);
         auto nodeHandleRectTransform = nodeHandle->get_rectTransform();
