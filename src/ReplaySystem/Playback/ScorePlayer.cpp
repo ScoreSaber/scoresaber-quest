@@ -65,7 +65,7 @@ namespace ScoreSaber::ReplaySystem::Playback
                 _lastIndex = c;
                 Tick();
                 UpdateScore(c != 0 ? _sortedScoreEvents[c - 1].Score : 0, newTime);
-                break;
+                return;
             }
         }
         UpdateScore(_sortedScoreEvents[_sortedScoreEvents.size() - 1].Score, newTime);

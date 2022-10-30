@@ -68,7 +68,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             }
         }
 
-        if ((combo == 0 && cutOrMissRecorded > 0) || didLoseCombo)
+        if ((combo == 0 && cutOrMissRecorded == 0) || !didLoseCombo)
         {
             _comboUIController->animator->Rebind();
             _comboUIController->fullComboLost = false;
