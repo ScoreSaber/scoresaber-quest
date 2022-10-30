@@ -11,10 +11,10 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, MultiplierPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void MultiplierPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* _scoreController)
+    void MultiplierPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController)
     {
         _audioTimeSyncController = audioTimeSyncController;
-        _scoreController = _scoreController;
+        _scoreController = scoreController;
         _sortedMultiplierEvents = ReplayLoader::LoadedReplay->multiplierKeyframes;
     }
     void MultiplierPlayer::TimeUpdate(float newTime)

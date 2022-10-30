@@ -11,7 +11,7 @@ DECLARE_CLASS_CODEGEN(
     ScoreSaber::ReplaySystem::Playback, MultiplierPlayer, Il2CppObject,
     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
     DECLARE_PRIVATE_FIELD(GlobalNamespace::ScoreController*, _scoreController);
-    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* _scoreController);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController);
     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
     vector<Data::Private::MultiplierEvent> _sortedMultiplierEvents;
     void UpdateMultiplier(int multiplier, float progress);)

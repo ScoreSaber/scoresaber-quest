@@ -71,7 +71,6 @@ namespace ScoreSaber::ReplaySystem::Playback
         {
             return;
         }
-
         // TODO: Cancel hitsounds
 
         CancelAllHitSounds();
@@ -87,7 +86,6 @@ namespace ScoreSaber::ReplaySystem::Playback
             item->get_gameObject()->SetActive(true);
             item->Dissolve(0.0f);
         }
-
         auto bombNotePool = _basicBeatmapObjectManager->bombNotePoolContainer;
         auto bombNotePoolItems = bombNotePool->get_activeItems();
         for (int i = 0; i < bombNotePoolItems->get_Count(); i++)
@@ -109,22 +107,21 @@ namespace ScoreSaber::ReplaySystem::Playback
             item->get_gameObject()->SetActive(true);
             item->Dissolve(0.0f);
         }
-
         auto previousState = _audioTimeSyncController->state;
         _audioTimeSyncController->Pause();
         _audioTimeSyncController->SeekTo(time / _audioTimeSyncController->timeScale);
-
         if (previousState == GlobalNamespace::AudioTimeSyncController::State::Playing)
         {
             _audioTimeSyncController->Resume();
         }
-
         _callbackInitData->startFilterTime = time;
         _beatmapObjectCallbackController->startFilterTime = time;
         auto callbacks = _beatmapObjectCallbackController->callbacksInTimes;
-        for (int i = 0; i < callbacks->get_Count(); i++)
+
+        auto itr = callbacks->GetEnumerator();
+        while (itr.MoveNext())
         {
-            auto callback = callbacks->get_Item(i);
+            auto callback = itr.current.value;
             if (callback->lastProcessedNode != nullptr && callback->lastProcessedNode->item->time > time)
             {
                 callback->lastProcessedNode = nullptr;
@@ -149,17 +146,17 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void ReplayTimeSyncController::CancelAllHitSounds()
     {
-        auto noteCutPool = _noteCutSoundEffectManager->noteCutSoundEffectPoolContainer;
-        auto noteCutPoolItems = noteCutPool->get_activeItems();
-        for (int i = 0; i < noteCutPoolItems->get_Count(); i++)
-        {
-            auto effect = noteCutPoolItems->get_Item(i);
-            if (effect->get_isActiveAndEnabled())
-            {
-                effect->StopPlayingAndFinish();
-            }
-        }
-        _noteCutSoundEffectManager->prevNoteATime = -1.0f;
-        _noteCutSoundEffectManager->prevNoteBTime = -1.0f;
+        // auto noteCutPool = _noteCutSoundEffectManager->noteCutSoundEffectPoolContainer;
+        // auto noteCutPoolItems = noteCutPool->get_activeItems();
+        // for (int i = 0; i < noteCutPoolItems->get_Count(); i++)
+        // {
+        //     auto effect = noteCutPoolItems->get_Item(i);
+        //     if (effect->get_isActiveAndEnabled())
+        //     {
+        //         effect->StopPlayingAndFinish();
+        //     }
+        // }
+        // _noteCutSoundEffectManager->prevNoteATime = -1.0f;
+        // _noteCutSoundEffectManager->prevNoteBTime = -1.0f;
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

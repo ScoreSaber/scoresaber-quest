@@ -59,6 +59,51 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberManager::Initialize()
     {
         // TODO: Sub to events
+
+        _mainImberPanelView->DidClickLoop = [&]() {
+            MainImberPanelView_DidClickLoop();
+        };
+        _mainImberPanelView->DidPositionJump = [&]() {
+            MainImberPanelView_DidPositionJump();
+        };
+        _mainImberPanelView->DidClickRestart = [&]() {
+            MainImberPanelView_DidClickRestart();
+        };
+        _mainImberPanelView->DidClickPausePlay = [&]() {
+            MainImberPanelView_DidClickPausePlay();
+        };
+        _mainImberPanelView->DidTimeSyncChange = [&](float value) {
+            MainImberPanelView_DidTimeSyncChange(value);
+        };
+        _mainImberPanelView->DidChangeVisiblity = [&](bool value) {
+            MainImberPanelView_DidChangeVisibility(value);
+        };
+        _mainImberPanelView->HandDidSwitchEvent = [&](XR::XRNode value) {
+            MainImberPanelView_DidHandSwitchEvent(value);
+        };
+        _mainImberPanelView->DidPositionPreviewChange = [&](std::string value) {
+            MainImberPanelView_DidPositionPreviewChange(value);
+        };
+        _mainImberPanelView->DidPositionTabVisibilityChange = [&](bool value) {
+            MainImberPanelView_DidPositionTabVisibilityChange(value);
+        };
+
+        // TODO: Specator controller update pose
+
+        _imberScrubber->DidCalculateNewTime = [&](float value) {
+            ImberScrubber_DidCalculateNewTime(value);
+        };
+        _imberSpecsReporter->DidReport = [&](int fps, float leftSaberSpeed, float rightSaberSpeed) {
+            ImberSpecsReporter_DidReport(fps, leftSaberSpeed, rightSaberSpeed);
+        };
+
+        std::function<void()> gameDidResume = [&]() {
+            GamePause_didResumeEvent();
+        };
+        _didResumeDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume);
+        _gamePause->add_didResumeEvent(_didResumeDelegate);
+
+        // CreateWatermark();
     }
 
     void ImberManager::MainImberPanelView_DidHandSwitchEvent(XR::XRNode hand)
@@ -70,7 +115,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::GamePause_didResumeEvent()
     {
-        // _mainImberPanelView->set_playPauseText("PAUSE");
+        _mainImberPanelView->set_playPauseText("PAUSE");
     }
 
     void ImberManager::ImberSpecsReporter_DidReport(int fps, float leftSaberSpeed, float rightSaberSpeed)
@@ -98,7 +143,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _watermarkObjectTransform->set_position(Vector3(0.0f, 0.025f, 0.8f));
         _watermarkObjectTransform->set_rotation(Quaternion::Euler(Vector3(90.0f, 0.0f, 0.0f)));
         auto canvas = _watermarkObject->AddComponent<Canvas*>();
-        auto canvasRectTransform = il2cpp_utils::try_cast<RectTransform>(canvas).value_or(nullptr); // NOTE: Might not work
+        auto canvasRectTransform = il2cpp_utils::try_cast<RectTransform>(canvas->get_transform()).value_or(nullptr); // NOTE: Might not work
         canvasRectTransform->set_sizeDelta(Vector2(100.0f, 50.0f));
 
         auto curvedCanvasSettigns = _watermarkObject->AddComponent<HMUI::CurvedCanvasSettings*>();
@@ -183,7 +228,22 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::Dispose()
     {
-        // TODO: Unsub from events
+        _mainImberPanelView->DidClickLoop = nullptr;
+        _mainImberPanelView->DidPositionJump = nullptr;
+        _mainImberPanelView->DidClickRestart = nullptr;
+        _mainImberPanelView->DidClickPausePlay = nullptr;
+        _mainImberPanelView->DidTimeSyncChange = nullptr;
+        _mainImberPanelView->DidChangeVisiblity = nullptr;
+        _mainImberPanelView->HandDidSwitchEvent = nullptr;
+        _mainImberPanelView->DidPositionPreviewChange = nullptr;
+        _mainImberPanelView->DidPositionTabVisibilityChange = nullptr;
+
+        // TODO: Specator controller update pose
+
+        _imberScrubber->DidCalculateNewTime = nullptr;
+        _imberSpecsReporter->DidReport = nullptr;
+
+        _gamePause->remove_didResumeEvent(_didResumeDelegate);
     }
 
 } // namespace ScoreSaber::ReplaySystem::UI

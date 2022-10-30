@@ -13,7 +13,7 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
     DECLARE_PRIVATE_FIELD(GlobalNamespace::GameEnergyCounter*, _gameEnergyCounter);
     DECLARE_PRIVATE_FIELD(GlobalNamespace::GameEnergyUIPanel*, _gameEnergyUIPanel);
-    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* _gameEnergyCounter);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter);
     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
     vector<Data::Private::EnergyEvent> _sortedEnergyEvents;
     void UpdateEnergy(float energy);)

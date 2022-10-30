@@ -15,10 +15,10 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, EnergyPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* _gameEnergyCounter)
+    void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter)
     {
         _audioTimeSyncController = audioTimeSyncController;
-        _gameEnergyCounter = _gameEnergyCounter;
+        _gameEnergyCounter = gameEnergyCounter;
         _gameEnergyUIPanel = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::GameEnergyUIPanel*>()->values[0];
         _sortedEnergyEvents = ReplayLoader::LoadedReplay->energyKeyframes;
     }
