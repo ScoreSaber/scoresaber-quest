@@ -408,13 +408,13 @@ namespace ScoreSaber::UI::Other
         {
             if (enabled)
             {
-                replayImage->set_color({1.0f, 1.0f, 1.0f, 1.0f});
+                replayImage->set_color({1.0f, 1.0f, 1.0f, 0.8f});
                 replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 1.0f});
             }
             else
             {
-                replayImage->set_color({1.0f, 1.0f, 1.0f, 0.5f});
-                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 0.5f});
+                replayImage->set_color({1.0f, 1.0f, 1.0f, 0.2f});
+                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 0.2f});
             }
         }
     }

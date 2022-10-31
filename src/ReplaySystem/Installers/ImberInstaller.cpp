@@ -23,20 +23,12 @@ namespace ScoreSaber::ReplaySystem::Installers
     void ImberInstaller::InstallBindings()
     {
         auto container = get_Container();
-        INFO("Installing ImberInstaller");
-        INFO("Installing VRControllerAccessor");
         container->Bind<UI::VRControllerAccessor*>()->AsSingle();
-        INFO("Installing ImberManager");
         container->BindInterfacesTo<UI::ImberManager*>()->AsSingle();
-        INFO("Installing ImberScrubber");
         container->BindInterfacesAndSelfTo<UI::ImberScrubber*>()->AsSingle();
-        INFO("Installing ImberSpecsReporter");
         container->BindInterfacesAndSelfTo<UI::ImberSpecsReporter*>()->AsSingle();
-        INFO("Installing ImberUIPositionController");
         container->BindInterfacesAndSelfTo<UI::ImberUIPositionController*>()->AsSingle();
-        INFO("Installing MainImberPanelView");
         FromNewComponentAsViewController(container->Bind<UI::MainImberPanelView*>())->AsSingle();
-        INFO("Installing SpectateAreaController");
         container->BindInterfacesAndSelfTo<UI::SpectateAreaController*>()->AsSingle();
     }
 } // namespace ScoreSaber::ReplaySystem::Installers
