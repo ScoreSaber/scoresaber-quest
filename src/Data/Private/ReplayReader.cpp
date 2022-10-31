@@ -265,8 +265,19 @@ namespace ScoreSaber::Data::Private::ReplayReader
             {
                 compressedReplayBytes.push_back(currentChar);
             }
-            position++;
+
             currentChar = readStream.get();
+
+            if (position == 0)
+            {
+                if (currentChar == (char)93)
+                {
+                    // This is an old replay
+                    return "";
+                }
+            }
+
+            position++;
         }
 
         size_t compressedSize = compressedReplayBytes.size();

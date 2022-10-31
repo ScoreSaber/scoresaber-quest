@@ -70,6 +70,7 @@ namespace UIUtils
             clickableText->get_onPointerClickEvent() += [onClick](auto _) { onClick(); };
         return clickableText;
     }
+
     ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, std::function<void()> onClick)
     {
         auto clickableText = CreateClickableText(parent, text);

@@ -13,8 +13,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     extern ScoreSaber::Data::Private::ReplayFile* LoadedReplay;
     extern ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
     extern bool IsPlaying;
-    void LoadReplay();
     void StartReplay(GlobalNamespace::IDifficultyBeatmap* beatmap);
-    void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
+    void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
 
 } // namespace ScoreSaber::ReplaySystem::ReplayLoader

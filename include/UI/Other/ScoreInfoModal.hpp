@@ -1,6 +1,7 @@
 #pragma once
 #include "Data/Score.hpp"
 
+#include "CustomTypes/Components/ClickableImage.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "HMUI/ModalView.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
@@ -29,7 +30,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBe
                       void Hide();
                       void Show(ScoreSaber::Data::Score& score, int leaderboardId);
 
-                      static ScoreSaber::UI::Other::ScoreInfoModal* Create(UnityEngine::Transform* parent);
+                      static ScoreSaber::UI::Other::ScoreInfoModal * Create(UnityEngine::Transform * parent);
 
                       void Setup();
 
@@ -45,12 +46,15 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBe
                       void set_timeSet(std::string_view timeSet);
 
                       private
-                      :
-
-                      std::string playerId;
+                      : int leaderboardId;
                       ScoreSaber::Data::Score currentScore;
-                      int leaderboardId;
+                      std::string playerId;
+                      std::string replayFileName;
+                      bool replayEnabled;
+                      ScoreSaber::CustomTypes::Components::ClickableImage * replayImage;
+
                       void ShowPlayerProfileModal();
                       void PlayReplay();
+                      void SetReplayButtonState(bool enabled);
 
 )

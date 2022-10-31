@@ -1,8 +1,13 @@
 #include "UI/Other/ScoreInfoModal.hpp"
 
+#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
+#include "GlobalNamespace/BeatmapDifficulty.hpp"
+#include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
+#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
+#include "Services/FileService.hpp"
 #include "Sprites.hpp"
 #include "System/DateTime.hpp"
 #include "System/DayOfWeek.hpp"
@@ -27,6 +32,7 @@
 #include "main.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "static.hpp"
 #include <map>
 
 DEFINE_TYPE(ScoreSaber::UI::Other, ScoreInfoModal);
@@ -229,7 +235,21 @@ namespace ScoreSaber::UI::Other
                 {
                     playerId = score.leaderboardPlayerInfo.id.value();
                 }
+
+                auto previewBeatmapLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(currentBeatmap->get_level());
+                std::string levelHash = StringUtils::GetFormattedHash(previewBeatmapLevel->get_levelID());
+                std::string characteristic = currentBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
+                std::string songName = previewBeatmapLevel->get_songName();
+                std::string difficultyName = GlobalNamespace::BeatmapDifficultySerializedMethods::SerializedName(currentBeatmap->get_difficulty());
+                replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic, score.leaderboardPlayerInfo.id.value(), songName);
+                replayEnabled = score.hasReplay;
                 modal->Show(true, true, nullptr);
+                if (fileexists(ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat"))
+                {
+                    replayEnabled = true;
+                }
+
+                SetReplayButtonState(replayEnabled);
             })));
     }
 
@@ -282,11 +302,8 @@ namespace ScoreSaber::UI::Other
 
         // No replay functionality. Button doesnt do anything
         auto replaySprite = Base64ToSprite(replay_base64);
-        auto replayImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), replaySprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::PlayReplay, this));
+        replayImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), replaySprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::PlayReplay, this));
         replayImage->set_preserveAspect(true);
-        Color replayCol = replayImage->get_color();
-        // replayImage->set_defaultColor(Color(replayCol.r * 0.4f, replayCol.g * 0.4f, replayCol.b * 0.4f, replayCol.a));
-        // replayImage->set_highlightColor(Color(replayCol.r * 0.4f, replayCol.g * 0.4f, replayCol.b * 0.4f, replayCol.a));
 
         auto seperatorHorizontal = CreateHorizontalLayoutGroup(mainVertical->get_transform());
         auto seperatorLayout = seperatorHorizontal->get_gameObject()->GetComponent<LayoutElement*>();
@@ -385,23 +402,46 @@ namespace ScoreSaber::UI::Other
         }
     }
 
+    void ScoreInfoModal::SetReplayButtonState(bool enabled)
+    {
+        if (replayImage)
+        {
+            if (enabled)
+            {
+                replayImage->set_color({1.0f, 1.0f, 1.0f, 1.0f});
+                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 1.0f});
+            }
+            else
+            {
+                replayImage->set_color({1.0f, 1.0f, 1.0f, 0.5f});
+                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 0.5f});
+            }
+        }
+    }
+
     void ScoreInfoModal::PlayReplay()
     {
-        Hide();
-        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Loading Replay...", -1);
-        ScoreSaber::ReplaySystem::ReplayLoader::GetReplayData(currentBeatmap, leaderboardId, currentScore, [=](bool result) {
-            QuestUI::MainThreadScheduler::Schedule([=]() {
-                if (result)
-                {
-                    INFO("1");
-                    ScoreSaber::ReplaySystem::ReplayLoader::StartReplay(currentBeatmap);
-                    INFO("2");
-                }
-                else
-                {
-                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Failed to load replay", 3);
-                }
+        if (replayEnabled)
+        {
+            SetReplayButtonState(false);
+            replayEnabled = false;
+            Hide();
+            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Loading Replay...", -1);
+            ScoreSaber::ReplaySystem::ReplayLoader::GetReplayData(currentBeatmap, leaderboardId, replayFileName, currentScore, [=](bool result) {
+                QuestUI::MainThreadScheduler::Schedule([=]() {
+                    if (result)
+                    {
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Replay loaded!", 3);
+                        ScoreSaber::ReplaySystem::ReplayLoader::StartReplay(currentBeatmap);
+                    }
+                    else
+                    {
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Failed to load replay", 3);
+                    }
+                    SetReplayButtonState(true);
+                    replayEnabled = true;
+                });
             });
-        });
+        }
     }
 } // namespace ScoreSaber::UI::Other
