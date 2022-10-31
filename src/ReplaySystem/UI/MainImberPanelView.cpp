@@ -157,15 +157,12 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::Construct()
     {
+        _floatingScreen = BSML::FloatingScreen::CreateFloatingScreen({60.0f, 45.0f}, false, defaultPosition.position, defaultPosition.rotation, 0.0f, false);
 
-        auto rawFloatingScreen = BSML::FloatingScreen::CreateFloatingScreen({60.0f, 45.0f}, false, defaultPosition.position, defaultPosition.rotation, 0.0f, false);
-
-        _floatingScreen = rawFloatingScreen->GetComponent<BSML::FloatingScreen*>();
         auto localScale = _floatingScreen->get_transform()->get_localScale();
         _floatingScreen->GetComponent<Canvas*>()->set_sortingOrder(31);
-
         _floatingScreen->get_transform()->set_localScale({localScale.x / 2.0f, localScale.y / 2.0f, localScale.z / 2.0f});
-        rawFloatingScreen->set_name("Imber Replay Panel (Screen)");
+        _floatingScreen->set_name("Imber Replay Panel (Screen)");
         set_name("Imber Replay Panel (View)");
     }
 

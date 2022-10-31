@@ -60,9 +60,8 @@ namespace StringUtils
 
     std::string ReplaceInvalidChars(std::string fileName)
     {
-        auto fileNameCstr = StringW(fileName);
-        auto splitChars = fileNameCstr->Split(System::IO::Path::GetInvalidFileNameChars());
-        auto result = System::String::Join("_", splitChars);
+        auto splitChars = StringW(fileName)->Split(System::IO::Path::GetInvalidFileNameChars());
+        auto result = System::String::Join(StringW("_"), splitChars);
         return result;
     }
 

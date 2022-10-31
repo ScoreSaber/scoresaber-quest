@@ -42,9 +42,10 @@ namespace ScoreSaber::CustomTypes::Components
         }
     }
 
-    void LeaderboardScoreInfoButtonHandler::set_scoreCollection(std::vector<ScoreSaber::Data::Score> _scores)
+    void LeaderboardScoreInfoButtonHandler::set_scoreCollection(std::vector<ScoreSaber::Data::Score> _scores, int leaderboardId)
     {
         this->scores = _scores;
+        this->leaderboardId = leaderboardId;
         set_buttonCount(_scores.size());
     }
 
@@ -52,7 +53,7 @@ namespace ScoreSaber::CustomTypes::Components
     {
         if (scoreInfoModal && buttonIdx < scores.size())
         {
-            scoreInfoModal->Show(scores.at(buttonIdx));
+            scoreInfoModal->Show(scores.at(buttonIdx), leaderboardId);
         }
     }
 }

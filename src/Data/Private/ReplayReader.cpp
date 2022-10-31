@@ -19,9 +19,9 @@ using namespace std;
 
 namespace ScoreSaber::Data::Private::ReplayReader
 {
-    ReplayFile* Read(std::string fileName)
+    ReplayFile* Read(std::string absolutePath, std::string fileName)
     {
-        std::string decompressedPath = DecompressReplay(fileName);
+        std::string decompressedPath = DecompressReplay(absolutePath, fileName);
         if (decompressedPath == "")
         {
             return nullptr;
@@ -39,6 +39,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
                                           ReadComboKeyframes(inputStream, pointers.comboKeyframes),
                                           ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
                                           ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
+
         unlink(decompressedPath.c_str());
         return file;
     }
@@ -216,11 +217,10 @@ namespace ScoreSaber::Data::Private::ReplayReader
 
     std::string ReadString(ifstream& inputStream)
     {
-        int length = ReadInt(inputStream);
-        char* buffer = new char[length];
-        inputStream.read(buffer, length);
-        std::string value = std::string(buffer, length);
-        delete[] buffer;
+        size_t stringLength = (size_t)ReadInt(inputStream);
+        std::string value;
+        value.resize(stringLength);
+        inputStream.read(value.data(), stringLength);
         return value;
     }
 
@@ -249,14 +249,12 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return value;
     }
 
-    std::string DecompressReplay(std::string fileName)
+    std::string DecompressReplay(std::string absolutePath, std::string fileName)
     {
-
-        std::string compressedPath = ScoreSaber::Static::REPLAY_DIR + "/" + fileName;
         std::string tmpDecompressedPath = ScoreSaber::Static::REPLAY_TMP_DIR + "/" + fileName + ".decompressed.tmp";
 
         // Read tmp replay file into memory
-        ifstream readStream(compressedPath, ios_base::in | ios::binary);
+        ifstream readStream(absolutePath, ios_base::in | ios::binary);
         vector<unsigned char> compressedReplayBytes;
         unsigned char currentChar = readStream.get();
 

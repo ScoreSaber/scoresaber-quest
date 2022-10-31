@@ -3,7 +3,7 @@
 
 namespace ScoreSaber::Data::Private::ReplayReader
 {
-    ReplayFile* Read(std::string fileName);
+    ReplayFile* Read(std::string absolutePath, std::string fileName);
     Pointers ReadPointers(ifstream& inputStream);
     Metadata* ReadMetadata(ifstream& inputStream, int offset);
     vector<VRPoseGroup> ReadPoseKeyframes(ifstream& inputStream, int offset);
@@ -30,5 +30,5 @@ namespace ScoreSaber::Data::Private::ReplayReader
     std::vector<string> ReadStringArray(ifstream& inputStream);
     float ReadFloat(ifstream& inputStream);
     bool ReadBool(ifstream& inputStream);
-    std::string DecompressReplay(std::string fileName);
+    std::string DecompressReplay(std::string absolutePath, std::string fileName);
 } // namespace ScoreSaber::Data::Private::ReplayReader

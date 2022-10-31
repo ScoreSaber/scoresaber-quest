@@ -18,7 +18,7 @@
 #include "main.hpp"
 #include <tuple>
 
-//#include "gif_read.h"
+// #include "gif_read.h"
 
 using namespace UnityEngine;
 using namespace StringUtils;
@@ -484,6 +484,68 @@ namespace WebUtils
                 finished(responseCode, response);
             });
         t.detach();
+    }
+
+    long DownloadFileSync(std::string url, std::string filePath, long timeout)
+    {
+
+        FILE* val = fopen(filePath.c_str(), "wb");
+        // Init curl
+        auto* curl = curl_easy_init();
+        struct curl_slist* headers = NULL;
+        headers = curl_slist_append(headers, "Accept: */*");
+
+        curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+        if (!cookie.empty())
+        {
+            curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
+        }
+        // Set headers
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+        curl_easy_setopt(curl, CURLOPT_URL, query_encode(url).c_str());
+
+        // Don't wait forever, time out after TIMEOUT seconds.
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+
+        // Follow HTTP redirects if necessary.
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+                         DownloadFileCallback);
+
+        long httpCode(0);
+        if (val)
+        {
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, val);
+        }
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+        auto res = curl_easy_perform(curl);
+        /* Check for errors */
+        if (res != CURLE_OK)
+        {
+            getLogger().critical("curl_easy_perform() failed: %u: %s", res,
+                                 curl_easy_strerror(res));
+        }
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+        if (val)
+        {
+            fclose(val);
+        }
+        curl_easy_cleanup(curl);
+
+        return httpCode;
+    }
+
+    std::size_t DownloadFileCallback(void* ptr, size_t size, size_t nmemb, void* stream)
+    {
+        size_t written = fwrite(ptr, size, nmemb, (FILE*)stream);
+        return written;
     }
 
     std::vector<unsigned char> Swap(std::vector<unsigned char> panda1, std::vector<unsigned char> panda2)

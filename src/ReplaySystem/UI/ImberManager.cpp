@@ -186,8 +186,8 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::MainImberPanelView_DidClickLoop()
     {
-        _imberScrubber->_loopMode = !_imberScrubber->_loopMode;
-        _mainImberPanelView->_loopText = _imberScrubber->_loopMode ? "UNLOOP" : "LOOP";
+        _imberScrubber->set_loopMode(!_imberScrubber->_loopMode);
+        _mainImberPanelView->set_loopText(_imberScrubber->_loopMode ? "UNLOOP" : "LOOP");
     }
 
     void ImberManager::MainImberPanelView_DidClickRestart()
@@ -200,12 +200,12 @@ namespace ScoreSaber::ReplaySystem::UI
         if (_audioTimeSyncController->state == GlobalNamespace::AudioTimeSyncController::State::Playing)
         {
             _replayTimeSyncController->CancelAllHitSounds();
-            // _mainImberPanelView->set_playPauseText("PLAY");
+            _mainImberPanelView->set_playPauseText("PLAY");
             _audioTimeSyncController->Pause();
         }
         else if (_audioTimeSyncController->state == GlobalNamespace::AudioTimeSyncController::State::Paused)
         {
-            // _mainImberPanelView->set_playPauseText("PAUSE");
+            _mainImberPanelView->set_playPauseText("PAUSE");
             _audioTimeSyncController->Resume();
         }
     }

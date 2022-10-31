@@ -31,4 +31,8 @@ namespace WebUtils
     /// @brief gets gif @ url and applies it's first frame to out->set_sprite() after downloading
     custom_types::Helpers::Coroutine WaitForGifDownload(std::string url, HMUI::ImageView* out);
 
+    // void DownloadFileAsync(std::string url, std::string filePath, long timeOut, const std::function<void(long)>& finished);
+    long DownloadFileSync(std::string url, std::string filePath, long timeOut);
+    std::size_t DownloadFileCallback(void* ptr, size_t size, size_t nmemb, void* stream);
+
 } // namespace WebUtils

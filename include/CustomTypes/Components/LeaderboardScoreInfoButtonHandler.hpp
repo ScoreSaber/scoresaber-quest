@@ -17,10 +17,11 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::CustomTypes::Components, LeaderboardScoreInfoB
 
                       void Setup();
                       void set_buttonCount(int count);
-                      void set_scoreCollection(std::vector<ScoreSaber::Data::Score> scores);
+                      void set_scoreCollection(std::vector<ScoreSaber::Data::Score> scores, int leaderboardId);
                       private
                       :
 
+                        int leaderboardId;
                       std::vector<ScoreSaber::Data::Score>
                           scores;
                       void ShowScoreInfoModal(int buttonIdx);

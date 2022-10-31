@@ -61,6 +61,6 @@ extern "C" __attribute((visibility("default"))) void load()
     ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying = true;
     auto zenjector = Lapiz::Zenject::Zenjector::Get();
     //   zenjector->Install<TrickSaber::Installers::GameInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
-    zenjector->Install<ScoreSaber::ReplaySystem::Installers::ImberInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+     zenjector->Install<ScoreSaber::ReplaySystem::Installers::ImberInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
 }

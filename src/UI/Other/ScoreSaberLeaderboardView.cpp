@@ -246,7 +246,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                         tableView->SetScores(internalLeaderboard.leaderboardItems, playerScoreIndex);
                                         loadingControl->ShowText(System::String::_get_Empty(), false);
                                         loadingControl->Hide();
-                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores);
+                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, internalLeaderboard.leaderboard->leaderboardInfo.id);
                                         SetPlayButtonState(true);
                                         SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
                                     }

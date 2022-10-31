@@ -1,6 +1,7 @@
 #pragma once
 #include "Data/Score.hpp"
 
+#include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "HMUI/ModalView.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
@@ -20,14 +21,16 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBe
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, missedNotes);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, modifiers);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, timeSet);
+                      DECLARE_INSTANCE_FIELD(GlobalNamespace::IDifficultyBeatmap*, currentBeatmap);
 
                       public
                       :
 
                       void Hide();
-                      void Show(ScoreSaber::Data::Score& score);
+                      void Show(ScoreSaber::Data::Score& score, int leaderboardId);
 
-                      static ScoreSaber::UI::Other::ScoreInfoModal * Create(UnityEngine::Transform * parent);
+                      static ScoreSaber::UI::Other::ScoreInfoModal* Create(UnityEngine::Transform* parent);
+
                       void Setup();
 
                       void set_player(std::u16string player);
@@ -45,6 +48,9 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBe
                       :
 
                       std::string playerId;
+                      ScoreSaber::Data::Score currentScore;
+                      int leaderboardId;
                       void ShowPlayerProfileModal();
+                      void PlayReplay();
 
 )

@@ -32,6 +32,10 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void HeightPlayer::Tick()
     {
+        if (_sortedHeightEvents.size() == 0)
+        {
+            return;
+        }
         if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
         {
             if (_lastIndex >= _sortedHeightEvents.size() - 1)
