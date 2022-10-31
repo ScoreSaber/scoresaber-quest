@@ -57,6 +57,10 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void HeightPlayer::TimeUpdate(float songTime)
     {
+        if (_sortedHeightEvents.size() == 0)
+        {
+            return;
+        }
         if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
         {
             for (int c = 0; c < _sortedHeightEvents.size(); c++)
