@@ -9,6 +9,7 @@
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include "ReplaySystem/Playback/ScorePlayer.hpp"
+#include "ReplaySystem/ReplayLoader.hpp"
 #include "Zenject/ConcreteBinderGeneric_1.hpp"
 #include "Zenject/ConcreteIdBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -29,15 +30,18 @@ namespace ScoreSaber::ReplaySystem::Installers
 
     void PlaybackInstaller::InstallBindings()
     {
-        auto container = get_Container();
-        container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<Playback::NotePlayer*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<Playback::ScorePlayer*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<Playback::HeightPlayer*>()->AsSingle();
+        if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying) {
+            auto container = get_Container();
+            container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
+            container->BindInterfacesAndSelfTo<Playback::NotePlayer*>()->AsSingle();
+            container->BindInterfacesAndSelfTo<Playback::ScorePlayer*>()->AsSingle();
+            if(_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
+                container->BindInterfacesAndSelfTo<Playback::HeightPlayer*>()->AsSingle();
 
-        container->Bind<Playback::ComboPlayer*>()->AsSingle();
-        container->Bind<Playback::EnergyPlayer*>()->AsSingle();
-        container->Bind<Playback::MultiplierPlayer*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
+            container->Bind<Playback::ComboPlayer*>()->AsSingle();
+            container->Bind<Playback::EnergyPlayer*>()->AsSingle();
+            container->Bind<Playback::MultiplierPlayer*>()->AsSingle();
+            container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
+        }
     }
 } // namespace ScoreSaber::ReplaySystem::Installers

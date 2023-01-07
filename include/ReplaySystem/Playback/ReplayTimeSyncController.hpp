@@ -51,13 +51,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, ReplayTi
                                                  GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
                                                  GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
                                                  GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
-                                                 ScoreSaber::ReplaySystem::Playback::ComboPlayer* comboPlayer,
-                                                 ScoreSaber::ReplaySystem::Playback::EnergyPlayer* energyPlayer,
-                                                 ScoreSaber::ReplaySystem::Playback::HeightPlayer* heightPlayer,
-                                                 ScoreSaber::ReplaySystem::Playback::MultiplierPlayer* multiplierPlayer,
-                                                 ScoreSaber::ReplaySystem::Playback::NotePlayer* notePlayer,
-                                                 ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer,
-                                                 ScoreSaber::ReplaySystem::Playback::ScorePlayer* scorePlayer);
+                                                 Zenject::DiContainer* container);
 
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
                                     DECLARE_INSTANCE_METHOD(void, UpdateTimes);

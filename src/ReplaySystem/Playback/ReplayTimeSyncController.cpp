@@ -23,13 +23,7 @@ namespace ScoreSaber::ReplaySystem::Playback
                                         GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
                                         GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
                                         GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
-                                        ScoreSaber::ReplaySystem::Playback::ComboPlayer* comboPlayer,
-                                        ScoreSaber::ReplaySystem::Playback::EnergyPlayer* energyPlayer,
-                                        ScoreSaber::ReplaySystem::Playback::HeightPlayer* heightPlayer,
-                                        ScoreSaber::ReplaySystem::Playback::MultiplierPlayer* multiplierPlayer,
-                                        ScoreSaber::ReplaySystem::Playback::NotePlayer* notePlayer,
-                                        ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer,
-                                        ScoreSaber::ReplaySystem::Playback::ScorePlayer* scorePlayer)
+                                        Zenject::DiContainer* container)
     {
         _audioTimeSyncController = audioTimeSyncController;
         _audioInitData = audioInitData;
@@ -40,13 +34,13 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         _audioManagerSO = _noteCutSoundEffectManager->audioManager;
 
-        _comboPlayer = comboPlayer;
-        _energyPlayer = energyPlayer;
-        _heightPlayer = heightPlayer;
-        _multiplierPlayer = multiplierPlayer;
-        _notePlayer = notePlayer;
-        _posePlayer = posePlayer;
-        _scorePlayer = scorePlayer;
+        _comboPlayer = container->Resolve<ComboPlayer*>();
+        _energyPlayer = container->Resolve<EnergyPlayer*>();
+        _heightPlayer = container->TryResolve<HeightPlayer*>();
+        _multiplierPlayer = container->Resolve<MultiplierPlayer*>();
+        _notePlayer = container->Resolve<NotePlayer*>();
+        _posePlayer = container->Resolve<PosePlayer*>();
+        _scorePlayer = container->Resolve<ScorePlayer*>();
     }
 
     void ReplayTimeSyncController::Tick()
@@ -58,7 +52,8 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         _comboPlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _energyPlayer->TimeUpdate(_audioTimeSyncController->songTime);
-        _heightPlayer->TimeUpdate(_audioTimeSyncController->songTime);
+        if(_heightPlayer)
+            _heightPlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _multiplierPlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _notePlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _posePlayer->TimeUpdate(_audioTimeSyncController->songTime);
