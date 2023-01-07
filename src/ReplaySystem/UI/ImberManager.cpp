@@ -53,7 +53,10 @@ namespace ScoreSaber::ReplaySystem::UI
         }
 
         _imberScrubber->Setup(ReplayLoader::LoadedReplay->metadata->FailTime, noFail);
-        _initialTimeScale = ReplayLoader::LoadedReplay->noteKeyframes[0].TimeSyncTimescale;
+        if (ReplayLoader::LoadedReplay->noteKeyframes.size() > 0)
+            _initialTimeScale = ReplayLoader::LoadedReplay->noteKeyframes[0].TimeSyncTimescale;
+        else
+            _initialTimeScale = 1.0;
     }
 
     void ImberManager::Initialize()
