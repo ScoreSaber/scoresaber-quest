@@ -7,6 +7,7 @@
 #include "ReplaySystem/UI/MainImberPanelView.hpp"
 #include "ReplaySystem/UI/SpectateAreaController.hpp"
 #include "ReplaySystem/UI/VRControllerAccessor.hpp"
+#include "ReplaySystem/ReplayLoader.hpp"
 #include "Zenject/ConcreteBinderGeneric_1.hpp"
 #include "Zenject/ConcreteIdBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -22,13 +23,15 @@ namespace ScoreSaber::ReplaySystem::Installers
 {
     void ImberInstaller::InstallBindings()
     {
-        auto container = get_Container();
-        container->Bind<UI::VRControllerAccessor*>()->AsSingle();
-        container->BindInterfacesTo<UI::ImberManager*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<UI::ImberScrubber*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<UI::ImberSpecsReporter*>()->AsSingle();
-        container->BindInterfacesAndSelfTo<UI::ImberUIPositionController*>()->AsSingle();
-        FromNewComponentAsViewController(container->Bind<UI::MainImberPanelView*>())->AsSingle();
-        container->BindInterfacesAndSelfTo<UI::SpectateAreaController*>()->AsSingle();
+        if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying) {
+            auto container = get_Container();
+            container->Bind<UI::VRControllerAccessor*>()->AsSingle();
+            container->BindInterfacesTo<UI::ImberManager*>()->AsSingle();
+            container->BindInterfacesAndSelfTo<UI::ImberScrubber*>()->AsSingle();
+            container->BindInterfacesAndSelfTo<UI::ImberSpecsReporter*>()->AsSingle();
+            container->BindInterfacesAndSelfTo<UI::ImberUIPositionController*>()->AsSingle();
+            FromNewComponentAsViewController(container->Bind<UI::MainImberPanelView*>())->AsSingle();
+            container->BindInterfacesAndSelfTo<UI::SpectateAreaController*>()->AsSingle();
+        }
     }
 } // namespace ScoreSaber::ReplaySystem::Installers
