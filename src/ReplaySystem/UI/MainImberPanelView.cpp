@@ -8,6 +8,8 @@
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 // #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
+#include <sstream>
+#include <iomanip>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -54,10 +56,22 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::set_leftSaberSpeed(float value)
     {
+        if (leftSpeedText != nullptr) {
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(2) << value << " m/s";
+            leftSpeedText->set_text(ss.str());
+            leftSpeedText->set_color(value >= 2.0f ? _goodColor : _noColor);
+        }
     }
 
     void MainImberPanelView::set_rightSaberSpeed(float value)
     {
+        if (rightSpeedText != nullptr) {
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(2) << value << " m/s";
+            rightSpeedText->set_text(ss.str());
+            rightSpeedText->set_color(value >= 2.0f ? _goodColor : _noColor);
+        }
     }
 
     void MainImberPanelView::set_didParse(bool value)
