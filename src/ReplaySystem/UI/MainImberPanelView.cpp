@@ -184,6 +184,7 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         _initialTime = initialSongTime;
         _targetFPS = targetFramerate;
+        _timeSync = initialSongTime;
         _location = defaultLocation;
         // _locations = locations;
         //_locations = locations;
