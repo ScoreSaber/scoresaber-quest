@@ -50,8 +50,8 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         auto playerData = playerDataModel->playerData;
         auto localPlayerSettings = playerData->playerSpecificSettings;
 
-        auto playerSettings = PlayerSpecificSettings::New_ctor(LoadedReplay->metadata->LeftHanded, localPlayerSettings->playerHeight,
-                                                               localPlayerSettings->automaticPlayerHeight, localPlayerSettings->sfxVolume,
+        auto playerSettings = PlayerSpecificSettings::New_ctor(LoadedReplay->metadata->LeftHanded, LoadedReplay->metadata->InitialHeight,
+                                                               LoadedReplay->heightKeyframes.size() > 0, localPlayerSettings->sfxVolume,
                                                                localPlayerSettings->reduceDebris, localPlayerSettings->noTextsAndHuds, localPlayerSettings->noFailEffects,
                                                                localPlayerSettings->advancedHud, localPlayerSettings->autoRestart, localPlayerSettings->saberTrailIntensity,
                                                                localPlayerSettings->noteJumpDurationTypeSettings, localPlayerSettings->noteJumpFixedDuration,
