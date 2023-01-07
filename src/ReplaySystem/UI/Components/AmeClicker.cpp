@@ -22,6 +22,6 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         Vector2 computedVector;
         RectTransformUtility::ScreenPointToLocalPointInRectangle(_rect, eventData->get_position(), eventData->get_pressEventCamera(), &computedVector);
         float maxX = _rect->get_rect().get_width() / 2.0f;
-        _clickCallback(Mathf::InverseLerp(--maxX, maxX, computedVector.x));
+        _clickCallback(Mathf::InverseLerp(-maxX, maxX, computedVector.x));
     }
 } // namespace ScoreSaber::ReplaySystem::UI::Components
