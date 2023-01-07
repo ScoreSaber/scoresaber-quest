@@ -7,6 +7,8 @@
 #include "UnityEngine/Resources.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
+#include <sstream>
+#include <iomanip>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -27,14 +29,16 @@ namespace ScoreSaber::ReplaySystem::UI::Components
 
     void AmeBar::set_currentTime(float value)
     {
-        // TODO: Implement properly
-        _currentTimeText->set_text(std::to_string(value));
+        std::stringstream ss;
+        ss << int(value / 60) << ":" << std::setw(2) << std::setfill('0') << int(fmod(value, 60));
+        _currentTimeText->set_text(ss.str());
     }
 
     void AmeBar::set_endTime(float value)
     {
-        // TODO: Implement properly
-        _endTimeText->set_text(std::to_string(value));
+        std::stringstream ss;
+        ss << int(value / 60) << ":" << std::setw(2) << std::setfill('0') << int(fmod(value, 60));
+        _endTimeText->set_text(ss.str());
     }
 
     void AmeBar::Setup(UnityEngine::RectTransform* fillBarTransform, UnityEngine::RectTransform* otherTransform)
