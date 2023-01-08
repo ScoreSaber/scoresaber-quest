@@ -19,7 +19,6 @@
 #include "Services/UploadService.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "Utils/StringUtils.hpp"
-#include "Utils/obfuscation.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -62,7 +61,7 @@ namespace ScoreSaber::ReplaySystem::Recorders::MetadataRecorder
     Metadata* Export()
     {
         auto metadata = new Metadata();
-        metadata->Version = ENCRYPT_STRING_AUTO_A(encoder, "2.0.0");
+        metadata->Version = "2.0.0";
         metadata->LevelID = static_cast<std::string>(_previewBeatmapLevel->get_levelID());
         metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_difficultyBeatmap->get_difficulty());
         metadata->Characteristic = static_cast<std::string>(_difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);

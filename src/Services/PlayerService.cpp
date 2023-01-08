@@ -5,7 +5,6 @@
 #include "System/IO/Directory.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/StringUtils.hpp"
-#include "Utils/obfuscation.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
@@ -52,10 +51,10 @@ namespace ScoreSaber::Services::PlayerService
             friends = readfile(ScoreSaber::Static::FRIENDS_PATH);
         }
 
-        std::string postData = string_format(ENCRYPT_STRING_AUTO_A(encoder, "at=2&playerId=%s&nonce=%s&friends=%s&name="),
+        std::string postData = string_format("at=2&playerId=%s&nonce=%s&friends=%s&name=",
                                              playerId.c_str(), steamKey.c_str(), friends.c_str());
 
-        std::string authUrl = ScoreSaber::Static::BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/auth");
+        std::string authUrl = ScoreSaber::Static::BASE_URL + "/api/game/auth";
 
         WebUtils::PostAsync(authUrl, postData, 6000, [=](long code, std::string result) {
             if (code == 200)
@@ -84,15 +83,15 @@ namespace ScoreSaber::Services::PlayerService
     void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished)
     {
 
-        std::string url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/api/player/%s"), ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
+        std::string url = string_format("%s/api/player/%s", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
 
         if (full)
         {
-            url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/full"), url.c_str());
+            url = string_format("%s/full", url.c_str());
         }
         else
         {
-            url = string_format(ENCRYPT_STRING_AUTO_A(encoder, "%s/basic"), url.c_str());
+            url = string_format("%s/basic", url.c_str());
         }
 
         WebUtils::GetAsync(url, [&, finished](long code, std::string result) {

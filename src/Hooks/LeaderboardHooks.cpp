@@ -34,7 +34,6 @@
 
 #include "GlobalNamespace/MenuTransitionsHelper.hpp"
 
-#include "Utils/obfuscation.hpp"
 #include "logging.hpp"
 
 using namespace HMUI;
@@ -114,7 +113,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
                      GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::LevelCompletionResults* levelCompletionResults)
 {
-    if (StringUtils::GetEnv(ENCRYPT_STRING_AUTO_A(encoder, "disable_ss_upload")) != "1")
+    if (StringUtils::GetEnv("disable_ss_upload") != "1")
     {
         if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
         {

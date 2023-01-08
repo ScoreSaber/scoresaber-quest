@@ -55,8 +55,6 @@
 #include "questui/shared/QuestUI.hpp"
 #include <chrono>
 
-#include "Utils/obfuscation.hpp"
-
 using namespace HMUI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
@@ -172,13 +170,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 switch (loginStatus)
                 {
                     case PlayerService::LoginStatus::Success: {
-                        ScoreSaberBanner->Prompt(ENCRYPT_STRING_AUTO_A(encoder, "<color=#89fc81>Successfully signed in to ScoreSaber</color>"), false, 5.0f,
+                        ScoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
                                                  nullptr);
                         _platformLeaderboardViewController->Refresh(true, true);
                         break;
                     }
                     case PlayerService::LoginStatus::Error: {
-                        ScoreSaberBanner->Prompt(ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>Authentication failed</color>"), false, 5.0f, nullptr);
+                        ScoreSaberBanner->Prompt("<color=#fc8181>Authentication failed</color>", false, 5.0f, nullptr);
                         break;
                     }
                 }
@@ -385,7 +383,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             {
                 _platformLeaderboardViewController->loadingControl->ShowLoading(System::String::_get_Empty());
                 ScoreSaberBanner->set_loading(true);
-                ScoreSaberBanner->set_prompt(ENCRYPT_STRING_AUTO_A(encoder, "Uploading score..."), -1);
+                ScoreSaberBanner->set_prompt("Uploading score...", -1);
                 // ScoreSaberBanner->Prompt("Uploading Score", true, 5.0f, nullptr);
             }
             else
@@ -394,7 +392,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
                 if (success)
                 {
-                    ScoreSaberBanner->set_prompt(ENCRYPT_STRING_AUTO_A(encoder, "<color=#89fc81>Score uploaded successfully</color>"), 5);
+                    ScoreSaberBanner->set_prompt("<color=#89fc81>Score uploaded successfully</color>", 5);
                     PlayerService::UpdatePlayerInfo(true);
                 }
                 else

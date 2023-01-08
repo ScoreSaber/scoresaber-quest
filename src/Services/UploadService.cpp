@@ -21,7 +21,6 @@
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
-#include "Utils/obfuscation.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -47,7 +46,7 @@ namespace ScoreSaber::Services::UploadService
         PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
         if (!practiceViewController->get_isInViewControllerHierarchy())
         {
-            if (standardLevelScenesTransitionSetupData->gameMode == ENCRYPT_STRING_AUTO_A(encoder, "Solo"))
+            if (standardLevelScenesTransitionSetupData->gameMode == "Solo")
             {
                 if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
                 {
@@ -120,7 +119,7 @@ namespace ScoreSaber::Services::UploadService
                             if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
                             {
                                 //  ERROR("Didn't beat score not uploading");
-                                ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>Didn't beat score, not uploading</color>"));
+                                ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>Didn't beat score, not uploading</color>");
                                 uploading = false;
                                 return;
                             }
@@ -143,15 +142,15 @@ namespace ScoreSaber::Services::UploadService
                     if (containsV3Stuff)
                     {
                         // ERROR("Beatmap contains V3 stuff, not uploading");
-                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, ENCRYPT_STRING_AUTO_A(encoder, "<color=#fc8181>New note type not supported, not uploading</color>"));
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>New note type not supported, not uploading</color>");
                         uploading = false;
                         return;
                     }
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
                     std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
-                    std::string url = BASE_URL + ENCRYPT_STRING_AUTO_A(encoder, "/api/game/upload");
-                    std::string postData = ENCRYPT_STRING_AUTO_A(encoder, "data=") + uploadPacket;
+                    std::string url = BASE_URL + "/api/game/upload";
+                    std::string postData = "data=" + uploadPacket;
 
                     while (!done)
                     {
@@ -268,7 +267,7 @@ namespace ScoreSaber::Services::UploadService
 
         std::string uploadData = data.serialize();
 
-        std::string key = md5(ENCRYPT_STRING_AUTO_A(encoder, "f0b4a81c9bd3ded1081b365f7628781f-") + ScoreSaber::Services::PlayerService::playerInfo.playerKey + "-" + playerId + ENCRYPT_STRING_AUTO_A(encoder, "-f0b4a81c9bd3ded1081b365f7628781f"));
+        std::string key = md5("f0b4a81c9bd3ded1081b365f7628781f-" + ScoreSaber::Services::PlayerService::playerInfo.playerKey + "-" + playerId + "-f0b4a81c9bd3ded1081b365f7628781f");
 
         std::vector<unsigned char> keyBytes(key.begin(), key.end());
         std::vector<unsigned char> uploadDataBytes(uploadData.begin(), uploadData.end());
@@ -283,71 +282,71 @@ namespace ScoreSaber::Services::UploadService
         std::vector<std::string> results;
         if (gameplayModifiers->energyType == GameplayModifiers::EnergyType::Battery)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "BE"));
+            results.push_back("BE");
         }
         if (gameplayModifiers->noFailOn0Energy && energy == 0)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NF"));
+            results.push_back("NF");
         }
         if (gameplayModifiers->noFailOn0Energy && energy == -1)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NF"));
+            results.push_back("NF");
         }
         if (gameplayModifiers->instaFail)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "IF"));
+            results.push_back("IF");
         }
         if (gameplayModifiers->failOnSaberClash)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SC"));
+            results.push_back("SC");
         }
         if (gameplayModifiers->enabledObstacleType == GameplayModifiers::EnabledObstacleType::NoObstacles)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NO"));
+            results.push_back("NO");
         }
         if (gameplayModifiers->noBombs)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NB"));
+            results.push_back("NB");
         }
         if (gameplayModifiers->strictAngles)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SA"));
+            results.push_back("SA");
         }
         if (gameplayModifiers->disappearingArrows)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "DA"));
+            results.push_back("DA");
         }
         if (gameplayModifiers->ghostNotes)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "GN"));
+            results.push_back("GN");
         }
         if (gameplayModifiers->songSpeed == GameplayModifiers::SongSpeed::Slower)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SS"));
+            results.push_back("SS");
         }
         if (gameplayModifiers->songSpeed == GameplayModifiers::SongSpeed::Faster)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "FS"));
+            results.push_back("FS");
         }
         if (gameplayModifiers->songSpeed == GameplayModifiers::SongSpeed::SuperFast)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SF"));
+            results.push_back("SF");
         }
         if (gameplayModifiers->smallCubes)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SC"));
+            results.push_back("SC");
         }
         if (gameplayModifiers->strictAngles)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "SA"));
+            results.push_back("SA");
         }
         if (gameplayModifiers->proMode)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "PM"));
+            results.push_back("PM");
         }
         if (gameplayModifiers->noArrows)
         {
-            results.push_back(ENCRYPT_STRING_AUTO_A(encoder, "NA"));
+            results.push_back("NA");
         }
         return results;
     }
