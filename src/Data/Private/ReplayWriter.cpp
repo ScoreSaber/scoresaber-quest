@@ -1,9 +1,6 @@
 #include "Data/Private/ReplayWriter.hpp"
 
-extern "C"
-{
-#include "Utils/lzma/simple.h"
-}
+#include "Utils/lzma/lzma.hpp"
 
 #include <codecvt>
 #include <locale>
@@ -26,8 +23,6 @@ namespace ScoreSaber::Data::Private::ReplayWriter
 
         // Open tmp replay file
         ofstream outputStream = ofstream(tmpFilePath, ios::binary);
-        std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
-        outputStream.imbue(utf8_locale);
 
         int pointerLocation = outputStream.tellp();
         for (int i = 0; i < _pointerSize; i += 4)
@@ -82,22 +77,14 @@ namespace ScoreSaber::Data::Private::ReplayWriter
 
         // Delete tmp replay file
         unlink(tmpFilePath.c_str());
-
-        // Compress replay file
-        unsigned char* compressed;
-        size_t sz;
-        int result = simpleCompress(ELZMA_lzma, uncompressed, uncompressedSize, &compressed, &sz);
-        if (result == ELZMA_E_OK)
+        std::vector<unsigned char> compressed;
+        if (LZMA::lzmaCompress(uncompressedReplayBytes, compressed))
         {
             // If compression went okay, add file header to compressed replay and write to disk
 
             ofstream finalOutputStream = ofstream(tmpFilePath, ios::binary);
-            std::locale utf8_locale(std::locale(), new codecvt_utf8<char16_t>);
-            finalOutputStream.imbue(utf8_locale);
             WriteRawString("ScoreSaber Replay 👌🤠\r\n", finalOutputStream);
-            finalOutputStream.write(reinterpret_cast<char*>(compressed), sz);
-            finalOutputStream.flush();
-            finalOutputStream.close();
+            finalOutputStream.write(reinterpret_cast<char*>(compressed.data()), compressed.size());
             return tmpFilePath;
         }
         return "-1";
