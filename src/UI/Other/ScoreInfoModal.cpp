@@ -34,6 +34,7 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "static.hpp"
 #include <map>
+#include <sstream>
 
 DEFINE_TYPE(ScoreSaber::UI::Other, ScoreInfoModal);
 
@@ -149,51 +150,49 @@ std::string GetDate(std::string date)
     constexpr const unsigned int secondsInDay = 86400;
     constexpr const unsigned int secondsInHour = 3600;
     constexpr const unsigned int secondsInMinute = 60;
-    int year = floor(seconds / secondsInYear);
-    times.push_back({"Year", year});
+    int year = seconds / secondsInYear;
+    if (year)
+        times.push_back({"year", year});
     int yRemain = seconds % secondsInYear;
 
-    int month = floor(yRemain / (daysInMo * secondsInDay));
-    times.push_back({"Month", month});
+    int month = yRemain / (daysInMo * secondsInDay);
+    if (month)
+        times.push_back({"month", month});
     int mRemain = yRemain % (daysInMo * secondsInDay);
 
-    int week = floor(mRemain / secondsInWeek);
-    times.push_back({"Week", week});
+    int week = mRemain / secondsInWeek;
+    if (week)
+        times.push_back({"week", week});
     int wRemain = mRemain % secondsInWeek;
 
-    int day = floor(wRemain / secondsInDay);
-    times.push_back({"Day", day});
+    int day = wRemain / secondsInDay;
+    if (day)
+        times.push_back({"day", day});
     int dRemain = wRemain % secondsInDay;
 
-    int hour = floor(dRemain / secondsInHour);
-    times.push_back({"Hour", hour});
+    int hour = dRemain / secondsInHour;
+    if (hour)
+        times.push_back({"hour", hour});
     int hRemain = dRemain % secondsInHour;
 
-    int minute = floor(hRemain / secondsInMinute);
-    times.push_back({"Minute", minute});
+    int minute = hRemain / secondsInMinute;
+    if (minute)
+        times.push_back({"minute", minute});
 
-    int second = floor(hRemain % secondsInMinute);
-    times.push_back({"Second", second});
+    int second = hRemain % secondsInMinute;
+    times.push_back({"second", second});
 
-    std::string s;
+    stringstream s;
 
-    for (std::pair<std::string, int> pair : times)
+    for (size_t i = 0; i < min<size_t>(2, times.size()); ++i)
     {
-        if (pair.second > 0)
-        {
-            if (s.length() == 0)
-            {
-                s = string_format("%s and ", GetUnit(pair.first, pair.second).c_str());
+        if (i > 0)
+            s << " and ";
+        s << GetUnit(times[i].first, times[i].second);
             }
-            else
-            {
-                s = string_format("%s%s ago", s.c_str(), GetUnit(pair.first, pair.second).c_str());
-                break;
-            }
-        }
-    }
+    s << " ago";
 
-    return s;
+    return s.str();
 }
 
 namespace ScoreSaber::UI::Other
