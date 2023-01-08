@@ -189,7 +189,7 @@ std::string GetDate(std::string date)
         if (i > 0)
             s << " and ";
         s << GetUnit(times[i].first, times[i].second);
-            }
+    }
     s << " ago";
 
     return s.str();
@@ -407,13 +407,14 @@ namespace ScoreSaber::UI::Other
         {
             if (enabled)
             {
-                replayImage->set_color({1.0f, 1.0f, 1.0f, 0.8f});
-                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 1.0f});
+                // setting color doesn't seem to do anything, so I swapped the highlight colors around so that change only happens if enabled
+                //replayImage->set_color({1.0f, 1.0f, 1.0f, 0.8f});
+                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 0.2f});
             }
             else
             {
-                replayImage->set_color({1.0f, 1.0f, 1.0f, 0.2f});
-                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 0.2f});
+                //replayImage->set_color({1.0f, 1.0f, 1.0f, 0.2f});
+                replayImage->set_highlightColor({1.0f, 1.0f, 1.0f, 1.0f});
             }
         }
     }
