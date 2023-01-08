@@ -106,7 +106,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _didResumeDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume);
         _gamePause->add_didResumeEvent(_didResumeDelegate);
 
-        // CreateWatermark();
+        CreateWatermark();
     }
 
     void ImberManager::MainImberPanelView_DidHandSwitchEvent(XR::XRNode hand)

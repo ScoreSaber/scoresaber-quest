@@ -11,7 +11,11 @@
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
     extern ScoreSaber::Data::Private::ReplayFile* LoadedReplay;
+    extern GlobalNamespace::IDifficultyBeatmap* CurrentLevel;
+    extern std::u16string CurrentPlayerName;
+    extern std::string CurrentModifiers;
     extern ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
+
     extern bool IsPlaying;
     void StartReplay(GlobalNamespace::IDifficultyBeatmap* beatmap);
     void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);

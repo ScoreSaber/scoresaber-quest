@@ -10,6 +10,7 @@
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include "ReplaySystem/Playback/ScorePlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
+#include "ReplaySystem/UI/GameReplayUI.hpp"
 #include "Zenject/ConcreteBinderGeneric_1.hpp"
 #include "Zenject/ConcreteIdBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -42,6 +43,7 @@ namespace ScoreSaber::ReplaySystem::Installers
             container->Bind<Playback::EnergyPlayer*>()->AsSingle();
             container->Bind<Playback::MultiplierPlayer*>()->AsSingle();
             container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
+            FromNewComponentOnNewGameObject(container->Bind<UI::GameReplayUI*>())->AsSingle()->NonLazy();
         }
     }
 } // namespace ScoreSaber::ReplaySystem::Installers

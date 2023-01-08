@@ -1,6 +1,7 @@
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ReplayReader.hpp"
+#include "Data/Score.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
@@ -31,6 +32,9 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     GlobalNamespace::MenuTransitionsHelper* menuTransitionsHelper;
 
     ScoreSaber::Data::Private::ReplayFile* LoadedReplay;
+    GlobalNamespace::IDifficultyBeatmap* CurrentLevel;
+    std::u16string CurrentPlayerName;
+    std::string CurrentModifiers;
     ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
 
     bool IsPlaying;
@@ -78,6 +82,10 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     {
         std::string tmpFilePath = ScoreSaber::Static::REPLAY_TMP_DIR + "/" + replayFileName + ".tmp";
         std::string localPath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
+
+        CurrentLevel = beatmap;
+        CurrentPlayerName = score.leaderboardPlayerInfo.name.value_or(u"unknown");
+        CurrentModifiers = score.modifiers;
 
         std::thread t([tmpFilePath, localPath, replayFileName, leaderboardId, score, finished] {
             if (fileexists(localPath))
