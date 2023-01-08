@@ -28,4 +28,5 @@ namespace ScoreSaber::Services::UploadService
     std::vector<std::string> GetModifierList(GlobalNamespace::GameplayModifiers* gameplayModifiers, float energy);
     std::vector<unsigned char> Swap(std::vector<unsigned char> panda1, std::vector<unsigned char> panda2);
     std::string ConvertToHex(const std::vector<unsigned char>& v);
+    std::string GetVersionHash();
 } // namespace ScoreSaber::Services::UploadService

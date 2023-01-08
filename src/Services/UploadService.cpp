@@ -15,6 +15,7 @@
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
+#include "UnityEngine/Application.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
@@ -260,7 +261,7 @@ namespace ScoreSaber::Services::UploadService
         auto modifiers = GetModifierList(gameplayModifiers, energy);
         int hmd = 32;
 
-        std::string infoHash = md5(readfile(ScoreSaber::Static::MOD_DIR + "/libscoresaber.so"));
+        std::string infoHash = GetVersionHash();
 
         ScoreSaberUploadData data(playerName, playerId, rawScore, levelHash, songName, songSubName, levelAuthorName, songAuthorName, bpm,
                                   difficulty, infoHash, modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, hmd);
@@ -385,5 +386,9 @@ namespace ScoreSaber::Services::UploadService
             buffer << std::setw(2) << static_cast<unsigned>(v[i]);
         }
         return buffer.str();
+    }
+
+    std::string GetVersionHash() {
+        return md5(std::string("Quest") + VERSION + (std::string)UnityEngine::Application::get_version());
     }
 } // namespace ScoreSaber::Services::UploadService
