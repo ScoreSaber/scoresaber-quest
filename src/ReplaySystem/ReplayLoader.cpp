@@ -90,7 +90,9 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         std::thread t([tmpFilePath, localPath, replayFileName, leaderboardId, score, finished] {
             if (fileexists(localPath))
             {
-                LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(localPath, replayFileName);
+                std::ifstream replayFile(localPath, ios::binary);
+                std::vector<char> replayData((std::istreambuf_iterator<char>(replayFile)), std::istreambuf_iterator<char>());
+                LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
                 if (LoadedReplay != nullptr)
                 {
                     finished(true);
@@ -103,10 +105,11 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
             else
             {
                 std::string url = string_format("%s/api/game/telemetry/downloadReplay?playerId=%s&leaderboardId=%d", ScoreSaber::Static::BASE_URL.c_str(), score.leaderboardPlayerInfo.id.value().c_str(), leaderboardId);
-                long response = WebUtils::DownloadFileSync(url, tmpFilePath, 64);
+                std::vector<char> replayData;
+                long response = WebUtils::DownloadReplaySync(url, replayData, 64);
                 if (response == 200)
                 {
-                    LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(tmpFilePath, replayFileName);
+                    LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
 
                     unlink(tmpFilePath.c_str());
                     if (LoadedReplay != nullptr)

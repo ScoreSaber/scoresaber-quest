@@ -1,32 +1,33 @@
 #include "Data/Private/ReplayFile.hpp"
 #include <fstream>
+#include <sstream>
 
 namespace ScoreSaber::Data::Private::ReplayWriter
 {
-    std::string Write(ReplayFile* file, std::string fileName);
-    int WriteMetadata(Metadata* metadata, ofstream& outputStream);
-    int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, ofstream& outputStream);
-    int WriteVRPose(VRPose vrPose, ofstream& outputStream);
-    int WriteHeightEvent(HeightEvent heightEvent, ofstream& outputStream);
-    int WriteNoteEvent(NoteEvent noteEvent, ofstream& outputStream);
-    int WriteNoteID(NoteID noteID, ofstream& outputStream);
-    int WriteScoreEvent(ScoreEvent scoreEvent, ofstream& outputStream);
-    int WriteComboEvent(ComboEvent scoreEvent, ofstream& outputStream);
-    int WriteMultiplierEvent(MultiplierEvent multiplierEvent, ofstream& outputStream);
-    int WriteEnergyEvent(EnergyEvent energyEvent, ofstream& outputStream);
-    int WriteStringArray(vector<string> values, ofstream& outputStream);
-    int WriteVRPoseGroupList(vector<VRPoseGroup> values, ofstream& outputStream);
-    int WriteHeightChangeList(vector<HeightEvent> values, ofstream& outputStream);
-    int WriteNoteEventList(vector<NoteEvent> values, ofstream& outputStream);
-    int WriteScoreEventList(vector<ScoreEvent> values, ofstream& outputStream);
-    int WriteComboEventList(vector<ComboEvent> values, ofstream& outputStream);
-    int WriteMultiplierEventList(vector<MultiplierEvent> values, ofstream& outputStream);
-    int WriteEnergyEventList(vector<EnergyEvent> values, ofstream& outputStream);
-    int WriteString(string value, ofstream& outputStream);
-    int WriteRawString(string value, ofstream& outputStream);
-    int WriteInt(int value, ofstream& outputStream);
-    int WriteFloat(float value, ofstream& outputStream);
-    int WriteBool(bool value, ofstream& outputStream);
-    int WriteVRPosition(VRPosition position, ofstream& outputStream);
-    int WriteVRRotation(VRRotation rotation, ofstream& outputStream);
+    std::vector<char> Write(ReplayFile* file);
+    int WriteMetadata(Metadata* metadata, stringstream& outputStream);
+    int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, stringstream& outputStream);
+    int WriteVRPose(VRPose vrPose, stringstream& outputStream);
+    int WriteHeightEvent(HeightEvent heightEvent, stringstream& outputStream);
+    int WriteNoteEvent(NoteEvent noteEvent, stringstream& outputStream);
+    int WriteNoteID(NoteID noteID, stringstream& outputStream);
+    int WriteScoreEvent(ScoreEvent scoreEvent, stringstream& outputStream);
+    int WriteComboEvent(ComboEvent scoreEvent, stringstream& outputStream);
+    int WriteMultiplierEvent(MultiplierEvent multiplierEvent, stringstream& outputStream);
+    int WriteEnergyEvent(EnergyEvent energyEvent, stringstream& outputStream);
+    int WriteStringArray(vector<string> values, stringstream& outputStream);
+    int WriteVRPoseGroupList(vector<VRPoseGroup> values, stringstream& outputStream);
+    int WriteHeightChangeList(vector<HeightEvent> values, stringstream& outputStream);
+    int WriteNoteEventList(vector<NoteEvent> values, stringstream& outputStream);
+    int WriteScoreEventList(vector<ScoreEvent> values, stringstream& outputStream);
+    int WriteComboEventList(vector<ComboEvent> values, stringstream& outputStream);
+    int WriteMultiplierEventList(vector<MultiplierEvent> values, stringstream& outputStream);
+    int WriteEnergyEventList(vector<EnergyEvent> values, stringstream& outputStream);
+    int WriteString(string value, stringstream& outputStream);
+    int WriteRawString(string value, stringstream& outputStream);
+    int WriteInt(int value, stringstream& outputStream);
+    int WriteFloat(float value, stringstream& outputStream);
+    int WriteBool(bool value, stringstream& outputStream);
+    int WriteVRPosition(VRPosition position, stringstream& outputStream);
+    int WriteVRRotation(VRRotation rotation, stringstream& outputStream);
 } // namespace ScoreSaber::Data::Private::ReplayWriter

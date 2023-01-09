@@ -17,12 +17,9 @@ using namespace std;
 namespace ScoreSaber::Data::Private::ReplayWriter
 {
     int _pointerSize = 38;
-    std::string Write(ReplayFile* file, std::string fileName)
+    std::vector<char> Write(ReplayFile* file)
     {
-        std::string tmpFilePath = ScoreSaber::Static::REPLAY_TMP_DIR + "/" + fileName + ".tmp";
-
-        // Open tmp replay file
-        ofstream outputStream = ofstream(tmpFilePath, ios::binary);
+        stringstream outputStream;
 
         int pointerLocation = outputStream.tellp();
         for (int i = 0; i < _pointerSize; i += 4)
@@ -59,38 +56,19 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         WriteInt(multiplierEventsPointer, outputStream);
         WriteInt(energyEventsPointer, outputStream);
 
-        outputStream.flush();
-        outputStream.close();
-
-        // Read tmp replay file into memory
-        ifstream readStream(tmpFilePath, ios_base::in | ios::binary);
-        vector<unsigned char> uncompressedReplayBytes;
-        unsigned char currentChar = readStream.get();
-        while (readStream.good())
-        {
-            uncompressedReplayBytes.push_back(currentChar);
-            currentChar = readStream.get();
-        }
-
-        size_t uncompressedSize = uncompressedReplayBytes.size();
-        unsigned char* uncompressed = uncompressedReplayBytes.data();
-
-        // Delete tmp replay file
-        unlink(tmpFilePath.c_str());
-        std::vector<unsigned char> compressed;
+        outputStream.seekg(0);
+        vector<char> uncompressedReplayBytes((std::istreambuf_iterator<char>(outputStream)), std::istreambuf_iterator<char>());
+        std::vector<char> compressed;
         if (LZMA::lzmaCompress(uncompressedReplayBytes, compressed))
         {
-            // If compression went okay, add file header to compressed replay and write to disk
-
-            ofstream finalOutputStream = ofstream(tmpFilePath, ios::binary);
-            WriteRawString("ScoreSaber Replay 👌🤠\r\n", finalOutputStream);
-            finalOutputStream.write(reinterpret_cast<char*>(compressed.data()), compressed.size());
-            return tmpFilePath;
+            std::string magic = "ScoreSaber Replay 👌🤠\r\n";
+            compressed.insert(compressed.begin(), magic.begin(), magic.end());
+            return compressed;
         }
-        return "-1";
+        return {};
     }
 
-    int WriteMetadata(Metadata* metadata, ofstream& outputStream)
+    int WriteMetadata(Metadata* metadata, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteString(metadata->Version, outputStream);
@@ -108,7 +86,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, ofstream& outputStream)
+    int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteVRPose(vrPoseGroup.Head, outputStream);
@@ -119,7 +97,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteVRPose(VRPose vrPose, ofstream& outputStream)
+    int WriteVRPose(VRPose vrPose, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteVRPosition(vrPose.Position, outputStream);
@@ -127,7 +105,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteHeightEvent(HeightEvent heightEvent, ofstream& outputStream)
+    int WriteHeightEvent(HeightEvent heightEvent, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteFloat(heightEvent.Height, outputStream);
@@ -135,7 +113,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteNoteEvent(NoteEvent noteEvent, ofstream& outputStream)
+    int WriteNoteEvent(NoteEvent noteEvent, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteNoteID(noteEvent.TheNoteID, outputStream);
@@ -157,7 +135,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteNoteID(NoteID noteID, ofstream& outputStream)
+    int WriteNoteID(NoteID noteID, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteFloat(noteID.Time, outputStream);
@@ -168,7 +146,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteScoreEvent(ScoreEvent scoreEvent, ofstream& outputStream)
+    int WriteScoreEvent(ScoreEvent scoreEvent, stringstream& outputStream)
     {
 
         int bytesWritten = 0;
@@ -177,7 +155,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteComboEvent(ComboEvent scoreEvent, ofstream& outputStream)
+    int WriteComboEvent(ComboEvent scoreEvent, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(scoreEvent.Combo, outputStream);
@@ -185,7 +163,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteMultiplierEvent(MultiplierEvent multiplierEvent, ofstream& outputStream)
+    int WriteMultiplierEvent(MultiplierEvent multiplierEvent, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(multiplierEvent.Multiplier, outputStream);
@@ -194,7 +172,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteEnergyEvent(EnergyEvent energyEvent, ofstream& outputStream)
+    int WriteEnergyEvent(EnergyEvent energyEvent, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteFloat(energyEvent.Energy, outputStream);
@@ -203,7 +181,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
     }
 
     // Lists
-    int WriteStringArray(vector<string> values, ofstream& outputStream)
+    int WriteStringArray(vector<string> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -214,7 +192,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteVRPoseGroupList(vector<VRPoseGroup> values, ofstream& outputStream)
+    int WriteVRPoseGroupList(vector<VRPoseGroup> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -225,7 +203,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteHeightChangeList(vector<HeightEvent> values, ofstream& outputStream)
+    int WriteHeightChangeList(vector<HeightEvent> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -236,7 +214,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteNoteEventList(vector<NoteEvent> values, ofstream& outputStream)
+    int WriteNoteEventList(vector<NoteEvent> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -247,7 +225,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteScoreEventList(vector<ScoreEvent> values, ofstream& outputStream)
+    int WriteScoreEventList(vector<ScoreEvent> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -258,7 +236,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteComboEventList(vector<ComboEvent> values, ofstream& outputStream)
+    int WriteComboEventList(vector<ComboEvent> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -269,7 +247,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteMultiplierEventList(vector<MultiplierEvent> values, ofstream& outputStream)
+    int WriteMultiplierEventList(vector<MultiplierEvent> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -280,7 +258,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteEnergyEventList(vector<EnergyEvent> values, ofstream& outputStream)
+    int WriteEnergyEventList(vector<EnergyEvent> values, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteInt(values.size(), outputStream);
@@ -292,7 +270,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
     }
 
     // Primitives
-    int WriteString(string value, ofstream& outputStream)
+    int WriteString(string value, stringstream& outputStream)
     {
         int bytesWritten = 0;
         const char* cString = value.c_str();
@@ -304,7 +282,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteRawString(string value, ofstream& outputStream)
+    int WriteRawString(string value, stringstream& outputStream)
     {
         int bytesWritten = 0;
         const char* cString = value.c_str();
@@ -315,25 +293,25 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteInt(int value, ofstream& outputStream)
+    int WriteInt(int value, stringstream& outputStream)
     {
         outputStream.write(reinterpret_cast<const char*>(&value), sizeof(int));
         return 4;
     }
 
-    int WriteFloat(float value, ofstream& outputStream)
+    int WriteFloat(float value, stringstream& outputStream)
     {
         outputStream.write(reinterpret_cast<const char*>(&value), sizeof(float));
         return 4;
     }
 
-    int WriteBool(bool value, ofstream& outputStream)
+    int WriteBool(bool value, stringstream& outputStream)
     {
         outputStream.write(reinterpret_cast<const char*>(&value), sizeof(bool));
         return 1;
     }
 
-    int WriteVRPosition(VRPosition position, ofstream& outputStream)
+    int WriteVRPosition(VRPosition position, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteFloat(position.X, outputStream);
@@ -342,7 +320,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return bytesWritten;
     }
 
-    int WriteVRRotation(VRRotation rotation, ofstream& outputStream)
+    int WriteVRRotation(VRRotation rotation, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteFloat(rotation.X, outputStream);

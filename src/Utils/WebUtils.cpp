@@ -265,6 +265,24 @@ namespace WebUtils
         }
         return newLength;
     }
+    
+    std::size_t CurlWrite_CallbackFunc_VectorChar(void* contents, std::size_t size,
+                                                 std::size_t nmemb,
+                                                 std::vector<char>* v)
+    {
+        std::size_t newLength = size * nmemb;
+        try
+        {
+            v->insert(v->end(), (char*)contents, (char*)contents + newLength);
+        }
+        catch (std::bad_alloc& e)
+        {
+            // handle memory problem
+            getLogger().critical("Failed to allocate vector of size: %lu", newLength);
+            return 0;
+        }
+        return newLength;
+    }
 
     size_t hdf(char* b, size_t size, size_t nitems, void* userdata)
     {
@@ -407,7 +425,7 @@ namespace WebUtils
         t.detach();
     }
 
-    std::tuple<long, std::string> PostWithFileSync(std::string url, std::string filePath, std::string postData, long timeout)
+    std::tuple<long, std::string> PostWithReplaySync(std::string url, const std::vector<char> &replayData, std::string postData, long timeout)
     {
         std::string val;
         // Init curl
@@ -447,7 +465,8 @@ namespace WebUtils
         part = curl_mime_addpart(mime);
 
         curl_mime_name(part, "zr");
-        curl_mime_filedata(part, filePath.c_str());
+        curl_mime_data(part, replayData.data(), replayData.size());
+        curl_mime_filename(part, "zr.dat"); // DO NOT DELETE, otherwise the server will reject the replay
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
 
         // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
@@ -476,20 +495,19 @@ namespace WebUtils
         return std::make_tuple(httpCode, val);
     }
 
-    void PostWithFileAsync(std::string url, std::string filePath, std::string postData, long timeout, std::function<void(long, std::string)> finished)
+    // intentionally copy replayData so we don't accidentally access something in a thread-unsafe manner
+    void PostWithReplayAsync(std::string url, const std::vector<char> replayData, std::string postData, long timeout, std::function<void(long, std::string)> finished)
     {
         std::thread t(
-            [url, filePath, postData, timeout, finished] {
-                auto [responseCode, response] = PostWithFileSync(url, filePath, postData, timeout);
+            [url, replayData, postData, timeout, finished] {
+                auto [responseCode, response] = PostWithReplaySync(url, replayData, postData, timeout);
                 finished(responseCode, response);
             });
         t.detach();
     }
 
-    long DownloadFileSync(std::string url, std::string filePath, long timeout)
+    long DownloadReplaySync(std::string url, std::vector<char> &replayData, long timeout)
     {
-
-        FILE* val = fopen(filePath.c_str(), "wb");
         // Init curl
         auto* curl = curl_easy_init();
         struct curl_slist* headers = NULL;
@@ -512,14 +530,10 @@ namespace WebUtils
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
-                         DownloadFileCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_VectorChar);
 
         long httpCode(0);
-        if (val)
-        {
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, val);
-        }
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &replayData);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -533,19 +547,9 @@ namespace WebUtils
                                  curl_easy_strerror(res));
         }
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-        if (val)
-        {
-            fclose(val);
-        }
         curl_easy_cleanup(curl);
 
         return httpCode;
-    }
-
-    std::size_t DownloadFileCallback(void* ptr, size_t size, size_t nmemb, void* stream)
-    {
-        size_t written = fwrite(ptr, size, nmemb, (FILE*)stream);
-        return written;
     }
 
     std::vector<unsigned char> Swap(std::vector<unsigned char> panda1, std::vector<unsigned char> panda2)

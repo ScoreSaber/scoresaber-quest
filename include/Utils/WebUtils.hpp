@@ -23,8 +23,8 @@ namespace WebUtils
     /// @param finished the callback for when we're done downloading
     void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished);
 
-    std::tuple<long, std::string> PostWithFileSync(std::string url, std::string filePath, std::string postData, long timeout);
-    void PostWithFileAsync(std::string url, std::string filePath, std::string postData, long timeout, std::function<void(long, std::string)> finished);
+    std::tuple<long, std::string> PostWithReplaySync(std::string url, const std::vector<char> &replayData, std::string postData, long timeout);
+    void PostWithReplayAsync(std::string url, const std::vector<char> replayData, std::string postData, long timeout, std::function<void(long, std::string)> finished);
 
     /// @brief gets texture @ url and applies it to out->set_sprite() after downloading
     custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out);
@@ -32,7 +32,6 @@ namespace WebUtils
     custom_types::Helpers::Coroutine WaitForGifDownload(std::string url, HMUI::ImageView* out);
 
     // void DownloadFileAsync(std::string url, std::string filePath, long timeOut, const std::function<void(long)>& finished);
-    long DownloadFileSync(std::string url, std::string filePath, long timeOut);
-    std::size_t DownloadFileCallback(void* ptr, size_t size, size_t nmemb, void* stream);
+    long DownloadReplaySync(std::string url, std::vector<char> &replayData, long timeOut);
 
 } // namespace WebUtils

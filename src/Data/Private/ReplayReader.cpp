@@ -16,14 +16,14 @@ using namespace std;
 
 namespace ScoreSaber::Data::Private::ReplayReader
 {
-    ReplayFile* Read(std::string absolutePath, std::string fileName)
+    ReplayFile* Read(const vector<char> &replayData)
     {
-        std::string decompressedPath = DecompressReplay(absolutePath, fileName);
-        if (decompressedPath == "")
-        {
+        std::vector<char> decompressed;
+        if(!DecompressReplay(replayData, decompressed)) {
             return nullptr;
         }
-        ifstream inputStream = ifstream(decompressedPath, ios::binary);
+        stringstream inputStream;
+        inputStream.write(decompressed.data(), decompressed.size());
         Pointers pointers = ReadPointers(inputStream);
 
         ReplayFile* file = new ReplayFile(ReadMetadata(inputStream, pointers.metadata),
@@ -34,12 +34,10 @@ namespace ScoreSaber::Data::Private::ReplayReader
                                           ReadComboKeyframes(inputStream, pointers.comboKeyframes),
                                           ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
                                           ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
-
-        unlink(decompressedPath.c_str());
         return file;
     }
 
-    Pointers ReadPointers(ifstream& inputStream)
+    Pointers ReadPointers(stringstream& inputStream)
     {
         inputStream.seekg(0);
         return Pointers(ReadInt(inputStream), ReadInt(inputStream),
@@ -49,7 +47,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
                         ReadInt(inputStream));
     }
 
-    Metadata* ReadMetadata(ifstream& inputStream, int offset)
+    Metadata* ReadMetadata(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         return new Metadata(ReadString(inputStream), ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
@@ -57,7 +55,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
                             ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream));
     }
 
-    vector<VRPoseGroup> ReadPoseKeyframes(ifstream& inputStream, int offset)
+    vector<VRPoseGroup> ReadPoseKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -69,7 +67,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return poseKeyframes;
     }
 
-    vector<HeightEvent> ReadHeightKeyframes(ifstream& inputStream, int offset)
+    vector<HeightEvent> ReadHeightKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -81,7 +79,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return heightKeyframes;
     }
 
-    vector<NoteEvent> ReadNoteKeyframes(ifstream& inputStream, int offset)
+    vector<NoteEvent> ReadNoteKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -93,7 +91,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return noteKeyframes;
     }
 
-    vector<ScoreEvent> ReadScoreKeyframes(ifstream& inputStream, int offset)
+    vector<ScoreEvent> ReadScoreKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -105,7 +103,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return scoreKeyframes;
     }
 
-    vector<ComboEvent> ReadComboKeyframes(ifstream& inputStream, int offset)
+    vector<ComboEvent> ReadComboKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -117,7 +115,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return comboKeyframes;
     }
 
-    vector<MultiplierEvent> ReadMultiplierKeyframes(ifstream& inputStream, int offset)
+    vector<MultiplierEvent> ReadMultiplierKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -129,7 +127,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return multiplierKeyframes;
     }
 
-    vector<EnergyEvent> ReadEnergyKeyframes(ifstream& inputStream, int offset)
+    vector<EnergyEvent> ReadEnergyKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
         int count = ReadInt(inputStream);
@@ -141,34 +139,34 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return energyKeyframes;
     }
 
-    VRPosition ReadVRPosition(ifstream& inputStream)
+    VRPosition ReadVRPosition(stringstream& inputStream)
     {
         return VRPosition(ReadFloat(inputStream), ReadFloat(inputStream),
                           ReadFloat(inputStream));
     }
 
-    VRRotation ReadVRRotation(ifstream& inputStream)
+    VRRotation ReadVRRotation(stringstream& inputStream)
     {
         return VRRotation(ReadFloat(inputStream), ReadFloat(inputStream),
                           ReadFloat(inputStream), ReadFloat(inputStream));
     }
 
-    VRPoseGroup ReadVRPoseGroup(ifstream& inputStream)
+    VRPoseGroup ReadVRPoseGroup(stringstream& inputStream)
     {
         return VRPoseGroup(ReadVRPose(inputStream), ReadVRPose(inputStream), ReadVRPose(inputStream), ReadInt(inputStream), ReadFloat(inputStream));
     }
 
-    VRPose ReadVRPose(ifstream& inputStream)
+    VRPose ReadVRPose(stringstream& inputStream)
     {
         return VRPose(ReadVRPosition(inputStream), ReadVRRotation(inputStream));
     }
 
-    HeightEvent ReadHeightEvent(ifstream& inputStream)
+    HeightEvent ReadHeightEvent(stringstream& inputStream)
     {
         return HeightEvent(ReadFloat(inputStream), ReadFloat(inputStream));
     }
 
-    NoteEvent ReadNoteEvent(ifstream& inputStream)
+    NoteEvent ReadNoteEvent(stringstream& inputStream)
     {
         return NoteEvent(ReadNoteID(inputStream), (NoteEventType)ReadInt(inputStream), ReadVRPosition(inputStream), ReadVRPosition(inputStream),
                          ReadVRPosition(inputStream), ReadInt(inputStream), ReadBool(inputStream), ReadFloat(inputStream), ReadFloat(inputStream),
@@ -176,41 +174,41 @@ namespace ScoreSaber::Data::Private::ReplayReader
                          ReadFloat(inputStream), ReadFloat(inputStream), ReadFloat(inputStream));
     }
 
-    NoteID ReadNoteID(ifstream& inputStream)
+    NoteID ReadNoteID(stringstream& inputStream)
     {
         return NoteID(ReadFloat(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream));
     }
 
-    ScoreEvent ReadScoreEvent(ifstream& inputStream)
+    ScoreEvent ReadScoreEvent(stringstream& inputStream)
     {
         return ScoreEvent(ReadInt(inputStream), ReadFloat(inputStream));
     }
 
-    ComboEvent ReadComboEvent(ifstream& inputStream)
+    ComboEvent ReadComboEvent(stringstream& inputStream)
     {
         return ComboEvent(ReadInt(inputStream), ReadFloat(inputStream));
     }
 
-    MultiplierEvent ReadMultiplierEvent(ifstream& inputStream)
+    MultiplierEvent ReadMultiplierEvent(stringstream& inputStream)
     {
         return MultiplierEvent(ReadInt(inputStream), ReadFloat(inputStream), ReadFloat(inputStream));
     }
 
-    EnergyEvent ReadEnergyEvent(ifstream& inputStream)
+    EnergyEvent ReadEnergyEvent(stringstream& inputStream)
     {
         return EnergyEvent(ReadFloat(inputStream), ReadFloat(inputStream));
     }
 
     // Primitives
 
-    int ReadInt(ifstream& inputStream)
+    int ReadInt(stringstream& inputStream)
     {
         int value = 0;
         inputStream.read((char*)&value, sizeof(int));
         return value;
     }
 
-    std::string ReadString(ifstream& inputStream)
+    std::string ReadString(stringstream& inputStream)
     {
         size_t stringLength = (size_t)ReadInt(inputStream);
         std::string value;
@@ -219,7 +217,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return value;
     }
 
-    std::vector<string> ReadStringArray(ifstream& inputStream)
+    std::vector<string> ReadStringArray(stringstream& inputStream)
     {
         int length = ReadInt(inputStream);
         std::vector<string> value = std::vector<string>();
@@ -230,59 +228,31 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return value;
     }
 
-    float ReadFloat(ifstream& inputStream)
+    float ReadFloat(stringstream& inputStream)
     {
         float value = 0;
         inputStream.read((char*)&value, sizeof(float));
         return value;
     }
 
-    bool ReadBool(ifstream& inputStream)
+    bool ReadBool(stringstream& inputStream)
     {
         bool value = 0;
         inputStream.read((char*)&value, sizeof(bool));
         return value;
     }
 
-    std::string DecompressReplay(std::string absolutePath, std::string fileName)
+    bool DecompressReplay(const std::vector<char> &replay, std::vector<char> &decompressed)
     {
-        std::string tmpDecompressedPath = ScoreSaber::Static::REPLAY_TMP_DIR + "/" + fileName + ".decompressed.tmp";
-
-        // Read tmp replay file into memory
-        ifstream readStream(absolutePath, ios_base::in | ios::binary);
-        vector<unsigned char> compressedReplayBytes;
-        unsigned char currentChar = readStream.get();
-
-        int position = 0;
-        while (readStream.good())
-        {
-            if (position > 27)
-            {
-                compressedReplayBytes.push_back(currentChar);
-            }
-
-            currentChar = readStream.get();
-
-            if (position == 0)
-            {
-                if (currentChar == (char)93)
-                {
-                    // This is an old replay
-                    return "";
-                }
-            }
-
-            position++;
+        if(replay[0] == (char)93 && replay[1] == 0 && replay[2] == 0 && replay[3] == (char)128) {
+            ERROR("Can't load legacy replays");
+            return false; // legacy replay
         }
 
-        std::vector<unsigned char> uncompressed;
-        if (LZMA::lzmaDecompress(compressedReplayBytes, uncompressed))
-        {
-            ofstream tmpUncompressedOutputStream = ofstream(tmpDecompressedPath, ios::binary);
-            tmpUncompressedOutputStream.write(reinterpret_cast<char*>(uncompressed.data()), uncompressed.size());
-            return tmpDecompressedPath;
-        }
-        return "";
+        // remove magic bytes
+        vector<char> compressedReplayBytes(replay.begin() + 28, replay.end());
+
+        return LZMA::lzmaDecompress(compressedReplayBytes, decompressed);
     }
 
 } // namespace ScoreSaber::Data::Private::ReplayReader

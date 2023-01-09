@@ -148,7 +148,7 @@ namespace ScoreSaber::Services::UploadService
                     }
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-                    std::string serializedReplayPath = ScoreSaber::Data::Private::ReplayWriter::Write(replay, replayFileName);
+                    std::vector<char> serializedReplay = ScoreSaber::Data::Private::ReplayWriter::Write(replay);
                     std::string url = BASE_URL + "/api/game/upload";
                     std::string postData = "data=" + uploadPacket;
 
@@ -173,7 +173,7 @@ namespace ScoreSaber::Services::UploadService
                         else
                         {
                             //  INFO("Uploading ranked score...");
-                            auto [responseCode, response] = WebUtils::PostWithFileSync(url, serializedReplayPath, uploadPacket, 30000);
+                            auto [responseCode, response] = WebUtils::PostWithReplaySync(url, serializedReplay, uploadPacket, 30000);
                             if (responseCode == 200)
                             {
                                 // INFO("Score uploaded successfully");
@@ -210,7 +210,7 @@ namespace ScoreSaber::Services::UploadService
                         // Score uploaded successfully
                         // Save local replay
                         // INFO("Score uploaded");
-                        MoveReplay(serializedReplayPath, replayFileName);
+                        SaveReplay(serializedReplay, replayFileName);
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
                     }
 
@@ -228,13 +228,11 @@ namespace ScoreSaber::Services::UploadService
         t.detach();
     }
 
-    void MoveReplay(std::string replayPath, std::string replayFileName)
+    void SaveReplay(const std::vector<char> &replay, std::string replayFileName)
     {
-        std::string newFilePath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
-        if (std::rename(replayPath.c_str(), newFilePath.c_str()) != 0)
-        {
-            // ERROR("Failed to save local replay");
-        }
+        std::string filePath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
+        std::ofstream file(filePath, ios::binary);
+        file.write(replay.data(), replay.size());
     }
 
     std::string CreateScorePacket(GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, int rawScore,
