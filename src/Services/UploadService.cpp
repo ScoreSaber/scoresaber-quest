@@ -155,36 +155,18 @@ namespace ScoreSaber::Services::UploadService
                     while (!done)
                     {
                         uploading = true;
-                        if (!ranked)
+                        //  INFO("Uploading score...");
+                        auto [responseCode, response] = WebUtils::PostWithReplaySync(url, serializedReplay, uploadPacket, 30000);
+                        if (responseCode == 200)
                         {
-                            auto [responseCode, response] = WebUtils::PostSync(url, postData, 30000);
-                            if (responseCode == 200)
-                            {
-                                //  INFO("Score uploaded successfully");
-                                done = true;
-                            }
-                            if (responseCode == 403)
-                            {
-                                // INFO("Player banned, score didn't upload");
-                                done = true;
-                                failed = true;
-                            }
+                            // INFO("Score uploaded successfully");
+                            done = true;
                         }
-                        else
+                        if (responseCode == 403)
                         {
-                            //  INFO("Uploading ranked score...");
-                            auto [responseCode, response] = WebUtils::PostWithReplaySync(url, serializedReplay, uploadPacket, 30000);
-                            if (responseCode == 200)
-                            {
-                                // INFO("Score uploaded successfully");
-                                done = true;
-                            }
-                            if (responseCode == 403)
-                            {
-                                // INFO("Player banned, score didn't upload");
-                                done = true;
-                                failed = true;
-                            }
+                            // INFO("Player banned, score didn't upload");
+                            done = true;
+                            failed = true;
                         }
 
                         if (!done)
