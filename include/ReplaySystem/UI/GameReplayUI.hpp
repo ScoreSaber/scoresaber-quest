@@ -15,5 +15,4 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, GameReplayUI, UnityEngine::M
                       DECLARE_CTOR(ctor, GlobalNamespace::GameplayCoreSceneSetupData* gameplayCoreSceneSetupData);
                       void CreateReplayUI();
                       TMPro::TextMeshProUGUI* CreateText(UnityEngine::RectTransform* parent, StringW text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, float fontSize);
-                      std::string GetFriendlyDifficulty(GlobalNamespace::BeatmapDifficulty diff);
-                      std::string GetFriendlyModifiers(GlobalNamespace::GameplayModifiers* gameplayModifiers);)
+                      std::string GetFriendlyDifficulty(GlobalNamespace::BeatmapDifficulty diff);)
