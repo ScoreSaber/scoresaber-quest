@@ -141,14 +141,16 @@ MAKE_AUTO_HOOK_MATCH(GoodCutScoringElement_Init, &GoodCutScoringElement::Init, v
     }
 }
 
-MAKE_AUTO_HOOK_MATCH(PauseController_HandleHMDUnmounted, &PauseController::HandleHMDUnmounted, void, PauseController* self)
-{
-    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
-    {
-        return;
-    }
-    PauseController_HandleHMDUnmounted(self);
-}
+// TODO find a proper replacement for this hook. HandleHMDUnmounted has too little IL instructions to be hooked directly without breaking the PauseController
+// It is only called as a single callback though, so we could hijack the callback accordingly.
+//MAKE_AUTO_HOOK_MATCH(PauseController_HandleHMDUnmounted, &PauseController::HandleHMDUnmounted, void, PauseController* self)
+//{
+//    if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+//    {
+//        return;
+//    }
+//    PauseController_HandleHMDUnmounted(self);
+//}
 
 MAKE_AUTO_HOOK_MATCH(GameNoteController_HandleCut_Event, &GameNoteController::HandleCut,
                      void, GameNoteController* self, GlobalNamespace::Saber* saber, UnityEngine::Vector3 cutPoint, UnityEngine::Quaternion orientation, UnityEngine::Vector3 cutDirVec, bool allowBadCut)
