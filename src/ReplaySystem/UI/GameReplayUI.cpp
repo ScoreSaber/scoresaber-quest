@@ -50,7 +50,7 @@ namespace ScoreSaber::ReplaySystem::UI
             timeScale = ReplaySystem::ReplayLoader::LoadedReplay->noteKeyframes[0].TimeSyncTimescale;
         if (timeScale != 1.0f) {
             stringstream ss;
-            ss << std::fixed << std::setprecision(3) << " [" << timeScale * 100 << "]";
+            ss << std::setprecision(3) << " [" << timeScale * 100 << "%]";
             replayText += ss.str();
         }
         std::string friendlyMods = ReplaySystem::ReplayLoader::CurrentModifiers;
