@@ -20,6 +20,7 @@
 #include "Services/FileService.hpp"
 #include "System/Action_2.hpp"
 
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "logging.hpp"
 #include "static.hpp"
 #include <custom-types/shared/delegate.hpp>
@@ -76,6 +77,18 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                   playerData->colorSchemesSettings->GetSelectedColorScheme(), BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers),
                                                   playerSettings, nullptr, "Exit Replay", false, false, nullptr, replayEndDelegate, nullptr);
         IsPlaying = true;
+    }
+
+    void Load(const std::vector<char> &replayData, GlobalNamespace::IDifficultyBeatmap* beatmap, std::string modifiers, std::u16string playerName) {
+        CurrentLevel = beatmap;
+        CurrentPlayerName = playerName;
+        CurrentModifiers = modifiers;
+
+        LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
+
+        QuestUI::MainThreadScheduler::Schedule([=]() {
+            StartReplay(beatmap);
+        });
     }
 
     void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished)

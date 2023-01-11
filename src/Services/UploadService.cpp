@@ -14,6 +14,7 @@
 #include "Services/FileService.hpp"
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
+#include "Services/ReplayService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -40,47 +41,29 @@ namespace ScoreSaber::Services::UploadService
 {
     bool uploading;
 
+
+
     void Five(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupData,
               GlobalNamespace::LevelCompletionResults* levelCompletionResults)
     {
         PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
-        if (!practiceViewController->get_isInViewControllerHierarchy())
+        if (practiceViewController->get_isInViewControllerHierarchy())
         {
-            if (standardLevelScenesTransitionSetupData->gameMode == "Solo")
-            {
-                if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
-                {
-                    // We are in practice mode
-                    return;
-                }
-
-                if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None)
-                {
-                    // Write replay
-                    return;
-                }
-
-                if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared)
-                {
-                    if (levelCompletionResults->gameplayModifiers->noFailOn0Energy)
-                    {
-                        Six(standardLevelScenesTransitionSetupData->difficultyBeatmap, levelCompletionResults);
-                        return;
-                    }
-                    else
-                    {
-                        // Player failed level, write replay don't continue to upload phase
-                        return;
-                    }
-                }
-
-                // Continue to upload phase
-                Six(standardLevelScenesTransitionSetupData->difficultyBeatmap, levelCompletionResults);
-            }
+            ReplayService::WriteSerializedReplay();
+            return;
         }
-        else
+        if (standardLevelScenesTransitionSetupData->gameMode == "Solo")
         {
-            // We are in practice mode, still write the replay
+            ReplayService::WriteSerializedReplay();
+            if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
+                return;
+            if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None)
+                return;
+            if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared)
+                return;
+
+            // Continue to upload phase
+            Six(standardLevelScenesTransitionSetupData->difficultyBeatmap, levelCompletionResults);
         }
     }
 
@@ -130,7 +113,6 @@ namespace ScoreSaber::Services::UploadService
                         // ERROR("Failed to get leaderboards ranked status");
                     }
 
-                    ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
 
                     bool done = false;
                     bool failed = false;
@@ -148,7 +130,6 @@ namespace ScoreSaber::Services::UploadService
                     }
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-                    std::vector<char> serializedReplay = ScoreSaber::Data::Private::ReplayWriter::Write(replay);
                     std::string url = BASE_URL + "/api/game/upload";
                     std::string postData = "data=" + uploadPacket;
 
@@ -156,7 +137,7 @@ namespace ScoreSaber::Services::UploadService
                     {
                         uploading = true;
                         //  INFO("Uploading score...");
-                        auto [responseCode, response] = WebUtils::PostWithReplaySync(url, serializedReplay, uploadPacket, 30000);
+                        auto [responseCode, response] = WebUtils::PostWithReplaySync(url, ReplayService::CurrentSerializedReplay, uploadPacket, 30000);
                         if (responseCode == 200)
                         {
                             // INFO("Score uploaded successfully");
@@ -192,7 +173,7 @@ namespace ScoreSaber::Services::UploadService
                         // Score uploaded successfully
                         // Save local replay
                         // INFO("Score uploaded");
-                        SaveReplay(serializedReplay, replayFileName);
+                        SaveReplay(ReplayService::CurrentSerializedReplay, replayFileName);
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
                     }
 
