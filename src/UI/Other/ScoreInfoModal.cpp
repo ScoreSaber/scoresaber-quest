@@ -299,7 +299,6 @@ namespace ScoreSaber::UI::Other
         auto userImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), userSprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
         userImage->set_preserveAspect(true);
 
-        // No replay functionality. Button doesnt do anything
         auto replaySprite = Base64ToSprite(replay_base64);
         replayImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), replaySprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::PlayReplay, this));
         replayImage->set_preserveAspect(true);
