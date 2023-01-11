@@ -10,11 +10,14 @@
 
 #include "Data/Private/ReplayReader.hpp"
 #include "ReplaySystem/Installers/ImberInstaller.hpp"
+#include "ReplaySystem/Installers/MainInstaller.hpp"
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 #include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
 #include "Utils/TeamUtils.hpp"
+#include "bsml/shared/BSMLDataCache.hpp"
 #include "lapiz/shared/zenject/Zenjector.hpp"
+#include "assets.hpp"
 #include "static.hpp"
 
 ModInfo modInfo = {MOD_ID, VERSION};
@@ -58,7 +61,11 @@ extern "C" __attribute((visibility("default"))) void load()
     ScoreSaber::Services::FileService::EnsurePaths();
 
     auto zenjector = Lapiz::Zenject::Zenjector::Get();
-    //   zenjector->Install<TrickSaber::Installers::GameInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+    zenjector->Install<ScoreSaber::ReplaySystem::Installers::MainInstaller*>(Lapiz::Zenject::Location::Menu);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::ImberInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+}
+
+BSML_DATACACHE(replay_png) {
+    return IncludedAssets::replay_png;
 }

@@ -1,4 +1,5 @@
 #include "Utils/lzma/lzma.hpp"
+#include <mutex>
 
 namespace LZMA
 {
@@ -7,6 +8,7 @@ namespace LZMA
     
     std::vector<char> *output_data;
 
+    std::mutex lock; // lazy threadsafety
     
     SRes Read(const ISeqInStream *pp, void *buf, size_t *size)
     {
@@ -36,6 +38,8 @@ namespace LZMA
     }
 
     bool lzmaDecompress(const std::vector<char> &in, std::vector<char> &out) {
+        std::lock_guard<std::mutex> guard(lock);
+
         ISeqInStream instream;
         ISeqOutStream outstream;
         initialize_input(in, instream);
@@ -45,6 +49,8 @@ namespace LZMA
     }
 
     bool lzmaCompress(const std::vector<char> &in, std::vector<char> &out) {
+        std::lock_guard<std::mutex> guard(lock);
+        
         ISeqInStream instream;
         ISeqOutStream outstream;
         initialize_input(in, instream);
