@@ -7,21 +7,13 @@ env:
 on:
    push:
       tags:
-         - 'v*.*.*-bs-*.*.*'
+         - "v*"
 
 jobs:
    publish:
       runs-on: ubuntu-latest
 
       steps:
-         - name: Get Mod and game version from tag name
-           id: modversion
-           run: |
-              TEMP=$(echo "$GITHUB_REF_NAME" | grep -Po "(?<=v)\d+.\d+.\d+")
-              echo "VERSION=$TEMP" >> $GITHUB_ENV
-              TEMP=$(echo "$GITHUB_REF_NAME" | grep -Po "(?<=bs-)[.\d_]*")
-              echo "BS_VERSION=$TEMP" >> $GITHUB_ENV
-
          - uses: actions/checkout@v3
            name: Checkout
            with:
@@ -34,6 +26,7 @@ jobs:
            run: |
               echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
               cat ${GITHUB_WORKSPACE}/ndkpath.txt
+
          - name: Get QPM
            if: steps.cache-qpm.outputs.cache-hit != 'true'
            uses: dawidd6/action-download-artifact@v2
@@ -48,6 +41,7 @@ jobs:
            run: |
               chmod +x ./QPM/qpm-rust
               ./QPM/qpm-rust collapse
+
          - name: QPM Dependencies Cache
            id: cache-qpm-deps
            uses: actions/cache@v3
@@ -55,19 +49,16 @@ jobs:
               cache-name: cache-qpm-deps
            with:
               path: /home/runner/.local/share/QPM-Rust/cache
-              key: ${{ runner.os }}-build-${{ env.BS_VERSION }}-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
               restore-keys: |
-                 ${{ runner.os }}-build-${{ env.BS_VERSION }}-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
                  ${{ runner.os }}-build-
                  ${{ runner.os }}-
+
          - name: QPM Restore
            run: |
-              chmod +x ./QPM/qpm-rust
               ./QPM/qpm-rust restore
-         - name: QPM Legacy fix
-           run: |
-              chmod +x ./QPM/qpm-rust
-              ./QPM/qpm-rust cache legacy-fix
+
          - name: List Post Restore
            run: |
               echo includes:
@@ -77,19 +68,60 @@ jobs:
               echo cache:
               ls -la $HOME/.local/share/QPM-Rust/cache
 
+         - name: QPM Legacy fix
+           run: |
+              ./QPM/qpm-rust cache legacy-fix
+
+         - name: Get Tag Version
+           id: get_tag_version
+           run: |
+              echo ${GITHUB_REF#refs/tags/}
+              echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+              echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+
          - name: QPM Edit Version
            run: |
-              ./QPM/qpm-rust package edit --version "${{ env.VERSION }}"
+              ./QPM/qpm-rust package edit --version "${{ steps.get_tag_version.outputs.VERSION }}"
 
          - name: Build
            run: |
               cd ${GITHUB_WORKSPACE}
-              pwsh -Command ./build.ps1
               ./QPM/qpm-rust qmod build
+              pwsh -Command ./build.ps1
 
          - name: Create Qmod
            run: |
               pwsh -Command ./createqmod.ps1 ${{env.qmodName}}
+
+         # Commit the change to the package
+         - name: Configure commit
+           run: |
+              git config user.name "Github Actions"
+              git config user.email "<>"
+
+         - name: Commit Edit Version
+           run: |
+              git add ./qpm.json
+              git commit -m "Update Version and post restore" --allow-empty
+
+         # Then, we want to use the commit we have just made, and force push our tag to that commit
+         - name: Get Commit ID
+           id: get_commit_id
+           run: |
+              echo `git rev-parse HEAD`
+              echo ::set-output name=ID::`git rev-parse HEAD`
+
+         - name: Force create tag
+           run: |
+              git tag --force ${{ steps.get_tag_version.outputs.TAG }} ${{ steps.get_commit_id.outputs.ID }}
+
+         # Then, push and upload our artifacts
+         - name: Create and push version specific branch
+           env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           run: |
+              git branch version-${{ steps.get_tag_version.outputs.TAG }}
+              git push -u origin version-${{ steps.get_tag_version.outputs.TAG }} --force --tags
 
          - name: Get Library Name
            id: libname
@@ -97,12 +129,12 @@ jobs:
               cd ./build/
               pattern="lib${module_id}*.so"
               files=( $pattern )
-              echo "LIBNAME=${files[0]}" >> $GITHUB_ENV
+              echo ::set-output name=NAME::"${files[0]}"
 
          - name: Release
            uses: softprops/action-gh-release@v1
-           if: startsWith(github.ref, 'refs/tags/')
            with:
+              body: "**DO NOT USE THIS DOWNLOAD IF YOU WANT TO RUN SCORESABER ON YOUR QUEST! IT WILL NOT AUTHENTICATE PROPERLY!**\nDownload it from https://scoresaber.com/quest instead!"
               files: |
                  ./${{ env.qmodName }}.qmod
-                 ./build/${{ env.LIBNAME }}
+                 ./build/${{ steps.libname.outputs.NAME }}
