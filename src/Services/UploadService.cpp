@@ -11,6 +11,7 @@
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "GlobalNamespace/PracticeViewController.hpp"
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
+#include "ReplaySystem/ReplayLoader.hpp"
 #include "Services/FileService.hpp"
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
@@ -41,17 +42,27 @@ namespace ScoreSaber::Services::UploadService
 {
     bool uploading;
 
-
-
     void Five(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupData,
               GlobalNamespace::LevelCompletionResults* levelCompletionResults)
     {
+
+        if (StringUtils::GetEnv("disable_ss_upload") == "1")
+        {
+            return;
+        }
+
+        if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+        {
+            return;
+        }
+
         PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
         if (practiceViewController->get_isInViewControllerHierarchy())
         {
             ReplayService::WriteSerializedReplay();
             return;
         }
+
         if (standardLevelScenesTransitionSetupData->gameMode == "Solo")
         {
             ReplayService::WriteSerializedReplay();
@@ -112,7 +123,6 @@ namespace ScoreSaber::Services::UploadService
                     {
                         // ERROR("Failed to get leaderboards ranked status");
                     }
-
 
                     bool done = false;
                     bool failed = false;
@@ -191,7 +201,7 @@ namespace ScoreSaber::Services::UploadService
         t.detach();
     }
 
-    void SaveReplay(const std::vector<char> &replay, std::string replayFileName)
+    void SaveReplay(const std::vector<char>& replay, std::string replayFileName)
     {
         std::string filePath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
         std::ofstream file(filePath, ios::binary);
@@ -348,7 +358,8 @@ namespace ScoreSaber::Services::UploadService
         return buffer.str();
     }
 
-    std::string GetVersionHash() {
+    std::string GetVersionHash()
+    {
         return md5(std::string("Quest") + VERSION + (std::string)UnityEngine::Application::get_version());
     }
 } // namespace ScoreSaber::Services::UploadService

@@ -61,8 +61,6 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::Initialize()
     {
-        // TODO: Sub to events
-
         _mainImberPanelView->DidClickLoop = [&]() {
             MainImberPanelView_DidClickLoop();
         };
