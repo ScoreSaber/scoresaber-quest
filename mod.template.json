@@ -8,8 +8,8 @@
    "packageId": "com.beatgames.beatsaber",
    "packageVersion": "1.27.0_3631150051",
    "description": "Allows you to upload scores to an online leaderboard at https://scoresaber.com. Earn PP from ranked maps and compare scores with others.",
-   "modFiles": ["libscoresaber.so"],
-   "libraryFiles": ["libbeatsaber-hook_3_14_0.so"],
+   "modFiles": [],
+   "libraryFiles": [],
    "fileCopies": [
       {
          "name": "scoresaber_DO_NOT_SHARE.scary",
