@@ -9,7 +9,7 @@
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/Vector2.hpp"
 #include "VRUIControls/VRGraphicRaycaster.hpp"
-#include "bsml/shared/helpers/utilities.hpp"
+#include "bsml/shared/Helpers/utilities.hpp"
 #include "logging.hpp"
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
