@@ -1,11 +1,10 @@
 Param(
-    [String]$qmodname="",
-    [Parameter(Mandatory=$false)]
+    [String]$qmodname = "",
+    [Parameter(Mandatory = $false)]
     [Switch]$clean
 )
 
-if ($qmodName -eq "")
-{
+if ($qmodName -eq "") {
     echo "Give a proper qmod name and try again"
     exit
 }
@@ -15,76 +14,60 @@ $modJson = Get-Content $mod -Raw | ConvertFrom-Json
 $filelist = @($mod)
 
 $cover = "./" + $modJson.coverImage
-$fileList = @($mod)
-
-if ((-not ($cover -eq "./")) -and (Test-Path $cover))
-{
-    $fileList += ,$cover
+if ((-not ($cover -eq "./")) -and (Test-Path $cover)) { 
+    $filelist += , $cover
 }
 
-foreach ($mod in $modJson.modFiles)
-{
+foreach ($mod in $modJson.modFiles) {
     $path = "./build/" + $mod
-    if (-not (Test-Path $path))
-    {
+    if (-not (Test-Path $path)) {
         $path = "./extern/libs/" + $mod
     }
     $filelist += $path
 }
 
-foreach ($lib in $modJson.libraryFiles)
-{
-    $path = "./build/" + $lib
-    if (-not (Test-Path $path))
-    {
-        $path = "./extern/libs/" + $mod
+foreach ($lib in $modJson.libraryFiles) {
+    $path = "./extern/libs/" + $lib
+    if (-not (Test-Path $path)) {
+        $path = "./build/" + $lib
     }
     $filelist += $path
 }
 
-if (Test-Path "./ExtraFiles")
-{
+if (Test-Path "./ExtraFiles") {
     $extraFiles = @()
     $extraEntries = Get-ChildItem ./ExtraFiles/* -Recurse
 
-    foreach ($entry in $extraEntries)
-    {
+    foreach ($entry in $extraEntries) {
         $mode = $entry | Select -Expand Mode
-        if ($mode.Contains("d"))
-        {
+        if ($mode.Contains("d")) {
             continue
         }
 
         # if not a dir
-        if (-not $entry.Directory.Name.Contains("ExtraFiles"))
-        {
+        if (-not $entry.Directory.Name.Contains("ExtraFiles")) {
             $dir = $entry.Directory
             $folderPath = $dir.Name + "/" + $entry.Name
-            while (($dir.Directory) -and (-not $dir.Directory.Name.Contains("ExtraFiles")))
-            {
+            while (($dir.Directory) -and (-not $dir.Directory.Name.Contains("ExtraFiles"))) {
                 $folderPath = $dir.Directory.Name + "/" + $folderPath
             }
 
-            if ($folderPath.Contains("Icons")) 
-            {
+            if ($folderPath.Contains("Icons")) {
                 continue;
             }
-            $extraFiles += ,$folderPath
+            $extraFiles += , $folderPath
         }
-        else
-        {
-            $extraFiles += ,$entry.Name
+        else {
+            $extraFiles += , $entry.Name
         }
     }
 
-    foreach ($file in $extraFiles)
-    {
+    foreach ($file in $extraFiles) {
         $path = "./ExtraFiles/" + $file
-        $filelist += ,$path
+        $filelist += , $path
     } 
 }
-else
-{
+else {
     echo "No ExtraFiles Directory Found"
 }
 
@@ -95,8 +78,7 @@ if ($clean.IsPresent) {
     echo "Making Clean Qmod"
 }
 
-if ((-not ($clean.IsPresent)) -and (Test-Path $qmod))
-{
+if ((-not ($clean.IsPresent)) -and (Test-Path $qmod)) {
     Move-Item $qmod $zip -Force
 }
 
