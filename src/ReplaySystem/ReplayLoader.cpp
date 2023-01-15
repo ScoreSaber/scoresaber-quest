@@ -93,14 +93,13 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
 
     void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished)
     {
-        std::string tmpFilePath = ScoreSaber::Static::REPLAY_TMP_DIR + "/" + replayFileName + ".tmp";
         std::string localPath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
 
         CurrentLevel = beatmap;
         CurrentPlayerName = score.leaderboardPlayerInfo.name.value_or(u"unknown");
         CurrentModifiers = score.modifiers;
 
-        std::thread t([tmpFilePath, localPath, replayFileName, leaderboardId, score, finished] {
+        std::thread t([localPath, replayFileName, leaderboardId, score, finished] {
             if (fileexists(localPath))
             {
                 std::ifstream replayFile(localPath, ios::binary);
@@ -123,8 +122,6 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                 if (response == 200)
                 {
                     LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
-
-                    unlink(tmpFilePath.c_str());
                     if (LoadedReplay != nullptr)
                     {
                         finished(true);
