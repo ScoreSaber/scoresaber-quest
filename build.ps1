@@ -19,14 +19,7 @@ if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
     $out = new-item -Path build -ItemType Directory
 }
 
-$buildType = "Debug"
-if ($release.IsPresent) {
-    $buildType = "RelWithDebInfo"
-}
+& cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" -B ./build .
+& cmake --build ./build
 
-cd build
-& cmake -G "Ninja" -DCMAKE_BUILD_TYPE="$buildType" ../
-& cmake --build .
-$ExitCode = $LastExitCode
-cd ..
 exit $ExitCode
