@@ -21,7 +21,7 @@ namespace ScoreSaber::UI::FlowCoordinators
             faqViewController = CreateViewController<ScoreSaber::UI::ViewControllers::FAQViewController*>();
             teamViewController = CreateViewController<ScoreSaber::UI::ViewControllers::TeamViewController*>();
 
-            SetTitle(il2cpp_utils::newcsstr("ScoreSaber"), ViewController::AnimationType::Out);
+            SetTitle("ScoreSaber", ViewController::AnimationType::Out);
             set_showBackButton(true);
             ProvideInitialViewControllers(globalViewController, teamViewController, faqViewController, nullptr, nullptr);
         }

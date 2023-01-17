@@ -26,6 +26,7 @@
 #include "HMUI/SegmentedControl.hpp"
 #include "Services/UploadService.hpp"
 #include "System/Guid.hpp"
+#include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 
 #include "Data/Private/ReplayFile.hpp"
@@ -61,8 +62,10 @@ MAKE_AUTO_HOOK_MATCH(
     segmentedControl->SelectCellWithNumber(_lastScopeIndex);
 }
 
+// Soft restart
 MAKE_AUTO_HOOK_MATCH(MenuTransitionsHelper_RestartGame, &GlobalNamespace::MenuTransitionsHelper::RestartGame, void, GlobalNamespace::MenuTransitionsHelper* self, System::Action_1<Zenject::DiContainer*>* finishCallback)
 {
+    BeatmapUtils::playerDataModel = nullptr;
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::DidDeactivate();
     MenuTransitionsHelper_RestartGame(self, finishCallback);
 }

@@ -34,7 +34,7 @@ namespace StringUtils
         }
         else
         {
-            levelId = levelId->Replace("custom_level_", Il2CppString::_get_Empty());
+            levelId = levelId->Replace("custom_level_", std::string());
             return levelId;
         }
     }
@@ -286,7 +286,9 @@ namespace StringUtils
     {
         size_t start_pos = str.find(from);
         if (start_pos == std::string::npos)
+        {
             return false;
+        }
         str.replace(start_pos, from.length(), to);
         return true;
     }

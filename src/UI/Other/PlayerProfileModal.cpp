@@ -51,7 +51,7 @@ namespace ScoreSaber::UI::Other
         if (playerId == "")
             co_return;
         std::string url = string_format("%s/api/player/%s/full", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
-        UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(url));
+        UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
         if (!webRequest->get_isNetworkError())
         {
@@ -116,7 +116,7 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(headerHorizon, 90, -1);
 
         auto bg = headerHorizon->get_gameObject()->AddComponent<Backgroundable*>();
-        bg->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
+        bg->ApplyBackgroundWithAlpha("title-gradient", 1.0f);
 
         auto bgImage = bg->get_gameObject()->GetComponentInChildren<ImageView*>();
         bgImage->gradient = false;
@@ -196,7 +196,7 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::OpenPlayerUrl()
     {
-        Application::OpenURL(il2cpp_utils::newcsstr(string_format("https://scoresaber.com/u/%s", playerId.c_str())));
+        Application::OpenURL(string_format("https://scoresaber.com/u/%s", playerId.c_str()));
     }
 
     void PlayerProfileModal::ClearBadges()
@@ -243,27 +243,27 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::set_header(std::u16string_view header)
     {
-        headerText->set_text(il2cpp_utils::newcsstr(u"<i>" + std::u16string(header) + u"</i>"));
+        headerText->set_text(u"<i>" + std::u16string(header) + u"</i>");
     }
 
     void PlayerProfileModal::set_globalRanking(int globalRanking)
     {
-        this->globalRanking->set_text(il2cpp_utils::newcsstr(string_format("<i>#%d</i>", globalRanking)));
+        this->globalRanking->set_text(string_format("<i>#%d</i>", globalRanking));
     }
 
     void PlayerProfileModal::set_performancePoints(float performancePoints)
     {
-        this->performancePoints->set_text(il2cpp_utils::newcsstr(string_format("<i><color=#6772E5>%.2fpp</color></i>", performancePoints)));
+        this->performancePoints->set_text(string_format("<i><color=#6772E5>%.2fpp</color></i>", performancePoints));
     }
 
     void PlayerProfileModal::set_averageRankedAccuracy(float averageRankedAccuracy)
     {
-        this->averageRankedAccuracy->set_text(il2cpp_utils::newcsstr(string_format("<i>%.2f</i>", averageRankedAccuracy)));
+        this->averageRankedAccuracy->set_text(string_format("<i>%.2f</i>", averageRankedAccuracy));
     }
 
     void PlayerProfileModal::set_totalScore(long totalScore)
     {
-        this->totalScore->set_text(il2cpp_utils::newcsstr(string_format("<i>%ld</i>", totalScore)));
+        this->totalScore->set_text(string_format("<i>%ld</i>", totalScore));
     }
 
     void PlayerProfileModal::stopProfileRoutine()

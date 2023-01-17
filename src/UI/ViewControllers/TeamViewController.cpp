@@ -63,7 +63,7 @@ namespace ScoreSaber::UI::ViewControllers
             headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
             headerText->set_fontSize(7.0f);
             auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
-            headerBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
+            headerBG->ApplyBackgroundWithAlpha("round-rect-panel", 0.5f);
 
             auto segmentedHorizontal = CreateHorizontalLayoutGroup(get_transform());
             SetPreferredSize(segmentedHorizontal, 80.0f, 6.0f);
@@ -107,7 +107,9 @@ namespace ScoreSaber::UI::ViewControllers
             auto theTab = creditTabs->values[i];
             // disable the ones that are not this one, and enable the one that is this one
             if (theTab)
+            {
                 theTab->SetActive(i == idx);
+            }
         }
     }
 
@@ -121,7 +123,7 @@ namespace ScoreSaber::UI::ViewControllers
         rootTab->set_childForceExpandWidth(true);
         rootTab->set_childControlWidth(true);
         auto rootBG = rootTab->get_gameObject()->AddComponent<Backgroundable*>();
-        rootBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 1.0f);
+        rootBG->ApplyBackgroundWithAlpha("round-rect-panel", 1.0f);
 
         UnityEngine::GameObject* scrollViewGO = BeatSaberUI::CreateScrollView(rootTab->get_transform());
         auto externalComponents = scrollViewGO->GetComponent<ExternalComponents*>();

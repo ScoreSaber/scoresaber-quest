@@ -49,8 +49,7 @@ custom_types::Helpers::Coroutine Update(ImageButton* self)
             for (int i = 0; i < images->Length(); i++)
             {
                 HMUI::ImageView* image = images->get(i);
-                image->set_color(UnityEngine::Color(self->r * 0.6, self->g * 0.8f,
-                                                    self->b * 1.0f, 1.0f));
+                image->set_color(UnityEngine::Color(self->r * 0.6, self->g * 0.8f, self->b * 1.0f, 1.0f));
             }
         }
         else
@@ -75,13 +74,11 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
 {
     if (anchoredPosition != Vector2(0.0f, 0.0f))
     {
-        button = QuestUI::BeatSaberUI::CreateUIButton(
-            parent, "", "SettingsButton", anchoredPosition, sizeDelta, onClick);
+        button = QuestUI::BeatSaberUI::CreateUIButton(parent, std::string(), "SettingsButton", anchoredPosition, sizeDelta, onClick);
     }
     else
     {
-        button = QuestUI::BeatSaberUI::CreateUIButton(parent, "", "SettingsButton",
-                                                      onClick);
+        button = QuestUI::BeatSaberUI::CreateUIButton(parent, std::string(), "SettingsButton", onClick);
     }
     BeatSaberUI::SetButtonSprites(button, sprite, sprite);
     button->get_gameObject()->AddComponent<Collider*>();
@@ -105,6 +102,5 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
         this->a = img->get_color().a;
     }
 
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-        custom_types::Helpers::CoroutineHelper::New(Update(this)));
+    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Update(this)));
 }

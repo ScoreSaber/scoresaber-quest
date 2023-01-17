@@ -265,10 +265,10 @@ namespace WebUtils
         }
         return newLength;
     }
-    
+
     std::size_t CurlWrite_CallbackFunc_VectorChar(void* contents, std::size_t size,
-                                                 std::size_t nmemb,
-                                                 std::vector<char>* v)
+                                                  std::size_t nmemb,
+                                                  std::vector<char>* v)
     {
         std::size_t newLength = size * nmemb;
         try
@@ -425,7 +425,7 @@ namespace WebUtils
         t.detach();
     }
 
-    std::tuple<long, std::string> PostWithReplaySync(std::string url, const std::vector<char> &replayData, std::string postData, long timeout)
+    std::tuple<long, std::string> PostWithReplaySync(std::string url, const std::vector<char>& replayData, std::string postData, long timeout)
     {
         std::string val;
         // Init curl
@@ -506,7 +506,7 @@ namespace WebUtils
         t.detach();
     }
 
-    long DownloadReplaySync(std::string url, std::vector<char> &replayData, long timeout)
+    long DownloadReplaySync(std::string url, std::vector<char>& replayData, long timeout)
     {
         // Init curl
         auto* curl = curl_easy_init();
@@ -590,7 +590,7 @@ namespace WebUtils
 
     custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
     {
-        UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
+        UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
         auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
         auto texture = downloadHandlerTexture->get_texture();
@@ -601,7 +601,7 @@ namespace WebUtils
 
     custom_types::Helpers::Coroutine WaitForGifDownload(std::string url, HMUI::ImageView* out)
     {
-        UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(url));
+        UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
         auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->get_downloadHandler());
         auto gifDataArr = downloadHandler->GetData();

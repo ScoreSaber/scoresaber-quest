@@ -324,7 +324,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     void SetErrorState(LoadingControl* loadingControl, std::string errorText, bool showRefreshButton)
     {
         loadingControl->Hide();
-        loadingControl->ShowText(il2cpp_utils::newcsstr(errorText), showRefreshButton);
+        loadingControl->ShowText(errorText, showRefreshButton);
         SetPlayButtonState(true);
     }
 

@@ -63,7 +63,9 @@ std::string flag_url(std::string_view COUNTRY)
 {
     auto country = std::string(COUNTRY);
     for (auto& c : country)
+    {
         c = tolower(c);
+    }
     auto url = string_format("https://github.com/hampusborgos/country-flags/raw/main/png250px/%s.png", country.c_str());
     return url;
 }
@@ -88,7 +90,7 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
         }
     }
 
-    this->name->set_text(il2cpp_utils::newcsstr(player.name));
+    this->name->set_text(player.name);
 
     if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
@@ -118,8 +120,7 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     }
     else
     {
-        weeklyChange = histories[length - 8] -
-                       histories[length - 1];
+        weeklyChange = histories[length - 8] - histories[length - 1];
     }
 
     std::string result;
@@ -142,10 +143,9 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
 
 GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 {
-    static auto playerTableCellStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("GlobalLeaderboardTableCell");
     auto cellGO = UnityEngine::GameObject::New_ctor();
     auto playerCell = cellGO->AddComponent<GlobalLeaderboardTableCell*>();
-    cellGO->set_name(playerTableCellStr);
+    cellGO->set_name("GlobalLeaderboardTableCell");
 
     cellGO->AddComponent<HMUI::Touchable*>();
     playerCell->set_interactable(false);
@@ -153,8 +153,7 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     auto verticalLayoutGroup = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
         playerCell->get_transform());
 
-    auto layout = verticalLayoutGroup->get_gameObject()
-                      ->GetComponent<UnityEngine::UI::LayoutElement*>();
+    auto layout = verticalLayoutGroup->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
     layout->set_preferredHeight(11.0f);
     layout->set_preferredWidth(200.0f);
 
@@ -168,6 +167,7 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     playerCell->name = UIUtils::CreateClickableText(
         CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
         u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+
     playerCell->name->set_overflowMode(TextOverflowModes::Ellipsis);
     playerCell->name->set_alignment(TextAlignmentOptions::Left);
     playerCell->name->set_fontSize(5.0f);
@@ -176,11 +176,13 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
         CreateHost(t, {-18.0f, -2.0f}, {40.0f, 8.0f})->get_transform(),
         "#---", false,
         {0.0f, 0.0f});
+
     playerCell->rank->set_alignment(TextAlignmentOptions::Left);
 
     playerCell->pp = BeatSaberUI::CreateText(
         CreateHost(t, {27.0f, 0.0f}, {20.0f, 11.0f})->get_transform(),
         "---<color=#6872e5>pp</color>", false, {0.0f, 0.0f});
+
     playerCell->pp->set_fontSize(5.0f);
     playerCell->pp->set_overflowMode(TextOverflowModes::Ellipsis);
 
@@ -188,6 +190,7 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
         CreateHost(t, {19.42f, -1.65f}, {4.0f, 3.0f})->get_transform(),
         Base64ToSprite(country_base64), {0.0f, 0.0f},
         {4.0, 3.0f});
+
     playerCell->flag->set_preserveAspect(true);
 
     playerCell->country = BeatSaberUI::CreateText(
@@ -198,6 +201,7 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     playerCell->weekly = BeatSaberUI::CreateText(
         CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->get_transform(), "0", false,
         {0.0f, 0.0f});
+
     playerCell->weekly->set_alignment(TextAlignmentOptions::Right);
     playerCell->weekly->set_fontSize(5.0f);
 
@@ -207,14 +211,18 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 void GlobalLeaderboardTableCell::stopProfileRoutine()
 {
     if (profileRoutine)
+    {
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(profileRoutine);
+    }
     profileRoutine = nullptr;
 }
 
 void GlobalLeaderboardTableCell::stopFlagRoutine()
 {
     if (flagRoutine)
+    {
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(flagRoutine);
+    }
     flagRoutine = nullptr;
 }
 

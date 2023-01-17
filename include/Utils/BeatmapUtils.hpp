@@ -1,15 +1,18 @@
 #pragma once
 
 #include "GlobalNamespace/BeatmapData.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"
 #include "GlobalNamespace/GameplayModifiers.hpp"
+#include "GlobalNamespace/IDifficultyBeatmap.hpp"
+#include "GlobalNamespace/PlayerDataModel.hpp"
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+
 #include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/register.hpp"
 #include "custom-types/shared/types.hpp"
 
 namespace BeatmapUtils
 {
+    static GlobalNamespace::PlayerDataModel* playerDataModel;
     int getDiff(GlobalNamespace::IDifficultyBeatmap* beatmap);
     int getMaxScore(GlobalNamespace::IBeatmapDataBasicInfo* beatmapDataBasicInfo);
     std::tuple<GlobalNamespace::IBeatmapDataBasicInfo*, GlobalNamespace::IReadonlyBeatmapData*> getBeatmapData(GlobalNamespace::IDifficultyBeatmap* beatmap);

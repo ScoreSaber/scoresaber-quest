@@ -39,9 +39,8 @@ custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components
 {
     std::string url = self->get_leaderboardURL();
     UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
-    webRequest->SetRequestHeader(il2cpp_utils::newcsstr("Cookie"), il2cpp_utils::newcsstr(WebUtils::cookie));
-    co_yield reinterpret_cast<System::Collections::IEnumerator*>(
-        CRASH_UNLESS(webRequest->SendWebRequest()));
+    webRequest->SetRequestHeader("Cookie", WebUtils::cookie);
+    co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
     if (!webRequest->get_isNetworkError())
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document
@@ -61,7 +60,7 @@ namespace ScoreSaber::CustomTypes::Components
     void GlobalLeaderboardTableData::ctor()
     {
         page = 1;
-        reuseIdentifier = il2cpp_utils::newcsstr("CustomPlayerCellList");
+        reuseIdentifier = "CustomPlayerCellList";
         leaderboardType = Global;
     }
 
@@ -137,7 +136,9 @@ namespace ScoreSaber::CustomTypes::Components
     void GlobalLeaderboardTableData::StartRefresh()
     {
         if (isLoading)
+        {
             return;
+        }
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Refresh()));
     }
 

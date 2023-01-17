@@ -21,9 +21,6 @@ MAKE_AUTO_HOOK_MATCH(LeaderboardTableView_CellForIdx,
     LeaderboardTableCell* cell =
         reinterpret_cast<LeaderboardTableCell*>(tableCell);
 
-    static auto playerNameStr =
-        il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("PlayerName");
-
     cell->playerNameText->set_richText(true);
     cell->playerNameText->Rebuild(UnityEngine::UI::CanvasUpdate::PreRender);
 

@@ -80,7 +80,7 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(loadingVertical, 10, 10);
 
         bg = horizon->get_gameObject()->AddComponent<Backgroundable*>();
-        bg->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
+        bg->ApplyBackgroundWithAlpha("title-gradient", 1.0f);
 
         bgImage = bg->get_gameObject()->GetComponentInChildren<ImageView*>();
         bgImage->skew = 0.18f;
@@ -176,7 +176,7 @@ namespace ScoreSaber::UI::Other
     void Banner::OpenSongInBrowser()
     {
         auto songURL = string_format("https://scoresaber.com/leaderboard/%d", scoreboardId);
-        Application::OpenURL(il2cpp_utils::newcsstr(songURL));
+        Application::OpenURL(songURL);
     }
 
     void Banner::set_rainbow(bool value)
@@ -216,7 +216,7 @@ namespace ScoreSaber::UI::Other
         std::string status, bool showIndicator, float dismiss,
         std::function<void()> callback)
     {
-        this->promptText->SetText(il2cpp_utils::newcsstr(status));
+        this->promptText->SetText(status);
 
         std::string text = status;
 
@@ -232,7 +232,7 @@ namespace ScoreSaber::UI::Other
                 if (i % 4 != 0)
                 {
                     text = text + ".";
-                    promptText->SetText(il2cpp_utils::newcsstr(text));
+                    promptText->SetText(text);
                 }
                 else
                 {
@@ -240,14 +240,14 @@ namespace ScoreSaber::UI::Other
                     {
                         text.pop_back();
                     }
-                    promptText->SetText(il2cpp_utils::newcsstr(text));
+                    promptText->SetText(text);
                 }
             }
         }
 
         if (dismiss > 0)
         {
-            promptText->set_text(il2cpp_utils::newcsstr(""));
+            promptText->set_text(std::string());
         }
 
         if (callback)
@@ -260,13 +260,13 @@ namespace ScoreSaber::UI::Other
 
     void Banner::set_prompt(std::string text, int dismissTime)
     {
-        promptText->set_text(il2cpp_utils::newcsstr(text));
+        promptText->set_text(text);
         if (dismissTime != -1)
         {
             std::thread t([dismissTime, this] {
                 std::this_thread::sleep_for(std::chrono::seconds(dismissTime));
                 QuestUI::MainThreadScheduler::Schedule([=]() {
-                    this->promptText->set_text(il2cpp_utils::newcsstr(""));
+                    this->promptText->set_text(std::string());
                 });
             });
             t.detach();
@@ -300,13 +300,13 @@ namespace ScoreSaber::UI::Other
 
     void Banner::set_topText(std::u16string_view newText)
     {
-        topText->set_text(il2cpp_utils::newcsstr(u"<i>" + std::u16string(newText) + u"</i>"));
+        topText->set_text(u"<i>" + std::u16string(newText) + u"</i>");
         topText->get_gameObject()->SetActive(true);
     }
 
     void Banner::set_bottomText(std::u16string_view newText)
     {
-        bottomText->set_text(il2cpp_utils::newcsstr(u"<i>" + std::u16string(newText) + u"</i>"));
+        bottomText->set_text(u"<i>" + std::u16string(newText) + u"</i>");
         bottomText->get_gameObject()->SetActive(true);
     }
 } // namespace ScoreSaber::UI::Other

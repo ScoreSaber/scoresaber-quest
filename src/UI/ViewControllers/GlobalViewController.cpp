@@ -53,10 +53,6 @@ namespace ScoreSaber::UI::ViewControllers
     {
         if (firstActivation)
         {
-            std::string iconPath =
-                "/sdcard/ModData/com.beatgames.beatsaber/"
-                "Mods/ScoreSaber/Icons/";
-
             VerticalLayoutGroup* vertical = BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
             vertical->set_spacing(2.0f);
             vertical->set_childControlHeight(false);
@@ -77,10 +73,7 @@ namespace ScoreSaber::UI::ViewControllers
             textHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
             SetPreferredSize(textHorizontal, 80.0f, -1);
             textHorizontal->get_rectTransform()->set_sizeDelta(Vector2(-40.0f, 0.0f));
-            auto headerText = UIUtils::CreateClickableText(
-                textHorizontal->get_transform(), u"Global Leaderboards", Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f), []() {
-                    static auto rankURL = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("https://scoresaber.com/rankings");
-                    Application::OpenURL(rankURL); });
+            auto headerText = UIUtils::CreateClickableText(textHorizontal->get_transform(), u"Global Leaderboards", Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f), []() { Application::OpenURL("https://scoresaber.com/rankings"); });
 
             headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
             headerText->set_fontSize(7.0f);
@@ -93,7 +86,7 @@ namespace ScoreSaber::UI::ViewControllers
             textObject->set_alignment(TMPro::TextAlignmentOptions::Left);
 
             auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
-            headerBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
+            headerBG->ApplyBackgroundWithAlpha("round-rect-panel", 0.5f);
             auto headerImageView = headerBG->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>()->skew = 0.18f;
 
             HorizontalLayoutGroup* globalHost = BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
@@ -127,7 +120,7 @@ namespace ScoreSaber::UI::ViewControllers
             scoreScopesElement->set_preferredHeight(40.0f);
 
             Backgroundable* background = scoreScopes->get_gameObject()->AddComponent<Backgroundable*>();
-            background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 1.0f);
+            background->ApplyBackgroundWithAlpha("round-rect-panel", 1.0f);
 
             VerticalLayoutGroup* imagesGroup = BeatSaberUI::CreateVerticalLayoutGroup(scoreScopes->get_transform());
 
@@ -178,7 +171,7 @@ namespace ScoreSaber::UI::ViewControllers
             playersHost->set_padding(RectOffset::New_ctor(2, 2, 2, 2));
 
             Backgroundable* playersHostBg = playersHost->get_gameObject()->AddComponent<Backgroundable*>();
-            playersHostBg->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 1.0f);
+            playersHostBg->ApplyBackgroundWithAlpha("round-rect-panel", 1.0f);
 
             LayoutElement* playersHostElement = playersHost->GetComponent<LayoutElement*>();
             playersHostElement->set_preferredWidth(105.0f);
@@ -256,7 +249,7 @@ namespace ScoreSaber::UI::ViewControllers
             auto buttonHorizontal = CreateHorizontalLayoutGroup(textVertical->get_transform());
             auto dismiss = CreateUIButton(buttonHorizontal->get_transform(), "Dismiss", [&]() { moreInfoModal->Hide(true, nullptr); });
 
-            auto moreInfo = CreateUIButton(buttonHorizontal->get_transform(), "More Info", []() { Application::OpenURL(il2cpp_utils::newcsstr("http://bit.ly/2X8Anko")); });
+            auto moreInfo = CreateUIButton(buttonHorizontal->get_transform(), "More Info", []() { Application::OpenURL("http://bit.ly/2X8Anko"); });
         }
         moreInfoModal->Show(true, true, nullptr);
     }

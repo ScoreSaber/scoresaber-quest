@@ -44,14 +44,14 @@ using namespace QuestUI::BeatSaberUI;
     layout##identifier->set_preferredWidth(width);                                          \
     layout##identifier->set_preferredHeight(height)
 
-#define SocialButton(identifier)                                                                                                                                                                                     \
-    std::string str##identifier = member.get_##identifier();                                                                                                                                                         \
-    if (str##identifier != "")                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                \
-        auto identifier##_sprite = Base64ToSprite(identifier##_base64);                                                                                                                                              \
-        auto btn##identifier = CreateClickableImage(socialHorizontal->get_transform(), identifier##_sprite, {0, 0}, {0, 0}, [str##identifier]() { Application::OpenURL(il2cpp_utils::newcsstr(str##identifier)); }); \
-        SetPreferredSize(btn##identifier, 3, 3);                                                                                                                                                                     \
-        AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                                         \
+#define SocialButton(identifier)                                                                                                                                                             \
+    std::string str##identifier = member.get_##identifier();                                                                                                                                 \
+    if (str##identifier != "")                                                                                                                                                               \
+    {                                                                                                                                                                                        \
+        auto identifier##_sprite = Base64ToSprite(identifier##_base64);                                                                                                                      \
+        auto btn##identifier = CreateClickableImage(socialHorizontal->get_transform(), identifier##_sprite, {0, 0}, {0, 0}, [str##identifier]() { Application::OpenURL(str##identifier); }); \
+        SetPreferredSize(btn##identifier, 3, 3);                                                                                                                                             \
+        AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                 \
     }
 
 #define BeginCoroutine(method)                                               \
@@ -81,8 +81,7 @@ namespace UIUtils
 
     ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
     {
-        static auto name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("QuestUIText");
-        GameObject* gameObj = GameObject::New_ctor(name);
+        GameObject* gameObj = GameObject::New_ctor("QuestUIText");
         gameObj->SetActive(false);
 
         ScoreSaber::CustomTypes::Components::ClickableText* textMesh = gameObj->AddComponent<ScoreSaber::CustomTypes::Components::ClickableText*>();
@@ -90,9 +89,8 @@ namespace UIUtils
         rectTransform->SetParent(parent, false);
         textMesh->set_font(GetMainTextFont());
         textMesh->set_fontSharedMaterial(GetMainUIFontMaterial());
-        Il2CppString* text_cs = nullptr;
-        text_cs = il2cpp_utils::newcsstr(text);
-        textMesh->set_text(text_cs);
+
+        textMesh->set_text(text);
         textMesh->set_fontSize(4.0f);
         textMesh->set_color(UnityEngine::Color::get_white());
         textMesh->set_richText(true);
@@ -132,8 +130,7 @@ namespace UIUtils
     {
         auto original = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<GameObject*>(), [](auto el) { return to_utf8(csstrtostr(el->get_name())) == "LoadingIndicator"; });
         auto loadingIndicator = Object::Instantiate(original, parent, false);
-        static auto scoreSaberLoadingIndicator = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ScoreSaberLoadingIndicator");
-        loadingIndicator->set_name(scoreSaberLoadingIndicator);
+        loadingIndicator->set_name("ScoreSaberLoadingIndicator");
 
         loadingIndicator->AddComponent<LayoutElement*>();
         return loadingIndicator;
@@ -180,14 +177,15 @@ namespace UIUtils
     {
         auto image = CreateClickableImage(parent, sprite, anchoredPosition, sizeDelta);
         if (onClick)
+        {
             image->get_onPointerClickEvent() += [onClick](auto _) { onClick(); };
+        }
         return image;
     }
 
     ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
     {
-        static auto name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ScoreSaberClickableImage");
-        auto go = GameObject::New_ctor(name);
+        auto go = GameObject::New_ctor("ScoreSaberClickableImage");
 
         auto image = go->AddComponent<ScoreSaber::CustomTypes::Components::ClickableImage*>();
         auto mat_UINoGlow = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return to_utf8(csstrtostr(x->get_name())) == "UINoGlow"; });
@@ -224,16 +222,12 @@ namespace UIUtils
     {
         VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(parent);
         vertical->get_rectTransform()->set_anchoredPosition({0.0f, 45.0f});
-        HorizontalLayoutGroup* horizontal =
-            CreateHorizontalLayoutGroup(vertical->get_transform());
+        HorizontalLayoutGroup* horizontal = CreateHorizontalLayoutGroup(vertical->get_transform());
 
-        Backgroundable* background =
-            horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-        background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("panel-top"),
-                                             1.0f);
+        Backgroundable* background = horizontal->get_gameObject()->AddComponent<Backgroundable*>();
+        background->ApplyBackgroundWithAlpha("panel-top", 1.0f);
 
-        ImageView* imageView =
-            background->get_gameObject()->GetComponentInChildren<ImageView*>();
+        ImageView* imageView = background->get_gameObject()->GetComponentInChildren<ImageView*>();
         imageView->gradient = true;
         imageView->gradientDirection = 0;
         imageView->set_color(Color::get_white());

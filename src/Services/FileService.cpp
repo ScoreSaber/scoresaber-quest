@@ -10,15 +10,15 @@ namespace ScoreSaber::Services::FileService
     {
         if (!direxists(ScoreSaber::Static::DATA_DIR))
         {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(ScoreSaber::Static::DATA_DIR));
+            System::IO::Directory::CreateDirectory(ScoreSaber::Static::DATA_DIR);
         }
         if (!direxists(ScoreSaber::Static::REPLAY_DIR))
         {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(ScoreSaber::Static::REPLAY_DIR));
+            System::IO::Directory::CreateDirectory(ScoreSaber::Static::REPLAY_DIR);
         }
         if (!direxists(ScoreSaber::Static::REPLAY_TMP_DIR))
         {
-            System::IO::Directory::CreateDirectory(il2cpp_utils::newcsstr(ScoreSaber::Static::REPLAY_TMP_DIR));
+            System::IO::Directory::CreateDirectory(ScoreSaber::Static::REPLAY_TMP_DIR);
         }
     }
 

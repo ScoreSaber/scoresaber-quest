@@ -114,7 +114,7 @@ void PanelView::Show()
 
     Backgroundable* background =
         horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-    background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"),
+    background->ApplyBackgroundWithAlpha("title-gradient",
                                          1.0f);
 
     HMUI::ImageView* imageView =
@@ -170,7 +170,7 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
     std::string status, bool showIndicator, float dismiss,
     std::function<void()> callback)
 {
-    this->promptText->SetText(il2cpp_utils::newcsstr(status));
+    this->promptText->SetText(status);
 
     std::string text = status;
 
@@ -186,7 +186,7 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
             if (i % 4 != 0)
             {
                 text = text + ".";
-                promptText->SetText(il2cpp_utils::newcsstr(text));
+                promptText->SetText(text);
             }
             else
             {
@@ -194,12 +194,12 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
                 {
                     text.pop_back();
                 }
-                promptText->SetText(il2cpp_utils::newcsstr(text));
+                promptText->SetText(text);
             }
         }
     }
 
-    promptText->SetText(il2cpp_utils::newcsstr(""));
+    promptText->SetText(std::string());
 
     if (callback)
     {
