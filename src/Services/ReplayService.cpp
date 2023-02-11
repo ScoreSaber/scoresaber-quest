@@ -13,6 +13,7 @@ namespace ScoreSaber::Services::ReplayService
     {
         ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
         CurrentSerializedReplay = ScoreSaber::Data::Private::ReplayWriter::Write(replay);
+        delete replay;
         if (ReplaySerialized != nullptr)
             ReplaySerialized(CurrentSerializedReplay);
     }

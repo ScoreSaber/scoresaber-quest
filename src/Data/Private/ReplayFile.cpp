@@ -193,4 +193,8 @@ namespace ScoreSaber::Data::Private
     }
 
     ReplayFile::ReplayFile(){};
+
+    ReplayFile::~ReplayFile(){
+        delete metadata;
+    };
 } // namespace ScoreSaber::Data::Private

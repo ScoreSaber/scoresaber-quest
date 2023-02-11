@@ -176,6 +176,7 @@ namespace ScoreSaber::Data::Private
         ReplayFile(Metadata* metadata, vector<VRPoseGroup> poseKeyframes, vector<HeightEvent> heightKeyframes, vector<NoteEvent> noteKeyframes,
                    vector<ScoreEvent> scoreKeyframes, vector<ComboEvent> comboKeyframes, vector<MultiplierEvent> multiplierKeyframes,
                    vector<EnergyEvent> energyKeyframes);
+        ~ReplayFile();
         Metadata* metadata;
         vector<VRPoseGroup> poseKeyframes;
         vector<HeightEvent> heightKeyframes;
