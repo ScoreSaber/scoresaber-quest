@@ -7,38 +7,46 @@
 #include "UnityEngine/Time.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include <custom-types/shared/delegate.hpp>
+#include "custom-types/shared/delegate.hpp"
 #include <functional>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
-namespace ScoreSaber::ReplaySystem::Recorders::HeightEventRecorder
-{
-    AudioTimeSyncController* _audioTimeSyncController;
-    PlayerHeightDetector* _playerHeightDetector;
-    vector<HeightEvent> _heightKeyframes;
+DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, HeightEventRecorder);
 
-    void LevelStarted(PlayerHeightDetector* playerHeightDetector, AudioTimeSyncController* audioTimeSyncController)
+namespace ScoreSaber::ReplaySystem::Recorders
+{
+    void HeightEventRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, Zenject::DiContainer* container)
     {
-        _heightKeyframes.clear();
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
-        _playerHeightDetector = playerHeightDetector;
-        std::function<void(float)> fun = [&](float x) {
-            PlayerHeightDetector_playerHeightDidChangeEvent(x);
-        };
-        auto delegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), fun);
-        playerHeightDetector->add_playerHeightDidChangeEvent(delegate);
+        _playerHeightDetector = container->TryResolve<PlayerHeightDetector*>();
+    }
+    
+    void HeightEventRecorder::Initialize()
+    {
+        if(_playerHeightDetector != nullptr) {
+            playerHeightDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), (function<void(float)>)[&](float energy) {PlayerHeightDetector_playerHeightDidChangeEvent(energy);});
+            _playerHeightDetector->add_playerHeightDidChangeEvent(playerHeightDidChangeDelegate);
+        }
     }
 
-    void PlayerHeightDetector_playerHeightDidChangeEvent(float newHeight)
+    void HeightEventRecorder::Dispose()
+    {
+        if(_playerHeightDetector != nullptr && playerHeightDidChangeDelegate) {
+            _playerHeightDetector->remove_playerHeightDidChangeEvent(playerHeightDidChangeDelegate);
+        }
+    }
+
+    void HeightEventRecorder::PlayerHeightDetector_playerHeightDidChangeEvent(float newHeight)
     {
         _heightKeyframes.push_back(HeightEvent(newHeight, _audioTimeSyncController->songTime));
     }
 
-    vector<HeightEvent> Export()
+    vector<HeightEvent> HeightEventRecorder::Export()
     {
         return _heightKeyframes;
     }
-} // namespace ScoreSaber::ReplaySystem::Recorders::HeightEventRecorder
+} // namespace ScoreSaber::ReplaySystem::Recorders

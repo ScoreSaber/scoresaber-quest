@@ -12,6 +12,7 @@
 #include "ReplaySystem/Installers/ImberInstaller.hpp"
 #include "ReplaySystem/Installers/MainInstaller.hpp"
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
+#include "ReplaySystem/Installers/RecordInstaller.hpp"
 #include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
 #include "Utils/TeamUtils.hpp"
@@ -64,6 +65,7 @@ extern "C" __attribute((visibility("default"))) void load()
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::MainInstaller*>(Lapiz::Zenject::Location::Menu);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::ImberInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+    zenjector->Install<ScoreSaber::ReplaySystem::Installers::RecordInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
 }
 
 BSML_DATACACHE(replay_png) {

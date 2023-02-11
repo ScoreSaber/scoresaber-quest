@@ -4,14 +4,21 @@
 #include "Data/Private/ReplayWriter.hpp"
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
 
+using namespace ScoreSaber::Data::Private;
+
 namespace ScoreSaber::Services::ReplayService
 {
-    std::vector<char> CurrentSerializedReplay;
-    std::function<void(const std::vector<char>&)> ReplaySerialized;
+    vector<char> CurrentSerializedReplay;
+    function<void(const vector<char>&)> ReplaySerialized;
+    ReplaySystem::Recorders::MainRecorder* recorder;
+
+    void NewPlayStarted(ReplaySystem::Recorders::MainRecorder* _recorder) {
+        recorder = _recorder;
+    }
 
     void WriteSerializedReplay()
     {
-        ReplayFile* replay = Recorders::MainRecorder::ExportCurrentReplay();
+        ReplayFile* replay = recorder->ExportCurrentReplay();
         CurrentSerializedReplay = ScoreSaber::Data::Private::ReplayWriter::Write(replay);
         delete replay;
         if (ReplaySerialized != nullptr)

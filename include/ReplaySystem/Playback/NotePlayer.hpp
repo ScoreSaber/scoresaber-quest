@@ -12,14 +12,11 @@
 #include "GlobalNamespace/NoteCutInfo.hpp"
 #include "GlobalNamespace/NoteData.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
-#include "System/Collections/Generic/Dictionary_2.hpp"
-#include "System/IDisposable.hpp"
 #include "Zenject/DiContainer.hpp"
-#include "Zenject/IInitializable.hpp"
 #include "Zenject/ITickable.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "lapiz/shared/macros.hpp"
-#include <map>
+#include <vector>
 
 // std::map<GoodCutScoringElement*, float> _scoringStartInfo;
 
@@ -49,7 +46,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlay
                                     DECLARE_CTOR(ctor, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager);
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
                                     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
-                                    vector<Data::Private::NoteEvent> _sortedNoteEvents;
+                                    std::vector<Data::Private::NoteEvent> _sortedNoteEvents;
                                     std::vector<RecognizedNoteCutInfo> _recognizedNoteCutInfos;
                                     // std::map<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> _recognizedNoteCutInfos;
                                     // System::Collections::Generic::Dictionary_2<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> * _recognizedNoteCutInfos;

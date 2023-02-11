@@ -1,5 +1,7 @@
+#include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
+#include "GlobalNamespace/MainCamera.hpp"
 #include "GlobalNamespace/Saber.hpp"
 #include "GlobalNamespace/SaberManager.hpp"
 #include "GlobalNamespace/VRController.hpp"
@@ -15,25 +17,24 @@ using namespace QuestUI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
-namespace ScoreSaber::ReplaySystem::Recorders::PoseRecorder
+DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, PoseRecorder);
+
+namespace ScoreSaber::ReplaySystem::Recorders
 {
-    SaberManager* _saberManager;
-    VRController* _controllerLeft;
-    VRController* _controllerRight;
-    AudioTimeSyncController* _audioTimeSyncController;
-
-    vector<VRPoseGroup> _vrPoseGroup;
-
-    void LevelStarted(SaberManager* saberManager, AudioTimeSyncController* audioTimeSyncController)
+    void PoseRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, MainCamera* mainCamera, SaberManager* saberManager)
     {
-        _vrPoseGroup.clear();
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
+        _mainCamera = mainCamera;
         _controllerLeft = saberManager->leftSaber->GetComponentInParent<VRController*>();
         _controllerRight = saberManager->rightSaber->GetComponentInParent<VRController*>();
     }
 
-    void Tick(Vector3 headPos, Quaternion headRot)
+    void PoseRecorder::Tick()
     {
+        Vector3 headPos = _mainCamera->get_position();
+        Quaternion headRot = _mainCamera->get_rotation();
+
         Vector3 leftControllerPosition = _controllerLeft->get_position();
         Quaternion leftControllerRotation = _controllerLeft->get_rotation();
 
@@ -56,8 +57,8 @@ namespace ScoreSaber::ReplaySystem::Recorders::PoseRecorder
             fps, _audioTimeSyncController->songTime));
     }
 
-    vector<VRPoseGroup> Export()
+    vector<VRPoseGroup> PoseRecorder::Export()
     {
         return _vrPoseGroup;
     }
-} // namespace ScoreSaber::ReplaySystem::Recorders::PoseRecorder
+} // namespace ScoreSaber::ReplaySystem::Recorders

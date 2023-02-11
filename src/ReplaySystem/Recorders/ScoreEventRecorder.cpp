@@ -9,78 +9,71 @@
 #include "UnityEngine/Time.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include <custom-types/shared/delegate.hpp>
+#include "custom-types/shared/delegate.hpp"
 #include <functional>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
-namespace ScoreSaber::ReplaySystem::Recorders::ScoreEventRecorder
-{
-    AudioTimeSyncController* _audioTimeSyncController;
-    ScoreController* _scoreController;
-    vector<ScoreEvent> _scoreKeyFrames;
-    vector<ComboEvent> _comboKeyFrames;
-    vector<MultiplierEvent> _multiplierKeyFrames;
+DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, ScoreEventRecorder);
 
-    void LevelStarted(ScoreController* scoreController, AudioTimeSyncController* audioTimeSyncController, ComboController* comboController)
+namespace ScoreSaber::ReplaySystem::Recorders
+{
+    void ScoreEventRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, ScoreController* scoreController, ComboController* comboController)
     {
-        _scoreKeyFrames.clear();
-        _comboKeyFrames.clear();
-        _multiplierKeyFrames.clear();
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
-
-        std::function<void(int)> comboDidChangeCallback = [&](int combo) {
-            ComboController_comboDidChangeEvent(combo);
-        };
-
-        std::function<void(int, int)> scoreDidChangeCallback = [&](int rawScore, int score) {
-            ScoreController_scoreDidChangeEvent(rawScore, score);
-        };
-
-        std::function<void(int, float)> multiplierDidChangeCallback = [&](int multiplier, float nextMultiplierProgress) {
-            ScoreController_multiplierDidChangeEvent(multiplier, nextMultiplierProgress);
-        };
-
-        auto comboDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), comboDidChangeCallback);
-        auto scoreDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, int>*>(classof(System::Action_2<int, int>*), scoreDidChangeCallback);
-        auto multiplierDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, float>*>(classof(System::Action_2<int, float>*), multiplierDidChangeCallback);
-
-        comboController->add_comboDidChangeEvent(comboDidChangeDelegate);
-        scoreController->add_scoreDidChangeEvent(scoreDidChangeDelegate);
-        scoreController->add_multiplierDidChangeEvent(multiplierDidChangeDelegate);
+        _comboController = comboController;
     }
 
-    void ComboController_comboDidChangeEvent(int combo)
+    void ScoreEventRecorder::Initialize()
+    {
+        comboDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<int>*>((function<void(int)>)[&](int combo) {ComboController_comboDidChangeEvent(combo);});
+        scoreDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, int>*>((function<void(int, int)>)[&](int rawScore, int score) {ScoreController_scoreDidChangeEvent(rawScore, score);});
+        multiplierDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, float>*>((function<void(int, float)>)[&](int multiplier, float nextMultiplierProgress) {ScoreController_multiplierDidChangeEvent(multiplier, nextMultiplierProgress);});
+        
+        _comboController->add_comboDidChangeEvent(comboDidChangeDelegate);
+        _scoreController->add_scoreDidChangeEvent(scoreDidChangeDelegate);
+        _scoreController->add_multiplierDidChangeEvent(multiplierDidChangeDelegate);
+    }
+
+    void ScoreEventRecorder::Dispose()
+    {
+        _comboController->remove_comboDidChangeEvent(comboDidChangeDelegate);
+        _scoreController->remove_scoreDidChangeEvent(scoreDidChangeDelegate);
+        _scoreController->remove_multiplierDidChangeEvent(multiplierDidChangeDelegate);
+    }
+
+    void ScoreEventRecorder::ComboController_comboDidChangeEvent(int combo)
     {
         _comboKeyFrames.push_back(ComboEvent(combo, _audioTimeSyncController->songTime));
     }
 
-    void ScoreController_scoreDidChangeEvent(int rawScore, int score)
+    void ScoreEventRecorder::ScoreController_scoreDidChangeEvent(int rawScore, int score)
     {
         _scoreKeyFrames.push_back(ScoreEvent(rawScore, _audioTimeSyncController->songTime));
     }
 
-    void ScoreController_multiplierDidChangeEvent(int multiplier, float nextMultiplierProgress)
+    void ScoreEventRecorder::ScoreController_multiplierDidChangeEvent(int multiplier, float nextMultiplierProgress)
     {
         _multiplierKeyFrames.push_back(MultiplierEvent(multiplier, nextMultiplierProgress, _audioTimeSyncController->songTime));
     }
 
-    vector<ScoreEvent> ExportScoreKeyframes()
+    vector<ScoreEvent> ScoreEventRecorder::ExportScoreKeyframes()
     {
         return _scoreKeyFrames;
     }
 
-    vector<ComboEvent> ExportComboKeyframes()
+    vector<ComboEvent> ScoreEventRecorder::ExportComboKeyframes()
     {
         return _comboKeyFrames;
     }
 
-    vector<MultiplierEvent> ExportMultiplierKeyframes()
+    vector<MultiplierEvent> ScoreEventRecorder::ExportMultiplierKeyframes()
     {
         return _multiplierKeyFrames;
     }
 
-} // namespace ScoreSaber::ReplaySystem::Recorders::ScoreEventRecorder
+} // namespace ScoreSaber::ReplaySystem::Recorders

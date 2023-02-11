@@ -1,3 +1,4 @@
+#include "ReplaySystem/Recorders/MetadataRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
@@ -17,54 +18,57 @@
 #include "GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/Vector3SO.hpp"
 #include "Services/UploadService.hpp"
+#include "System/Action.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
+#include "custom-types/shared/delegate.hpp"
+#include <functional>
 
 using namespace UnityEngine;
 using namespace QuestUI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
-namespace ScoreSaber::ReplaySystem::Recorders::MetadataRecorder
+DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, MetadataRecorder);
+
+namespace ScoreSaber::ReplaySystem::Recorders
 {
-
-    float _failTime;
-
-    IDifficultyBeatmap* _difficultyBeatmap;
-    MainSettingsModelSO* _mainSettingsModelSO;
-    IPreviewBeatmapLevel* _previewBeatmapLevel;
-    AudioTimeSyncController* _audioTimeSyncController;
-    GameplayCoreSceneSetupData* _gameplayCoreSceneSetupData;
-    BeatmapObjectSpawnController::InitData* _beatmapObjectSpawnControllerInitData;
-
-    void LevelStarted(IDifficultyBeatmap* difficultyBeatmap, MainSettingsModelSO* mainSettingsModelSO, IPreviewBeatmapLevel* previewBeatmapLevel,
-                      AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData,
-                      BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData)
+    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, IGameEnergyCounter* gameEnergyCounter)
     {
-        _failTime = 0;
-        _difficultyBeatmap = difficultyBeatmap;
-        _mainSettingsModelSO = mainSettingsModelSO;
-        _previewBeatmapLevel = previewBeatmapLevel;
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
-        _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
         _beatmapObjectSpawnControllerInitData = beatmapObjectSpawnControllerInitData;
+        _mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
+        _gameEnergyCounter = gameEnergyCounter;
+        _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
     }
 
-    void LevelFailed()
+    void MetadataRecorder::Initialize()
+    {
+        gameEnergyDidReach0Delegate = custom_types::MakeDelegate<System::Action*>((function<void()>)[&]() {GameEnergyCounter_gameEnergyDidReach0Event();});
+        _gameEnergyCounter->add_gameEnergyDidReach0Event(gameEnergyDidReach0Delegate);
+    }
+
+    void MetadataRecorder::Dispose()
+    {
+        _gameEnergyCounter->remove_gameEnergyDidReach0Event(gameEnergyDidReach0Delegate);
+    }
+
+    void MetadataRecorder::GameEnergyCounter_gameEnergyDidReach0Event()
     {
         _failTime = _audioTimeSyncController->songTime;
     }
-
-    Metadata* Export()
+    
+    Metadata* MetadataRecorder::Export()
     {
         auto metadata = new Metadata();
         metadata->Version = "2.0.0";
-        metadata->LevelID = static_cast<std::string>(_previewBeatmapLevel->get_levelID());
-        metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_difficultyBeatmap->get_difficulty());
-        metadata->Characteristic = static_cast<std::string>(_difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
+        metadata->LevelID = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_level()->i_IPreviewBeatmapLevel()->get_levelID());
+        metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->difficultyBeatmap->get_difficulty());
+        metadata->Characteristic = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
         metadata->Environment = static_cast<std::string>(_gameplayCoreSceneSetupData->environmentInfo->serializedName);
         metadata->Modifiers = ScoreSaber::Services::UploadService::GetModifierList(_gameplayCoreSceneSetupData->gameplayModifiers, -1);
         metadata->NoteSpawnOffset = _beatmapObjectSpawnControllerInitData->noteJumpValue;
@@ -76,4 +80,4 @@ namespace ScoreSaber::ReplaySystem::Recorders::MetadataRecorder
         metadata->FailTime = _failTime;
         return metadata;
     }
-} // namespace ScoreSaber::ReplaySystem::Recorders::MetadataRecorder
+} // namespace ScoreSaber::ReplaySystem::Recorders

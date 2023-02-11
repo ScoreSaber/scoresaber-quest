@@ -3,44 +3,47 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/GameEnergyCounter.hpp"
 #include "System/Action_1.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
-#include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include <custom-types/shared/delegate.hpp>
+#include "custom-types/shared/delegate.hpp"
 #include <functional>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
-namespace ScoreSaber::ReplaySystem::Recorders::EnergyEventRecorder
-{
-    AudioTimeSyncController* _audioTimeSyncController;
-    GameEnergyCounter* _gameEnergyCounter;
-    vector<EnergyEvent> _energyKeyFrames;
+DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, EnergyEventRecorder);
 
-    void LevelStarted(GameEnergyCounter* gameEnergyCounter, AudioTimeSyncController* audioTimeSyncController)
+namespace ScoreSaber::ReplaySystem::Recorders
+{
+    void EnergyEventRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameEnergyCounter* gameEnergyCounter)
     {
-        _energyKeyFrames.clear();
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _gameEnergyCounter = gameEnergyCounter;
-
-        std::function<void(float)> gameEnergyDidChangeCallback = [&](float energy) {
-            GameEnergyCounter_gameEnergyDidChangeEvent(energy);
-        };
-
-        auto gameEnergyDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), gameEnergyDidChangeCallback);
-        gameEnergyCounter->add_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
     }
 
-    void GameEnergyCounter_gameEnergyDidChangeEvent(float energy)
+    void EnergyEventRecorder::Initialize()
     {
-        _energyKeyFrames.push_back(EnergyEvent(energy, _audioTimeSyncController->songTime));
+        if(_gameEnergyCounter != nullptr) {
+            gameEnergyDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), (function<void(float)>)[&](float energy) {GameEnergyCounter_gameEnergyDidChangeEvent(energy);});
+            _gameEnergyCounter->add_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
+        }
     }
 
-    vector<EnergyEvent> Export()
+    void EnergyEventRecorder::Dispose()
     {
-        return _energyKeyFrames;
+        if(_gameEnergyCounter != nullptr && gameEnergyDidChangeDelegate) {
+            _gameEnergyCounter->remove_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
+        }
     }
-} // namespace ScoreSaber::ReplaySystem::Recorders::EnergyEventRecorder
+
+    void EnergyEventRecorder::GameEnergyCounter_gameEnergyDidChangeEvent(float energy)
+    {
+        _energyKeyframes.push_back(EnergyEvent(energy, _audioTimeSyncController->songTime));
+    }
+
+    vector<EnergyEvent> EnergyEventRecorder::Export()
+    {
+        return _energyKeyframes;
+    }
+} // namespace ScoreSaber::ReplaySystem::Recorders

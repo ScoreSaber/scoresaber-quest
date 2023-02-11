@@ -1,5 +1,5 @@
 
-
+#include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ReplayWriter.hpp"
 #include "ReplaySystem/Recorders/EnergyEventRecorder.hpp"
@@ -8,22 +8,48 @@
 #include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
+#include "Services/ReplayService.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "logging.hpp"
+
 using namespace ScoreSaber::ReplaySystem;
-namespace ScoreSaber::ReplaySystem::Recorders::MainRecorder
+using namespace ScoreSaber::Services;
+using namespace ScoreSaber::Data::Private;
+
+DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, MainRecorder);
+
+namespace ScoreSaber::ReplaySystem::Recorders
 {
-    ReplayFile* ExportCurrentReplay()
+    void MainRecorder::ctor(PoseRecorder* poseRecorder, MetadataRecorder* metadataRecorder, NoteEventRecorder* noteEventRecorder, ScoreEventRecorder* scoreEventRecorder, HeightEventRecorder* heightEventRecorder, EnergyEventRecorder* energyEventRecorder)
     {
-        Metadata* metadata = Recorders::MetadataRecorder::Export();
-        vector<VRPoseGroup> poseKeyFrames = Recorders::PoseRecorder::Export();
-        vector<HeightEvent> heightKeyframes = Recorders::HeightEventRecorder::Export();
-        vector<NoteEvent> noteKeyframes = Recorders::NoteEventRecorder::Export();
-        vector<ScoreEvent> scoreKeyframes = Recorders::ScoreEventRecorder::ExportScoreKeyframes();
-        vector<ComboEvent> comboKeyframes = Recorders::ScoreEventRecorder::ExportComboKeyframes();
-        vector<MultiplierEvent> multiplierKeyframes = Recorders::ScoreEventRecorder::ExportMultiplierKeyframes();
-        vector<EnergyEvent> energyKeyframes = Recorders::EnergyEventRecorder::Export();
+        INVOKE_CTOR();
+        _poseRecorder = poseRecorder;
+        _metadataRecorder = metadataRecorder;
+        _noteEventRecorder = noteEventRecorder;
+        _scoreEventRecorder = scoreEventRecorder;
+        _heightEventRecorder = heightEventRecorder;
+        _energyEventRecorder = energyEventRecorder;
+    }
+
+    void MainRecorder::Initialize() {
+        ReplayService::NewPlayStarted(this);
+    }
+
+    void MainRecorder::Dispose() {
+        
+    }
+
+    ReplayFile* MainRecorder::ExportCurrentReplay()
+    {
+        Metadata* metadata = _metadataRecorder->Export();
+        vector<VRPoseGroup> poseKeyFrames = _poseRecorder->Export();
+        vector<HeightEvent> heightKeyframes = _heightEventRecorder->Export();
+        vector<NoteEvent> noteKeyframes = _noteEventRecorder->Export();
+        vector<ScoreEvent> scoreKeyframes = _scoreEventRecorder->ExportScoreKeyframes();
+        vector<ComboEvent> comboKeyframes = _scoreEventRecorder->ExportComboKeyframes();
+        vector<MultiplierEvent> multiplierKeyframes = _scoreEventRecorder->ExportMultiplierKeyframes();
+        vector<EnergyEvent> energyKeyframes = _energyEventRecorder->Export();
         auto replayFile = new ReplayFile(metadata, poseKeyFrames, heightKeyframes, noteKeyframes, scoreKeyframes, comboKeyframes, multiplierKeyframes, energyKeyframes);
         return replayFile;
     }
-} // namespace ScoreSaber::ReplaySystem::Recorders::MainRecorder
+} // namespace ScoreSaber::ReplaySystem::Recorders
