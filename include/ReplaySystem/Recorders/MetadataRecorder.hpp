@@ -34,7 +34,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, Metadat
                                     float _failTime;
                                     System::Action *gameEnergyDidReach0Delegate;
                                     public:
-                                    Data::Private::Metadata* Export();
+                                    std::shared_ptr<Data::Private::Metadata> Export();
                                     )
 
 #undef INTERFACES

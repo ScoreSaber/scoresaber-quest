@@ -16,7 +16,7 @@ using namespace std;
 
 namespace ScoreSaber::Data::Private::ReplayReader
 {
-    ReplayFile* Read(const vector<char> &replayData)
+    shared_ptr<ReplayFile> Read(const vector<char> &replayData)
     {
         std::vector<char> decompressed;
         if(!DecompressReplay(replayData, decompressed)) {
@@ -26,15 +26,14 @@ namespace ScoreSaber::Data::Private::ReplayReader
         inputStream.write(decompressed.data(), decompressed.size());
         Pointers pointers = ReadPointers(inputStream);
 
-        ReplayFile* file = new ReplayFile(ReadMetadata(inputStream, pointers.metadata),
-                                          ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
-                                          ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
-                                          ReadNoteKeyframes(inputStream, pointers.noteKeyframes),
-                                          ReadScoreKeyframes(inputStream, pointers.scoreKeyframes),
-                                          ReadComboKeyframes(inputStream, pointers.comboKeyframes),
-                                          ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
-                                          ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
-        return file;
+        return make_shared<ReplayFile>(ReadMetadata(inputStream, pointers.metadata),
+                                       ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
+                                       ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
+                                       ReadNoteKeyframes(inputStream, pointers.noteKeyframes),
+                                       ReadScoreKeyframes(inputStream, pointers.scoreKeyframes),
+                                       ReadComboKeyframes(inputStream, pointers.comboKeyframes),
+                                       ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
+                                       ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
     }
 
     Pointers ReadPointers(stringstream& inputStream)
@@ -47,10 +46,10 @@ namespace ScoreSaber::Data::Private::ReplayReader
                         ReadInt(inputStream));
     }
 
-    Metadata* ReadMetadata(stringstream& inputStream, int offset)
+    shared_ptr<Metadata> ReadMetadata(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
-        return new Metadata(ReadString(inputStream), ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
+        return make_shared<Metadata>(ReadString(inputStream), ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
                             ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
                             ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream));
     }

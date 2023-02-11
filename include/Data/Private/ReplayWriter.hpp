@@ -4,8 +4,8 @@
 
 namespace ScoreSaber::Data::Private::ReplayWriter
 {
-    std::vector<char> Write(ReplayFile* file);
-    int WriteMetadata(Metadata* metadata, stringstream& outputStream);
+    std::vector<char> Write(std::shared_ptr<ReplayFile> file);
+    int WriteMetadata(std::shared_ptr<Metadata> metadata, stringstream& outputStream);
     int WriteVRPoseGroup(VRPoseGroup vrPoseGroup, stringstream& outputStream);
     int WriteVRPose(VRPose vrPose, stringstream& outputStream);
     int WriteHeightEvent(HeightEvent heightEvent, stringstream& outputStream);

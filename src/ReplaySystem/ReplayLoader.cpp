@@ -32,7 +32,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     GlobalNamespace::PlayerDataModel* playerDataModel;
     GlobalNamespace::MenuTransitionsHelper* menuTransitionsHelper;
 
-    ScoreSaber::Data::Private::ReplayFile* LoadedReplay;
+    std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
     GlobalNamespace::IDifficultyBeatmap* CurrentLevel;
     std::u16string CurrentPlayerName;
     std::string CurrentModifiers;

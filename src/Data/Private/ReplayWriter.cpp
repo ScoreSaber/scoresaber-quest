@@ -17,7 +17,7 @@ using namespace std;
 namespace ScoreSaber::Data::Private::ReplayWriter
 {
     int _pointerSize = 38;
-    std::vector<char> Write(ReplayFile* file)
+    std::vector<char> Write(std::shared_ptr<ReplayFile> file)
     {
         stringstream outputStream;
 
@@ -68,7 +68,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         return {};
     }
 
-    int WriteMetadata(Metadata* metadata, stringstream& outputStream)
+    int WriteMetadata(std::shared_ptr<Metadata> metadata, stringstream& outputStream)
     {
         int bytesWritten = 0;
         bytesWritten += WriteString(metadata->Version, outputStream);

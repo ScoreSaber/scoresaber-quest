@@ -39,9 +39,9 @@ namespace ScoreSaber::ReplaySystem::Recorders
         
     }
 
-    ReplayFile* MainRecorder::ExportCurrentReplay()
+    std::shared_ptr<ReplayFile> MainRecorder::ExportCurrentReplay()
     {
-        Metadata* metadata = _metadataRecorder->Export();
+        std::shared_ptr<Metadata> metadata = _metadataRecorder->Export();
         vector<VRPoseGroup> poseKeyFrames = _poseRecorder->Export();
         vector<HeightEvent> heightKeyframes = _heightEventRecorder->Export();
         vector<NoteEvent> noteKeyframes = _noteEventRecorder->Export();
@@ -49,7 +49,6 @@ namespace ScoreSaber::ReplaySystem::Recorders
         vector<ComboEvent> comboKeyframes = _scoreEventRecorder->ExportComboKeyframes();
         vector<MultiplierEvent> multiplierKeyframes = _scoreEventRecorder->ExportMultiplierKeyframes();
         vector<EnergyEvent> energyKeyframes = _energyEventRecorder->Export();
-        auto replayFile = new ReplayFile(metadata, poseKeyFrames, heightKeyframes, noteKeyframes, scoreKeyframes, comboKeyframes, multiplierKeyframes, energyKeyframes);
-        return replayFile;
+        return std::make_shared<ReplayFile>(metadata, poseKeyFrames, heightKeyframes, noteKeyframes, scoreKeyframes, comboKeyframes, multiplierKeyframes, energyKeyframes);
     }
 } // namespace ScoreSaber::ReplaySystem::Recorders

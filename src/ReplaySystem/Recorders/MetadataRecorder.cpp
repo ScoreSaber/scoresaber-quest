@@ -62,9 +62,9 @@ namespace ScoreSaber::ReplaySystem::Recorders
         _failTime = _audioTimeSyncController->songTime;
     }
     
-    Metadata* MetadataRecorder::Export()
+    std::shared_ptr<Metadata> MetadataRecorder::Export()
     {
-        auto metadata = new Metadata();
+        auto metadata = make_shared<Metadata>();
         metadata->Version = "2.0.0";
         metadata->LevelID = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_level()->i_IPreviewBeatmapLevel()->get_levelID());
         metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->difficultyBeatmap->get_difficulty());

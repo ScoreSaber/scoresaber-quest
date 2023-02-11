@@ -4,9 +4,9 @@
 
 namespace ScoreSaber::Data::Private::ReplayReader
 {
-    ReplayFile* Read(const vector<char> &replayData);
+    std::shared_ptr<ReplayFile> Read(const vector<char> &replayData);
     Pointers ReadPointers(stringstream& inputStream);
-    Metadata* ReadMetadata(stringstream& inputStream, int offset);
+    std::shared_ptr<Metadata> ReadMetadata(stringstream& inputStream, int offset);
     vector<VRPoseGroup> ReadPoseKeyframes(stringstream& inputStream, int offset);
     vector<HeightEvent> ReadHeightKeyframes(stringstream& inputStream, int offset);
     vector<NoteEvent> ReadNoteKeyframes(stringstream& inputStream, int offset);

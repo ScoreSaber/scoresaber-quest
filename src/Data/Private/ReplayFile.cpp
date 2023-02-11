@@ -178,7 +178,7 @@ namespace ScoreSaber::Data::Private
 
     NoteEvent::NoteEvent(){};
 
-    ReplayFile::ReplayFile(Metadata* _metadata, vector<VRPoseGroup> _poseKeyframes, vector<HeightEvent> _heightKeyframes, vector<NoteEvent> _noteKeyframes,
+    ReplayFile::ReplayFile(std::shared_ptr<Metadata> _metadata, vector<VRPoseGroup> _poseKeyframes, vector<HeightEvent> _heightKeyframes, vector<NoteEvent> _noteKeyframes,
                            vector<ScoreEvent> _scoreKeyframes, vector<ComboEvent> _comboKeyframes, vector<MultiplierEvent> _multiplierKeyframes,
                            vector<EnergyEvent> _energyKeyframes)
     {
@@ -193,8 +193,4 @@ namespace ScoreSaber::Data::Private
     }
 
     ReplayFile::ReplayFile(){};
-
-    ReplayFile::~ReplayFile(){
-        delete metadata;
-    };
 } // namespace ScoreSaber::Data::Private
