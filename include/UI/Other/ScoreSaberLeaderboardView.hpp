@@ -34,4 +34,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     void SetPlayButtonState(bool state);
     void SetUploadState(bool state, bool success, std::string errorMessage = "<color=#fc8181>Upload failed</color>");
     void CheckPage();
+
+    void AllowReplayWatching(bool value);
+    bool IsReplayWatchingAllowed();
+
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView

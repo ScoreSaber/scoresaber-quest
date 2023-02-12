@@ -2,6 +2,8 @@
 #include "GlobalNamespace/GameplayModifiers.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/LevelCompletionResults.hpp"
+#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"
+#include "GlobalNamespace/MultiplayerResultsData.hpp"
 #include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp"
 
 #include <iomanip>
@@ -11,8 +13,12 @@
 namespace ScoreSaber::Services::UploadService
 {
     extern bool uploading;
-    void Five(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupData,
-              GlobalNamespace::LevelCompletionResults* levelCompletionResults);
+
+    void Three(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupDataSO, GlobalNamespace::LevelCompletionResults* levelCompletionResults);
+    
+    void Four(GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO* multiplayerLevelScenesTransitionSetupDataSO, GlobalNamespace::MultiplayerResultsData* multiplayerResultsData);
+
+    void Five(StringW gameMode, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::LevelCompletionResults* levelCompletionResults, bool practicing);
 
     void Six(GlobalNamespace::IDifficultyBeatmap* beatmap, GlobalNamespace::LevelCompletionResults* levelCompletionResults);
 

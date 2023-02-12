@@ -247,6 +247,9 @@ namespace ScoreSaber::UI::Other
                 {
                     replayEnabled = true;
                 }
+                
+                if(!ScoreSaberLeaderboardView::IsReplayWatchingAllowed())
+                    replayEnabled = false;
 
                 SetReplayButtonState(replayEnabled);
             })));

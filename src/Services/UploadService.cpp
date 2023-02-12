@@ -8,6 +8,8 @@
 #include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
+#include "GlobalNamespace/MultiplayerLevelCompletionResults.hpp"
+#include "GlobalNamespace/MultiplayerPlayerResultsData.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "GlobalNamespace/PracticeViewController.hpp"
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
@@ -42,8 +44,28 @@ namespace ScoreSaber::Services::UploadService
 {
     bool uploading;
 
-    void Five(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupData,
-              GlobalNamespace::LevelCompletionResults* levelCompletionResults)
+    
+    void Three(GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* standardLevelScenesTransitionSetupDataSO, GlobalNamespace::LevelCompletionResults* levelCompletionResults)
+    {
+        Five(standardLevelScenesTransitionSetupDataSO->gameMode, standardLevelScenesTransitionSetupDataSO->difficultyBeatmap, levelCompletionResults, standardLevelScenesTransitionSetupDataSO->practiceSettings != nullptr);
+    }
+    
+    void Four(GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO* multiplayerLevelScenesTransitionSetupDataSO, GlobalNamespace::MultiplayerResultsData* multiplayerResultsData)
+    {
+        if(multiplayerLevelScenesTransitionSetupDataSO->difficultyBeatmap == nullptr)
+            return;
+        if(multiplayerResultsData->localPlayerResultData->multiplayerLevelCompletionResults->levelCompletionResults == nullptr)
+            return;
+        if(multiplayerResultsData->localPlayerResultData->multiplayerLevelCompletionResults->playerLevelEndReason == GlobalNamespace::MultiplayerLevelCompletionResults::MultiplayerPlayerLevelEndReason::HostEndedLevel)
+            return;
+        if(multiplayerResultsData->localPlayerResultData->multiplayerLevelCompletionResults->levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared)
+            return;
+
+        Five(multiplayerLevelScenesTransitionSetupDataSO->gameMode, multiplayerLevelScenesTransitionSetupDataSO->difficultyBeatmap, multiplayerResultsData->localPlayerResultData->multiplayerLevelCompletionResults->levelCompletionResults, false);
+    }
+
+
+    void Five(StringW gameMode, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::LevelCompletionResults* levelCompletionResults, bool practicing)
     {
 
         if (StringUtils::GetEnv("disable_ss_upload") == "1")
@@ -63,10 +85,10 @@ namespace ScoreSaber::Services::UploadService
             return;
         }
 
-        if (standardLevelScenesTransitionSetupData->gameMode == "Solo")
+        if (gameMode == "Solo" || gameMode == "Multiplayer")
         {
             ReplayService::WriteSerializedReplay();
-            if (standardLevelScenesTransitionSetupData->practiceSettings != nullptr)
+            if (practicing)
                 return;
             if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None)
                 return;
@@ -74,7 +96,7 @@ namespace ScoreSaber::Services::UploadService
                 return;
 
             // Continue to upload phase
-            Six(standardLevelScenesTransitionSetupData->difficultyBeatmap, levelCompletionResults);
+            Six(difficultyBeatmap, levelCompletionResults);
         }
     }
 

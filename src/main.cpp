@@ -5,12 +5,14 @@
 #include "GlobalNamespace/GameScenesManager.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator.hpp"
 #include "GlobalNamespace/HealthWarningFlowCoordinator_InitData.hpp"
+#include "GlobalNamespace/MultiplayerLocalActivePlayerInstaller.hpp"
+#include "GlobalNamespace/StandardGameplayInstaller.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "questui/shared/QuestUI.hpp"
 
 #include "Data/Private/ReplayReader.hpp"
+#include "MainInstaller.hpp"
 #include "ReplaySystem/Installers/ImberInstaller.hpp"
-#include "ReplaySystem/Installers/MainInstaller.hpp"
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 #include "ReplaySystem/Installers/RecordInstaller.hpp"
 #include "Services/FileService.hpp"
@@ -62,10 +64,11 @@ extern "C" __attribute((visibility("default"))) void load()
     ScoreSaber::Services::FileService::EnsurePaths();
 
     auto zenjector = Lapiz::Zenject::Zenjector::Get();
-    zenjector->Install<ScoreSaber::ReplaySystem::Installers::MainInstaller*>(Lapiz::Zenject::Location::Menu);
+    zenjector->Install<ScoreSaber::MainInstaller*>(Lapiz::Zenject::Location::Menu);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::ImberInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
-    zenjector->Install<ScoreSaber::ReplaySystem::Installers::RecordInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
+    zenjector->Install<ScoreSaber::ReplaySystem::Installers::RecordInstaller*, GlobalNamespace::StandardGameplayInstaller*>();
+    zenjector->Install<ScoreSaber::ReplaySystem::Installers::RecordInstaller*, GlobalNamespace::MultiplayerLocalActivePlayerInstaller*>();
 }
 
 BSML_DATACACHE(replay_png) {

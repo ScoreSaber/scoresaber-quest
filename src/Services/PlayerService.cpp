@@ -17,9 +17,29 @@ using namespace StringUtils;
 namespace ScoreSaber::Services::PlayerService
 {
     playerInfo_t playerInfo;
+
+    std::mutex authLock;
+    
+    enum AuthState
+    {
+        NotStarted,
+        Started,
+        Finished
+    } authState;
+    std::vector<std::function<void(LoginStatus)>> finishedCallbacks;
+
     void AuthenticateUser(std::function<void(LoginStatus)> finished)
     {
-
+        {
+            std::lock_guard lock(authLock);
+            if (authState == Finished) // we are done already, nothing to do
+                return;
+            finishedCallbacks.push_back(finished);
+            if (authState == Started) // store the callback, but don't do anything else
+                return;
+            authState = Started;
+        }
+        
         std::string steamKey = "";
         std::string playerId = "";
         std::string friends = "";
@@ -37,7 +57,13 @@ namespace ScoreSaber::Services::PlayerService
         {
             ERROR("Failed to read player authentication data");
             playerInfo.loginStatus = LoginStatus::Error;
-            finished(LoginStatus::Error);
+            {
+                std::lock_guard lock(authLock);
+                authState = Finished;
+                for(auto fin : finishedCallbacks)
+                    fin(LoginStatus::Error);
+                finishedCallbacks.clear();
+            }
             return;
         }
 
@@ -68,14 +94,26 @@ namespace ScoreSaber::Services::PlayerService
                 playerInfo.localPlayerData = Data::Player(playerId);
 
                 playerInfo.loginStatus = LoginStatus::Success;
-                finished(LoginStatus::Success);
+                {
+                    std::lock_guard lock(authLock);
+                    authState = Finished;
+                    for(auto fin : finishedCallbacks)
+                        fin(LoginStatus::Success);
+                    finishedCallbacks.clear();
+                }
                 UpdatePlayerInfoThread();
             }
             else
             {
                 // ERROR("Authentication error");
                 playerInfo.loginStatus = LoginStatus::Error;
-                finished(LoginStatus::Error);
+                {
+                    std::lock_guard lock(authLock);
+                    authState = Finished;
+                    for(auto fin : finishedCallbacks)
+                        fin(LoginStatus::Error);
+                    finishedCallbacks.clear();
+                }
             }
         });
     }
@@ -121,8 +159,15 @@ namespace ScoreSaber::Services::PlayerService
         std::thread t([] {
             while (true)
             {
-                UpdatePlayerInfo(false);
-                std::this_thread::sleep_for(std::chrono::seconds(300));
+                if(ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner == nullptr)
+                {
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                }
+                else
+                {
+                    UpdatePlayerInfo(false);
+                    std::this_thread::sleep_for(std::chrono::seconds(300));
+                }
             }
         });
         t.detach();
@@ -133,7 +178,7 @@ namespace ScoreSaber::Services::PlayerService
         if (!fromMainThread)
         {
             QuestUI::MainThreadScheduler::Schedule([=]() {
-                ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
+                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
             });
         }
         else

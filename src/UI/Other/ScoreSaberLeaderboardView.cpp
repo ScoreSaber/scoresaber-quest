@@ -86,6 +86,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     int _leaderboardPage = 1;
     bool _filterAroundCountry = false;
     std::string _currentLeaderboardRefreshId;
+    
+    bool _allowReplayWatching = true;
 
     void ResetPage()
     {
@@ -401,6 +403,16 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 }
             }
         });
+    }
+
+    void AllowReplayWatching(bool value)
+    {
+        _allowReplayWatching = value;
+    }
+
+    bool IsReplayWatchingAllowed()
+    {
+        return _allowReplayWatching;
     }
 
 } // namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView

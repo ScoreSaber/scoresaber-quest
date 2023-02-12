@@ -15,6 +15,7 @@
 // StandardLevelScenesTransitionSetupDataSO
 
 #include "GlobalNamespace/LevelCompletionResults.hpp"
+#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"
 #include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp"
 
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
@@ -116,6 +117,14 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
                      GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::LevelCompletionResults* levelCompletionResults)
 {
-    ScoreSaber::Services::UploadService::Five(self, levelCompletionResults);
+    ScoreSaber::Services::UploadService::Three(self, levelCompletionResults);
     StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
+}
+
+MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Finish, &GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO::Finish, void,
+                     GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO* self,
+                     GlobalNamespace::MultiplayerResultsData* multiplayerResultsData)
+{
+    ScoreSaber::Services::UploadService::Four(self, multiplayerResultsData);
+    MultiplayerLevelScenesTransitionSetupDataSO_Finish(self, multiplayerResultsData);
 }

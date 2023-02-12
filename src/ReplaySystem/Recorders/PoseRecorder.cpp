@@ -26,8 +26,8 @@ namespace ScoreSaber::ReplaySystem::Recorders
         INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _mainCamera = mainCamera;
-        _controllerLeft = saberManager->leftSaber->GetComponentInParent<VRController*>();
-        _controllerRight = saberManager->rightSaber->GetComponentInParent<VRController*>();
+        _controllerLeft = saberManager->leftSaber->get_transform()->get_parent()->GetComponent<VRController*>();
+        _controllerRight = saberManager->rightSaber->get_transform()->get_parent()->GetComponent<VRController*>();
     }
 
     void PoseRecorder::Tick()
