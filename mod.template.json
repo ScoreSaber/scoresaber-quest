@@ -2,7 +2,7 @@
    "_QPVersion": "0.1.1",
    "name": "${mod_name}",
    "id": "${mod_id}",
-   "author": "Umbranox, Optimus, RedBrumbler",
+   "author": "Umbranox, Optimus, RedBrumbler, Qwasyx",
    "version": "${version}",
    "coverImage": "logo.jpg",
    "packageId": "com.beatgames.beatsaber",
