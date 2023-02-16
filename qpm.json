@@ -1,73 +1,75 @@
 {
-   "sharedDir": "shared",
-   "dependenciesDir": "extern",
-   "info": {
-      "name": "ScoreSaber",
-      "id": "scoresaber",
-      "version": "1.0.0",
-      "url": null,
+  "sharedDir": "shared",
+  "dependenciesDir": "extern",
+  "info": {
+    "name": "ScoreSaber",
+    "id": "scoresaber",
+    "version": "2.1.0",
+    "url": null,
+    "additionalData": {
+      "overrideSoName": "libscoresaber.so"
+    }
+  },
+  "dependencies": [
+    {
+      "id": "beatsaber-hook",
+      "versionRange": "^3.14.0",
       "additionalData": {
-         "overrideSoName": "libscoresaber.so"
+        "extraFiles": [
+          "src/inline-hook"
+        ]
       }
-   },
-   "dependencies": [
-      {
-         "id": "beatsaber-hook",
-         "versionRange": "^3.14.0",
-         "additionalData": {
-            "extraFiles": ["src/inline-hook"]
-         }
-      },
-      {
-         "id": "modloader",
-         "versionRange": "^1.2.3",
-         "additionalData": {}
-      },
-      {
-         "id": "codegen",
-         "versionRange": "^0.32.0",
-         "additionalData": {}
-      },
-      {
-         "id": "questui",
-         "versionRange": "^0.17.10",
-         "additionalData": {}
-      },
-      {
-         "id": "custom-types",
-         "versionRange": "^0.15.22",
-         "additionalData": {}
-      },
-      {
-         "id": "config-utils",
-         "versionRange": "^1.0.2",
-         "additionalData": {}
-      },
-      {
-         "id": "libcurl",
-         "versionRange": "^7.78.0",
-         "additionalData": {}
-      },
-      {
-         "id": "gif-lib",
-         "versionRange": "^5.2.2",
-         "additionalData": {}
-      },
-      {
-         "id": "lapiz",
-         "versionRange": "^0.1.10",
-         "additionalData": {}
-      },
-      {
-         "id": "bsml",
-         "versionRange": "^0.2.10",
-         "additionalData": {}
-      },
-      {
-         "id": "tinyxml2",
-         "versionRange": "^9.0.5",
-         "additionalData": {}
-      }
-   ],
-   "additionalData": {}
+    },
+    {
+      "id": "modloader",
+      "versionRange": "^1.2.3",
+      "additionalData": {}
+    },
+    {
+      "id": "codegen",
+      "versionRange": "^0.32.0",
+      "additionalData": {}
+    },
+    {
+      "id": "questui",
+      "versionRange": "^0.17.10",
+      "additionalData": {}
+    },
+    {
+      "id": "custom-types",
+      "versionRange": "^0.15.22",
+      "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^1.0.2",
+      "additionalData": {}
+    },
+    {
+      "id": "libcurl",
+      "versionRange": "^7.78.0",
+      "additionalData": {}
+    },
+    {
+      "id": "gif-lib",
+      "versionRange": "^5.2.2",
+      "additionalData": {}
+    },
+    {
+      "id": "lapiz",
+      "versionRange": "^0.1.10",
+      "additionalData": {}
+    },
+    {
+      "id": "bsml",
+      "versionRange": "^0.2.10",
+      "additionalData": {}
+    },
+    {
+      "id": "tinyxml2",
+      "versionRange": "^9.0.5",
+      "additionalData": {}
+    }
+  ],
+  "additionalData": {}
 }
