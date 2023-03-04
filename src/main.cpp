@@ -18,6 +18,7 @@
 #include "Services/FileService.hpp"
 #include "UI/Other/Banner.hpp"
 #include "Utils/TeamUtils.hpp"
+#include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSMLDataCache.hpp"
 #include "lapiz/shared/zenject/Zenjector.hpp"
 #include "assets.hpp"
@@ -57,6 +58,7 @@ extern "C" __attribute((visibility("default"))) void load()
     il2cpp_functions::Init();
     // il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
     // il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
+    BSML::Init();
     QuestUI::Init();
     custom_types::Register::AutoRegister();
     Hooks::InstallHooks(ScoreSaber::Logging::getLogger());
