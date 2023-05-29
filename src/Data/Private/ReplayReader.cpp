@@ -26,14 +26,20 @@ namespace ScoreSaber::Data::Private::ReplayReader
         inputStream.write(decompressed.data(), decompressed.size());
         Pointers pointers = ReadPointers(inputStream);
 
-        return make_shared<ReplayFile>(ReadMetadata(inputStream, pointers.metadata),
-                                       ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
-                                       ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
-                                       ReadNoteKeyframes(inputStream, pointers.noteKeyframes),
-                                       ReadScoreKeyframes(inputStream, pointers.scoreKeyframes),
-                                       ReadComboKeyframes(inputStream, pointers.comboKeyframes),
-                                       ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
-                                       ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
+        shared_ptr<Metadata> metadata = ReadMetadata(inputStream, pointers.metadata);
+
+        if (metadata->Version == "2.0.0") {
+            return make_shared<ReplayFile>(metadata,
+                                           ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
+                                           ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
+                                           ReadNoteKeyframes(inputStream, pointers.noteKeyframes),
+                                           ReadScoreKeyframes(inputStream, pointers.scoreKeyframes),
+                                           ReadComboKeyframes(inputStream, pointers.comboKeyframes),
+                                           ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
+                                           ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
+        } else {
+            return nullptr;
+        }
     }
 
     Pointers ReadPointers(stringstream& inputStream)
@@ -246,6 +252,11 @@ namespace ScoreSaber::Data::Private::ReplayReader
         if(replay[0] == (char)93 && replay[1] == 0 && replay[2] == 0 && replay[3] == (char)128) {
             ERROR("Can't load legacy replays");
             return false; // legacy replay
+        }
+
+        string magic = "ScoreSaber Replay 👌🤠\r\n";
+        if (replay.size() < 28 || string(replay.begin(), replay.end() + 28) != magic) {
+            return false; // invalid magic
         }
 
         // remove magic bytes
