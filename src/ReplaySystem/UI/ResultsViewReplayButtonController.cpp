@@ -41,6 +41,7 @@ namespace ScoreSaber::ReplaySystem::UI
             watchReplayButton->get_transform()->set_localScale(watchReplayButton->get_transform()->get_localScale() * 0.4f);
             watchReplayButton->get_transform()->set_localPosition({42.5f, 27.0f, 0.0f});
         }
+        watchReplayButton->set_interactable(_serializedReplay.size() > 0);
         _difficultyBeatmap = _resultsViewController->difficultyBeatmap;
         _levelCompletionResults = _resultsViewController->levelCompletionResults;
         WaitForReplay();
