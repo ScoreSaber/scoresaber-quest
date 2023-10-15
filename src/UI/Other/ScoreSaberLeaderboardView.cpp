@@ -237,7 +237,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 int playerScoreIndex = GetPlayerScoreIndex(internalLeaderboard.leaderboard.value().scores);
                                 if (internalLeaderboard.leaderboardItems->get_Count() != 0)
                                 {
-                                    if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && playerScoreIndex == -1)
+                                    if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && playerScoreIndex == -1 && !_filterAroundCountry)
                                     {
                                         SetErrorState(loadingControl, "You haven't set a score on this leaderboard", true);
                                     }
