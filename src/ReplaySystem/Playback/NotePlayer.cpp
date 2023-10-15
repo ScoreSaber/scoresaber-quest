@@ -29,6 +29,8 @@ namespace ScoreSaber::ReplaySystem::Playback
         _audioTimeSyncController = audioTimeSyncController;
         _basicBeatmapObjectManager = basicBeatmapObjectManager;
         _gameNotePool = basicBeatmapObjectManager->basicGameNotePoolContainer;
+        _burstSliderHeadNotePool = basicBeatmapObjectManager->burstSliderHeadGameNotePoolContainer;
+        _burstSliderNotePool = basicBeatmapObjectManager->burstSliderGameNotePoolContainer;
         _bombNotePool = basicBeatmapObjectManager->bombNotePoolContainer;
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         std::sort(_sortedNoteEvents.begin(), _sortedNoteEvents.end(), [](const auto& lhs, const auto& rhs) {
@@ -37,52 +39,47 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     void NotePlayer::Tick()
     {
-        if (_lastIndex >= _sortedNoteEvents.size())
-        {
-            return;
-        }
-        while (_audioTimeSyncController->songTime >= _sortedNoteEvents[_lastIndex].Time)
-        {
-            NoteEvent activeEvent = _sortedNoteEvents[_lastIndex++];
+        while (_nextIndex < _sortedNoteEvents.size() && _audioTimeSyncController->songTime >= _sortedNoteEvents[_nextIndex].Time) {
+            NoteEvent activeEvent = _sortedNoteEvents[_nextIndex++];
             ProcessEvent(activeEvent);
-            if (_lastIndex >= _sortedNoteEvents.size())
-            {
-                break;
-            }
         }
     }
-    bool NotePlayer::ProcessEvent(Data::Private::NoteEvent activeEvent)
+    void NotePlayer::ProcessEvent(Data::Private::NoteEvent &activeEvent)
     {
         bool foundNote = false;
-        if (activeEvent.EventType == NoteEventType::GoodCut || activeEvent.EventType == NoteEventType::BadCut)
-        {
-            auto items = _gameNotePool->get_activeItems();
-            for (int i = 0; i < items->get_Count(); i++)
-            {
-                auto noteController = items->get_Item(i);
-                if (HandleEvent(activeEvent, noteController))
-                {
-                    foundNote = true;
-                    break;
+        if (activeEvent.EventType == NoteEventType::GoodCut || activeEvent.EventType == NoteEventType::BadCut) {
+            auto itemsNotes = _gameNotePool->get_activeItems();
+            for (int i = 0; i < itemsNotes->get_Count(); i++) {
+                auto noteController = itemsNotes->get_Item(i);
+                if (HandleEvent(activeEvent, noteController)) {
+                    return;
                 }
             }
-        }
-        else if (activeEvent.EventType == NoteEventType::Bomb)
-        {
+            auto itemsSliderHeads = _burstSliderHeadNotePool->get_activeItems();
+            for (int i = 0; i < itemsSliderHeads->get_Count(); i++) {
+                auto noteController = itemsSliderHeads->get_Item(i);
+                if (HandleEvent(activeEvent, noteController)) {
+                    return;
+                }
+            }
+            auto itemsSliderNotes = _burstSliderNotePool->get_activeItems();
+            for (int i = 0; i < itemsSliderNotes->get_Count(); i++) {
+                auto noteController = itemsSliderNotes->get_Item(i);
+                if (HandleEvent(activeEvent, noteController)) {
+                    return;
+                }
+            }
+        } else if (activeEvent.EventType == NoteEventType::Bomb) {
             auto items = _bombNotePool->get_activeItems();
-            for (int i = 0; i < items->get_Count(); i++)
-            {
+            for (int i = 0; i < items->get_Count(); i++) {
                 auto bombController = items->get_Item(i);
-                if (HandleEvent(activeEvent, bombController))
-                {
-                    foundNote = true;
-                    break;
+                if (HandleEvent(activeEvent, bombController)) {
+                    return;
                 }
             }
         }
-        return foundNote;
     }
-    bool NotePlayer::HandleEvent(Data::Private::NoteEvent activeEvent, GlobalNamespace::NoteController* noteController)
+    bool NotePlayer::HandleEvent(Data::Private::NoteEvent &activeEvent, GlobalNamespace::NoteController* noteController)
     {
         if (DoesNoteMatchID(activeEvent.TheNoteID, noteController->noteData))
         {
@@ -114,21 +111,40 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         return false;
     }
-    bool NotePlayer::DoesNoteMatchID(Data::Private::NoteID id, GlobalNamespace::NoteData* noteData)
+    bool NotePlayer::DoesNoteMatchID(Data::Private::NoteID &id, GlobalNamespace::NoteData* noteData)
     {
-        return Mathf::Approximately(id.Time, noteData->time) && id.LineIndex == noteData->lineIndex && id.LineLayer == noteData->noteLineLayer && id.ColorType == noteData->colorType && id.CutDirection == noteData->cutDirection;
+        if (Mathf::Approximately(id.Time, noteData->time) ||
+            id.LineIndex != noteData->lineIndex ||
+            id.LineLayer != noteData->noteLineLayer ||
+            id.ColorType != noteData->colorType ||
+            id.CutDirection != noteData->cutDirection) {
+            return false;
+        }
+
+        if (id.GameplayType.has_value() && id.GameplayType.value() != noteData->gameplayType.value) {
+            return false;
+        }
+        
+        if (id.ScoringType.has_value() && id.ScoringType.value() != noteData->scoringType.value) {
+            return false;
+        }
+        
+        if (id.CutDirectionAngleOffset.has_value() && !Mathf::Approximately(id.CutDirectionAngleOffset.value(), noteData->cutDirectionAngleOffset)) {
+            return false;
+        }
+        return true;
     }
     void NotePlayer::TimeUpdate(float newTime)
     {
         for (int c = 0; c < _sortedNoteEvents.size(); c++)
         {
-            if (_sortedNoteEvents[c].Time >= newTime)
+            if (_sortedNoteEvents[c].Time > newTime)
             {
-                _lastIndex = c;
-                Tick();
-                break;
+                _nextIndex = c;
+                return;
             }
         }
+        _nextIndex = _sortedNoteEvents.size();
     }
     static bool operator==(const GlobalNamespace::NoteCutInfo& lhs, const GlobalNamespace::NoteCutInfo& rhs)
     {

@@ -16,7 +16,7 @@
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, HeightPlayer, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Playback", INTERFACES, 0, nullptr,
-                                    DECLARE_PRIVATE_FIELD(int, _lastIndex);
+                                    DECLARE_PRIVATE_FIELD(int, _nextIndex);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::PlayerHeightDetector*, _playerHeightDetector);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::GameplayCoreSceneSetupData*, _gameplayCoreSceneSetupData);

@@ -26,7 +26,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::IReturnToMenuController*, _returnToMenuController);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::PlayerTransforms*, _playerTransforms);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
-                                    DECLARE_PRIVATE_FIELD(int, _lastIndex);
+                                    DECLARE_PRIVATE_FIELD(int, _nextIndex);
                                     DECLARE_PRIVATE_FIELD(UnityEngine::Camera*, _spectatorCamera);
                                     DECLARE_PRIVATE_FIELD(UnityEngine::Camera*, _desktopCamera);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::MainSettingsModelSO*, _mainSettingsModelSO);

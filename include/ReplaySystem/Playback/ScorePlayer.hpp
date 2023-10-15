@@ -16,7 +16,7 @@
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, ScorePlayer, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Playback", INTERFACES, 0, nullptr,
-                                    DECLARE_PRIVATE_FIELD(int, _lastIndex);
+                                    DECLARE_PRIVATE_FIELD(int, _nextIndex);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::ScoreController*, _scoreController);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::IGameEnergyCounter*, _gameEnergyCounter);
@@ -25,7 +25,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, ScorePla
                                     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
                                     vector<Data::Private::NoteEvent> _sortedNoteEvents;
                                     vector<Data::Private::ScoreEvent> _sortedScoreEvents;
-                                    void UpdateScore(int newScore, float time);
+                                    void UpdateScore(int newScore, std::optional<int> immediateMaxPossibleScore, float time);
+                                    void UpdateMultiplier();
                                     int CalculatePostNoteCountForTime(float time);)
 
 #undef INTERFACES

@@ -1,4 +1,5 @@
 #include "Data/Private/ReplayFile.hpp"
+#include "UnityEngine/Mathf.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/Vector3.hpp"
 
@@ -78,6 +79,13 @@ namespace ScoreSaber::Data::Private
         Time = _Time;
     }
 
+    ScoreEvent::ScoreEvent(int _Score, float _Time, int _ImmediateMaxPossible)
+    {
+        Score = _Score;
+        Time = _Time;
+        ImmediateMaxPossibleScore = _ImmediateMaxPossible;
+    }
+
     ScoreEvent::ScoreEvent(){};
 
     ComboEvent::ComboEvent(int _Combo, float _Time)
@@ -95,6 +103,18 @@ namespace ScoreSaber::Data::Private
         LineIndex = _LineIndex;
         ColorType = _ColorType;
         CutDirection = _CutDirection;
+    }
+
+    NoteID::NoteID(float _Time, int _LineLayer, int _LineIndex, int _ColorType, int _CutDirection, int _GameplayType, int _ScoringType, int _CutDirectionAngleOffset)
+    {
+        Time = _Time;
+        LineLayer = _LineLayer;
+        LineIndex = _LineIndex;
+        ColorType = _ColorType;
+        CutDirection = _CutDirection;
+        GameplayType = _GameplayType;
+        ScoringType = _ScoringType;
+        CutDirectionAngleOffset = _CutDirectionAngleOffset;
     }
 
     NoteID::NoteID(){};
@@ -174,6 +194,35 @@ namespace ScoreSaber::Data::Private
         Time = _Time;
         UnityTimescale = _UnityTimescale;
         TimeSyncTimescale = _TimeSyncTimescale;
+    }
+    
+    NoteEvent::NoteEvent(NoteID _TheNoteID, NoteEventType _EventType, VRPosition _CutPoint, VRPosition _CutNormal, VRPosition _SaberDirection,
+                         int _SaberType, bool _DirectionOK, float _SaberSpeed, float _CutAngle, float _CutDistanceToCenter, float _CutDirectionDeviation,
+                         float _BeforeCutRating, float _AfterCutRating, float _Time, float _UnityTimescale, float _TimeSyncTimescale, float _TimeDeviation,
+                         VRRotation _WorldRotation, VRRotation _InverseWorldRotation, VRRotation _NoteRotation, VRPosition _NotePosition)
+    {
+        TheNoteID = _TheNoteID;
+        EventType = _EventType;
+        CutPoint = _CutPoint;
+        CutNormal = _CutNormal;
+        SaberDirection = _SaberDirection;
+        SaberType = _SaberType;
+        DirectionOK = _DirectionOK;
+        SaberSpeed = _SaberSpeed;
+        CutAngle = _CutAngle;
+        CutDistanceToCenter = _CutDistanceToCenter;
+        CutDirectionDeviation = _CutDirectionDeviation;
+        BeforeCutRating = _BeforeCutRating;
+        AfterCutRating = _AfterCutRating;
+        Time = _Time;
+        UnityTimescale = _UnityTimescale;
+        TimeSyncTimescale = _TimeSyncTimescale;
+
+        TimeDeviation = _TimeDeviation;
+        WorldRotation = _WorldRotation;
+        InverseWorldRotation = _InverseWorldRotation;
+        NoteRotation = _NoteRotation;
+        NotePosition = _NotePosition;
     }
 
     NoteEvent::NoteEvent(){};

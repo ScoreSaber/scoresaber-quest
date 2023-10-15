@@ -21,7 +21,8 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         for (int c = 0; c < _sortedMultiplierEvents.size(); c++)
         {
-            if (_sortedMultiplierEvents[c].Time >= newTime)
+            // TODO: this has potential to have problems if _sortedMultiplierEvents[c].Time is within an epsilon of newTime, potentially applying combo changes twice or not at all
+            if (_sortedMultiplierEvents[c].Time > newTime)
             {
                 int multiplier = c != 0 ? _sortedMultiplierEvents[c - 1].Multiplier : 1;
                 float progress = c != 0 ? _sortedMultiplierEvents[c - 1].NextMultiplierProgress : 0.0f;
@@ -29,8 +30,10 @@ namespace ScoreSaber::ReplaySystem::Playback
                 return;
             }
         }
-        auto lastEvent = _sortedMultiplierEvents[_sortedMultiplierEvents.size() - 1];
-        UpdateMultiplier(lastEvent.Multiplier, lastEvent.NextMultiplierProgress);
+        if (_sortedMultiplierEvents.size() > 0) {
+            auto lastEvent = _sortedMultiplierEvents[_sortedMultiplierEvents.size() - 1];
+            UpdateMultiplier(lastEvent.Multiplier, lastEvent.NextMultiplierProgress);
+        }
     }
     void MultiplierPlayer::UpdateMultiplier(int multiplier, float progress)
     {

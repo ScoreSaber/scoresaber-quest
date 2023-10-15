@@ -65,7 +65,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
     std::shared_ptr<Metadata> MetadataRecorder::Export()
     {
         auto metadata = make_shared<Metadata>();
-        metadata->Version = "2.0.0";
+        metadata->Version = "3.0.0";
         metadata->LevelID = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_level()->i_IPreviewBeatmapLevel()->get_levelID());
         metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->difficultyBeatmap->get_difficulty());
         metadata->Characteristic = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);

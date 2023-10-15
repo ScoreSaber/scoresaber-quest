@@ -53,7 +53,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void ScoreEventRecorder::ScoreController_scoreDidChangeEvent(int rawScore, int score)
     {
-        _scoreKeyFrames.push_back(ScoreEvent(rawScore, _audioTimeSyncController->songTime));
+        _scoreKeyFrames.push_back(ScoreEvent(rawScore, _audioTimeSyncController->songTime, _scoreController->immediateMaxPossibleMultipliedScore));
     }
 
     void ScoreEventRecorder::ScoreController_multiplierDidChangeEvent(int multiplier, float nextMultiplierProgress)

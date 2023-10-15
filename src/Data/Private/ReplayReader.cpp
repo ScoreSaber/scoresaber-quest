@@ -37,6 +37,15 @@ namespace ScoreSaber::Data::Private::ReplayReader
                                            ReadComboKeyframes(inputStream, pointers.comboKeyframes),
                                            ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
                                            ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
+        } else if (metadata->Version == "3.0.0") {
+            return make_shared<ReplayFile>(metadata,
+                                           ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
+                                           ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
+                                           ReadNoteKeyframes_v3(inputStream, pointers.noteKeyframes),
+                                           ReadScoreKeyframes_v3(inputStream, pointers.scoreKeyframes),
+                                           ReadComboKeyframes(inputStream, pointers.comboKeyframes),
+                                           ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
+                                           ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
         } else {
             return nullptr;
         }
@@ -96,6 +105,18 @@ namespace ScoreSaber::Data::Private::ReplayReader
         return noteKeyframes;
     }
 
+    vector<NoteEvent> ReadNoteKeyframes_v3(stringstream& inputStream, int offset)
+    {
+        inputStream.seekg(offset);
+        int count = ReadInt(inputStream);
+        vector<NoteEvent> noteKeyframes = vector<NoteEvent>();
+        for (int i = 0; i < count; i++)
+        {
+            noteKeyframes.push_back(ReadNoteEvent_v3(inputStream));
+        }
+        return noteKeyframes;
+    }
+
     vector<ScoreEvent> ReadScoreKeyframes(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
@@ -104,6 +125,18 @@ namespace ScoreSaber::Data::Private::ReplayReader
         for (int i = 0; i < count; i++)
         {
             scoreKeyframes.push_back(ReadScoreEvent(inputStream));
+        }
+        return scoreKeyframes;
+    }
+
+    vector<ScoreEvent> ReadScoreKeyframes_v3(stringstream& inputStream, int offset)
+    {
+        inputStream.seekg(offset);
+        int count = ReadInt(inputStream);
+        vector<ScoreEvent> scoreKeyframes = vector<ScoreEvent>();
+        for (int i = 0; i < count; i++)
+        {
+            scoreKeyframes.push_back(ReadScoreEvent_v3(inputStream));
         }
         return scoreKeyframes;
     }
@@ -179,14 +212,32 @@ namespace ScoreSaber::Data::Private::ReplayReader
                          ReadFloat(inputStream), ReadFloat(inputStream), ReadFloat(inputStream));
     }
 
+    NoteEvent ReadNoteEvent_v3(stringstream& inputStream)
+    {
+        return NoteEvent(ReadNoteID_v3(inputStream), (NoteEventType)ReadInt(inputStream), ReadVRPosition(inputStream), ReadVRPosition(inputStream),
+                         ReadVRPosition(inputStream), ReadInt(inputStream), ReadBool(inputStream), ReadFloat(inputStream), ReadFloat(inputStream),
+                         ReadFloat(inputStream), ReadFloat(inputStream), ReadFloat(inputStream), ReadFloat(inputStream),
+                         ReadFloat(inputStream), ReadFloat(inputStream), ReadFloat(inputStream), ReadFloat(inputStream),
+                         ReadVRRotation(inputStream), ReadVRRotation(inputStream), ReadVRRotation(inputStream), ReadVRPosition(inputStream));
+    }
+
     NoteID ReadNoteID(stringstream& inputStream)
     {
         return NoteID(ReadFloat(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream));
     }
 
+    NoteID ReadNoteID_v3(stringstream& inputStream)
+    {
+        return NoteID(ReadFloat(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadInt(inputStream), ReadFloat(inputStream));
+    }
+
     ScoreEvent ReadScoreEvent(stringstream& inputStream)
     {
         return ScoreEvent(ReadInt(inputStream), ReadFloat(inputStream));
+    }
+    ScoreEvent ReadScoreEvent_v3(stringstream& inputStream)
+    {
+        return ScoreEvent(ReadInt(inputStream), ReadFloat(inputStream), ReadInt(inputStream));
     }
 
     ComboEvent ReadComboEvent(stringstream& inputStream)

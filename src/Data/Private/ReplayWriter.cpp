@@ -132,6 +132,12 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         bytesWritten += WriteFloat(noteEvent.Time, outputStream);
         bytesWritten += WriteFloat(noteEvent.UnityTimescale, outputStream);
         bytesWritten += WriteFloat(noteEvent.TimeSyncTimescale, outputStream);
+
+        bytesWritten += WriteFloat(noteEvent.TimeDeviation.value(), outputStream);
+        bytesWritten += WriteVRRotation(noteEvent.WorldRotation.value(), outputStream);
+        bytesWritten += WriteVRRotation(noteEvent.InverseWorldRotation.value(), outputStream);
+        bytesWritten += WriteVRRotation(noteEvent.NoteRotation.value(), outputStream);
+        bytesWritten += WriteVRPosition(noteEvent.NotePosition.value(), outputStream);
         return bytesWritten;
     }
 
@@ -143,6 +149,9 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         bytesWritten += WriteInt(noteID.LineIndex, outputStream);
         bytesWritten += WriteInt(noteID.ColorType, outputStream);
         bytesWritten += WriteInt(noteID.CutDirection, outputStream);
+        bytesWritten += WriteInt(noteID.GameplayType.value(), outputStream);
+        bytesWritten += WriteInt(noteID.ScoringType.value(), outputStream);
+        bytesWritten += WriteFloat(noteID.CutDirectionAngleOffset.value(), outputStream);
         return bytesWritten;
     }
 
@@ -152,6 +161,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         int bytesWritten = 0;
         bytesWritten += WriteInt(scoreEvent.Score, outputStream);
         bytesWritten += WriteFloat(scoreEvent.Time, outputStream);
+        bytesWritten += WriteInt(scoreEvent.ImmediateMaxPossibleScore.value(), outputStream);
         return bytesWritten;
     }
 

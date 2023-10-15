@@ -68,7 +68,8 @@ namespace ScoreSaber::ReplaySystem::Recorders
     void NoteEventRecorder::ScoreController_scoringForNoteFinishedEvent(ScoringElement* element)
     {
         auto noteData = element->noteData;
-        NoteID noteID = NoteID(noteData->time, (int)noteData->noteLineLayer, noteData->lineIndex, (int)noteData->colorType, (int)noteData->cutDirection);
+        NoteID noteID = NoteID(noteData->time, (int)noteData->noteLineLayer, noteData->lineIndex, (int)noteData->colorType, (int)noteData->cutDirection,
+                               (int)noteData->gameplayType, (int)noteData->scoringType, noteData->cutDirectionAngleOffset);
 
         if (auto goodCut = il2cpp_utils::try_cast<GoodCutScoringElement>(element).value_or(nullptr))
         {
@@ -81,7 +82,10 @@ namespace ScoreSaber::ReplaySystem::Recorders
                                                noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
                                                noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
                                                goodCut->cutScoreBuffer->get_beforeCutSwingRating(), goodCut->cutScoreBuffer->get_afterCutSwingRating(),
-                                               cutTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
+                                               cutTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
+                                               
+                                               noteCutInfo.timeDeviation, VRRotation(noteCutInfo.worldRotation), VRRotation(noteCutInfo.inverseWorldRotation),
+                                               VRRotation(noteCutInfo.noteRotation), VRPosition(noteCutInfo.notePosition)));
         }
         else if (auto badCut = il2cpp_utils::try_cast<BadCutScoringElement>(element).value_or(nullptr))
         {
@@ -93,13 +97,20 @@ namespace ScoreSaber::ReplaySystem::Recorders
                                                (int)noteCutInfo.saberType, noteCutInfo.directionOK,
                                                noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
                                                noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
-                                               0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
+                                               0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
+                                               
+                                               noteCutInfo.timeDeviation, VRRotation(noteCutInfo.worldRotation), VRRotation(noteCutInfo.inverseWorldRotation),
+                                               VRRotation(noteCutInfo.noteRotation), VRPosition(noteCutInfo.notePosition)));
         }
         else if (noteData->colorType != ColorType::None && il2cpp_utils::try_cast<MissScoringElement>(element).value_or(nullptr))
         {
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Miss, VRPosition(), VRPosition(), VRPosition(), (int)noteData->colorType,
                                                false, 0,
-                                               0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale));
+                                               0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
+                                               
+                                               // I couldn't find where to grab these for misses
+                                               0, VRRotation(), VRRotation(),
+                                               VRRotation(), VRPosition()));
         }
     }
 

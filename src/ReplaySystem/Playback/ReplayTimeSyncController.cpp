@@ -51,7 +51,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     void ReplayTimeSyncController::UpdateTimes()
     {
         _comboPlayer->TimeUpdate(_audioTimeSyncController->songTime);
-        _energyPlayer->TimeUpdate(_audioTimeSyncController->songTime);
+        _energyPlayer->TimeUpdate(_audioTimeSyncController->songTime); // needs to be run before the ScorePlayer
         if(_heightPlayer)
             _heightPlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _multiplierPlayer->TimeUpdate(_audioTimeSyncController->songTime);
@@ -70,8 +70,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         CancelAllHitSounds();
 
-        auto gameNotePool = _basicBeatmapObjectManager->basicGameNotePoolContainer;
-        auto gameNotePoolItems = gameNotePool->get_activeItems();
+        auto gameNotePoolItems = _basicBeatmapObjectManager->basicGameNotePoolContainer->get_activeItems();
         for (int i = 0; i < gameNotePoolItems->get_Count(); i++)
         {
             auto item = gameNotePoolItems->get_Item(i);
@@ -81,8 +80,27 @@ namespace ScoreSaber::ReplaySystem::Playback
             item->get_gameObject()->SetActive(true);
             item->Dissolve(0.0f);
         }
-        auto bombNotePool = _basicBeatmapObjectManager->bombNotePoolContainer;
-        auto bombNotePoolItems = bombNotePool->get_activeItems();
+        auto sliderHeadPoolItems = _basicBeatmapObjectManager->burstSliderHeadGameNotePoolContainer->get_activeItems();
+        for (int i = 0; i < sliderHeadPoolItems->get_Count(); i++)
+        {
+            auto item = sliderHeadPoolItems->get_Item(i);
+            item->Hide(false);
+            item->Pause(false);
+            item->set_enabled(true);
+            item->get_gameObject()->SetActive(true);
+            item->Dissolve(0.0f);
+        }
+        auto sliderNotePoolItems = _basicBeatmapObjectManager->burstSliderGameNotePoolContainer->get_activeItems();
+        for (int i = 0; i < sliderNotePoolItems->get_Count(); i++)
+        {
+            auto item = sliderNotePoolItems->get_Item(i);
+            item->Hide(false);
+            item->Pause(false);
+            item->set_enabled(true);
+            item->get_gameObject()->SetActive(true);
+            item->Dissolve(0.0f);
+        }
+        auto bombNotePoolItems = _basicBeatmapObjectManager->bombNotePoolContainer->get_activeItems();
         for (int i = 0; i < bombNotePoolItems->get_Count(); i++)
         {
             auto item = bombNotePoolItems->get_Item(i);
@@ -93,9 +111,10 @@ namespace ScoreSaber::ReplaySystem::Playback
             item->Dissolve(0.0f);
         }
 
-        for (int i = 0; i < _basicBeatmapObjectManager->get_activeObstacleControllers()->get_Count(); i++)
+        auto obstacleNotePool = _basicBeatmapObjectManager->get_activeObstacleControllers();
+        for (int i = 0; i < obstacleNotePool->get_Count(); i++)
         {
-            auto item = _basicBeatmapObjectManager->get_activeObstacleControllers()->get_Item(i);
+            auto item = obstacleNotePool->get_Item(i);
             item->Hide(false);
             item->Pause(false);
             item->set_enabled(true);

@@ -116,12 +116,12 @@ namespace ScoreSaber::Services::UploadService
 
         std::string replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic,
                                                                                           ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id, songName);
-        Seven(beatmap, levelCompletionResults->modifiedScore, encryptedPacket, replayFileName);
+        Seven(beatmap, levelCompletionResults->modifiedScore, levelCompletionResults->multipliedScore, encryptedPacket, replayFileName);
     }
 
-    void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, std::string uploadPacket, std::string replayFileName)
+    void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, int multipliedScore, std::string uploadPacket, std::string replayFileName)
     {
-        std::thread t([beatmap, modifiedScore, uploadPacket, replayFileName] {
+        std::thread t([beatmap, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
 
             LeaderboardService::GetLeaderboardData(
@@ -151,14 +151,11 @@ namespace ScoreSaber::Services::UploadService
                     int attempts = 0;
 
                     auto [beatmapDataBasicInfo, readonlyBeatmapData] = BeatmapUtils::getBeatmapData(beatmap);
-                    bool containsV3Stuff = BeatmapUtils::containsV3Stuff(readonlyBeatmapData);
+                    int maxScore = ScoreModel::ComputeMaxMultipliedScoreForBeatmap(readonlyBeatmapData);
 
-                    if (containsV3Stuff)
-                    {
-                        // ERROR("Beatmap contains V3 stuff, not uploading");
-                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>New note type not supported, not uploading</color>");
-                        uploading = false;
-                        return;
+                    if(multipliedScore > maxScore) {
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>Failed to upload (score was</color>");
+                                
                     }
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));

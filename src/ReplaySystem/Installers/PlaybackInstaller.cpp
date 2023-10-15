@@ -35,12 +35,12 @@ namespace ScoreSaber::ReplaySystem::Installers
             auto container = get_Container();
             container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
             container->BindInterfacesAndSelfTo<Playback::NotePlayer*>()->AsSingle();
+            container->Bind<Playback::EnergyPlayer*>()->AsSingle(); // needs to be injected before the ScorePlayer to make the TimeUpdate methods run in the correct order (order fixed in case we can ever use interfaces)
             container->BindInterfacesAndSelfTo<Playback::ScorePlayer*>()->AsSingle();
             if(_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
                 container->BindInterfacesAndSelfTo<Playback::HeightPlayer*>()->AsSingle();
 
             container->Bind<Playback::ComboPlayer*>()->AsSingle();
-            container->Bind<Playback::EnergyPlayer*>()->AsSingle();
             container->Bind<Playback::MultiplierPlayer*>()->AsSingle();
             container->BindInterfacesAndSelfTo<Playback::ReplayTimeSyncController*>()->AsSingle();
             FromNewComponentOnNewGameObject(container->Bind<UI::GameReplayUI*>())->AsSingle()->NonLazy();

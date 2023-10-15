@@ -28,60 +28,64 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     void ScorePlayer::Tick()
     {
-        if (_lastIndex >= _sortedScoreEvents.size())
-        {
-            return;
-        }
-        int recentMultipliedScore = -1;
-        while (_audioTimeSyncController->songTime >= _sortedScoreEvents[_lastIndex].Time)
-        {
-            ScoreEvent activeEvent = _sortedScoreEvents[_lastIndex++];
-            recentMultipliedScore = _scoreController->multipliedScore = activeEvent.Score;
-            if (_lastIndex >= _sortedScoreEvents.size())
-            {
-                break;
-            }
+        optional<int> recentMultipliedScore;
+        optional<int> recentImmediateMaxPossibleScore;
+        while (_nextIndex < _sortedScoreEvents.size() && _audioTimeSyncController->songTime >= _sortedScoreEvents[_nextIndex].Time) {
+            ScoreEvent activeEvent = _sortedScoreEvents[_nextIndex++];
+            recentMultipliedScore = activeEvent.Score;
+            recentImmediateMaxPossibleScore = activeEvent.ImmediateMaxPossibleScore;
         }
 
-        if (recentMultipliedScore != -1)
-        {
-            auto postNoteCount = CalculatePostNoteCountForTime(_audioTimeSyncController->songTime);
-            _scoreController->immediateMaxPossibleMultipliedScore = BeatmapUtils::OldMaxRawScoreForNumberOfNotes(postNoteCount);
-
-            if (_scoreController->scoreDidChangeEvent != nullptr)
-            {
-                _scoreController->scoreDidChangeEvent->Invoke(recentMultipliedScore,
-                                                              GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(recentMultipliedScore, _scoreController->prevMultiplierFromModifiers));
-            }
+        if (recentMultipliedScore.has_value()) {
+            UpdateScore(recentMultipliedScore.value(), recentImmediateMaxPossibleScore, _audioTimeSyncController->songTime);
         }
     }
 
     void ScorePlayer::TimeUpdate(float newTime)
     {
-        for (int c = 0; c < _sortedScoreEvents.size(); c++)
-        {
-            if (_sortedScoreEvents[c].Time >= newTime)
-            {
-                _lastIndex = c;
-                Tick();
-                UpdateScore(c != 0 ? _sortedScoreEvents[c - 1].Score : 0, newTime);
-                return;
+        ScorePlayer::UpdateMultiplier();
+
+        _nextIndex = _sortedScoreEvents.size();
+        for (int c = 0; c < _sortedScoreEvents.size(); c++) {
+            if (_sortedScoreEvents[c].Time > newTime) {
+                _nextIndex = c;
+                break;
             }
         }
-        UpdateScore(_sortedScoreEvents[_sortedScoreEvents.size() - 1].Score, newTime);
+
+        if (_nextIndex > 0) {
+            auto scoreEvent = _sortedScoreEvents[_nextIndex - 1];
+            UpdateScore(scoreEvent.Score, scoreEvent.ImmediateMaxPossibleScore, newTime);
+        } else {
+            UpdateScore(0, 0, newTime);
+        }
     }
 
-    void ScorePlayer::UpdateScore(int newScore, float time)
+    void ScorePlayer::UpdateMultiplier()
     {
-        int postNoteCount = CalculatePostNoteCountForTime(time);
         float totalMultiplier = _scoreController->gameplayModifiersModel->GetTotalMultiplier(_scoreController->gameplayModifierParams, _gameEnergyCounter->get_energy());
         _scoreController->prevMultiplierFromModifiers = totalMultiplier;
-        int immediate = _scoreController->immediateMaxPossibleMultipliedScore = BeatmapUtils::OldMaxRawScoreForNumberOfNotes(postNoteCount);
-        int earlyScore = newScore;
-        _scoreController->multipliedScore = earlyScore;
-        if (_scoreController->scoreDidChangeEvent != nullptr)
-        {
-            _scoreController->scoreDidChangeEvent->Invoke(earlyScore, GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(earlyScore, totalMultiplier));
+    }
+
+    void ScorePlayer::UpdateScore(int newScore, optional<int> immediateMaxPossibleScore, float time)
+    {
+        int immediate;
+        if (immediateMaxPossibleScore.has_value()) {
+            immediate = immediateMaxPossibleScore.value();
+        } else {
+            immediate = BeatmapUtils::OldMaxRawScoreForNumberOfNotes(CalculatePostNoteCountForTime(time));
+        }
+        float multiplier = _scoreController->prevMultiplierFromModifiers;
+
+        int newModifiedScore = GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(newScore, multiplier);
+
+        _scoreController->multipliedScore = newScore;
+        _scoreController->immediateMaxPossibleMultipliedScore = immediate;
+        _scoreController->modifiedScore = newModifiedScore;
+        _scoreController->immediateMaxPossibleModifiedScore = GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(immediate, multiplier);
+
+        if (_scoreController->scoreDidChangeEvent != nullptr) {
+            _scoreController->scoreDidChangeEvent->Invoke(newScore, newModifiedScore);
         }
     }
     int ScorePlayer::CalculatePostNoteCountForTime(float time)

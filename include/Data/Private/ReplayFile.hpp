@@ -1,9 +1,11 @@
 #pragma once
 
+#include <optional>
 #include <stdlib.h>
 #include <string>
 #include <vector>
 
+#include "GlobalNamespace/NoteData.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/Vector3.hpp"
 
@@ -59,8 +61,10 @@ namespace ScoreSaber::Data::Private
     {
         ScoreEvent();
         ScoreEvent(int Score, float Time);
+        ScoreEvent(int Score, float Time, int ImmediateMaxPossible);
         int Score;
         float Time;
+        std::optional<int> ImmediateMaxPossibleScore;
     };
 
     struct ComboEvent
@@ -84,11 +88,15 @@ namespace ScoreSaber::Data::Private
     {
         NoteID();
         NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection);
+        NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection, int GameplayType, int ScoringType, int CutDirectionAngleOffset);
         float Time;
         int LineLayer;
         int LineIndex;
         int ColorType;
         int CutDirection;
+        std::optional<int> GameplayType;
+        std::optional<int> ScoringType;
+        std::optional<float> CutDirectionAngleOffset;
     };
 
     struct EnergyEvent
@@ -152,6 +160,10 @@ namespace ScoreSaber::Data::Private
         NoteEvent(NoteID TheNoteID, NoteEventType EventType, VRPosition CutPoint, VRPosition CutNormal, VRPosition SaberDirection, int SaberType, bool DirectionOK,
                   float SaberSpeed, float CutAngle, float CutDistanceToCenter, float CutDirectionDeviation, float BeforeCutRating, float AfterCutRating,
                   float Time, float UnityTimescale, float TimeSyncTimescale);
+        NoteEvent(NoteID TheNoteID, NoteEventType EventType, VRPosition CutPoint, VRPosition CutNormal, VRPosition SaberDirection, int SaberType, bool DirectionOK,
+                  float SaberSpeed, float CutAngle, float CutDistanceToCenter, float CutDirectionDeviation, float BeforeCutRating, float AfterCutRating,
+                  float Time, float UnityTimescale, float TimeSyncTimescale, float TimeDeviation, VRRotation WorldRotation, VRRotation InverseWorldRotation,
+                  VRRotation NoteRotation, VRPosition NotePosition);
         NoteID TheNoteID;
         NoteEventType EventType;
         VRPosition CutPoint;
@@ -168,6 +180,13 @@ namespace ScoreSaber::Data::Private
         float Time;
         float UnityTimescale;
         float TimeSyncTimescale;
+
+        // stored but not replayed
+        std::optional<float> TimeDeviation;
+        std::optional<VRRotation> WorldRotation;
+        std::optional<VRRotation> InverseWorldRotation;
+        std::optional<VRRotation> NoteRotation;
+        std::optional<VRPosition> NotePosition;
     };
 
     struct ReplayFile

@@ -36,11 +36,13 @@ struct RecognizedNoteCutInfo
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlayer, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Playback", INTERFACES, 0, nullptr,
-                                    DECLARE_PRIVATE_FIELD(int, _lastIndex);
+                                    DECLARE_PRIVATE_FIELD(int, _nextIndex);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::SaberManager*, _saberManager);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::BasicBeatmapObjectManager*, _basicBeatmapObjectManager);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::MemoryPoolContainer_1<GlobalNamespace::GameNoteController*>*, _gameNotePool);
+                                    DECLARE_PRIVATE_FIELD(GlobalNamespace::MemoryPoolContainer_1<GlobalNamespace::GameNoteController*>*, _burstSliderHeadNotePool);
+                                    DECLARE_PRIVATE_FIELD(GlobalNamespace::MemoryPoolContainer_1<GlobalNamespace::BurstSliderGameNoteController*>*, _burstSliderNotePool);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::MemoryPoolContainer_1<GlobalNamespace::BombNoteController*>*, _bombNotePool);
                                     DECLARE_INSTANCE_METHOD(void, ForceCompleteGoodScoringElements, GlobalNamespace::GoodCutScoringElement* scoringElement, GlobalNamespace::NoteCutInfo noteCutInfo, GlobalNamespace::CutScoreBuffer* cutScoreBuffer);
                                     DECLARE_CTOR(ctor, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager);
@@ -50,8 +52,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlay
                                     std::vector<RecognizedNoteCutInfo> _recognizedNoteCutInfos;
                                     // std::map<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> _recognizedNoteCutInfos;
                                     // System::Collections::Generic::Dictionary_2<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> * _recognizedNoteCutInfos;
-                                    bool ProcessEvent(Data::Private::NoteEvent activeEvent);
-                                    bool HandleEvent(Data::Private::NoteEvent activeEvent, GlobalNamespace::NoteController* noteController);
-                                    bool DoesNoteMatchID(Data::Private::NoteID id, GlobalNamespace::NoteData* noteData);)
+                                    void ProcessEvent(Data::Private::NoteEvent &activeEvent);
+                                    bool HandleEvent(Data::Private::NoteEvent &activeEvent, GlobalNamespace::NoteController* noteController);
+                                    bool DoesNoteMatchID(Data::Private::NoteID &id, GlobalNamespace::NoteData* noteData);)
 
 #undef INTERFACES

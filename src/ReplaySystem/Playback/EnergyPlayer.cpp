@@ -25,13 +25,15 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void EnergyPlayer::TimeUpdate(float newTime)
     {
+        // TODO: How would this ever be null? We get the object via Zenject and that would fail if it was null     
         if (_gameEnergyUIPanel == nullptr)
         {
             return;
         }
         for (int c = 0; c < _sortedEnergyEvents.size(); c++)
         {
-            if (_sortedEnergyEvents[c].Time >= newTime)
+            // TODO: this has potential to have problems if _sortedEnergyEvents[c].Time is within an epsilon of newTime, potentially applying energy changes twice or not at all
+            if (_sortedEnergyEvents[c].Time > newTime)
             {
                 float energy = c != 0 ? _sortedEnergyEvents[c - 1].Energy : 0.5f;
                 UpdateEnergy(energy);

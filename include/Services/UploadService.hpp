@@ -22,7 +22,7 @@ namespace ScoreSaber::Services::UploadService
 
     void Six(GlobalNamespace::IDifficultyBeatmap* beatmap, GlobalNamespace::LevelCompletionResults* levelCompletionResults);
 
-    void Seven(GlobalNamespace::IDifficultyBeatmap* beatmap, int modifiedScore, std::string uploadPacket, std::string replayFileName);
+    void Seven(GlobalNamespace::IDifficultyBeatmap* beatmap, int modifiedScore, int multipliedScore, std::string uploadPacket, std::string replayFileName);
     
     void SaveReplay(const std::vector<char> &replay, std::string replayFileName);
 

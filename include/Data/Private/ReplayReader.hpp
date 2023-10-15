@@ -10,7 +10,9 @@ namespace ScoreSaber::Data::Private::ReplayReader
     vector<VRPoseGroup> ReadPoseKeyframes(stringstream& inputStream, int offset);
     vector<HeightEvent> ReadHeightKeyframes(stringstream& inputStream, int offset);
     vector<NoteEvent> ReadNoteKeyframes(stringstream& inputStream, int offset);
+    vector<NoteEvent> ReadNoteKeyframes_v3(stringstream& inputStream, int offset);
     vector<ScoreEvent> ReadScoreKeyframes(stringstream& inputStream, int offset);
+    vector<ScoreEvent> ReadScoreKeyframes_v3(stringstream& inputStream, int offset);
     vector<ComboEvent> ReadComboKeyframes(stringstream& inputStream, int offset);
     vector<MultiplierEvent> ReadMultiplierKeyframes(stringstream& inputStream, int offset);
     vector<EnergyEvent> ReadEnergyKeyframes(stringstream& inputStream, int offset);
@@ -21,8 +23,11 @@ namespace ScoreSaber::Data::Private::ReplayReader
     VRPose ReadVRPose(stringstream& inputStream);
     HeightEvent ReadHeightEvent(stringstream& inputStream);
     NoteEvent ReadNoteEvent(stringstream& inputStream);
+    NoteEvent ReadNoteEvent_v3(stringstream& inputStream);
     NoteID ReadNoteID(stringstream& inputStream);
+    NoteID ReadNoteID_v3(stringstream& inputStream);
     ScoreEvent ReadScoreEvent(stringstream& inputStream);
+    ScoreEvent ReadScoreEvent_v3(stringstream& inputStream);
     ComboEvent ReadComboEvent(stringstream& inputStream);
     MultiplierEvent ReadMultiplierEvent(stringstream& inputStream);
     EnergyEvent ReadEnergyEvent(stringstream& inputStream);

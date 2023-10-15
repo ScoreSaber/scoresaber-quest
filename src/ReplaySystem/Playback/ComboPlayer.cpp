@@ -26,7 +26,8 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         for (int c = 0; c < _sortedComboEvents.size(); c++)
         {
-            if (_sortedComboEvents[c].Time >= newTime)
+            // TODO: this has potential to have problems if _sortedComboEvents[c].Time is within an epsilon of newTime, potentially applying combo twice or not at all
+            if (_sortedComboEvents[c].Time > newTime)
             {
                 UpdateCombo(newTime, c != 0 ? _sortedComboEvents[c - 1].Combo : 0);
                 return;

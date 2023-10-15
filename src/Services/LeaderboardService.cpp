@@ -99,15 +99,7 @@ namespace ScoreSaber::Services::LeaderboardService
 
         auto [beatmapDataBasicInfo, readonlyBeatmapData] = BeatmapUtils::getBeatmapData(difficultyBeatmap);
 
-        bool containsV3Stuff = BeatmapUtils::containsV3Stuff(readonlyBeatmapData);
-
-        if (containsV3Stuff)
-        {
-            finished(GetLeaderboardError("Maps with new note types currently not supported"));
-            return;
-        }
-
-        int maxScore = BeatmapUtils::getMaxScore(beatmapDataBasicInfo);
+        int maxScore = BeatmapUtils::getMaxScore(readonlyBeatmapData);
 
         WebUtils::GetAsync(
             url, [=](long code, std::string result) {

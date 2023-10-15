@@ -32,49 +32,32 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void HeightPlayer::Tick()
     {
-        if (_sortedHeightEvents.size() == 0)
-        {
-            return;
+        optional<float> newHeight;
+        while (_nextIndex < _sortedHeightEvents.size() && _audioTimeSyncController->get_songEndTime() >= _sortedHeightEvents[_nextIndex].Time) {
+            newHeight = _sortedHeightEvents[_nextIndex].Height;
+            _nextIndex++;
         }
-        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
-        {
-            if (_lastIndex >= _sortedHeightEvents.size() - 1)
-            {
-                return;
-            }
-
-            HeightEvent activeEvent = _sortedHeightEvents[_lastIndex];
-            if (_audioTimeSyncController->get_songEndTime() >= activeEvent.Time)
-            {
-                _lastIndex++;
-                if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr)
-                {
-                    _playerHeightDetector->playerHeightDidChangeEvent->Invoke(activeEvent.Height);
-                }
+        if (newHeight.has_value()) {
+            if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr) {
+                _playerHeightDetector->playerHeightDidChangeEvent->Invoke(newHeight.value());
             }
         }
     }
 
     void HeightPlayer::TimeUpdate(float songTime)
     {
-        if (_sortedHeightEvents.size() == 0)
+        _nextIndex = _sortedHeightEvents.size();
+        for (int c = 0; c < _sortedHeightEvents.size(); c++)
         {
-            return;
-        }
-        if (_gameplayCoreSceneSetupData->playerSpecificSettings->automaticPlayerHeight)
-        {
-            for (int c = 0; c < _sortedHeightEvents.size(); c++)
-            {
-                if (_sortedHeightEvents[c].Time >= songTime)
-                {
-                    _lastIndex = c;
-                    Tick();
-                    break;
-                }
+            if (_sortedHeightEvents[c].Time > songTime) {
+                _nextIndex = c;
+                break;
             }
-            if (_playerHeightDetector->playerHeightDidChangeEvent != nullptr)
-            {
-                _playerHeightDetector->playerHeightDidChangeEvent->Invoke(_sortedHeightEvents[_sortedHeightEvents.size() - 1].Height);
+        }
+        _nextIndex = _sortedHeightEvents.size();
+        if (_nextIndex > 0) {
+            if( _playerHeightDetector->playerHeightDidChangeEvent != nullptr) {
+                _playerHeightDetector->playerHeightDidChangeEvent->Invoke(_sortedHeightEvents[_nextIndex - 1].Height);
             }
         }
     }

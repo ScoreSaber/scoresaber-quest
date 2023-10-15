@@ -71,32 +71,27 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     void PosePlayer::Tick()
     {
-        if (ReachedEnd())
-        {
+        if (ReachedEnd()) {
             _returnToMenuController->ReturnToMenu();
             return;
         }
         bool foundPoseThisFrame = false;
-        while (_audioTimeSyncController->songTime >= _sortedPoses[_lastIndex].Time)
+        while (_audioTimeSyncController->songTime >= _sortedPoses[_nextIndex].Time)
         {
             foundPoseThisFrame = true;
-            VRPoseGroup activePose = _sortedPoses[_lastIndex++];
-            if (ReachedEnd())
-            {
+            VRPoseGroup activePose = _sortedPoses[_nextIndex++];
+            if (ReachedEnd()) {
                 return;
             }
 
-            VRPoseGroup nextPose = _sortedPoses[_lastIndex + 1];
+            VRPoseGroup nextPose = _sortedPoses[_nextIndex];
             UpdatePoses(activePose, nextPose);
         }
-        if (foundPoseThisFrame)
-        {
+        if (foundPoseThisFrame) {
             return;
-        }
-        else if (_lastIndex > 0 && !ReachedEnd())
-        {
-            VRPoseGroup activePose = _sortedPoses[_lastIndex - 1];
-            VRPoseGroup nextPose = _sortedPoses[_lastIndex];
+        } else if (_nextIndex > 0 && !ReachedEnd()) {
+            VRPoseGroup activePose = _sortedPoses[_nextIndex - 1];
+            VRPoseGroup nextPose = _sortedPoses[_nextIndex];
             UpdatePoses(activePose, nextPose);
         }
     }
@@ -134,20 +129,18 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     bool PosePlayer::ReachedEnd()
     {
-        return _lastIndex >= _sortedPoses.size() - 1;
+        return _nextIndex >= _sortedPoses.size();
     }
 
     void PosePlayer::TimeUpdate(float newTime)
     {
-        for (int c = 0; c < _sortedPoses.size(); c++)
-        {
-            if (_sortedPoses[c].Time > newTime)
-            {
-                _lastIndex = c;
-                Tick();
+        for (int c = 0; c < _sortedPoses.size(); c++) {
+            if (_sortedPoses[c].Time > newTime) {
+                _nextIndex = c;
                 return;
             }
         }
+        _nextIndex = _sortedPoses.size();
     }
     void PosePlayer::AddCallback(std::function<void(ScoreSaber::Data::Private::VRPoseGroup)> callback)
     {
