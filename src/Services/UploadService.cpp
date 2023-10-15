@@ -326,10 +326,6 @@ namespace ScoreSaber::Services::UploadService
         {
             results.push_back("SC");
         }
-        if (gameplayModifiers->strictAngles)
-        {
-            results.push_back("SA");
-        }
         if (gameplayModifiers->proMode)
         {
             results.push_back("PM");
