@@ -90,13 +90,22 @@ namespace ScoreSaber::Services::UploadService
 
         if (gameMode == "Solo" || gameMode == "Multiplayer")
         {
+            if (practicing) {
             ReplayService::WriteSerializedReplay();
-            if (practicing)
                 return;
-            if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None)
+            }
+            if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None) {
+                ReplayService::WriteSerializedReplay();
                 return;
-            if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared)
+            }
+            if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared) {
+                if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared) {
+                    // Level was restarted before it was finished, we don't need to serialize the replay
+                } else {
+                    ReplayService::WriteSerializedReplay();
+                }
                 return;
+            }
 
             // Continue to upload phase
             Six(difficultyBeatmap, levelCompletionResults);
