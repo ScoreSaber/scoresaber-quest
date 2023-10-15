@@ -74,7 +74,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         auto previewBeatmapLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(beatmap->get_level());
         menuTransitionsHelper->StartStandardLevel("Replay", beatmap, previewBeatmapLevel,
                                                   playerData->overrideEnvironmentSettings,
-                                                  playerData->colorSchemesSettings->GetSelectedColorScheme(), BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers),
+                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers),
                                                   playerSettings, nullptr, "Exit Replay", false, false, nullptr, replayEndDelegate, nullptr);
         IsPlaying = true;
     }
