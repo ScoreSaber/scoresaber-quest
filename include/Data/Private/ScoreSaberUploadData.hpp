@@ -35,10 +35,15 @@ namespace ScoreSaber::Data::Private
         int missedCount;
         int maxCombo;
         bool fullCombo;
-        int hmd;
+        string deviceHmdIdentifier;
+        string deviceControllerLeftIdentifier;
+        string deviceControllerRightIdentifier;
         ScoreSaberUploadData();
         ~ScoreSaberUploadData();
-        ScoreSaberUploadData(u16string, string, int, string, string, string, string, string, int, int, string, vector<string>, string, int, int, int, bool, int);
+        ScoreSaberUploadData(u16string playerName, string playerId, int score, string leaderboardId,
+                                           string songName, string songSubName, string levelAuthorName, string songAuthorName, int bpm, int difficulty,
+                                           string infoHash, vector<string> modifiers, string gameMode, int badCutsCount, int missedCount, int maxCombo,
+                                           bool fullCombo, string deviceHmdIdentifier, string deviceControllerLeftIdentifier, string deviceControllerRightIdentifier);
 
         template <typename Writer>
         void Serialize(Writer& writer) const
@@ -86,7 +91,13 @@ namespace ScoreSaber::Data::Private
             writer.String("fullCombo");
             writer.Bool(fullCombo);
             writer.String("hmd");
-            writer.Int(hmd);
+            writer.Null(); // legacy field, can't be determined post unity upgrade
+            writer.String("deviceHmdIdentifier");
+            writer.String(deviceHmdIdentifier.c_str());
+            writer.String("deviceControllerLeftIdentifier");
+            writer.String(deviceControllerLeftIdentifier.c_str());
+            writer.String("deviceControllerRightIdentifier");
+            writer.String(deviceControllerRightIdentifier.c_str());
             writer.EndObject();
         }
 

@@ -1,4 +1,5 @@
 #include "Data/Score.hpp"
+#include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/utils/utils.h"
 
 namespace ScoreSaber::Data
@@ -54,6 +55,24 @@ namespace ScoreSaber::Data
         if (hmdItr != value.MemberEnd())
         {
             hmd = hmdItr->value.GetInt();
+        }
+
+        auto deviceHmdItr = value.FindMember("deviceHmd");
+        if (deviceHmdItr != value.MemberEnd() && deviceHmdItr->value.IsString())
+        {
+            deviceHmd = deviceHmdItr->value.GetString();
+        }
+
+        auto deviceControllerLeftItr = value.FindMember("deviceControllerLeft");
+        if (deviceControllerLeftItr != value.MemberEnd() && deviceControllerLeftItr->value.IsString())
+        {
+            deviceControllerLeft = deviceControllerLeftItr->value.GetString();
+        }
+        
+        auto deviceControllerRightItr = value.FindMember("deviceControllerRight");
+        if (deviceControllerRightItr != value.MemberEnd() && deviceControllerRightItr->value.IsString())
+        {
+            deviceControllerRight = deviceControllerRightItr->value.GetString();
         }
 
         hasReplay = value["hasReplay"].GetBool();
@@ -118,6 +137,24 @@ namespace ScoreSaber::Data
             hmd = hmdItr->value.GetInt();
         }
 
+        auto deviceHmdItr = value.FindMember(u"deviceHmd");
+        if (deviceHmdItr != value.MemberEnd() && deviceHmdItr->value.IsString())
+        {
+            deviceHmd = StringUtils::to_utf8(deviceHmdItr->value.GetString());
+        }
+
+        auto deviceControllerLeftItr = value.FindMember(u"deviceControllerLeft");
+        if (deviceControllerLeftItr != value.MemberEnd() && deviceControllerLeftItr->value.IsString())
+        {
+            deviceControllerLeft = StringUtils::to_utf8(deviceControllerLeftItr->value.GetString());
+        }
+        
+        auto deviceControllerRightItr = value.FindMember(u"deviceControllerRight");
+        if (deviceControllerRightItr != value.MemberEnd() && deviceControllerRightItr->value.IsString())
+        {
+            deviceControllerRight = StringUtils::to_utf8(deviceControllerRightItr->value.GetString());
+        }
+
         hasReplay = value[u"hasReplay"].GetBool();
 
         auto timeSetItr = value.FindMember(u"timeSet");
@@ -180,6 +217,24 @@ namespace ScoreSaber::Data
             hmd = hmdItr->value.GetInt();
         }
 
+        auto deviceHmdItr = value.FindMember("deviceHmd");
+        if (deviceHmdItr != value.MemberEnd() && deviceHmdItr->value.IsString())
+        {
+            deviceHmd = deviceHmdItr->value.GetString();
+        }
+
+        auto deviceControllerLeftItr = value.FindMember("deviceControllerLeft");
+        if (deviceControllerLeftItr != value.MemberEnd() && deviceControllerLeftItr->value.IsString())
+        {
+            deviceControllerLeft = deviceControllerLeftItr->value.GetString();
+        }
+        
+        auto deviceControllerRightItr = value.FindMember("deviceControllerRight");
+        if (deviceControllerRightItr != value.MemberEnd() && deviceControllerRightItr->value.IsString())
+        {
+            deviceControllerRight = deviceControllerRightItr->value.GetString();
+        }
+
         hasReplay = value["hasReplay"].GetBool();
 
         auto timeSetItr = value.FindMember("timeSet");
@@ -240,6 +295,24 @@ namespace ScoreSaber::Data
         if (hmdItr != value.MemberEnd())
         {
             hmd = hmdItr->value.GetInt();
+        }
+
+        auto deviceHmdItr = value.FindMember(u"deviceHmd");
+        if (deviceHmdItr != value.MemberEnd() && deviceHmdItr->value.IsString())
+        {
+            deviceHmd = StringUtils::to_utf8(deviceHmdItr->value.GetString());
+        }
+
+        auto deviceControllerLeftItr = value.FindMember(u"deviceControllerLeft");
+        if (deviceControllerLeftItr != value.MemberEnd() && deviceControllerLeftItr->value.IsString())
+        {
+            deviceControllerLeft = StringUtils::to_utf8(deviceControllerLeftItr->value.GetString());
+        }
+        
+        auto deviceControllerRightItr = value.FindMember(u"deviceControllerRight");
+        if (deviceControllerRightItr != value.MemberEnd() && deviceControllerRightItr->value.IsString())
+        {
+            deviceControllerRight = StringUtils::to_utf8(deviceControllerRightItr->value.GetString());
         }
 
         hasReplay = value[u"hasReplay"].GetBool();

@@ -2,6 +2,7 @@
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
 #include "Data/LeaderboardPlayer.hpp"
+#include <optional>
 namespace ScoreSaber::Data
 {
     struct Score
@@ -25,6 +26,9 @@ namespace ScoreSaber::Data
         int maxCombo;
         bool fullCombo;
         int hmd;
+        std::optional<std::string> deviceHmd;
+        std::optional<std::string> deviceControllerLeft;
+        std::optional<std::string> deviceControllerRight;
         bool hasReplay;
         std::string timeSet;
     };

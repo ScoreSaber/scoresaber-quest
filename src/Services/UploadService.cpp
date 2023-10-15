@@ -12,6 +12,9 @@
 #include "GlobalNamespace/MultiplayerPlayerResultsData.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "GlobalNamespace/PracticeViewController.hpp"
+#include "GlobalNamespace/OVRPlugin.hpp"
+#include "GlobalNamespace/OVRPlugin_Controller.hpp"
+#include "GlobalNamespace/OVRPlugin_SystemHeadset.hpp"
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "Services/FileService.hpp"
@@ -248,12 +251,14 @@ namespace ScoreSaber::Services::UploadService
         std::string playerId = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id;
 
         auto modifiers = GetModifierList(gameplayModifiers, energy);
-        int hmd = 32;
+        
+        std::string deviceHmd = string_format("standalone_hmd:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetSystemHeadsetType().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetSystemHeadsetType());
+        std::string deviceController = string_format("standalone_controller:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetActiveController().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetActiveController());
 
         std::string infoHash = GetVersionHash();
 
         ScoreSaberUploadData data(playerName, playerId, rawScore, levelHash, songName, songSubName, levelAuthorName, songAuthorName, bpm,
-                                  difficulty, infoHash, modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, hmd);
+                                  difficulty, infoHash, modifiers, gameMode, badCutsCount, missedCount, maxCombo, fullCombo, deviceHmd, deviceController, deviceController);
 
         std::string uploadData = data.serialize();
 

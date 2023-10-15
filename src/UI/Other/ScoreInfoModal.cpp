@@ -99,7 +99,7 @@ std::string GetDevice(int id)
     if (id == 32) { return "Oculus Quest"; }
     if (id == 64) { return "Valve Index"; }
     if (id == 128) { return "HTC VIVE Cosmos"; }
-        return "Unknown";
+    return "Unknown";
 }
 
 std::string GetUnit(std::string unit, int amount)
@@ -192,7 +192,11 @@ namespace ScoreSaber::UI::Other
             set_player(score.leaderboardPlayerInfo.name.value());
         }
 
-        set_device(GetDevice(score.hmd));
+        if (score.deviceHmd) {
+            set_device_hmd(*score.deviceHmd);
+        } else {
+            set_device_hmd(GetDevice(score.hmd));
+        }
 
         // Not sure if this is the best way to get the beatmap
         // but it works
@@ -205,10 +209,17 @@ namespace ScoreSaber::UI::Other
             ->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(BeatmapUtils::getMaxScoreCoroutine(currentBeatmap, [&](int maxScore) {
                 set_score(score.modifiedScore, ((double)score.modifiedScore / (double)maxScore) * 100.0);
                 set_pp(score.pp);
-                set_combo(score.maxCombo);
-                set_fullCombo(score.fullCombo);
-                set_badCuts(score.badCuts);
-                set_missedNotes(score.missedNotes);
+                if (score.maxCombo != 0) {
+                    set_combo(score.maxCombo);
+                    set_fullCombo(score.fullCombo);
+                    set_badCuts(score.badCuts);
+                    set_missedNotes(score.missedNotes);
+                } else {
+                    set_combo(nullopt);
+                    set_fullCombo(nullopt);
+                    set_badCuts(nullopt);
+                    set_missedNotes(nullopt);
+                }
                 set_modifiers(score.modifiers);
                 set_timeSet(GetDate(score.timeSet));
 
@@ -304,7 +315,7 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(textVertical, 50.0f, 40.0f);
         textVertical->set_spacing(0.1f);
 
-        CreateDefaultTextAndSetSize(device, 3.5f);
+        CreateDefaultTextAndSetSize(deviceHmd, 3.5f);
         CreateDefaultTextAndSetSize(score, 3.5f);
         CreateDefaultTextAndSetSize(pp, 3.5f);
         CreateDefaultTextAndSetSize(combo, 3.5f);
@@ -315,7 +326,7 @@ namespace ScoreSaber::UI::Other
         CreateDefaultTextAndSetSize(timeSet, 3.5f);
 
         set_player(u"placeholder");
-        set_device("Oculus Quest");
+        set_device_hmd("Unknown");
         set_score(0, 0);
         set_pp(0);
         set_combo(0);
@@ -331,9 +342,9 @@ namespace ScoreSaber::UI::Other
         this->player->set_text(player + u"'s Score");
     }
 
-    void ScoreInfoModal::set_device(std::string_view device)
+    void ScoreInfoModal::set_device_hmd(std::string_view device)
     {
-        this->device->set_text(string_format("<color=#6F6F6F>Device:</color> %s", device.data()));
+        this->deviceHmd->set_text(string_format("<color=#6F6F6F>HMD:</color> %s", device.data()));
     }
 
     void ScoreInfoModal::set_score(long score, double percent)
@@ -346,24 +357,36 @@ namespace ScoreSaber::UI::Other
         this->pp->set_text(string_format("<color=#6F6F6F>Performance Points:</color> <color=#6872e5>%.2fpp</color>", pp));
     }
 
-    void ScoreInfoModal::set_combo(int combo)
+    void ScoreInfoModal::set_combo(std::optional<int> combo)
     {
-        this->combo->set_text(string_format("<color=#6F6F6F>Combo:</color> %s", FormatNumber(combo).c_str()));
+        if (combo)
+            this->combo->set_text(string_format("<color=#6F6F6F>Combo:</color> %s", FormatNumber(*combo).c_str()));
+        else
+            this->missedNotes->set_text("<color=#6F6F6F>Combo:</color> N/A");
     }
 
-    void ScoreInfoModal::set_fullCombo(bool value)
+    void ScoreInfoModal::set_fullCombo(std::optional<bool> value)
     {
-        this->fullCombo->set_text(string_format("<color=#6F6F6F>Full Combo:</color> %s", value ? "<color=#13fd81>Yes</color>" : "<color=\"red\">No</color>"));
+        if (value)
+            this->fullCombo->set_text(string_format("<color=#6F6F6F>Full Combo:</color> %s", *value ? "<color=#13fd81>Yes</color>" : "<color=\"red\">No</color>"));
+        else
+            this->missedNotes->set_text("<color=#6F6F6F>Full Combo:</color> N/A");
     }
 
-    void ScoreInfoModal::set_badCuts(int badCuts)
+    void ScoreInfoModal::set_badCuts(std::optional<int> badCuts)
     {
-        this->badCuts->set_text(string_format("<color=#6F6F6F>Bad Cuts:</color> %s", FormatNumber(badCuts).c_str()));
+        if (badCuts)
+            this->badCuts->set_text(string_format("<color=#6F6F6F>Bad Cuts:</color> %s", FormatNumber(*badCuts).c_str()));
+        else
+            this->missedNotes->set_text("<color=#6F6F6F>Bad Cuts:</color> N/A");
     }
 
-    void ScoreInfoModal::set_missedNotes(int missedNotes)
+    void ScoreInfoModal::set_missedNotes(std::optional<int> missedNotes)
     {
-        this->missedNotes->set_text(string_format("<color=#6F6F6F>Missed Notes:</color> %s", FormatNumber(missedNotes).c_str()));
+        if (missedNotes)
+            this->missedNotes->set_text(string_format("<color=#6F6F6F>Missed Notes:</color> %s", FormatNumber(*missedNotes).c_str()));
+        else
+            this->missedNotes->set_text("<color=#6F6F6F>Missed Notes:</color> N/A");
     }
 
     void ScoreInfoModal::set_modifiers(std::string_view modifiers)
