@@ -54,7 +54,6 @@ namespace ScoreSaber::ReplaySystem::Playback
                 break;
             }
         }
-        _nextIndex = _sortedHeightEvents.size();
         if (_nextIndex > 0) {
             if( _playerHeightDetector->playerHeightDidChangeEvent != nullptr) {
                 _playerHeightDetector->playerHeightDidChangeEvent->Invoke(_sortedHeightEvents[_nextIndex - 1].Height);
