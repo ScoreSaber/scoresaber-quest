@@ -63,7 +63,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _spectatorCamera = UnityEngine::Object::Instantiate(_desktopCamera);
         spectatorObject->get_transform()->set_position(Vector3(_mainSettingsModelSO->roomCenter->value.x, _mainSettingsModelSO->roomCenter->value.y, _mainSettingsModelSO->roomCenter->value.z + -2.0f));
         Quaternion rotation = Quaternion::Euler(0.0f, _mainSettingsModelSO->roomRotation->value, 0.0f);
-        _spectatorCamera->get_transform()->set_rotation(rotation);
+        spectatorObject->get_transform()->set_rotation(rotation);
         _spectatorCamera->set_stereoTargetEye(StereoTargetEyeMask::Both);
         _spectatorCamera->get_gameObject()->SetActive(true);
         _spectatorCamera->set_depth(0);
