@@ -90,34 +90,16 @@ std::string FormatNumber(int number)
 // but ill have to make do for now
 std::string GetDevice(int id)
 {
-    if (id == 64)
-    {
-        return "Valve Index";
-    }
-    else if (id == 32)
-    {
-        return "Oculus Quest";
-    }
-    else if (id == 16)
-    {
-        return "Oculus Rift S";
-    }
-    else if (id == 2)
-    {
-        return "Vive";
-    }
-    else if (id == 1)
-    {
-        return "Oculus Rift CV1";
-    }
-    else if (id == 0)
-    {
+    if (id == 0) { return "Unknown"; }
+    if (id == 1) { return "Oculus Rift CV1"; }
+    if (id == 2) { return "HTC VIVE"; }
+    if (id == 4) { return "HTC VIVE Pro"; }
+    if (id == 8) { return "Windows Mixed Reality"; }
+    if (id == 16) { return "Oculus Rift S"; }
+    if (id == 32) { return "Oculus Quest"; }
+    if (id == 64) { return "Valve Index"; }
+    if (id == 128) { return "HTC VIVE Cosmos"; }
         return "Unknown";
-    }
-    else
-    {
-        return std::to_string(id);
-    }
 }
 
 std::string GetUnit(std::string unit, int amount)
