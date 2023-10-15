@@ -2,10 +2,7 @@
 
 #include "Data/Private/ReplayFile.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/MainCamera.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/SaberManager.hpp"
-#include "GlobalNamespace/VRController.hpp"
+#include "GlobalNamespace/PlayerTransforms.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/Vector3.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -24,10 +21,8 @@ using namespace UnityEngine;
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, PoseRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
                                     DECLARE_PRIVATE_FIELD(AudioTimeSyncController*, _audioTimeSyncController);
-                                    DECLARE_PRIVATE_FIELD(MainCamera*, _mainCamera);
-                                    DECLARE_PRIVATE_FIELD(VRController*, _controllerLeft);
-                                    DECLARE_PRIVATE_FIELD(VRController*, _controllerRight);
-                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, MainCamera* mainCamera, SaberManager* saberManager);
+                                    DECLARE_PRIVATE_FIELD(PlayerTransforms*, _playerTransforms);
+                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, PlayerTransforms* playerTransforms);
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
                                     std::vector<Data::Private::VRPoseGroup> _vrPoseGroup;
                                     volatile bool _recording;

@@ -1,10 +1,5 @@
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/MainCamera.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/SaberManager.hpp"
-#include "GlobalNamespace/VRController.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Time.hpp"
 #include "Utils/StringUtils.hpp"
@@ -21,13 +16,11 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, PoseRecorder);
 
 namespace ScoreSaber::ReplaySystem::Recorders
 {
-    void PoseRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, MainCamera* mainCamera, SaberManager* saberManager)
+    void PoseRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, PlayerTransforms* playerTransforms)
     {
         INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
-        _mainCamera = mainCamera;
-        _controllerLeft = saberManager->leftSaber->get_transform()->get_parent()->GetComponent<VRController*>();
-        _controllerRight = saberManager->rightSaber->get_transform()->get_parent()->GetComponent<VRController*>();
+        _playerTransforms = playerTransforms;
         _recording = true;
     }
 
@@ -36,14 +29,14 @@ namespace ScoreSaber::ReplaySystem::Recorders
         if(!_recording)
             return;
 
-        Vector3 headPos = _mainCamera->get_position();
-        Quaternion headRot = _mainCamera->get_rotation();
+        Vector3 headPos = _playerTransforms->headPseudoLocalPos;
+        Quaternion headRot = _playerTransforms->headPseudoLocalRot;
 
-        Vector3 leftControllerPosition = _controllerLeft->get_position();
-        Quaternion leftControllerRotation = _controllerLeft->get_rotation();
+        Vector3 leftControllerPosition = _playerTransforms->leftHandPseudoLocalPos;
+        Quaternion leftControllerRotation = _playerTransforms->leftHandPseudoLocalRot;
 
-        Vector3 rightControllerPosition = _controllerRight->get_position();
-        Quaternion rightControllerRotation = _controllerRight->get_rotation();
+        Vector3 rightControllerPosition = _playerTransforms->rightHandPseudoLocalPos;
+        Quaternion rightControllerRotation = _playerTransforms->rightHandPseudoLocalRot;
 
         int fps = (int)(1 / Time::get_unscaledDeltaTime());
         _vrPoseGroup.push_back(VRPoseGroup(
