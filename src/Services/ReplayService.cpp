@@ -18,6 +18,7 @@ namespace ScoreSaber::Services::ReplayService
 
     void WriteSerializedReplay()
     {
+        recorder->StopRecording();
         auto replay = recorder->ExportCurrentReplay();
         CurrentSerializedReplay = ScoreSaber::Data::Private::ReplayWriter::Write(replay);
         if (ReplaySerialized != nullptr)

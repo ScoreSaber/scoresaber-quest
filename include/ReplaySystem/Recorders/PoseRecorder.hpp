@@ -30,8 +30,10 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, PoseRec
                                     DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, MainCamera* mainCamera, SaberManager* saberManager);
                                     DECLARE_OVERRIDE_METHOD(void, Tick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::ITickable::Tick>::get());
                                     std::vector<Data::Private::VRPoseGroup> _vrPoseGroup;
+                                    volatile bool _recording;
                                     public:
                                     std::vector<Data::Private::VRPoseGroup> Export();
+                                    void StopRecording();
                                     )
 
 #undef INTERFACES

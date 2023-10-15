@@ -28,10 +28,14 @@ namespace ScoreSaber::ReplaySystem::Recorders
         _mainCamera = mainCamera;
         _controllerLeft = saberManager->leftSaber->get_transform()->get_parent()->GetComponent<VRController*>();
         _controllerRight = saberManager->rightSaber->get_transform()->get_parent()->GetComponent<VRController*>();
+        _recording = true;
     }
 
     void PoseRecorder::Tick()
     {
+        if(!_recording)
+            return;
+
         Vector3 headPos = _mainCamera->get_position();
         Quaternion headRot = _mainCamera->get_rotation();
 
@@ -55,6 +59,10 @@ namespace ScoreSaber::ReplaySystem::Recorders
                    VRRotation(rightControllerRotation.x, rightControllerRotation.y, rightControllerRotation.z,
                               rightControllerRotation.w)),
             fps, _audioTimeSyncController->songTime));
+    }
+
+    void PoseRecorder::StopRecording() {
+        _recording = false;
     }
 
     vector<VRPoseGroup> PoseRecorder::Export()

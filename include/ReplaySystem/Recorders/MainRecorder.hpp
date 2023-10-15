@@ -30,6 +30,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, MainRec
                                     DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
                                     public:
                                     std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> ExportCurrentReplay();
+                                    void StopRecording();
                                     )
 
 #undef INTERFACES

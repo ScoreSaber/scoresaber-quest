@@ -51,4 +51,8 @@ namespace ScoreSaber::ReplaySystem::Recorders
         vector<EnergyEvent> energyKeyframes = _energyEventRecorder->Export();
         return std::make_shared<ReplayFile>(metadata, poseKeyFrames, heightKeyframes, noteKeyframes, scoreKeyframes, comboKeyframes, multiplierKeyframes, energyKeyframes);
     }
+
+    void MainRecorder::StopRecording() {
+        _poseRecorder->StopRecording();
+    }
 } // namespace ScoreSaber::ReplaySystem::Recorders
