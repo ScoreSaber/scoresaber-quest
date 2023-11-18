@@ -27,6 +27,19 @@ jobs:
               echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
               cat ${GITHUB_WORKSPACE}/ndkpath.txt
 
+         - name: QPM Dependencies Cache
+           id: cache-qpm-deps
+           uses: actions/cache@v3
+           env:
+              cache-name: cache-qpm-deps
+           with:
+              path: /home/runner/.local/share/QPM-RS/cache
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
+
          - name: QPM Rust Action
            uses: Fernthedev/qpm-action@main
            with:
