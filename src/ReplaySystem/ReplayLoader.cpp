@@ -6,6 +6,7 @@
 #include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
 #include "GlobalNamespace/ColorSchemesSettings.hpp"
+#include "GlobalNamespace/HMTask.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/MenuTransitionsHelper.hpp"
@@ -18,8 +19,10 @@
 
 #include "ReplaySystem/Playback/NotePlayer.hpp"
 #include "Services/FileService.hpp"
+#include "System/Action.hpp"
 #include "System/Action_2.hpp"
 
+#include "custom-types/shared/delegate.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "logging.hpp"
 #include "static.hpp"
@@ -99,7 +102,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         CurrentPlayerName = score.leaderboardPlayerInfo.name.value_or(u"unknown");
         CurrentModifiers = score.modifiers;
 
-        std::thread t([localPath, replayFileName, leaderboardId, score, finished] {
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[localPath, replayFileName, leaderboardId, score, finished]() {
             if (fileexists(localPath))
             {
                 std::ifstream replayFile(localPath, ios::binary);
@@ -136,8 +139,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                     finished(false);
                 }
             }
-        });
-        t.detach();
+        }), nullptr)->Run();
     }
 
 } // namespace ScoreSaber::ReplaySystem::ReplayLoader

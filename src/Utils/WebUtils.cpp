@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include "GlobalNamespace/HMTask.hpp"
+#include "System/Action.hpp"
 #include "UnityEngine/Networking/DownloadHandler.hpp"
 #include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
@@ -11,6 +13,7 @@
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "Utils/StringUtils.hpp"
+#include "custom-types/shared/delegate.hpp"
 #include "gif-lib/shared/gif_lib.h"
 #include "libcurl/shared/curl.h"
 #include "libcurl/shared/easy.h"
@@ -20,6 +23,7 @@
 
 // #include "gif_read.h"
 
+using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace StringUtils;
 
@@ -347,18 +351,24 @@ namespace WebUtils
         return std::make_tuple(httpCode, val);
     }
 
-    void GetAsync(std::string url, std::function<void(long, std::string)> finished)
+    void GetAsync(std::string url, std::function<void(long, std::string)> finished, bool pureCppCallback)
     {
-        GetAsync(url, TIMEOUT, finished);
+        GetAsync(url, TIMEOUT, finished, pureCppCallback);
     }
 
-    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished)
+    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished, bool pureCppCallback)
     {
-        std::thread t([url, timeout, finished] {
-            auto [responseCode, response] = GetSync(url, timeout);
-            finished(responseCode, response);
-        });
-        t.detach();
+        if (pureCppCallback) {
+            std::thread([url, timeout, finished]() {
+                auto [responseCode, response] = GetSync(url, timeout);
+                finished(responseCode, response);
+            }).detach();
+        } else {
+            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[url, timeout, finished]() {
+                auto [responseCode, response] = GetSync(url, timeout);
+                finished(responseCode, response);
+            }), nullptr)->Run();
+        }
     }
 
     std::tuple<long, std::string> PostSync(std::string url, std::string postData, long timeout)
@@ -415,14 +425,19 @@ namespace WebUtils
         return std::make_tuple(httpCode, val);
     }
 
-    void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished)
+    void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished, bool pureCppCallback)
     {
-        std::thread t(
-            [url, postData, timeout, finished] {
+        if (pureCppCallback) {
+            std::thread([url, postData, timeout, finished]() {
                 auto [responseCode, response] = PostSync(url, postData, timeout);
                 finished(responseCode, response);
-            });
-        t.detach();
+            }).detach();
+        } else {
+            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[url, postData, timeout, finished]() {
+                auto [responseCode, response] = PostSync(url, postData, timeout);
+                finished(responseCode, response);
+            }), nullptr)->Run();
+        }
     }
 
     std::tuple<long, std::string> PostWithReplaySync(std::string url, const std::vector<char>& replayData, std::string postData, long timeout)
@@ -498,12 +513,10 @@ namespace WebUtils
     // intentionally copy replayData so we don't accidentally access something in a thread-unsafe manner
     void PostWithReplayAsync(std::string url, const std::vector<char> replayData, std::string postData, long timeout, std::function<void(long, std::string)> finished)
     {
-        std::thread t(
-            [url, replayData, postData, timeout, finished] {
-                auto [responseCode, response] = PostWithReplaySync(url, replayData, postData, timeout);
-                finished(responseCode, response);
-            });
-        t.detach();
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[url, replayData, postData, timeout, finished] {
+            auto [responseCode, response] = PostWithReplaySync(url, replayData, postData, timeout);
+            finished(responseCode, response);
+        }), nullptr)->Run();
     }
 
     long DownloadReplaySync(std::string url, std::vector<char>& replayData, long timeout)

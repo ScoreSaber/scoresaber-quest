@@ -2,10 +2,13 @@
 #include "Utils/WebUtils.hpp"
 
 #include "Data/Private/AuthResponse.hpp"
+#include "GlobalNamespace/HMTask.hpp"
 #include "System/IO/Directory.hpp"
+#include "System/Action.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include "custom-types/shared/delegate.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
@@ -156,7 +159,7 @@ namespace ScoreSaber::Services::PlayerService
 
     void UpdatePlayerInfoThread()
     {
-        std::thread t([] {
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[] {
             while (true)
             {
                 if(ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner == nullptr)
@@ -169,8 +172,7 @@ namespace ScoreSaber::Services::PlayerService
                     std::this_thread::sleep_for(std::chrono::seconds(300));
                 }
             }
-        });
-        t.detach();
+        }), nullptr)->Run();
     }
 
     void UpdatePlayerInfo(bool fromMainThread)

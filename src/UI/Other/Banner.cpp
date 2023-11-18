@@ -1,11 +1,13 @@
 #include "UI/Other/Banner.hpp"
 
+#include "GlobalNamespace/HMTask.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "Services/PlayerService.hpp"
 #include "Sprites.hpp"
+#include "System/Action.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
 #include "UnityEngine/Application.hpp"
@@ -20,6 +22,7 @@
 #include "UnityEngine/WaitForSeconds.hpp"
 #include "Utils/UIUtils.hpp"
 #include "logging.hpp"
+#include "custom-types/shared/delegate.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
@@ -27,6 +30,7 @@
 
 DEFINE_TYPE(ScoreSaber::UI::Other, Banner);
 
+using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
@@ -263,13 +267,12 @@ namespace ScoreSaber::UI::Other
         promptText->set_text(text);
         if (dismissTime != -1)
         {
-            std::thread t([dismissTime, this] {
+            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[dismissTime, this] {
                 std::this_thread::sleep_for(std::chrono::seconds(dismissTime));
                 QuestUI::MainThreadScheduler::Schedule([=]() {
                     this->promptText->set_text(std::string());
                 });
-            });
-            t.detach();
+            }), nullptr)->Run();
         }
     }
 

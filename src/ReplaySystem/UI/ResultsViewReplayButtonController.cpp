@@ -3,6 +3,9 @@
 #include "Services/PlayerService.hpp"
 #include "Services/ReplayService.hpp"
 #include "Services/UploadService.hpp"
+
+#include "GlobalNamespace/HMTask.hpp"
+
 #include "bsml/shared/BSML.hpp"
 #include "custom-types/shared/delegate.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
@@ -67,14 +70,14 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::WaitForReplay()
     {
-        std::thread([&](){
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[&](){
             while(!_replayReady) {
-                std::this_thread::sleep_for(std::chrono::seconds(25));
+                std::this_thread::sleep_for(std::chrono::milliseconds(25));
             }
             QuestUI::MainThreadScheduler::Schedule([&]() {
                 watchReplayButton->set_interactable(true);
             });
-        }).detach();
+        }), nullptr)->Run();
     }
 
     void ResultsViewReplayButtonController::Dispose()
@@ -87,7 +90,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::ClickedReplayButton()
     {
-        std::thread([=](){
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[=](){
             std::vector<std::string> modifiersVec = Services::UploadService::GetModifierList(_levelCompletionResults->gameplayModifiers, _levelCompletionResults->energy);
             std::string modifiers;
             for(int i = 0; i < modifiersVec.size(); ++i) {
@@ -95,7 +98,7 @@ namespace ScoreSaber::ReplaySystem::UI
                 modifiers += modifiersVec[i];
             }
             ReplayLoader::Load(_serializedReplay, _difficultyBeatmap, modifiers, ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name);
-        }).detach();
+        }), nullptr)->Run();
         watchReplayButton->set_interactable(false);
     }
 }

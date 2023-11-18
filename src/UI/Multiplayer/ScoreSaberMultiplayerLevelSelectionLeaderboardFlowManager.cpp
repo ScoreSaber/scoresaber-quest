@@ -1,7 +1,9 @@
 #include "UI/Multiplayer/ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager.hpp"
 
+#include "GlobalNamespace/HMTask.hpp"
 #include "GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
+#include "System/Action.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "custom-types/shared/delegate.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
@@ -112,13 +114,12 @@ namespace ScoreSaber::UI::Multiplayer
         if (_performingFirstActivation)
         {
             _performingFirstActivation = false;
-            std::thread t([&] {
+            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[&] {
                 std::this_thread::sleep_for(std::chrono::milliseconds(250));
                 QuestUI::MainThreadScheduler::Schedule([=]() {
                     _platformLeaderboardViewController->Refresh(true, true);
                 });
-            });
-            t.detach();
+            }), nullptr)->Run();
         }
     }
 

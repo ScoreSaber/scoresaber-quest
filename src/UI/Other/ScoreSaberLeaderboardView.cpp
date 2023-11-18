@@ -5,6 +5,7 @@
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Score.hpp"
 
+#include "GlobalNamespace/HMTask.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/LoadingControl.hpp"
@@ -39,6 +40,7 @@
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
 
 #include "UI/Other/PanelView.hpp"
+#include "System/Action.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Rect.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -46,6 +48,7 @@
 #include "UnityEngine/UI/Button.hpp"
 #include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "custom-types/shared/delegate.hpp"
 #include "hooks.hpp"
 #include "logging.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
@@ -224,7 +227,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         _currentLeaderboardRefreshId = refreshId;
 
-        std::thread t([difficultyBeatmap, scope, loadingControl, tableView, refreshId] {
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[difficultyBeatmap, scope, loadingControl, tableView, refreshId]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             if (_currentLeaderboardRefreshId == refreshId)
             {
@@ -278,8 +281,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                     },
                     _filterAroundCountry);
             }
-        });
-        t.detach();
+        }), nullptr)->Run();
     }
 
     void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo)

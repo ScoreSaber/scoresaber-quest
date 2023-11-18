@@ -12,8 +12,8 @@ namespace WebUtils
 {
     extern std::string cookie;
     std::tuple<long, std::string> GetSync(std::string url, long timeout);
-    void GetAsync(std::string url, std::function<void(long, std::string)> finished);
-    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished);
+    void GetAsync(std::string url, std::function<void(long, std::string)> finished, bool pureCppCallback = false);
+    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished, bool pureCppCallback = false);
 
     std::tuple<long, std::string> PostSync(std::string url, std::string postData, long timeout);
     /// @brief posts to url and passes them into the finished callback along with the http response code
@@ -21,7 +21,8 @@ namespace WebUtils
     /// @param postData the postData to send
     /// @param timeout the timeout for the query
     /// @param finished the callback for when we're done downloading
-    void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished);
+    /// @param pureCppCallback whether we need to use a C# thread or can use C++ threads
+    void PostAsync(std::string url, std::string postData, long timeout, std::function<void(long, std::string)> finished, bool pureCppCallback = false);
 
     std::tuple<long, std::string> PostWithReplaySync(std::string url, const std::vector<char> &replayData, std::string postData, long timeout);
     void PostWithReplayAsync(std::string url, const std::vector<char> replayData, std::string postData, long timeout, std::function<void(long, std::string)> finished);

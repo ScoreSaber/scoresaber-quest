@@ -32,7 +32,7 @@ namespace TeamUtils
             {
                 ParseMembers(result);
             }
-        });
+        }, true);
     }
 
     void ParseMembers(std::string_view doc)

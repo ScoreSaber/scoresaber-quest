@@ -6,6 +6,7 @@
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
 #include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
+#include "GlobalNamespace/HMTask.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/MultiplayerLevelCompletionResults.hpp"
@@ -21,6 +22,7 @@
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
 #include "Services/ReplayService.hpp"
+#include "System/Action.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -29,6 +31,7 @@
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
 #include "logging.hpp"
+#include "custom-types/shared/delegate.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
 #include "static.hpp"
@@ -133,7 +136,7 @@ namespace ScoreSaber::Services::UploadService
 
     void Seven(IDifficultyBeatmap* beatmap, int modifiedScore, int multipliedScore, std::string uploadPacket, std::string replayFileName)
     {
-        std::thread t([beatmap, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
+        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[beatmap, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
 
             LeaderboardService::GetLeaderboardData(
@@ -228,8 +231,7 @@ namespace ScoreSaber::Services::UploadService
                     uploading = false;
                 },
                 false);
-        });
-        t.detach();
+        }), nullptr)->Run();
     }
 
     void SaveReplay(const std::vector<char>& replay, std::string replayFileName)
