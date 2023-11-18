@@ -26,7 +26,7 @@ namespace TeamUtils
 
     void Download()
     {
-        std::string url = "https://raw.githubusercontent.com/Umbranoxio/ScoreSaber-Team/main/team.json";
+        std::string url = "https://raw.githubusercontent.com/ScoreSaber/ScoreSaber-Team/main/team.json";
         WebUtils::GetAsync(url, [&](long code, std::string result) {
             if (code == 200)
             {
