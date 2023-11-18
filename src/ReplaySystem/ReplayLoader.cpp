@@ -105,6 +105,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[localPath, replayFileName, leaderboardId, score, finished]() {
             if (fileexists(localPath))
             {
+                INFO("Trying to load local replay: %s", localPath.c_str());
                 std::ifstream replayFile(localPath, ios::binary);
                 std::vector<char> replayData((std::istreambuf_iterator<char>(replayFile)), std::istreambuf_iterator<char>());
                 LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
@@ -121,6 +122,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
             {
                 std::string url = string_format("%s/api/game/telemetry/downloadReplay?playerId=%s&leaderboardId=%d", ScoreSaber::Static::BASE_URL.c_str(), score.leaderboardPlayerInfo.id.value().c_str(), leaderboardId);
                 std::vector<char> replayData;
+                INFO("Starting replay download");
                 long response = WebUtils::DownloadReplaySync(url, replayData, 64);
                 if (response == 200)
                 {
@@ -136,6 +138,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                 }
                 else
                 {
+                    ERROR("Got HTTP error %d", response);
                     finished(false);
                 }
             }

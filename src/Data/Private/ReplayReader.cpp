@@ -28,6 +28,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
 
         shared_ptr<Metadata> metadata = ReadMetadata(inputStream, pointers.metadata);
 
+        INFO("Found replay with version %s", metadata->Version.c_str());
         if (metadata->Version == "2.0.0") {
             return make_shared<ReplayFile>(metadata,
                                            ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
@@ -47,6 +48,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
                                            ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
                                            ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
         } else {
+            ERROR("Unknown replay version (potentially you need to update the ScoreSaber mod!");
             return nullptr;
         }
     }
@@ -307,13 +309,20 @@ namespace ScoreSaber::Data::Private::ReplayReader
 
         string magic = "ScoreSaber Replay 👌🤠\r\n";
         if (replay.size() < 28 || string(replay.begin(), replay.begin() + 28) != magic) {
+            ERROR("Invalid magic bytes in replay");
             return false; // invalid magic
         }
 
         // remove magic bytes
         vector<char> compressedReplayBytes(replay.begin() + 28, replay.end());
 
-        return LZMA::lzmaDecompress(compressedReplayBytes, decompressed);
+        bool result = LZMA::lzmaDecompress(compressedReplayBytes, decompressed);
+
+        if (!result) {
+            ERROR("decompression failed");
+        }
+
+        return result;
     }
 
 } // namespace ScoreSaber::Data::Private::ReplayReader
