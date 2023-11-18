@@ -27,38 +27,14 @@ jobs:
               echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
               cat ${GITHUB_WORKSPACE}/ndkpath.txt
 
-         - name: Get QPM
-           if: steps.cache-qpm.outputs.cache-hit != 'true'
-           uses: dawidd6/action-download-artifact@v2
+         - name: QPM Rust Action
+           uses: Fernthedev/qpm-action@main
            with:
-              github_token: ${{secrets.GITHUB_TOKEN}}
-              workflow: cargo-build.yml
-              name: linux-qpm-rust
-              path: QPM
-              repo: RedBrumbler/QuestPackageManager-Rust
-
-         - name: QPM Collapse
-           run: |
-              chmod +x ./QPM/qpm-rust
-              ./QPM/qpm-rust collapse
-
-         - name: QPM Dependencies Cache
-           id: cache-qpm-deps
-           uses: actions/cache@v3
-           env:
-              cache-name: cache-qpm-deps
-           with:
-              path: /home/runner/.local/share/QPM-Rust/cache
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
-              restore-keys: |
-                 ${{ runner.os }}-build-${{ env.cache-name }}-
-                 ${{ runner.os }}-build-
-                 ${{ runner.os }}-
-
-         - name: QPM Restore
-           run: |
-              ./QPM/qpm-rust restore
-
+              workflow_token: ${{secrets.GITHUB_TOKEN}}
+   
+              restore: true # will run restore on download
+              cache: true #will cache dependencies
+   
          - name: List Post Restore
            run: |
               echo includes:
@@ -66,12 +42,10 @@ jobs:
               echo libs:
               ls -la ${GITHUB_WORKSPACE}/extern/libs
               echo cache:
-              ls -la $HOME/.local/share/QPM-Rust/cache
-
-         - name: QPM Legacy fix
-           run: |
-              ./QPM/qpm-rust cache legacy-fix
-
+              ls -la $HOME/.local/share/QPM-RS/cache
+              echo qpm-cache:
+              qpm cache list
+               
          - name: Get Tag Version
            id: get_tag_version
            run: |
@@ -81,12 +55,12 @@ jobs:
 
          - name: QPM Edit Version
            run: |
-              ./QPM/qpm-rust package edit --version "${{ steps.get_tag_version.outputs.VERSION }}"
+              qpm package edit --version "${{ steps.get_tag_version.outputs.VERSION }}"
 
          - name: Build
            run: |
               cd ${GITHUB_WORKSPACE}
-              ./QPM/qpm-rust qmod build
+              qpm qmod build
               pwsh -Command ./build.ps1
 
          - name: Create Qmod
