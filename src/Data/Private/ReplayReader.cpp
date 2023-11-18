@@ -306,7 +306,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         }
 
         string magic = "ScoreSaber Replay 👌🤠\r\n";
-        if (replay.size() < 28 || string(replay.begin(), replay.end() + 28) != magic) {
+        if (replay.size() < 28 || string(replay.begin(), replay.begin() + 28) != magic) {
             return false; // invalid magic
         }
 
