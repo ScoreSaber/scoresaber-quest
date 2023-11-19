@@ -113,6 +113,7 @@ namespace ScoreSaber::Services::UploadService
                 return;
             }
 
+            ReplayService::WriteSerializedReplay();
             // Continue to upload phase
             Six(difficultyBeatmap, levelCompletionResults);
         }
