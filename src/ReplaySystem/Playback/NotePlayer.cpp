@@ -113,7 +113,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     bool NotePlayer::DoesNoteMatchID(Data::Private::NoteID &id, GlobalNamespace::NoteData* noteData)
     {
-        if (Mathf::Approximately(id.Time, noteData->time) ||
+        if (!Mathf::Approximately(id.Time, noteData->time) ||
             id.LineIndex != noteData->lineIndex ||
             id.LineLayer != noteData->noteLineLayer ||
             id.ColorType != noteData->colorType ||
