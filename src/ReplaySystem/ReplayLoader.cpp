@@ -138,7 +138,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                 }
                 else
                 {
-                    ERROR("Got HTTP error %d", response);
+                    ERROR("Got HTTP error %ld", response);
                     finished(false);
                 }
             }
