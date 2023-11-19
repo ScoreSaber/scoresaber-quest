@@ -98,15 +98,14 @@ namespace ScoreSaber::Services::UploadService
                 return;
             }
             if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None) {
-                ReplayService::WriteSerializedReplay();
-                return;
-            }
-            if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared) {
-                if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared) {
-                    // Level was restarted before it was finished, we don't need to serialize the replay
+                if (levelCompletionResults->levelEndAction == LevelCompletionResults::LevelEndAction::Restart) {
                 } else {
                     ReplayService::WriteSerializedReplay();
                 }
+                return;
+            }
+            if (levelCompletionResults->levelEndStateType != LevelCompletionResults::LevelEndStateType::Cleared) {
+                ReplayService::WriteSerializedReplay();
                 return;
             }
 
