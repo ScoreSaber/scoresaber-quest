@@ -267,8 +267,12 @@ namespace ScoreSaber::Services::UploadService
 
         auto modifiers = GetModifierList(gameplayModifiers, energy);
         
-        std::string deviceHmd = string_format("standalone_hmd:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetSystemHeadsetType().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetSystemHeadsetType());
-        std::string deviceController = string_format("standalone_controller:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetActiveController().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetActiveController());
+        // TODO go back to these versions after the unity upgrade (if it works then)
+        // std::string deviceHmd = string_format("standalone_hmd:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetSystemHeadsetType().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetSystemHeadsetType());
+        // std::string deviceController = string_format("standalone_controller:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetActiveController().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetActiveController());
+
+        std::string deviceHmd = string_format("standalone_hmd:(ovrplugin):%s(%d)", stringify_OVRPlugin_SystemHeadset(GlobalNamespace::OVRPlugin::GetSystemHeadsetType()).c_str(), (int)GlobalNamespace::OVRPlugin::GetSystemHeadsetType());
+        std::string deviceController = string_format("standalone_controller:(ovrplugin):%s(%d)", stringify_OVRPlugin_Controller(GlobalNamespace::OVRPlugin::GetActiveController()).c_str(), (int)GlobalNamespace::OVRPlugin::GetActiveController());
 
         std::string infoHash = GetVersionHash();
 

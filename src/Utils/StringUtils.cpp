@@ -293,4 +293,50 @@ namespace StringUtils
         return true;
     }
 
+    
+    std::string stringify_OVRPlugin_SystemHeadset(const GlobalNamespace::OVRPlugin::SystemHeadset& systemHeadset)
+    {
+        switch (systemHeadset) {
+            case GlobalNamespace::OVRPlugin::SystemHeadset::None: return "None";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Quest: return "Oculus_Quest";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Quest_2: return "Oculus_Quest_2";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_10: return "Placeholder_10";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_11: return "Placeholder_11";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_12: return "Placeholder_12";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_13: return "Placeholder_13";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_14: return "Placeholder_14";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Rift_DK1: return "Rift_DK1";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Rift_DK2: return "Rift_DK2";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Rift_CV1: return "Rift_CV1";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Rift_CB: return "Rift_CB";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Rift_S: return "Rift_S";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Link_Quest: return "Oculus_Link_Quest";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Link_Quest_2: return "Oculus_Link_Quest_2";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4103: return "PC_Placeholder_4103";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4104: return "PC_Placeholder_4104";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4105: return "PC_Placeholder_4105";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4106: return "PC_Placeholder_4106";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4107: return "PC_Placeholder_4107";
+            default: return "Unknown SystemHeadset";
+        }
+    }
+
+    std::string stringify_OVRPlugin_Controller(const GlobalNamespace::OVRPlugin::Controller& controller)
+    {
+        switch (controller) {
+            case GlobalNamespace::OVRPlugin::Controller::None: return "None";
+            case GlobalNamespace::OVRPlugin::Controller::LTouch: return "LTouch";
+            case GlobalNamespace::OVRPlugin::Controller::RTouch: return "RTouch";
+            case GlobalNamespace::OVRPlugin::Controller::Touch: return "Touch";
+            case GlobalNamespace::OVRPlugin::Controller::Remote: return "Remote";
+            case GlobalNamespace::OVRPlugin::Controller::Gamepad: return "Gamepad";
+            case GlobalNamespace::OVRPlugin::Controller::LHand: return "LHand";
+            case GlobalNamespace::OVRPlugin::Controller::RHand: return "RHand";
+            case GlobalNamespace::OVRPlugin::Controller::Hands: return "Hands";
+            case GlobalNamespace::OVRPlugin::Controller::Active: return "Active";
+            case GlobalNamespace::OVRPlugin::Controller::All: return "All";
+            default: return "Unknown Controller";
+        }
+    }
+
 } // namespace StringUtils

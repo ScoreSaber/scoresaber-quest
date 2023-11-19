@@ -1,10 +1,14 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
+#include "GlobalNamespace/OVRPlugin_Controller.hpp"
+#include "GlobalNamespace/OVRPlugin_SystemHeadset.hpp"
 #include "Data/Score.hpp"
 #include "beatsaber-hook/shared/utils/typedefs.h"
 #include "custom-types/shared/register.hpp"
 #include "custom-types/shared/types.hpp"
+#include <string>
+#include <vector>
 
 namespace StringUtils
 {
@@ -42,5 +46,8 @@ namespace StringUtils
     std::vector<std::string> split(const std::string& s, char delim);
 
     bool replace(std::string& str, const std::string& from, const std::string& to);
+
+    std::string stringify_OVRPlugin_SystemHeadset(const GlobalNamespace::OVRPlugin::SystemHeadset& systemHeadset);
+    std::string stringify_OVRPlugin_Controller(const GlobalNamespace::OVRPlugin::Controller& controller);
 
 } // namespace StringUtils
