@@ -7,6 +7,7 @@
 #include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
 #include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
 #include "GlobalNamespace/HMTask.hpp"
+#include "GlobalNamespace/IBeatmapLevel.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/MultiplayerLevelCompletionResults.hpp"
@@ -93,12 +94,15 @@ namespace ScoreSaber::Services::UploadService
 
         if (gameMode == "Solo" || gameMode == "Multiplayer")
         {
+            auto level = difficultyBeatmap->get_level()->i_IPreviewBeatmapLevel();
+            INFO("Starting upload process for %s:%s", ((string)(level->get_levelID())).c_str(), ((string)(level->get_songName())).c_str());
             if (practicing) {
-            ReplayService::WriteSerializedReplay();
+                ReplayService::WriteSerializedReplay();
                 return;
             }
             if (levelCompletionResults->levelEndAction != LevelCompletionResults::LevelEndAction::None) {
                 if (levelCompletionResults->levelEndAction == LevelCompletionResults::LevelEndAction::Restart) {
+                    INFO("Level was restarted before it was finished, don't write replay");
                 } else {
                     ReplayService::WriteSerializedReplay();
                 }
@@ -148,7 +152,6 @@ namespace ScoreSaber::Services::UploadService
                         {
                             if (modifiedScore < internalLeaderboard.leaderboard.value().leaderboardInfo.playerScore.value().modifiedScore)
                             {
-                                //  ERROR("Didn't beat score not uploading");
                                 ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>Didn't beat score, not uploading</color>");
                                 uploading = false;
                                 return;
@@ -157,7 +160,7 @@ namespace ScoreSaber::Services::UploadService
                     }
                     else
                     {
-                        // ERROR("Failed to get leaderboards ranked status");
+                        INFO("Failed to get leaderboards ranked status");
                     }
 
                     bool done = false;
@@ -168,8 +171,8 @@ namespace ScoreSaber::Services::UploadService
                     int maxScore = ScoreModel::ComputeMaxMultipliedScoreForBeatmap(readonlyBeatmapData);
 
                     if(multipliedScore > maxScore) {
-                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>Failed to upload (score was</color>");
-                                
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false, "<color=#fc8181>Failed to upload (score was impossible)</color>");
+                        INFO("Score was better than possible, not uploading!");
                     }
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
@@ -179,16 +182,17 @@ namespace ScoreSaber::Services::UploadService
                     while (!done)
                     {
                         uploading = true;
-                        //  INFO("Uploading score...");
+                        INFO("Uploading score...");
                         auto [responseCode, response] = WebUtils::PostWithReplaySync(url, ReplayService::CurrentSerializedReplay, uploadPacket, 30000);
+                        INFO("Server response:\nHTTP code %ld\nContent: %s", responseCode, response.c_str());
                         if (responseCode == 200)
                         {
-                            // INFO("Score uploaded successfully");
+                            INFO("Score uploaded successfully");
                             done = true;
                         }
-                        if (responseCode == 403)
+                        else if (responseCode == 403)
                         {
-                            // INFO("Player banned, score didn't upload");
+                            INFO("Player banned, score didn't upload");
                             done = true;
                             failed = true;
                         }
@@ -198,7 +202,7 @@ namespace ScoreSaber::Services::UploadService
                             if (attempts < 4)
                             {
                                 // Failed but retry
-                                // ERROR("Score failed to upload, retrying");
+                                ERROR("Score failed to upload, retrying");
                                 attempts++;
                                 std::this_thread::sleep_for(2000ms);
                             }
@@ -215,14 +219,14 @@ namespace ScoreSaber::Services::UploadService
                     {
                         // Score uploaded successfully
                         // Save local replay
-                        // INFO("Score uploaded");
+                        INFO("Score uploaded");
                         SaveReplay(ReplayService::CurrentSerializedReplay, replayFileName);
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, true);
                     }
 
                     if (failed)
                     {
-                        // ERROR("Failed to upload score");
+                        ERROR("Failed to upload score");
                         ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(false, false);
                         // Failed to upload score, tell user
                     }
