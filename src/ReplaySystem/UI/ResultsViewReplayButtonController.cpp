@@ -9,6 +9,7 @@
 #include "bsml/shared/BSML.hpp"
 #include "custom-types/shared/delegate.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "logging.hpp"
 
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::UI, ResultsViewReplayButtonController);
@@ -44,7 +45,8 @@ namespace ScoreSaber::ReplaySystem::UI
             watchReplayButton->get_transform()->set_localScale(watchReplayButton->get_transform()->get_localScale() * 0.4f);
             watchReplayButton->get_transform()->set_localPosition({42.5f, 27.0f, 0.0f});
         }
-        watchReplayButton->set_interactable(_serializedReplay.size() > 0);
+        _replayReady = _serializedReplay.size() > 0;
+        watchReplayButton->set_interactable(_replayReady);
         _difficultyBeatmap = _resultsViewController->difficultyBeatmap;
         _levelCompletionResults = _resultsViewController->levelCompletionResults;
         WaitForReplay();
