@@ -163,7 +163,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(ScoreController_LateUpdate, &ScoreController::LateUpda
             {
                 flag2 = true;
                 // self->multipliedScore += scoringElement2->get_cutScore() * scoringElement2->multiplier;
-                self->immediateMaxPossibleMultipliedScore += scoringElement2->get_maxPossibleCutScore() * scoringElement2->maxMultiplier;
+                // self->immediateMaxPossibleMultipliedScore += scoringElement2->get_maxPossibleCutScore() * scoringElement2->maxMultiplier;
             }
             self->scoringElementsToRemove->Add(scoringElement2);
             if (self->scoringForNoteFinishedEvent)
