@@ -153,14 +153,21 @@ namespace ScoreSaber::ReplaySystem::Playback
     void NotePlayer::ForceCompleteGoodScoringElements(GlobalNamespace::GoodCutScoringElement* scoringElement, GlobalNamespace::NoteCutInfo noteCutInfo, GlobalNamespace::CutScoreBuffer* cutScoreBuffer)
     {
         NoteEvent activeEvent;
+        bool found = false;
         for (int i = 0; i < _recognizedNoteCutInfos.size(); i++)
         {
             if (_recognizedNoteCutInfos[i].info == noteCutInfo)
             {
+                found = true;
                 activeEvent = _recognizedNoteCutInfos[i].event;
                 _recognizedNoteCutInfos.erase(_recognizedNoteCutInfos.begin() + i);
                 break;
             }
+        }
+        
+        if (!found) {
+            // Just in case someone else is creating their own scoring elements, we want to ensure that we're only force completing ones we know we've created
+            return;
         }
 
         if (!scoringElement->isFinished)
