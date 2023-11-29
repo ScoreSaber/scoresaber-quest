@@ -1,5 +1,7 @@
 #include "Utils/StringUtils.hpp"
 
+#include "Data/Private/Settings.hpp"
+
 #include <chrono>
 #include <codecvt>
 #include <sstream>
@@ -21,6 +23,7 @@ static std::u16string size_prefix_u16 = u"<size=";
 static std::u16string size_suffix_u16 = u"</size>";
 
 using namespace std;
+using namespace ScoreSaber::Data::Private;
 
 namespace StringUtils
 {
@@ -130,7 +133,7 @@ namespace StringUtils
             ppString.pop_back();
         std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
         s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
-        if (pp > 0.0f)
+        if (pp > 0.0f && Settings::showScorePP)
         {
             s = Colorize(s, "#6872e5");
             if (modifiers.compare("") == 0)
@@ -164,7 +167,7 @@ namespace StringUtils
             ppString.pop_back();
         std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
         s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
-        if (pp > 0.0f)
+        if (pp > 0.0f && Settings::showScorePP)
         {
             s = Colorize(s, "#6872e5");
             if (modifiers.compare("") == 0)
@@ -200,7 +203,7 @@ namespace StringUtils
         }
         s = s + Resize("pp", 50);
         s = Colorize(" - (", "\"white\"") + s + Colorize(")", "\"white\"");
-        if (pp > 0.0f)
+        if (pp > 0.0f && Settings::showScorePP)
         {
             s = Colorize(s, "#6872e5");
             if (modifiers.compare("") == 0)

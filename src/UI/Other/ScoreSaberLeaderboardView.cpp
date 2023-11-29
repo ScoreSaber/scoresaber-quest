@@ -4,6 +4,7 @@
 #include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Score.hpp"
+#include "Data/Private/Settings.hpp"
 
 #include "GlobalNamespace/HMTask.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
@@ -69,6 +70,7 @@ using namespace StringUtils;
 using namespace ScoreSaber::CustomTypes;
 using namespace ScoreSaber::UI::FlowCoordinators;
 using namespace ScoreSaber::Services;
+using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
@@ -106,22 +108,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             _playButton = _standardLevelDetailViewController->standardLevelDetailView->actionButton;
             _platformLeaderboardViewController = self;
-            Sprite* globalLeaderboardIcon = self->globalLeaderboardIcon;
-            Sprite* friendsLeaderboardIcon = self->friendsLeaderboardIcon;
-            Sprite* aroundPlayerLeaderboardIcon = self->aroundPlayerLeaderboardIcon;
-            Sprite* countryLeaderboardIcon = Base64ToSprite(country_base64);
-            countryLeaderboardIcon->get_textureRect().set_size({64.0f, 64.0f});
-
-            IconSegmentedControl* scopeSegmentedControl = self->scopeSegmentedControl;
-
-            ::Array<IconSegmentedControl::DataItem*>* array = ::Array<IconSegmentedControl::DataItem*>::New({
-                IconSegmentedControl::DataItem::New_ctor(globalLeaderboardIcon, "Global"),
-                IconSegmentedControl::DataItem::New_ctor(aroundPlayerLeaderboardIcon, "Around You"),
-                IconSegmentedControl::DataItem::New_ctor(friendsLeaderboardIcon, "Friends"),
-                IconSegmentedControl::DataItem::New_ctor(countryLeaderboardIcon, "Country"),
-            });
-
-            scopeSegmentedControl->SetData(array);
 
             // Page Buttons
 
@@ -187,6 +173,30 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 }
             });
         }
+
+        // we have to set this up again, because locationFilterMode could have changed
+        Sprite* globalLeaderboardIcon = self->globalLeaderboardIcon;
+        Sprite* friendsLeaderboardIcon = self->friendsLeaderboardIcon;
+        Sprite* aroundPlayerLeaderboardIcon = self->aroundPlayerLeaderboardIcon;
+        Sprite* countryLeaderboardIcon = Base64ToSprite(country_base64);
+        countryLeaderboardIcon->get_textureRect().set_size({64.0f, 64.0f});
+
+        IconSegmentedControl* scopeSegmentedControl = self->scopeSegmentedControl;
+
+        std::string mode = Settings::locationFilterMode;
+        for (auto& c : mode)
+        {
+            c = tolower(c);
+        }
+
+        ::Array<IconSegmentedControl::DataItem*>* array = ::Array<IconSegmentedControl::DataItem*>::New({
+            IconSegmentedControl::DataItem::New_ctor(globalLeaderboardIcon, "Global"),
+            IconSegmentedControl::DataItem::New_ctor(aroundPlayerLeaderboardIcon, "Around You"),
+            IconSegmentedControl::DataItem::New_ctor(friendsLeaderboardIcon, "Friends"),
+            IconSegmentedControl::DataItem::New_ctor(countryLeaderboardIcon, mode == "region" ? "Region" : "Country"),
+        });
+
+        scopeSegmentedControl->SetData(array);
     }
 
     void DidDeactivate()
@@ -330,6 +340,14 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         loadingControl->Hide();
         loadingControl->ShowText(errorText, showRefreshButton);
         SetPlayButtonState(true);
+    }
+    
+    void RefreshLeaderboard()
+    {
+        if (_activated)
+        {
+            _platformLeaderboardViewController->Refresh(true, true);
+        }
     }
 
     void ChangeScope(bool filterAroundCountry)

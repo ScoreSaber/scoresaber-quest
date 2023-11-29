@@ -2,6 +2,7 @@
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ScoreSaberUploadData.hpp"
+#include "Data/Private/Settings.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
@@ -240,6 +241,9 @@ namespace ScoreSaber::Services::UploadService
 
     void SaveReplay(const std::vector<char>& replay, std::string replayFileName)
     {
+        if (!Settings::saveLocalReplays)
+            return;
+            
         std::string filePath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
         std::ofstream file(filePath, ios::binary);
         file.write(replay.data(), replay.size());
@@ -266,7 +270,7 @@ namespace ScoreSaber::Services::UploadService
         std::string playerId = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id;
 
         auto modifiers = GetModifierList(gameplayModifiers, energy);
-        
+
         // TODO go back to these versions after the unity upgrade (if it works then)
         // std::string deviceHmd = string_format("standalone_hmd:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetSystemHeadsetType().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetSystemHeadsetType());
         // std::string deviceController = string_format("standalone_controller:(ovrplugin):%s(%d)", std::string(GlobalNamespace::OVRPlugin::GetActiveController().i_Enum()->ToString()).c_str(), (int)GlobalNamespace::OVRPlugin::GetActiveController());

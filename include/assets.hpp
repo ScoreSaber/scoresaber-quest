@@ -43,6 +43,7 @@ struct IncludedAsset {
 
 namespace IncludedAssets {
 
+	DECLARE_FILE(MainSettingsViewController_bsml)
 	DECLARE_FILE(imber_panel_bsml)
 	DECLARE_FILE(replay_png)
 

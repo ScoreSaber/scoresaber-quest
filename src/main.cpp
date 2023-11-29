@@ -11,6 +11,7 @@
 #include "questui/shared/QuestUI.hpp"
 
 #include "Data/Private/ReplayReader.hpp"
+#include "Data/Private/Settings.hpp"
 #include "MainInstaller.hpp"
 #include "ReplaySystem/Installers/ImberInstaller.hpp"
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
@@ -62,7 +63,9 @@ extern "C" __attribute((visibility("default"))) void load()
     QuestUI::Init();
     custom_types::Register::AutoRegister();
     Hooks::InstallHooks(ScoreSaber::Logging::getLogger());
+    ScoreSaber::Data::Private::Settings::LoadSettings();
     TeamUtils::Download();
+    
     ScoreSaber::Services::FileService::EnsurePaths();
 
     auto zenjector = Lapiz::Zenject::Zenjector::Get();

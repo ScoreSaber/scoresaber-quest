@@ -1,5 +1,7 @@
 #include "UI/Other/PanelView.hpp"
 
+#include "Data/Private/Settings.hpp"
+
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
@@ -25,6 +27,7 @@ DEFINE_TYPE(ScoreSaber::UI::Other, PanelView);
 using namespace ScoreSaber::UI::Other;
 using namespace ScoreSaber::CustomTypes::Components;
 using namespace ScoreSaber::UI::FlowCoordinators;
+using namespace ScoreSaber::Data::Private;
 using namespace QuestUI;
 using namespace UnityEngine::UI;
 using namespace UnityEngine::Events;
@@ -170,6 +173,10 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
     std::string status, bool showIndicator, float dismiss,
     std::function<void()> callback)
 {
+    if (!Settings::showStatusText) {
+        co_return;
+    }
+
     this->promptText->SetText(status);
 
     std::string text = status;

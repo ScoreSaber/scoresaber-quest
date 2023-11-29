@@ -25,6 +25,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                      bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
     void DidDeactivate();
     void ChangeScope(bool filterAroundCountry);
+    void RefreshLeaderboard();
     void RefreshLeaderboard(IDifficultyBeatmap* difficultyBeatmap, LeaderboardTableView* tableView, PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl, std::string refreshId);
     void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo);
     int GetPlayerScoreIndex(std::vector<Data::Score> scores);

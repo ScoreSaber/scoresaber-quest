@@ -1,6 +1,8 @@
 #include "Utils/StringUtils.hpp"
 
 #include "Data/InternalLeaderboard.hpp"
+#include "Data/Private/Settings.hpp"
+
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
@@ -25,6 +27,7 @@
 using namespace GlobalNamespace;
 using namespace StringUtils;
 using namespace ScoreSaber;
+using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::Services::LeaderboardService
 {
@@ -57,6 +60,9 @@ namespace ScoreSaber::Services::LeaderboardService
 
         std::string gameMode = "Solo" + difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
         int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
+        
+        bool hasPage = true;
+
         if (!filterAroundCountry)
         {
             switch (scope)
@@ -77,12 +83,29 @@ namespace ScoreSaber::Services::LeaderboardService
         }
         else
         {
-            url = string_format("%s/around-country/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+            std::string mode = Settings::locationFilterMode;
+            for (auto& c : mode)
+            {
+                c = tolower(c);
+            }
+            if(mode == "region") {
+                url = string_format("%s/around-region/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+            } else {
+                if(mode != "country") {
+                    ERROR("Invalid location filter mode, falling back to country");
+                }
+                url = string_format("%s/around-country/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+            }
+        }
+
+        if (Settings::hideNAScoresFromLeaderboard) {
+            if (hasPage)
+                url += "&hideNA=1";
+            else
+                url += "?hideNA=1";
         }
 
         return url;
-        // UMBY: hide NA scores, just implement a config first lol
-        // url = url + "&hideNA=1";
     }
 
     void GetLeaderboardData(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page,

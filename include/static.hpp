@@ -8,6 +8,7 @@ namespace ScoreSaber::Static
     static const std::string DATA_DIR = "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaber";
     static const std::string STEAM_KEY_PATH = DATA_DIR + "/scoresaber_DO_NOT_SHARE.scary";
     static const std::string FRIENDS_PATH = DATA_DIR + "/friends.txt";
+    static const std::string SETTINGS_PATH = DATA_DIR + "/ScoreSaber.json";
 
     static const std::string MOD_DIR = "/sdcard/Android/data/com.beatgames.beatsaber/files/mods";
 

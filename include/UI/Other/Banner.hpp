@@ -32,6 +32,7 @@ DECLARE_CLASS_CODEGEN(
     static ScoreSaber::UI::Other::Banner * Create(UnityEngine::Transform * parent);
     void Setup();
     void OpenMainMenuFlowCoordinator();
+    void OpenSettingsFlowCoordinator();
     void OpenPlayerInfoModal();
     void OpenSongInBrowser();
 
