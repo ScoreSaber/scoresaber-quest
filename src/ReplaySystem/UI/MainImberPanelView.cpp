@@ -142,19 +142,17 @@ namespace ScoreSaber::ReplaySystem::UI
         _location = "";
     }
 
-    System::Action_2<HMUI::SegmentedControl*, int> tabSelectAction;
 
     void MainImberPanelView::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
-        if (!firstActivation)
-        {
-            return;
+        //getBase()->DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+        if (firstActivation) {
+            BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, get_transform(), this);
         }
-        BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, get_transform(), this);
-        // tabSelectAction = il2cpp_utils::MakeDelegate<System::Action_2<HMUI::SegmentedControl*, int>*>(classof(System::Action_2<HMUI::SegmentedControl*, int>*), this, [](HMUI::SegmentedControl* segmentedControl, int idx) {
-        //     DidSelect(idx);
-        // });
-        // tabSelector->textSegmentedControl->didSelectCellEvent += tabSelectAction;
+        didSelectDelegate = custom_types::MakeDelegate<System::Action_2<HMUI::SegmentedControl*, int>*>((std::function<void(HMUI::SegmentedControl*, int)>)[&](HMUI::SegmentedControl* segmentedControl, int idx) {
+            DidSelect(segmentedControl, idx);
+        });
+        tabSelector->textSegmentedControl->add_didSelectCellEvent(didSelectDelegate);
         set_didParse(true);
         if (firstActivation)
         {
@@ -165,8 +163,8 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        // tabSelector->textSegmentedControl->didSelectCellEvent -= tabSelectAction;
-        // getBase()->DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+        tabSelector->textSegmentedControl->remove_didSelectCellEvent(didSelectDelegate);
+        //getBase()->DidDeactivate(removedFromHierarchy, screenSystemDisabling);
     }
 
     void MainImberPanelView::Construct()
@@ -186,8 +184,9 @@ namespace ScoreSaber::ReplaySystem::UI
         _targetFPS = targetFramerate;
         _timeSync = initialSongTime;
         _location = defaultLocation;
-        // _locations = locations;
-        //_locations = locations;
+        for (auto &loc : _locations) {
+            this->locations->Add(StringW(loc));
+        }
     }
 
     void MainImberPanelView::DidSelect(HMUI::SegmentedControl* segmentedControl, int selected)

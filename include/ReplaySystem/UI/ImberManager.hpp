@@ -73,6 +73,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, 
 
                                     DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
                                     System::Action * _didResumeDelegate;
+                                    std::vector<std::string> _positions;
 
 )
 

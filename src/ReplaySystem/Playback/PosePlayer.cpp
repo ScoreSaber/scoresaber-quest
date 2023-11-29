@@ -34,6 +34,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _returnToMenuController = returnToMenuController;
         _playerTransforms = playerTransforms;
         _audioTimeSyncController = audioTimeSyncController;
+        _spectatorOffset = Vector3(0, 0, -2);
         _mainSettingsModelSO = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::MainSettingsModelSO*>()->values[0];
     }
     void PosePlayer::Initialize()
@@ -61,7 +62,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         GameObject* spectatorObject = GameObject::New_ctor("SpectatorParent");
         _spectatorCamera = UnityEngine::Object::Instantiate(_desktopCamera);
-        spectatorObject->get_transform()->set_position(Vector3(_mainSettingsModelSO->roomCenter->value.x, _mainSettingsModelSO->roomCenter->value.y, _mainSettingsModelSO->roomCenter->value.z + -2.0f));
+        spectatorObject->get_transform()->set_position(Vector3(_mainSettingsModelSO->roomCenter->value.x + _spectatorOffset.x, _mainSettingsModelSO->roomCenter->value.y + _spectatorOffset.y, _mainSettingsModelSO->roomCenter->value.z + _spectatorOffset.z));
         Quaternion rotation = Quaternion::Euler(0.0f, _mainSettingsModelSO->roomRotation->value, 0.0f);
         spectatorObject->get_transform()->set_rotation(rotation);
         _spectatorCamera->set_stereoTargetEye(StereoTargetEyeMask::Both);
@@ -142,6 +143,12 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         _nextIndex = _sortedPoses.size();
     }
+
+    void PosePlayer::SetSpectatorOffset(Vector3 value) {
+        _spectatorCamera->get_transform()->get_parent()->set_position(Vector3(_mainSettingsModelSO->roomCenter->value.x + value.x, _mainSettingsModelSO->roomCenter->value.y + value.y, _mainSettingsModelSO->roomCenter->value.z + value.z));
+        _spectatorOffset = value;
+    }
+
     void PosePlayer::AddCallback(std::function<void(ScoreSaber::Data::Private::VRPoseGroup)> callback)
     {
         DidUpdatePose = callback;

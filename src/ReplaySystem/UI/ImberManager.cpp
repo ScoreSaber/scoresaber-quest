@@ -1,4 +1,6 @@
 #include "ReplaySystem/UI/ImberManager.hpp"
+
+#include "Data/Private/Settings.hpp"
 #include "HMUI/CurvedCanvasSettings.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "UnityEngine/Mathf.hpp"
@@ -39,9 +41,13 @@ namespace ScoreSaber::ReplaySystem::UI
         _initData = initData;
         _posePlayer = posePlayer;
 
-        // TODO: Load positions
+        for (auto &sp : Settings::spectatorPositions) {
+            _positions.push_back(sp.name);
+        }
 
-        _mainImberPanelView->Setup(initData->timeScale, 90, "default", std::vector<string>());
+        INFO("_positions has %d elements", (int)_positions.size());
+
+        _mainImberPanelView->Setup(initData->timeScale, 90, _positions.front(), _positions);
 
         bool noFail = false;
         for (int i = 0; i < ReplayLoader::LoadedReplay->metadata->Modifiers.size(); i++)
@@ -88,9 +94,9 @@ namespace ScoreSaber::ReplaySystem::UI
         _mainImberPanelView->DidPositionTabVisibilityChange = [&](bool value) {
             MainImberPanelView_DidPositionTabVisibilityChange(value);
         };
-
-        // TODO: Specator controller update pose
-
+        _spectateAreaController->DidUpdatePlayerSpectatorPose = [&](Vector3 position, Quaternion rotation) {
+            SpectateAreaController_DidUpdatePlayerSpectatorPose(position, rotation);
+        };
         _imberScrubber->DidCalculateNewTime = [&](float value) {
             ImberScrubber_DidCalculateNewTime(value);
         };
@@ -104,12 +110,21 @@ namespace ScoreSaber::ReplaySystem::UI
         _didResumeDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume);
         _gamePause->add_didResumeEvent(_didResumeDelegate);
 
-        CreateWatermark();
+        if (!Settings::hasOpenedReplayUI) {
+            CreateWatermark();
+        }
     }
 
     void ImberManager::MainImberPanelView_DidHandSwitchEvent(XR::XRNode hand)
     {
-        // TODO: Update hand settings in config
+
+        if (hand == XR::XRNode::RightHand) {
+            Settings::leftHandedReplayUI = true;
+        }
+        if (hand == XR::XRNode::LeftHand) {
+            Settings::leftHandedReplayUI = false;
+        }
+        Settings::SaveSettings();
 
         _imberUIPositionController->UpdateTrackingHand(hand);
     }
@@ -132,7 +147,7 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberManager::SpectateAreaController_DidUpdatePlayerSpectatorPose(Vector3 position, Quaternion rotation)
     {
         _imberUIPositionController->SetControllerOffset(position);
-        // TODO: _posePlayer.SetSpectatorOffset
+        _posePlayer->SetSpectatorOffset(position);
     }
 
     void ImberManager::CreateWatermark()
@@ -236,9 +251,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _mainImberPanelView->HandDidSwitchEvent = nullptr;
         _mainImberPanelView->DidPositionPreviewChange = nullptr;
         _mainImberPanelView->DidPositionTabVisibilityChange = nullptr;
-
-        // TODO: Specator controller update pose
-
+        _spectateAreaController->DidUpdatePlayerSpectatorPose = nullptr;
         _imberScrubber->DidCalculateNewTime = nullptr;
         _imberSpecsReporter->DidReport = nullptr;
 

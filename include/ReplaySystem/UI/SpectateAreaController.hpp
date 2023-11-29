@@ -22,7 +22,6 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, SpectateAreaCo
                                     DECLARE_INSTANCE_FIELD_DEFAULT(int, _colorID, UnityEngine::Shader::PropertyToID("Color"));
                                     DECLARE_INSTANCE_FIELD(Tweening::TimeTweeningManager*, _timeTweeningManager);
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::GameNoteController::Pool*, _gameNoteControllerPool);
-                                    // DidUpdatePlayerSpectatorPose
 
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::GameNoteController*, _activeNote);
                                     DECLARE_INSTANCE_FIELD(UnityEngine::Quaternion, _initialQuaternion);
@@ -39,8 +38,11 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, SpectateAreaCo
 
                                     DECLARE_INSTANCE_METHOD(void, UpdateNoteScale, UnityEngine::Vector3 scale);
                                     DECLARE_INSTANCE_METHOD(void, DespawnActiveNote);
-                                    DECLARE_INSTANCE_METHOD(UnityEngine::Vector3, TryGetPose, StringW poseID);
 
-                                    DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());)
+                                    DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
+                                    std::optional<UnityEngine::Vector3> TryGetPose(StringW poseID);
+                                    public:
+                                        std::function<void(UnityEngine::Vector3, UnityEngine::Quaternion)> DidUpdatePlayerSpectatorPose;
+)
 
 #undef INTERFACES

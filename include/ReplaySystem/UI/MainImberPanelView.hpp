@@ -65,9 +65,10 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       DECLARE_INJECT_METHOD(void, Construct);
                       /* Use the ctor to set default values like _playPauseText = "PAUSE"; */
                       DECLARE_CTOR(ctor);
-                      public
-                      : std::function<void(bool)>
-                          DidPositionTabVisibilityChange;
+                      private:
+                        System::Action_2<HMUI::SegmentedControl*, int> *didSelectDelegate;
+                      public: 
+                      std::function<void(bool)> DidPositionTabVisibilityChange;
                       std::function<void(std::string)> DidPositionPreviewChange;
                       std::function<void(UnityEngine::XR::XRNode)> HandDidSwitchEvent;
                       std::function<void(float)> DidTimeSyncChange;

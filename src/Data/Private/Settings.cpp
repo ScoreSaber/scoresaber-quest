@@ -110,6 +110,8 @@ namespace ScoreSaber::Data::Private {
                 }
             }
 
+            if (spectatorPositions.empty()) InitializeDefaultSpectatorPositions(); // make sure we always have some spectator positions
+
             if (fileVersion < currentVersion) {
                 // add settings upgrade code here once needed
                 SaveSettings();
@@ -147,9 +149,9 @@ namespace ScoreSaber::Data::Private {
             writer.Bool(hasOpenedReplayUI);
             writer.String("leftHandedReplayUI");
             writer.Bool(leftHandedReplayUI);
-            writer.String("spectatorPositions");
-            writer.Bool(lockedReplayUIMode);
             writer.String("lockedReplayUIMode");
+            writer.Bool(lockedReplayUIMode);
+            writer.String("spectatorPositions");
             writer.StartArray();
             for (auto position : spectatorPositions) {
                 writer.StartObject();

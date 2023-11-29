@@ -1,5 +1,7 @@
-
 #include "ReplaySystem/UI/ImberUIPositionController.hpp"
+
+#include "Data/Private/Settings.hpp"
+
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/WaitForEndOfFrame.hpp"
@@ -7,6 +9,7 @@
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
+using namespace ScoreSaber::Data::Private;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::UI, ImberUIPositionController);
 
@@ -41,7 +44,10 @@ namespace ScoreSaber::ReplaySystem::UI
         _gamePause->add_didResumeEvent(_didResumeDelegate);
         _gamePause->add_didPauseEvent(_didPauseDelegate);
         _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
-        // TODO: Check left hand
+
+        if (Settings::leftHandedReplayUI) {
+            _handTrack = XR::XRNode::RightHand;
+        }
     }
     void ImberUIPositionController::GamePause_didResumeEvent()
     {
@@ -99,8 +105,7 @@ namespace ScoreSaber::ReplaySystem::UI
                 _isClicking = false;
             }
         }
-        // TODO: Check settings for lockedReplayUIMode
-        if (_isActive)
+        if (_isActive && !Settings::lockedReplayUIMode)
         {
             SetUIPosition(controller);
         }
@@ -125,12 +130,18 @@ namespace ScoreSaber::ReplaySystem::UI
 
         _imberScrubber->get_transform()->set_localPosition(controller->get_transform()->TransformPoint(scrubberOffset));
         _imberScrubber->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
-        // _mainImberPanelView->get_Transform().SetLocalPosition
     }
 
     void ImberUIPositionController::OpenedUI()
     {
-        // TODO
+        if (!Settings::hasOpenedReplayUI) {
+            GameObject* replayPrompt = GameObject::Find("Replay Prompt");
+            if (replayPrompt != nullptr) {
+                GameObject::Destroy(replayPrompt);
+            }
+            Settings::hasOpenedReplayUI = true;
+            Settings::SaveSettings();
+        }
     }
 
     void ImberUIPositionController::UpdateTrackingHand(XR::XRNode handTrack)

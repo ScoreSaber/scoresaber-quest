@@ -9,6 +9,7 @@
 #include "GlobalNamespace/SaberManager.hpp"
 #include "System/IDisposable.hpp"
 #include "UnityEngine/Camera.hpp"
+#include "UnityEngine/Vector3.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "Zenject/IInitializable.hpp"
 #include "Zenject/ITickable.hpp"
@@ -29,6 +30,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     DECLARE_PRIVATE_FIELD(int, _nextIndex);
                                     DECLARE_PRIVATE_FIELD(UnityEngine::Camera*, _spectatorCamera);
                                     DECLARE_PRIVATE_FIELD(UnityEngine::Camera*, _desktopCamera);
+                                    DECLARE_PRIVATE_FIELD(UnityEngine::Vector3, _spectatorOffset);
                                     DECLARE_PRIVATE_FIELD(GlobalNamespace::MainSettingsModelSO*, _mainSettingsModelSO);
                                     DECLARE_CTOR(ctor, GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController);
                                     DECLARE_OVERRIDE_METHOD(void, Initialize, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::IInitializable::Initialize>::get());
@@ -41,6 +43,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     bool ReachedEnd();
                                     void SetupCameras();
                                     public:
+                                    void SetSpectatorOffset(UnityEngine::Vector3 value);
                                     void AddCallback(std::function<void(ScoreSaber::Data::Private::VRPoseGroup)> callback);
 
 );
