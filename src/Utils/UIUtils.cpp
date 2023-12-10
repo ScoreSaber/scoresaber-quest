@@ -9,6 +9,7 @@
 #include "HMUI/ButtonSpriteSwap.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
+#include "HMUI/StackLayoutGroup.hpp"
 #include "Libraries/HM/HMLib/VR/HapticPresetSO.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/GameObject.hpp"
@@ -247,5 +248,21 @@ namespace UIUtils
         button->sprite = sprite;
         button->Init(parent->get_transform(), anchoredPosition, sizeDelta, onClick);
         return button;
+    }
+
+    UnityEngine::GameObject* CreateStackLayoutGroup(UnityEngine::Transform* parent)
+    {
+        auto stack = GameObject::New_ctor("ScoreSaberStackLayoutGroup");
+        stack->get_transform()->SetParent(parent, false);
+        stack->AddComponent<HMUI::StackLayoutGroup*>();
+        stack->AddComponent<ContentSizeFitter*>();
+        stack->AddComponent<Backgroundable*>();
+        auto rowStackRect = reinterpret_cast<RectTransform*>(stack->get_transform());
+        rowStackRect->set_anchorMin({0, 0});
+        rowStackRect->set_anchorMax({1, 1});
+        rowStackRect->set_sizeDelta({0, 0});
+        stack->AddComponent<LayoutElement*>();
+
+        return stack;
     }
 } // namespace UIUtils

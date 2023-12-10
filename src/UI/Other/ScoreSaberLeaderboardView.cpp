@@ -30,6 +30,7 @@
 #include "HMUI/IconSegmentedControl_DataItem.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/Screen.hpp"
+#include "HMUI/StackLayoutGroup.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
 
@@ -41,14 +42,20 @@
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
 
 #include "UI/Other/PanelView.hpp"
+#include "UI/Other/ProfilePictureView.hpp"
 #include "System/Action.hpp"
+#include "System/Threading/CancellationTokenSource.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Rect.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/SpriteRenderer.hpp"
+#include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/UI/Button.hpp"
 #include "Utils/StringUtils.hpp"
+#include "Utils/UIUtils.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "bsml/shared/Helpers/utilities.hpp"
 #include "custom-types/shared/delegate.hpp"
 #include "hooks.hpp"
 #include "logging.hpp"
@@ -84,6 +91,9 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     UnityEngine::UI::Button* _pageUpButton;
     UnityEngine::UI::Button* _pageDownButton;
 
+    std::vector<ProfilePictureView> _ImageHolders;
+
+    SafePtr<System::Threading::CancellationTokenSource> cancellationToken;
 
     bool _activated = false;
 
@@ -171,6 +181,37 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                     }
                 }
             });
+
+            // profile pictures
+            auto pfpVertical = CreateVerticalLayoutGroup(self->get_transform());
+            pfpVertical->get_rectTransform()->set_anchoredPosition(Vector2(-21, -1));
+            pfpVertical->set_spacing(-20.15);
+
+            auto nullSprite = BSML::Utilities::ImageResources::GetBlankSprite();
+
+            for (int i = 0; i < 10; ++i) {
+                auto rowHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
+                rowHorizontal->set_childForceExpandHeight(true);
+                rowHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
+
+                auto rowStack = UIUtils::CreateStackLayoutGroup(rowHorizontal->get_transform());
+                
+                auto image = CreateImage(rowStack->get_transform(), nullSprite, {0.0f, 0.0f}, {4.75f, 4.75f});
+                image->set_preserveAspect(true);
+                auto imageLayout = image->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
+                imageLayout->set_preferredHeight(4.75f);
+                imageLayout->set_preferredWidth(4.75f);
+
+                auto loadingIndicator = UIUtils::CreateLoadingIndicator(rowStack->get_transform());
+                auto loadingIndicatorLayout = loadingIndicator->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
+                loadingIndicatorLayout->set_preferredHeight(3.75f);
+                loadingIndicatorLayout->set_preferredWidth(3.75f);
+                // missing: set preserveAspect to true, but not sure where to set this (or if it is even needed, but the PC plugin does it)
+                loadingIndicator->SetActive(false);
+
+                _ImageHolders.emplace_back(image, loadingIndicator);
+                _ImageHolders.back().Parsed();
+            }
         }
 
         // we have to set this up again, because locationFilterMode could have changed
@@ -205,6 +246,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         _pageDownButton = nullptr;
     }
 
+    void ByeImages()
+    {
+        for (auto &holder : _ImageHolders) {
+            holder.ClearSprite();
+        }
+    }
+
     void RefreshLeaderboard(IDifficultyBeatmap* difficultyBeatmap, LeaderboardTableView* tableView,
                             PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl,
                             std::string refreshId)
@@ -227,11 +275,20 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             _pageDownButton->set_interactable(true);
         }
 
+        ByeImages();
+
+        if (cancellationToken) {
+            cancellationToken->Cancel();
+            cancellationToken->Dispose();
+        }
+        cancellationToken = System::Threading::CancellationTokenSource::New_ctor();
+
         leaderboardScoreInfoButtonHandler->set_buttonCount(0);
 
         if (PlayerService::playerInfo.loginStatus == PlayerService::LoginStatus::Error)
         {
             SetErrorState(loadingControl, "ScoreSaber authentication failed, please restart Beat Saber", false);
+            ByeImages();
             return;
         }
 
@@ -250,6 +307,9 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                     difficultyBeatmap, scope, _leaderboardPage,
                     [=](Data::InternalLeaderboard internalLeaderboard) {
                         QuestUI::MainThreadScheduler::Schedule([=]() {
+                            if (_currentLeaderboardRefreshId != refreshId) {
+                                return; // we need to check this again, since some time may have passed due to waiting for leaderboard data
+                            }
                             if (internalLeaderboard.leaderboard.has_value())
                             {
                                 int playerScoreIndex = GetPlayerScoreIndex(internalLeaderboard.leaderboard.value().scores);
@@ -262,6 +322,9 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                     else
                                     {
                                         tableView->SetScores(internalLeaderboard.leaderboardItems, playerScoreIndex);
+                                        for (int i = 0; i < internalLeaderboard.profilePictures.size(); ++i) {
+                                            _ImageHolders[i].SetProfileImage(internalLeaderboard.profilePictures[i], i, cancellationToken->get_Token());
+                                        }
                                         loadingControl->ShowText(System::String::_get_Empty(), false);
                                         loadingControl->Hide();
                                         leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, internalLeaderboard.leaderboard->leaderboardInfo.id);
@@ -278,6 +341,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                     {
                                         SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
                                     }
+                                    ByeImages();
                                 }
                             }
                             else
@@ -290,6 +354,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 {
                                     SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
                                 }
+                                ByeImages();
                             }
                         });
                     },

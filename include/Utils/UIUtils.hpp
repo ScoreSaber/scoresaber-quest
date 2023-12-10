@@ -32,4 +32,5 @@ namespace UIUtils
     ScoreSaber::CustomTypes::Components::ImageButton* CreateImageButton(
         GameObject* parent, Sprite* sprite, Vector2 anchoredPosition,
         Vector2 sizeDelta, std::function<void()> onClick);
+    UnityEngine::GameObject* CreateStackLayoutGroup(UnityEngine::Transform* parent);
 } // namespace UIUtils

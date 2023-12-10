@@ -147,7 +147,7 @@ namespace ScoreSaber::Services::LeaderboardService
     {
         auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
         scores->Add(LeaderboardTableView::ScoreData::New_ctor(0, error, 0, false));
-        return Data::InternalLeaderboard(scores);
+        return Data::InternalLeaderboard(scores, {});
     }
 
     Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope,
@@ -155,6 +155,7 @@ namespace ScoreSaber::Services::LeaderboardService
     {
         auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
         auto modifiers = List<GameplayModifierParamsSO*>::New_ctor();
+        std::vector<std::string> profilePictures;
         Data::Leaderboard currentLeaderboard;
         rapidjson::Document doc;
         doc.Parse(rawData.data());
@@ -171,15 +172,16 @@ namespace ScoreSaber::Services::LeaderboardService
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
                     std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
-                    std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 80);
+                    std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 75);
                     scores->Add(LeaderboardTableView::ScoreData::New_ctor(score.modifiedScore, result, score.rank, false));
+                    profilePictures.push_back(leaderboardPlayerInfo.profilePicture);
                 }
 
                 if (scores->size == 0)
                 {
                     return GetLeaderboardError("No scores on this leaderboard!");
                 }
-                return Data::InternalLeaderboard(scores, std::make_optional<Data::Leaderboard>(currentLeaderboard));
+                return Data::InternalLeaderboard(scores, profilePictures, std::make_optional<Data::Leaderboard>(currentLeaderboard));
             }
             else
             {
