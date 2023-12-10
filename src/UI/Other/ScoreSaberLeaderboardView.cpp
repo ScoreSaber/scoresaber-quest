@@ -83,7 +83,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     UnityEngine::UI::Button* _pageUpButton;
     UnityEngine::UI::Button* _pageDownButton;
-    UnityEngine::UI::Button* _playButton;
+
 
     bool _activated = false;
 
@@ -106,7 +106,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         {
             StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
 
-            _playButton = _standardLevelDetailViewController->standardLevelDetailView->actionButton;
             _platformLeaderboardViewController = self;
 
             // Page Buttons
@@ -220,13 +219,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             return;
         }
 
-        SetPlayButtonState(false);
         leaderboardScoreInfoButtonHandler->set_buttonCount(0);
 
         if (PlayerService::playerInfo.loginStatus == PlayerService::LoginStatus::Error)
         {
             SetErrorState(loadingControl, "ScoreSaber authentication failed, please restart Beat Saber", false);
-            SetPlayButtonState(true);
             return;
         }
 
@@ -260,7 +257,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                         loadingControl->ShowText(System::String::_get_Empty(), false);
                                         loadingControl->Hide();
                                         leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, internalLeaderboard.leaderboard->leaderboardInfo.id);
-                                        SetPlayButtonState(true);
                                         SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
                                     }
                                 }
@@ -339,7 +335,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         loadingControl->Hide();
         loadingControl->ShowText(errorText, showRefreshButton);
-        SetPlayButtonState(true);
     }
     
     void RefreshLeaderboard()
@@ -388,14 +383,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         }
         _platformLeaderboardViewController->Refresh(true, true);
         CheckPage();
-    }
-
-    void SetPlayButtonState(bool state)
-    {
-        if (_playButton != nullptr)
-        {
-            _playButton->get_gameObject()->set_active(state);
-        }
     }
 
     void SetUploadState(bool state, bool success, std::string errorMessage)
