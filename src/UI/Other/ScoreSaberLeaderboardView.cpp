@@ -219,6 +219,14 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             return;
         }
 
+        if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && !_filterAroundCountry) {
+            _pageUpButton->set_interactable(false);
+            _pageDownButton->set_interactable(false);
+        } else {
+            _pageUpButton->set_interactable(true);
+            _pageDownButton->set_interactable(true);
+        }
+
         leaderboardScoreInfoButtonHandler->set_buttonCount(0);
 
         if (PlayerService::playerInfo.loginStatus == PlayerService::LoginStatus::Error)
