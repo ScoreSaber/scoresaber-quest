@@ -1,7 +1,6 @@
 
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 
-#include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Score.hpp"
 #include "Data/Private/Settings.hpp"
@@ -93,6 +92,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     std::vector<ProfilePictureView> _ImageHolders;
 
+    std::vector<HMUI::ImageView*> _cellClickingImages;
+
     SafePtr<System::Threading::CancellationTokenSource> cancellationToken;
 
     bool _activated = false;
@@ -158,11 +159,10 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             auto t = newGo->get_transform();
             t->get_transform()->SetParent(self->get_transform(), false);
             t->set_localScale({1, 1, 1});
+
             leaderboardScoreInfoButtonHandler = newGo->AddComponent<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*>();
             leaderboardScoreInfoButtonHandler->Setup();
             leaderboardScoreInfoButtonHandler->scoreInfoModal->playerProfileModal = playerProfileModal;
-            leaderboardScoreInfoButtonHandler = leaderboardScoreInfoButtonHandler;
-            leaderboardScoreInfoButtonHandler->set_buttonCount(0);
 
             _activated = true;
 
@@ -204,14 +204,39 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
                 auto loadingIndicator = UIUtils::CreateLoadingIndicator(rowStack->get_transform());
                 auto loadingIndicatorLayout = loadingIndicator->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
-                loadingIndicatorLayout->set_preferredHeight(3.75f);
                 loadingIndicatorLayout->set_preferredWidth(3.75f);
+                loadingIndicatorLayout->set_preferredHeight(3.75f);
                 // missing: set preserveAspect to true, but not sure where to set this (or if it is even needed, but the PC plugin does it)
                 loadingIndicator->SetActive(false);
 
                 _ImageHolders.emplace_back(image, loadingIndicator);
                 _ImageHolders.back().Parsed();
             }
+
+            // cell clickers
+            auto clickVertical = CreateVerticalLayoutGroup(self->get_transform());
+            clickVertical->get_rectTransform()->set_anchoredPosition(Vector2(5, -1));
+            clickVertical->set_spacing(-20.25);
+
+            auto mat_UINoGlowRoundEdge = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return to_utf8(csstrtostr(x->get_name())) == "UINoGlowRoundEdge"; });
+
+            for (int i = 0; i < 10; ++i) {
+                auto rowHorizontal = CreateHorizontalLayoutGroup(clickVertical->get_transform());
+                rowHorizontal->set_childForceExpandHeight(true);
+                rowHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
+
+                auto rowStack = UIUtils::CreateStackLayoutGroup(rowHorizontal->get_transform());
+                
+                auto image = CreateImage(rowStack->get_transform(), nullSprite, {0.0f, 0.0f}, {72.0f, 5.75f});
+                image->set_material(mat_UINoGlowRoundEdge);
+                image->set_preserveAspect(true);
+                auto imageLayout = image->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
+                imageLayout->set_preferredWidth(72.0f);
+                imageLayout->set_preferredHeight(5.75f);
+
+                _cellClickingImages.emplace_back(image);
+            }
+
         }
 
         // we have to set this up again, because locationFilterMode could have changed
@@ -282,8 +307,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             cancellationToken->Dispose();
         }
         cancellationToken = System::Threading::CancellationTokenSource::New_ctor();
-
-        leaderboardScoreInfoButtonHandler->set_buttonCount(0);
 
         if (PlayerService::playerInfo.loginStatus == PlayerService::LoginStatus::Error)
         {

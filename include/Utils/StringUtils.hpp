@@ -17,8 +17,6 @@ namespace StringUtils
 
     std::string GetEnv(const std::string& var);
 
-    std::string to_utf8(std::u16string_view view);
-
     std::string ReplaceInvalidChars(std::string fileName);
 
     std::string GetRoleColor(std::string role);

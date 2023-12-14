@@ -9,21 +9,15 @@
 #include <vector>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::CustomTypes::Components, LeaderboardScoreInfoButtonHandler, UnityEngine::MonoBehaviour,
-                      DECLARE_INSTANCE_FIELD(Array<ScoreSaber::CustomTypes::Components::ClickableImage*>*, buttons);
-
                       DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::ScoreInfoModal*, scoreInfoModal);
-                      public
-                      :
 
+                      public:
                       void Setup();
-                      void set_buttonCount(int count);
                       void set_scoreCollection(std::vector<ScoreSaber::Data::Score> scores, int leaderboardId);
-                      private
-                      :
-
-                        int leaderboardId;
-                      std::vector<ScoreSaber::Data::Score>
-                          scores;
                       void ShowScoreInfoModal(int buttonIdx);
+
+                      private:
+                      int leaderboardId;
+                      std::vector<ScoreSaber::Data::Score> scores;
 
 )

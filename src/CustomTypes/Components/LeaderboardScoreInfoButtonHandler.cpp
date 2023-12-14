@@ -19,34 +19,13 @@ namespace ScoreSaber::CustomTypes::Components
 {
     void LeaderboardScoreInfoButtonHandler::Setup()
     {
-        buttons = Array<ScoreSaber::CustomTypes::Components::ClickableImage*>::NewLength(10);
-        auto infoSprite = Base64ToSprite(info_base64);
-        Vector2 basePosition = {45.0f, 26.17f};
-        for (int i = 0; i < 10; i++)
-        {
-            auto btn = UIUtils::CreateClickableImage(get_transform(), infoSprite, basePosition, {3.5, 3.5}, std::bind(&LeaderboardScoreInfoButtonHandler::ShowScoreInfoModal, this, i));
-            btn->set_preserveAspect(true);
-            basePosition.y -= 6.0f;
-            buttons->values[i] = btn;
-        }
-
         scoreInfoModal = ScoreSaber::UI::Other::ScoreInfoModal::Create(get_transform());
-    }
-
-    void LeaderboardScoreInfoButtonHandler::set_buttonCount(int count)
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            bool active = i < count;
-            buttons->values[i]->get_gameObject()->SetActive(active);
-        }
     }
 
     void LeaderboardScoreInfoButtonHandler::set_scoreCollection(std::vector<ScoreSaber::Data::Score> _scores, int leaderboardId)
     {
         this->scores = _scores;
         this->leaderboardId = leaderboardId;
-        set_buttonCount(_scores.size());
     }
 
     void LeaderboardScoreInfoButtonHandler::ShowScoreInfoModal(int buttonIdx)

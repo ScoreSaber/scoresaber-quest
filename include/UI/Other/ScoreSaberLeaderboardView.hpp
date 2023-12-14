@@ -1,8 +1,10 @@
 #pragma once
 
+#include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
 #include "Data/LeaderboardInfo.hpp"
 #include "Data/Score.hpp"
 #include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
+#include "HMUI/ImageView.hpp"
 #include "HMUI/ModalView.hpp"
 #include "UI/Other/Banner.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
@@ -19,6 +21,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     };
 
     extern ScoreSaber::UI::Other::Banner* ScoreSaberBanner;
+    extern ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
+    extern std::vector<HMUI::ImageView*> _cellClickingImages;
 
     void ResetPage();
     void DidActivate(PlatformLeaderboardViewController* self,

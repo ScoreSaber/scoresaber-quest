@@ -55,12 +55,6 @@ namespace StringUtils
         }
     }
 
-    std::string to_utf8(std::u16string_view view)
-    {
-        return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
-            .to_bytes(view.data());
-    }
-
     std::string ReplaceInvalidChars(std::string fileName)
     {
         auto splitChars = StringW(fileName)->Split(System::IO::Path::GetInvalidFileNameChars());

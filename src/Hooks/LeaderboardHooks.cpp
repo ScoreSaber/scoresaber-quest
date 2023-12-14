@@ -30,11 +30,13 @@
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 
+#include "CustomTypes/Components/CellClicker.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
 #include "GlobalNamespace/MenuTransitionsHelper.hpp"
+#include "UnityEngine/GameObject.hpp"
 
 #include "logging.hpp"
 
@@ -43,9 +45,10 @@ using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber;
-using namespace ScoreSaber::UI::Other;
-using namespace ScoreSaber::ReplaySystem;
+using namespace ScoreSaber::CustomTypes::Components;
 using namespace ScoreSaber::Data::Private;
+using namespace ScoreSaber::ReplaySystem;
+using namespace ScoreSaber::UI::Other;
 
 int _lastScopeIndex = 0;
 
@@ -76,6 +79,13 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
                      void, GlobalNamespace::PlatformLeaderboardViewController* self,
                      bool showLoadingIndicator, bool clear)
 {
+    for (auto holder : ScoreSaberLeaderboardView::_cellClickingImages) {
+        CellClicker* existingCellClicker = holder->get_gameObject()->GetComponent<CellClicker*>();
+        if (existingCellClicker != nullptr) {
+            GameObject::Destroy(existingCellClicker);
+        }
+    }
+
     self->hasScoresData = false;
     self->leaderboardTableView->SetScores(System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor(), -1);
     LoadingControl* loadingControl = self->loadingControl;
