@@ -42,6 +42,16 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
 
     bool IsPlaying;
+    
+    void OnSoftRestart() {
+        playerDataModel = nullptr;
+        menuTransitionsHelper = nullptr;
+        LoadedReplay = nullptr;
+        CurrentLevel = nullptr;
+        CurrentPlayerName.clear();
+        CurrentModifiers.clear();
+        NotePlayerInstance = nullptr;
+    }
 
     void StartReplay(IDifficultyBeatmap* beatmap)
     {

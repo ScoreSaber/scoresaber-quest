@@ -17,7 +17,11 @@
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 #include "ReplaySystem/Installers/RecordInstaller.hpp"
 #include "Services/FileService.hpp"
+#include "Services/PlayerService.hpp"
+#include "Services/ReplayService.hpp"
 #include "UI/Other/Banner.hpp"
+#include "UI/Other/ProfilePictureView.hpp"
+#include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/TeamUtils.hpp"
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSMLDataCache.hpp"
@@ -53,6 +57,15 @@ extern "C" __attribute((visibility("default"))) void setup(ModInfo& info)
     getLogger().info("Completed setup!");
 }
 
+void soft_restart()
+{
+    ScoreSaber::ReplaySystem::ReplayLoader::OnSoftRestart();
+    ScoreSaber::Services::PlayerService::OnSoftRestart();
+    ScoreSaber::Services::ReplayService::OnSoftRestart();
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::OnSoftRestart();
+    ScoreSaber::UI::Other::ProfilePictureView::OnSoftRestart();
+}
+
 // Called later on in the game loading - a good time to install function hooks
 extern "C" __attribute((visibility("default"))) void load()
 {
@@ -74,6 +87,8 @@ extern "C" __attribute((visibility("default"))) void load()
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::PlaybackInstaller*>(Lapiz::Zenject::Location::StandardPlayer);
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::RecordInstaller*, GlobalNamespace::StandardGameplayInstaller*>();
     zenjector->Install<ScoreSaber::ReplaySystem::Installers::RecordInstaller*, GlobalNamespace::MultiplayerLocalActivePlayerInstaller*>();
+
+    BSML::Events::onGameDidRestart.addCallback(soft_restart);
 }
 
 BSML_DATACACHE(replay_png) {

@@ -105,6 +105,26 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     
     bool _allowReplayWatching = true;
 
+    void OnSoftRestart()
+    {
+        _activated = false;
+        int _lastCell = 0;
+        int _leaderboardPage = 1;
+        _filterAroundCountry = false;
+        _currentLeaderboardRefreshId.clear();
+        _allowReplayWatching = true;
+
+        ScoreSaberBanner = nullptr;
+        view = nullptr;
+        leaderboardScoreInfoButtonHandler = nullptr;
+        _platformLeaderboardViewController = nullptr;
+        _pageUpButton = nullptr;
+        _pageDownButton = nullptr;
+
+        _ImageHolders.clear();
+        _cellClickingImages.clear();
+    }
+
     void ResetPage()
     {
         _leaderboardPage = 1;
@@ -115,6 +135,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         if (firstActivation)
         {
+
             StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
 
             _platformLeaderboardViewController = self;

@@ -31,6 +31,12 @@ namespace ScoreSaber::Services::PlayerService
     } authState;
     std::vector<std::function<void(LoginStatus)>> finishedCallbacks;
 
+    void OnSoftRestart() {
+        playerInfo = playerInfo_t();
+        authState = NotStarted;
+        finishedCallbacks.clear();
+    }
+
     void AuthenticateUser(std::function<void(LoginStatus)> finished)
     {
         {

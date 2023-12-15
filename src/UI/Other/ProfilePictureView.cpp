@@ -52,6 +52,15 @@ namespace ScoreSaber::UI::Other {
     Sprite* nullSprite;
     Material* mat_UINoGlowRoundEdge;
 
+    void ProfilePictureView::OnSoftRestart() {
+        SpriteCache::cachedSprites.clear();
+        SpriteCache::spriteCacheQueue = queue<string>();
+
+        initializedGlobals = false;
+        nullSprite = nullptr;
+        mat_UINoGlowRoundEdge = nullptr;
+    }
+
     ProfilePictureView::ProfilePictureView(HMUI::ImageView* profileImage, UnityEngine::GameObject* loadingIndicator) : profileImage(profileImage), loadingIndicator(loadingIndicator) { }
 
     void ProfilePictureView::Parsed() {

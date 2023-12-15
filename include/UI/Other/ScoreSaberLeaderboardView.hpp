@@ -24,6 +24,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     extern ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
     extern std::vector<HMUI::ImageView*> _cellClickingImages;
 
+    void OnSoftRestart();
+
     void ResetPage();
     void DidActivate(PlatformLeaderboardViewController* self,
                      bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);

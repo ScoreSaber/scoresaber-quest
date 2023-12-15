@@ -28,4 +28,6 @@ namespace ScoreSaber::Services::PlayerService
     void UpdatePlayerInfo(bool fromMainThread);
     void UpdatePlayerInfoThread();
 
+    void OnSoftRestart();
+
 } // namespace ScoreSaber::Services::PlayerService

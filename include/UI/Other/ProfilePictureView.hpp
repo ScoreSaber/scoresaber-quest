@@ -16,5 +16,7 @@ namespace ScoreSaber::UI::Other {
         void Parsed(); // we are not using BSML here yet, but keep names analogous
         void SetProfileImage(std::string url, int pos, System::Threading::CancellationToken cancellationToken);
         void ClearSprite();
+
+        static void OnSoftRestart();
     };
 }

@@ -21,4 +21,6 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     void Load(const std::vector<char> &replayData, GlobalNamespace::IDifficultyBeatmap* beatmap, std::string modifiers, std::u16string playerName);
     void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
 
+    void OnSoftRestart();
+
 } // namespace ScoreSaber::ReplaySystem::ReplayLoader

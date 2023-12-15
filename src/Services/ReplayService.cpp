@@ -12,6 +12,12 @@ namespace ScoreSaber::Services::ReplayService
     function<void(const vector<char>&)> ReplaySerialized;
     ReplaySystem::Recorders::MainRecorder* recorder;
 
+    void OnSoftRestart() {
+        CurrentSerializedReplay.clear();
+        ReplaySerialized = nullptr;
+        recorder = nullptr;
+    }
+
     void NewPlayStarted(ReplaySystem::Recorders::MainRecorder* _recorder) {
         recorder = _recorder;
     }
