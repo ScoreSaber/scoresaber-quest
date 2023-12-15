@@ -356,6 +356,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             }
                             if (internalLeaderboard.leaderboard.has_value())
                             {
+                                SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
                                 int playerScoreIndex = GetPlayerScoreIndex(internalLeaderboard.leaderboard.value().scores);
                                 if (internalLeaderboard.leaderboardItems->get_Count() != 0)
                                 {
@@ -372,7 +373,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                         loadingControl->ShowText(System::String::_get_Empty(), false);
                                         loadingControl->Hide();
                                         leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, internalLeaderboard.leaderboard->leaderboardInfo.id);
-                                        SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
                                     }
                                 }
                                 else
