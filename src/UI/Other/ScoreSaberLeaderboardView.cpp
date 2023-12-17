@@ -195,6 +195,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             auto nullSprite = BSML::Utilities::ImageResources::GetBlankSprite();
 
+            _ImageHolders.clear();
             for (int i = 0; i < 10; ++i) {
                 auto rowHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
                 rowHorizontal->set_childForceExpandHeight(true);
@@ -226,6 +227,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             auto mat_UINoGlowRoundEdge = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return to_utf8(csstrtostr(x->get_name())) == "UINoGlowRoundEdge"; });
 
+            _cellClickingImages.clear();
             for (int i = 0; i < 10; ++i) {
                 auto rowHorizontal = CreateHorizontalLayoutGroup(clickVertical->get_transform());
                 rowHorizontal->set_childForceExpandHeight(true);
