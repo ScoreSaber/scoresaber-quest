@@ -45,8 +45,6 @@ namespace ScoreSaber::ReplaySystem::UI
             _positions.push_back(sp.name);
         }
 
-        INFO("_positions has %d elements", (int)_positions.size());
-
         _mainImberPanelView->Setup(initData->timeScale, 90, _positions.front(), _positions);
 
         bool noFail = false;
