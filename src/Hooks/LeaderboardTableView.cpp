@@ -41,6 +41,7 @@ MAKE_AUTO_HOOK_MATCH(LeaderboardTableView_CellForIdx,
     cell->playerNameText->set_richText(true);
     cell->playerNameText->get_rectTransform()->set_anchoredPosition(Vector2(normalAnchor->x + 2.5f, 0.0f));
     cell->playerNameText->Rebuild(UnityEngine::UI::CanvasUpdate::PreRender);
+    cell->set_showSeparator(true);
 
     return cell;
 }
