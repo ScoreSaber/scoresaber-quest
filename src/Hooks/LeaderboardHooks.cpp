@@ -58,20 +58,21 @@ MAKE_AUTO_HOOK_MATCH(
     GlobalNamespace::PlatformLeaderboardViewController* self,
     bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling)
 {
-
-    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ResetPage();
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::EarlyDidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
     PlatformLeaderboardViewController_DidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::DidActivate(self, firstActivation, addedToHeirarchy, screenSystemEnabling);
     auto segmentedControl = reinterpret_cast<SegmentedControl*>(self->scopeSegmentedControl);
     segmentedControl->SelectCellWithNumber(_lastScopeIndex);
 }
 
-// Soft restart
-MAKE_AUTO_HOOK_MATCH(MenuTransitionsHelper_RestartGame, &GlobalNamespace::MenuTransitionsHelper::RestartGame, void, GlobalNamespace::MenuTransitionsHelper* self, System::Action_1<Zenject::DiContainer*>* finishCallback)
+MAKE_AUTO_HOOK_MATCH(
+    PlatformLeaderboardViewController_DidDeactivate,
+    &GlobalNamespace::PlatformLeaderboardViewController::DidDeactivate, void,
+    GlobalNamespace::PlatformLeaderboardViewController* self,
+    bool removedFromHierarchy, bool screenSystemEnabling)
 {
-    BeatmapUtils::playerDataModel = nullptr;
+    PlatformLeaderboardViewController_DidDeactivate(self, removedFromHierarchy, screenSystemEnabling);
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::DidDeactivate();
-    MenuTransitionsHelper_RestartGame(self, finishCallback);
 }
 
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,

@@ -140,10 +140,10 @@ namespace ScoreSaber::UI::Other {
     }
 
     void ProfilePictureView::ClearSprite() {
-        if (profileImage != nullptr) {
+        if (profileImage.isAlive()) {
             profileImage->set_sprite(nullSprite.ptr());
         }
-        if (loadingIndicator != nullptr) {
+        if (loadingIndicator.isAlive()) {
             loadingIndicator->get_gameObject()->SetActive(false);
         }
     }

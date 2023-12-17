@@ -26,7 +26,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     void OnSoftRestart();
 
-    void ResetPage();
+    void EarlyDidActivate(PlatformLeaderboardViewController* self,
+                     bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
     void DidActivate(PlatformLeaderboardViewController* self,
                      bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
     void DidDeactivate();

@@ -125,8 +125,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         _cellClickingImages.clear();
     }
 
-    void ResetPage()
+    void EarlyDidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy,
+                     bool screenSystemEnabling)
     {
+        if (!firstActivation)
+            _activated = true;
         _leaderboardPage = 1;
     }
 
@@ -185,24 +188,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             leaderboardScoreInfoButtonHandler->Setup();
             leaderboardScoreInfoButtonHandler->scoreInfoModal->playerProfileModal = playerProfileModal;
 
-            _activated = true;
-
-            PlayerService::AuthenticateUser([&](PlayerService::LoginStatus loginStatus) {
-                switch (loginStatus)
-                {
-                    case PlayerService::LoginStatus::Success: {
-                        ScoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
-                                                 nullptr);
-                        _platformLeaderboardViewController->Refresh(true, true);
-                        break;
-                    }
-                    case PlayerService::LoginStatus::Error: {
-                        ScoreSaberBanner->Prompt("<color=#fc8181>Authentication failed</color>", false, 5.0f, nullptr);
-                        break;
-                    }
-                }
-            });
-
             // profile pictures
             auto pfpVertical = CreateVerticalLayoutGroup(self->get_transform());
             pfpVertical->get_rectTransform()->set_anchoredPosition(Vector2(-21, -1));
@@ -258,6 +243,22 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 _cellClickingImages.emplace_back(image);
             }
 
+            PlayerService::AuthenticateUser([&](PlayerService::LoginStatus loginStatus) {
+                switch (loginStatus)
+                {
+                    case PlayerService::LoginStatus::Success: {
+                        ScoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
+                                                 nullptr);
+                                                 INFO("Refresh 1");
+                        _platformLeaderboardViewController->Refresh(true, true);
+                        break;
+                    }
+                    case PlayerService::LoginStatus::Error: {
+                        ScoreSaberBanner->Prompt("<color=#fc8181>Authentication failed</color>", false, 5.0f, nullptr);
+                        break;
+                    }
+                }
+            });
         }
 
         // we have to set this up again, because locationFilterMode could have changed
@@ -283,13 +284,15 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         });
 
         scopeSegmentedControl->SetData(array);
+
+        _activated = true;
     }
 
     void DidDeactivate()
     {
         _activated = false;
-        _pageUpButton = nullptr;
-        _pageDownButton = nullptr;
+        ScoreSaberBanner->playerProfileModal->Hide();
+        leaderboardScoreInfoButtonHandler->scoreInfoModal->Hide();
     }
 
     void ByeImages()
@@ -351,7 +354,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                     difficultyBeatmap, scope, _leaderboardPage,
                     [=](Data::InternalLeaderboard internalLeaderboard) {
                         QuestUI::MainThreadScheduler::Schedule([=]() {
-                            if (_currentLeaderboardRefreshId != refreshId) {
+                            if (_currentLeaderboardRefreshId != refreshId || !_activated) {
                                 return; // we need to check this again, since some time may have passed due to waiting for leaderboard data
                             }
                             if (internalLeaderboard.leaderboard.has_value())
