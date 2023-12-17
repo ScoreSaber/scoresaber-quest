@@ -249,7 +249,7 @@ namespace ScoreSaber::UI::ViewControllers
             auto buttonHorizontal = CreateHorizontalLayoutGroup(textVertical->get_transform());
             auto dismiss = CreateUIButton(buttonHorizontal->get_transform(), "Dismiss", [&]() { moreInfoModal->Hide(true, nullptr); });
 
-            auto moreInfo = CreateUIButton(buttonHorizontal->get_transform(), "More Info", []() { Application::OpenURL("http://bit.ly/2X8Anko"); });
+            auto moreInfo = CreateUIButton(buttonHorizontal->get_transform(), "More Info", []() { Application::OpenURL("https://wiki.scoresaber.com/ranking-system.html"); });
         }
         moreInfoModal->Show(true, true, nullptr);
     }
