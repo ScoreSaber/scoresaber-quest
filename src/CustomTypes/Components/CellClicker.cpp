@@ -30,12 +30,10 @@ namespace ScoreSaber::CustomTypes::Components {
     }
 
     void CellClicker::Start() {
-        INFO("CellClicker::Start");
         originalScale = seperator->get_transform()->get_localScale();
     }
 
     void CellClicker::OnPointerClick(PointerEventData* data) {
-        INFO("CellClicker::OnPointerClick");
         // simulate BeatSaberUI.BasicUIAudioManager.HandleButtonClickEvent();
         auto signal = get_imageClickedSignal();
         if(signal) signal->Raise();
@@ -46,7 +44,6 @@ namespace ScoreSaber::CustomTypes::Components {
     }
 
     custom_types::Helpers::Coroutine LerpColors(ImageView* target, Color startColor, Color endColor, Color startColor0, Color endColor0, Color startColor1, Color endColor1, float duration) {
-        INFO("CellClicker::LerpColors");
         float elapsedTime = 0.0f;
         while (elapsedTime < duration) {
             float t = elapsedTime / duration;
@@ -63,7 +60,6 @@ namespace ScoreSaber::CustomTypes::Components {
     }
 
     void CellClicker::OnPointerEnter(PointerEventData* eventData) {
-        INFO("CellClicker::OnPointerEnter");
         if (!isScaled) {
             seperator->get_transform()->set_localScale(originalScale * 1.8f);
             isScaled = true;
@@ -80,7 +76,6 @@ namespace ScoreSaber::CustomTypes::Components {
     }
 
     void CellClicker::OnPointerExit(PointerEventData* eventData) {
-        INFO("CellClicker::OnPointerExit");
         if (isScaled) {
             seperator->get_transform()->set_localScale(originalScale);
             isScaled = false;
@@ -93,7 +88,6 @@ namespace ScoreSaber::CustomTypes::Components {
     }
 
     void CellClicker::OnDestroy() {
-        INFO("CellClicker::OnDestroy");
         StopAllCoroutines();
         onClick = nullptr;
         seperator->set_color(origColour);
