@@ -27,7 +27,7 @@ using namespace std;
 namespace ScoreSaber::UI::Other {
 
     namespace SpriteCache {
-        map<string, Sprite*> cachedSprites;
+        map<string, SafePtrUnity<Sprite>> cachedSprites;
         const int MaxSpriteCacheSize = 150;
         queue<string> spriteCacheQueue;
 
@@ -49,8 +49,8 @@ namespace ScoreSaber::UI::Other {
     }
 
     bool initializedGlobals = false;
-    Sprite* nullSprite;
-    Material* mat_UINoGlowRoundEdge;
+    SafePtrUnity<Sprite> nullSprite;
+    SafePtrUnity<Material> mat_UINoGlowRoundEdge;
 
     void ProfilePictureView::OnSoftRestart() {
         SpriteCache::cachedSprites.clear();
@@ -70,8 +70,8 @@ namespace ScoreSaber::UI::Other {
             initializedGlobals = true;
         }
 
-        profileImage->set_material(mat_UINoGlowRoundEdge);
-        profileImage->set_sprite(nullSprite);
+        profileImage->set_material(mat_UINoGlowRoundEdge.ptr());
+        profileImage->set_sprite(nullSprite.ptr());
         profileImage->get_gameObject()->SetActive(true);
         loadingIndicator->get_gameObject()->SetActive(false);
     }
@@ -108,7 +108,7 @@ namespace ScoreSaber::UI::Other {
         if (!cancellationToken.get_IsCancellationRequested()) {
             if (SpriteCache::cachedSprites.contains(url)) {
                 profileImage->get_gameObject()->SetActive(true);
-                profileImage->set_sprite(SpriteCache::cachedSprites[url]);
+                profileImage->set_sprite(SpriteCache::cachedSprites[url].ptr());
                 loadingIndicator->get_gameObject()->set_active(false);
             } else {
                 loadingIndicator->get_gameObject()->set_active(true);
@@ -141,7 +141,7 @@ namespace ScoreSaber::UI::Other {
 
     void ProfilePictureView::ClearSprite() {
         if (profileImage != nullptr) {
-            profileImage->set_sprite(nullSprite);
+            profileImage->set_sprite(nullSprite.ptr());
         }
         if (loadingIndicator != nullptr) {
             loadingIndicator->get_gameObject()->SetActive(false);
