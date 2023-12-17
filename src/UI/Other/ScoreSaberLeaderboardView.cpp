@@ -128,8 +128,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     void EarlyDidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy,
                      bool screenSystemEnabling)
     {
-        if (!firstActivation)
-            _activated = true;
         _leaderboardPage = 1;
     }
 
@@ -138,6 +136,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         if (firstActivation)
         {
+            INFO("PlatformLeaderboardViewController firstActivation");
 
             StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
 
@@ -292,7 +291,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     void DidDeactivate()
     {
-        _activated = false;
         ScoreSaberBanner->playerProfileModal->Hide();
         leaderboardScoreInfoButtonHandler->scoreInfoModal->Hide();
     }
@@ -356,7 +354,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                     difficultyBeatmap, scope, _leaderboardPage,
                     [=](Data::InternalLeaderboard internalLeaderboard) {
                         QuestUI::MainThreadScheduler::Schedule([=]() {
-                            if (_currentLeaderboardRefreshId != refreshId || !_activated) {
+                            if (_currentLeaderboardRefreshId != refreshId) {
                                 return; // we need to check this again, since some time may have passed due to waiting for leaderboard data
                             }
                             if (internalLeaderboard.leaderboard.has_value())

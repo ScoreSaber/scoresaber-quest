@@ -37,6 +37,17 @@ namespace ScoreSaber::UI::Other {
                 spriteCacheQueue.pop();
                 cachedSprites.erase(oldestUrl);
             }
+
+            // somehow the objects can be GCed, even when behind a SafePtrUnity
+            vector<string> badSprites;
+            for (auto &[key, value] : cachedSprites) {
+                if (!value.isAlive()) {
+                    badSprites.push_back(key);
+                }
+            }
+            for(auto &key : badSprites) {
+                cachedSprites.erase(key);
+            }
         }
 
         void AddSpriteToCache(string url, Sprite* sprite) {
@@ -106,7 +117,7 @@ namespace ScoreSaber::UI::Other {
 
     void ProfilePictureView::SetProfileImage(string url, int pos, CancellationToken cancellationToken) {
         if (!cancellationToken.get_IsCancellationRequested()) {
-            if (SpriteCache::cachedSprites.contains(url)) {
+            if (SpriteCache::cachedSprites.contains(url) && SpriteCache::cachedSprites[url].isAlive()) {
                 profileImage->get_gameObject()->SetActive(true);
                 profileImage->set_sprite(SpriteCache::cachedSprites[url].ptr());
                 loadingIndicator->get_gameObject()->set_active(false);
