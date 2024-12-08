@@ -4,10 +4,10 @@
 #include "Services/ReplayService.hpp"
 #include "Services/UploadService.hpp"
 
-#include "GlobalNamespace/HMTask.hpp"
+#include <GlobalNamespace/HMTask.hpp>
 
-#include "bsml/shared/BSML.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <bsml/shared/BSML.hpp>
+#include <custom-types/shared/delegate.hpp>
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "logging.hpp"
 
@@ -39,14 +39,14 @@ namespace ScoreSaber::ReplaySystem::UI
         if(firstActivation) {
             BSML::parse_and_construct(
                 "<button-with-icon id=\"watchReplayButton\" icon=\"ScoreSaber_replay_png\" hover-hint=\"Watch Replay\" pref-width=\"15\" pref-height=\"13\" interactable=\"false\" on-click=\"ClickedReplayButton\" />",
-                _resultsViewController->get_gameObject()->get_transform(),
+                _resultsViewController->gameObject->transform,
                 this
             );
-            watchReplayButton->get_transform()->set_localScale(watchReplayButton->get_transform()->get_localScale() * 0.4f);
-            watchReplayButton->get_transform()->set_localPosition({42.5f, 27.0f, 0.0f});
+            watchReplayButton->transform->localScale = watchReplayButton->transform->localScale * 0.4f;
+            watchReplayButton->transform->localPosition = {42.5f, 27.0f, 0.0f};
         }
         _replayReady = _serializedReplay.size() > 0;
-        watchReplayButton->set_interactable(_replayReady);
+        watchReplayButton->interactable = _replayReady;
         _difficultyBeatmap = _resultsViewController->difficultyBeatmap;
         _levelCompletionResults = _resultsViewController->levelCompletionResults;
         WaitForReplay();
@@ -77,7 +77,7 @@ namespace ScoreSaber::ReplaySystem::UI
                 std::this_thread::sleep_for(std::chrono::milliseconds(25));
             }
             QuestUI::MainThreadScheduler::Schedule([&]() {
-                watchReplayButton->set_interactable(true);
+                watchReplayButton->interactable = true;
             });
         }), nullptr)->Run();
     }
@@ -101,6 +101,6 @@ namespace ScoreSaber::ReplaySystem::UI
             }
             ReplayLoader::Load(_serializedReplay, _difficultyBeatmap, modifiers, ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name);
         }), nullptr)->Run();
-        watchReplayButton->set_interactable(false);
+        watchReplayButton->interactable = false;
     }
 }

@@ -1,6 +1,7 @@
 #include "Data/Score.hpp"
 #include "Utils/StringUtils.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
+#include <beatsaber-hook/shared/utils/utils.h>
+#include "paper/shared/string_convert.hpp"
 
 namespace ScoreSaber::Data
 {
@@ -108,7 +109,7 @@ namespace ScoreSaber::Data
             weight = weightItr->value.GetDouble();
         }
 
-        modifiers = to_utf8(value[u"modifiers"].GetString());
+        modifiers = Paper::StringConvert::from_utf16(value[u"modifiers"].GetString());
         multiplier = value[u"multiplier"].GetDouble();
 
         auto badCutsItr = value.FindMember(u"badCuts");
@@ -140,19 +141,19 @@ namespace ScoreSaber::Data
         auto deviceHmdItr = value.FindMember(u"deviceHmd");
         if (deviceHmdItr != value.MemberEnd() && deviceHmdItr->value.IsString())
         {
-            deviceHmd = to_utf8(deviceHmdItr->value.GetString());
+            deviceHmd = Paper::StringConvert::from_utf16(deviceHmdItr->value.GetString());
         }
 
         auto deviceControllerLeftItr = value.FindMember(u"deviceControllerLeft");
         if (deviceControllerLeftItr != value.MemberEnd() && deviceControllerLeftItr->value.IsString())
         {
-            deviceControllerLeft = to_utf8(deviceControllerLeftItr->value.GetString());
+            deviceControllerLeft = Paper::StringConvert::from_utf16(deviceControllerLeftItr->value.GetString());
         }
         
         auto deviceControllerRightItr = value.FindMember(u"deviceControllerRight");
         if (deviceControllerRightItr != value.MemberEnd() && deviceControllerRightItr->value.IsString())
         {
-            deviceControllerRight = to_utf8(deviceControllerRightItr->value.GetString());
+            deviceControllerRight = Paper::StringConvert::from_utf16(deviceControllerRightItr->value.GetString());
         }
 
         hasReplay = value[u"hasReplay"].GetBool();
@@ -160,7 +161,7 @@ namespace ScoreSaber::Data
         auto timeSetItr = value.FindMember(u"timeSet");
         if (timeSetItr != value.MemberEnd())
         {
-            timeSet = to_utf8(timeSetItr->value.GetString());
+            timeSet = Paper::StringConvert::from_utf16(timeSetItr->value.GetString());
         }
     }
 
@@ -268,7 +269,7 @@ namespace ScoreSaber::Data
             weight = weightItr->value.GetDouble();
         }
 
-        modifiers = to_utf8(value[u"modifiers"].GetString());
+        modifiers = Paper::StringConvert::from_utf16(value[u"modifiers"].GetString());
         multiplier = value[u"multiplier"].GetDouble();
 
         auto badCutsItr = value.FindMember(u"badCuts");
@@ -300,19 +301,19 @@ namespace ScoreSaber::Data
         auto deviceHmdItr = value.FindMember(u"deviceHmd");
         if (deviceHmdItr != value.MemberEnd() && deviceHmdItr->value.IsString())
         {
-            deviceHmd = to_utf8(deviceHmdItr->value.GetString());
+            deviceHmd = Paper::StringConvert::from_utf16(deviceHmdItr->value.GetString());
         }
 
         auto deviceControllerLeftItr = value.FindMember(u"deviceControllerLeft");
         if (deviceControllerLeftItr != value.MemberEnd() && deviceControllerLeftItr->value.IsString())
         {
-            deviceControllerLeft = to_utf8(deviceControllerLeftItr->value.GetString());
+            deviceControllerLeft = Paper::StringConvert::from_utf16(deviceControllerLeftItr->value.GetString());
         }
         
         auto deviceControllerRightItr = value.FindMember(u"deviceControllerRight");
         if (deviceControllerRightItr != value.MemberEnd() && deviceControllerRightItr->value.IsString())
         {
-            deviceControllerRight = to_utf8(deviceControllerRightItr->value.GetString());
+            deviceControllerRight = Paper::StringConvert::from_utf16(deviceControllerRightItr->value.GetString());
         }
 
         hasReplay = value[u"hasReplay"].GetBool();
@@ -320,7 +321,7 @@ namespace ScoreSaber::Data
         auto timeSetItr = value.FindMember(u"timeSet");
         if (timeSetItr != value.MemberEnd())
         {
-            timeSet = to_utf8(timeSetItr->value.GetString());
+            timeSet = Paper::StringConvert::from_utf16(timeSetItr->value.GetString());
         }
     }
 }

@@ -1,10 +1,8 @@
 #include "ReplaySystem/Playback/ComboPlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Animator.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "logging.hpp"
-#include <algorithm>
+#include <System/Action_1.hpp>
+#include <UnityEngine/Animator.hpp>
+#include <UnityEngine/Resources.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -18,7 +16,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _audioTimeSyncController = audioTimeSyncController;
         _comboController = comboController;
         // _comboUIController = comboUIController;
-        _comboUIController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::ComboUIController*>()->values[0];
+        _comboUIController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::ComboUIController*>()->First();
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         _sortedComboEvents = ReplayLoader::LoadedReplay->comboKeyframes;
     }
@@ -53,8 +51,8 @@ namespace ScoreSaber::ReplaySystem::Playback
                 cutOrMissRecorded++;
             }
         }
-        _comboController->combo = combo;
-        _comboController->maxCombo = cutOrMissRecorded;
+        _comboController->_combo = combo;
+        _comboController->_maxCombo = cutOrMissRecorded;
         if (_comboController->comboDidChangeEvent != nullptr)
         {
             _comboController->comboDidChangeEvent->Invoke(combo);
@@ -71,13 +69,13 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         if ((combo == 0 && cutOrMissRecorded == 0) || !didLoseCombo)
         {
-            _comboUIController->animator->Rebind();
-            _comboUIController->fullComboLost = false;
+            _comboUIController->_animator->Rebind();
+            _comboUIController->_fullComboLost = false;
         }
         else
         {
-            _comboUIController->animator->SetTrigger(_comboUIController->comboLostId);
-            _comboUIController->fullComboLost = true;
+            _comboUIController->_animator->SetTrigger(_comboUIController->_comboLostId);
+            _comboUIController->_fullComboLost = true;
         }
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

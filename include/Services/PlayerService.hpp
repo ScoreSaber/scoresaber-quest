@@ -1,7 +1,6 @@
 
 #pragma once
 #include "Data/Player.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include <string>
 namespace ScoreSaber::Services::PlayerService
 {

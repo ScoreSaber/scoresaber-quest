@@ -2,7 +2,7 @@
 
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 DEFINE_TYPE(ScoreSaber::UI::Multiplayer, ScoreSaberMultiplayerInitializer);

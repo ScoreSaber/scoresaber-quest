@@ -1,11 +1,9 @@
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Time.hpp>
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
 
 using namespace UnityEngine;
 using namespace QuestUI;
@@ -38,7 +36,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
         Vector3 rightControllerPosition = _playerTransforms->rightHandPseudoLocalPos;
         Quaternion rightControllerRotation = _playerTransforms->rightHandPseudoLocalRot;
 
-        int fps = (int)(1 / Time::get_unscaledDeltaTime());
+        int fps = (int)(1 / Time::unscaledDeltaTime);
         _vrPoseGroup.push_back(VRPoseGroup(
             VRPose(VRPosition(headPos.x, headPos.y,
                               headPos.z),

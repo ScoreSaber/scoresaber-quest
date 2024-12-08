@@ -1,7 +1,7 @@
 #include "UI/ViewControllers/MainSettingsViewController.hpp"
 
 #include "Data/Private/Settings.hpp"
-#include "bsml/shared/BSML.hpp"
+#include <bsml/shared/BSML.hpp>
 #include "assets.hpp"
 #include "logging.hpp"
 
@@ -10,52 +10,52 @@ using namespace ScoreSaber::Data::Private;
 DEFINE_TYPE(ScoreSaber::UI::ViewControllers, MainSettingsViewController);
 
 namespace ScoreSaber::UI::ViewControllers {
-    bool MainSettingsViewController::get_showScorePP() {
+    bool MainSettingsViewController::showScorePP {
         return Settings::showScorePP;
     }
 
-    void MainSettingsViewController::set_showScorePP(bool value) {
+    void MainSettingsViewController::showScorePP = bool value {
         Settings::showScorePP = value;
     }
 
-    bool MainSettingsViewController::get_showLocalPlayerRank() {
+    bool MainSettingsViewController::showLocalPlayerRank {
         return Settings::showLocalPlayerRank;
     }
 
-    void MainSettingsViewController::set_showLocalPlayerRank(bool value) {
+    void MainSettingsViewController::showLocalPlayerRank = bool value {
         Settings::showLocalPlayerRank = value;
     }
     
-    bool MainSettingsViewController::get_hideNAScores() {
+    bool MainSettingsViewController::hideNAScores {
         return Settings::hideNAScoresFromLeaderboard;
     }
 
-    void MainSettingsViewController::set_hideNAScores(bool value) {
+    void MainSettingsViewController::hideNAScores = bool value {
         Settings::hideNAScoresFromLeaderboard = value;
     }
     
-    StringW MainSettingsViewController::get_locationFilterMode() {
+    StringW MainSettingsViewController::locationFilterMode {
         return Settings::locationFilterMode;
     }
 
-    void MainSettingsViewController::set_locationFilterMode(StringW value) {
+    void MainSettingsViewController::locationFilterMode = StringW value {
         Settings::locationFilterMode = (std::string)value;
     }
     
-    bool MainSettingsViewController::get_enableCountryLeaderboards() {
+    bool MainSettingsViewController::enableCountryLeaderboards {
         return Settings::enableCountryLeaderboards;
     }
 
-    void MainSettingsViewController::set_enableCountryLeaderboards(bool value) {
+    void MainSettingsViewController::enableCountryLeaderboards = bool value {
         Settings::enableCountryLeaderboards = value;
     }
     
-    bool MainSettingsViewController::get_saveLocalReplays() {
+    bool MainSettingsViewController::saveLocalReplays {
         INFO("read");
         return Settings::saveLocalReplays;
     }
 
-    void MainSettingsViewController::set_saveLocalReplays(bool value) {
+    void MainSettingsViewController::saveLocalReplays = bool value {
         INFO("written");
         Settings::saveLocalReplays = value;
     }
@@ -63,7 +63,7 @@ namespace ScoreSaber::UI::ViewControllers {
     void MainSettingsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         if (firstActivation) {
-            BSML::parse_and_construct(IncludedAssets::MainSettingsViewController_bsml, get_transform(), this);
+            BSML::parse_and_construct(IncludedAssets::MainSettingsViewController_bsml, transform, this);
         }
     }
 

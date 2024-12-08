@@ -1,7 +1,7 @@
 #include "Data/LeaderboardInfo.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
-
-#include "beatsaber-hook/shared/utils/utils-functions.h"
+#include <beatsaber-hook/shared/utils/utils.h>
+#include <beatsaber-hook/shared/utils/utils-functions.h>
+#include "paper/shared/string_convert.hpp"
 
 inline rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> getdoc(std::u16string_view string)
 {
@@ -23,10 +23,10 @@ namespace ScoreSaber::Data
         : difficulty(doc["difficulty"].GetObject())
     {
         id = doc["id"].GetInt();
-        songHash = to_utf16(doc["songHash"].GetString());
-        songName = to_utf16(doc["songName"].GetString());
-        songSubName = to_utf16(doc["songSubName"].GetString());
-        songAuthorName = to_utf16(doc["songAuthorName"].GetString());
+        songHash = Paper::StringConvert::from_utf8(doc["songHash"].GetString());
+        songName = Paper::StringConvert::from_utf8(doc["songName"].GetString());
+        songSubName = Paper::StringConvert::from_utf8(doc["songSubName"].GetString());
+        songAuthorName = Paper::StringConvert::from_utf8(doc["songAuthorName"].GetString());
         maxScore = doc["maxScore"].GetInt();
         createdDate = doc["createdDate"].GetString();
         auto rankedDateItr = doc.FindMember("rankedDate");
@@ -80,21 +80,21 @@ namespace ScoreSaber::Data
         songSubName = std::u16string(doc[u"songSubName"].GetString());
         songAuthorName = std::u16string(doc[u"songAuthorName"].GetString());
         maxScore = doc[u"maxScore"].GetInt();
-        createdDate = to_utf8(doc[u"createdDate"].GetString());
+        createdDate = Paper::StringConvert::from_utf16(doc[u"createdDate"].GetString());
         auto rankedDateItr = doc.FindMember(u"rankedDate");
         if (!rankedDateItr->value.IsNull())
         {
-            rankedDate = std::make_optional(to_utf8(rankedDateItr->value.GetString()));
+            rankedDate = std::make_optional(Paper::StringConvert::from_utf16(rankedDateItr->value.GetString()));
         }
         auto qualifiedDateItr = doc.FindMember(u"qualifiedDate");
         if (!qualifiedDateItr->value.IsNull())
         {
-            qualifiedDate = std::make_optional(to_utf8(qualifiedDateItr->value.GetString()));
+            qualifiedDate = std::make_optional(Paper::StringConvert::from_utf16(qualifiedDateItr->value.GetString()));
         }
         auto lovedDateItr = doc.FindMember(u"lovedDate");
         if (!lovedDateItr->value.IsNull())
         {
-            lovedDate = std::make_optional(to_utf8(lovedDateItr->value.GetString()));
+            lovedDate = std::make_optional(Paper::StringConvert::from_utf16(lovedDateItr->value.GetString()));
         }
         ranked = doc[u"ranked"].GetBool();
         qualified = doc[u"qualified"].GetBool();
@@ -104,7 +104,7 @@ namespace ScoreSaber::Data
         positiveModifiers = doc[u"positiveModifiers"].GetBool();
         plays = doc[u"plays"].GetInt();
         dailyPlays = doc[u"dailyPlays"].GetInt();
-        coverImage = to_utf8(doc[u"coverImage"].GetString());
+        coverImage = Paper::StringConvert::from_utf16(doc[u"coverImage"].GetString());
 
         auto playerScoreItr = doc.FindMember(u"playerScore");
         if (!playerScoreItr->value.IsNull())
@@ -127,10 +127,10 @@ namespace ScoreSaber::Data
         : difficulty(value["difficulty"].GetObject())
     {
         id = value["id"].GetInt();
-        songHash = to_utf16(value["songHash"].GetString());
-        songName = to_utf16(value["songName"].GetString());
-        songSubName = to_utf16(value["songSubName"].GetString());
-        songAuthorName = to_utf16(value["songAuthorName"].GetString());
+        songHash = Paper::StringConvert::from_utf8(value["songHash"].GetString());
+        songName = Paper::StringConvert::from_utf8(value["songName"].GetString());
+        songSubName = Paper::StringConvert::from_utf8(value["songSubName"].GetString());
+        songAuthorName = Paper::StringConvert::from_utf8(value["songAuthorName"].GetString());
         maxScore = value["maxScore"].GetInt();
         createdDate = value["createdDate"].GetString();
         auto rankedDateItr = value.FindMember("rankedDate");
@@ -190,26 +190,26 @@ namespace ScoreSaber::Data
         songSubName = std::u16string(value[u"songSubName"].GetString());
         songAuthorName = std::u16string(value[u"songAuthorName"].GetString());
         maxScore = value[u"maxScore"].GetInt();
-        createdDate = to_utf8(value[u"createdDate"].GetString());
+        createdDate = Paper::StringConvert::from_utf16(value[u"createdDate"].GetString());
         auto rankedDateItr = value.FindMember(u"rankedDate");
 
         if (!rankedDateItr->value.IsNull())
         {
-            rankedDate = std::make_optional(to_utf8(rankedDateItr->value.GetString()));
+            rankedDate = std::make_optional(Paper::StringConvert::from_utf16(rankedDateItr->value.GetString()));
         }
 
         auto qualifiedDateItr = value.FindMember(u"qualifiedDate");
         if (!qualifiedDateItr->value.IsNull())
 
         {
-            qualifiedDate = std::make_optional(to_utf8(qualifiedDateItr->value.GetString()));
+            qualifiedDate = std::make_optional(Paper::StringConvert::from_utf16(qualifiedDateItr->value.GetString()));
         }
 
         auto lovedDateItr = value.FindMember(u"lovedDate");
 
         if (!lovedDateItr->value.IsNull())
         {
-            lovedDate = std::make_optional(to_utf8(lovedDateItr->value.GetString()));
+            lovedDate = std::make_optional(Paper::StringConvert::from_utf16(lovedDateItr->value.GetString()));
         }
 
         ranked = value[u"ranked"].GetBool();
@@ -220,7 +220,7 @@ namespace ScoreSaber::Data
         positiveModifiers = value[u"positiveModifiers"].GetBool();
         plays = value[u"plays"].GetInt();
         dailyPlays = value[u"dailyPlays"].GetInt();
-        coverImage = to_utf8(value[u"coverImage"].GetString());
+        coverImage = Paper::StringConvert::from_utf16(value[u"coverImage"].GetString());
 
         auto playerScoreItr = value.FindMember(u"playerScore");
 
@@ -243,10 +243,10 @@ namespace ScoreSaber::Data
         : difficulty(value["difficulty"].GetObject())
     {
         id = value["id"].GetInt();
-        songHash = to_utf16(value["songHash"].GetString());
-        songName = to_utf16(value["songName"].GetString());
-        songSubName = to_utf16(value["songSubName"].GetString());
-        songAuthorName = to_utf16(value["songAuthorName"].GetString());
+        songHash = Paper::StringConvert::from_utf8(value["songHash"].GetString());
+        songName = Paper::StringConvert::from_utf8(value["songName"].GetString());
+        songSubName = Paper::StringConvert::from_utf8(value["songSubName"].GetString());
+        songAuthorName = Paper::StringConvert::from_utf8(value["songAuthorName"].GetString());
         maxScore = value["maxScore"].GetInt();
         createdDate = value["createdDate"].GetString();
         auto rankedDateItr = value.FindMember("rankedDate");
@@ -306,26 +306,26 @@ namespace ScoreSaber::Data
         songSubName = std::u16string(value[u"songSubName"].GetString());
         songAuthorName = std::u16string(value[u"songAuthorName"].GetString());
         maxScore = value[u"maxScore"].GetInt();
-        createdDate = to_utf8(value[u"createdDate"].GetString());
+        createdDate = Paper::StringConvert::from_utf16(value[u"createdDate"].GetString());
         auto rankedDateItr = value.FindMember(u"rankedDate");
 
         if (!rankedDateItr->value.IsNull())
         {
-            rankedDate = std::make_optional(to_utf8(rankedDateItr->value.GetString()));
+            rankedDate = std::make_optional(Paper::StringConvert::from_utf16(rankedDateItr->value.GetString()));
         }
 
         auto qualifiedDateItr = value.FindMember(u"qualifiedDate");
 
         if (!qualifiedDateItr->value.IsNull())
         {
-            qualifiedDate = std::make_optional(to_utf8(qualifiedDateItr->value.GetString()));
+            qualifiedDate = std::make_optional(Paper::StringConvert::from_utf16(qualifiedDateItr->value.GetString()));
         }
 
         auto lovedDateItr = value.FindMember(u"lovedDate");
 
         if (!lovedDateItr->value.IsNull())
         {
-            lovedDate = std::make_optional(to_utf8(lovedDateItr->value.GetString()));
+            lovedDate = std::make_optional(Paper::StringConvert::from_utf16(lovedDateItr->value.GetString()));
         }
 
         ranked = value[u"ranked"].GetBool();
@@ -336,7 +336,7 @@ namespace ScoreSaber::Data
         positiveModifiers = value[u"positiveModifiers"].GetBool();
         plays = value[u"plays"].GetInt();
         dailyPlays = value[u"dailyPlays"].GetInt();
-        coverImage = to_utf8(value[u"coverImage"].GetString());
+        coverImage = Paper::StringConvert::from_utf16(value[u"coverImage"].GetString());
         auto playerScoreItr = value.FindMember(u"playerScore");
 
         if (!playerScoreItr->value.IsNull())
@@ -361,10 +361,10 @@ namespace ScoreSaber::Data
         // This is the one that gets called
 
         id = value["id"].GetInt();
-        songHash = to_utf16(value["songHash"].GetString());
-        songName = to_utf16(value["songName"].GetString());
-        songSubName = to_utf16(value["songSubName"].GetString());
-        songAuthorName = to_utf16(value["songAuthorName"].GetString());
+        songHash = Paper::StringConvert::from_utf8(value["songHash"].GetString());
+        songName = Paper::StringConvert::from_utf8(value["songName"].GetString());
+        songSubName = Paper::StringConvert::from_utf8(value["songSubName"].GetString());
+        songAuthorName = Paper::StringConvert::from_utf8(value["songAuthorName"].GetString());
         maxScore = value["maxScore"].GetInt();
         createdDate = value["createdDate"].GetString();
         auto rankedDateItr = value.FindMember("rankedDate");
@@ -424,26 +424,26 @@ namespace ScoreSaber::Data
         songSubName = std::u16string(value[u"songSubName"].GetString());
         songAuthorName = std::u16string(value[u"songAuthorName"].GetString());
         maxScore = value[u"maxScore"].GetInt();
-        createdDate = to_utf8(value[u"createdDate"].GetString());
+        createdDate = Paper::StringConvert::from_utf16(value[u"createdDate"].GetString());
         auto rankedDateItr = value.FindMember(u"rankedDate");
 
         if (!rankedDateItr->value.IsNull())
         {
-            rankedDate = std::make_optional(to_utf8(rankedDateItr->value.GetString()));
+            rankedDate = std::make_optional(Paper::StringConvert::from_utf16(rankedDateItr->value.GetString()));
         }
 
         auto qualifiedDateItr = value.FindMember(u"qualifiedDate");
 
         if (!qualifiedDateItr->value.IsNull())
         {
-            qualifiedDate = std::make_optional(to_utf8(qualifiedDateItr->value.GetString()));
+            qualifiedDate = std::make_optional(Paper::StringConvert::from_utf16(qualifiedDateItr->value.GetString()));
         }
 
         auto lovedDateItr = value.FindMember(u"lovedDate");
 
         if (!lovedDateItr->value.IsNull())
         {
-            lovedDate = std::make_optional(to_utf8(lovedDateItr->value.GetString()));
+            lovedDate = std::make_optional(Paper::StringConvert::from_utf16(lovedDateItr->value.GetString()));
         }
 
         ranked = value[u"ranked"].GetBool();
@@ -454,7 +454,7 @@ namespace ScoreSaber::Data
         positiveModifiers = value[u"positiveModifiers"].GetBool();
         plays = value[u"plays"].GetInt();
         dailyPlays = value[u"dailyPlays"].GetInt();
-        coverImage = to_utf8(value[u"coverImage"].GetString());
+        coverImage = Paper::StringConvert::from_utf16(value[u"coverImage"].GetString());
 
         auto playerScoreItr = value.FindMember(u"playerScore");
 
@@ -475,7 +475,7 @@ namespace ScoreSaber::Data
     }
 
     LeaderboardInfo::LeaderboardInfo(StringW string)
-        : LeaderboardInfo(getdoc(csstrtostr(string))){};
+        : LeaderboardInfo(getdoc(string)){};
 
     LeaderboardInfo::LeaderboardInfo(std::string_view string)
         : LeaderboardInfo(getdoc(string)){};

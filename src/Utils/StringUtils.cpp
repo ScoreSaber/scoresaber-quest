@@ -8,9 +8,10 @@
 #include <string>
 #include <vector>
 
-#include "System/IO/Path.hpp"
-#include "System/String.hpp"
+#include <System/IO/Path.hpp>
+#include <System/String.hpp>
 #include "logging.hpp"
+#include "paper/shared/string_convert.hpp"
 
 static std::string color_prefix = "<color=";
 static std::string color_suffix = "</color>";
@@ -77,7 +78,7 @@ namespace StringUtils
 
     std::u16string FormatScore(double s)
     {
-        return to_utf16(string_format(" - (<color=#ffd42a>%.2f%%</color>)", s));
+        return Paper::StringConvert::from_utf8(string_format(" - (<color=#ffd42a>%.2f%%</color>)", s));
     }
 
     std::string FormatScore(std::string s)
@@ -125,7 +126,7 @@ namespace StringUtils
         std::string ppString = std::to_string(pp);
         for (int i = 0; i < 4; i++)
             ppString.pop_back();
-        std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
+        std::u16string s = Paper::StringConvert::from_utf8(ppString) + Resize(u"pp", 50);
         s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
         if (pp > 0.0f && Settings::showScorePP)
         {
@@ -136,7 +137,7 @@ namespace StringUtils
             }
             else
             {
-                return s + u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
+                return s + u" - " + Colorize(u"[" + Paper::StringConvert::from_utf8(modifiers) + u"]", "#464f55");
             }
         }
         else
@@ -147,7 +148,7 @@ namespace StringUtils
             }
             else
             {
-                return u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
+                return u" - " + Colorize(u"[" + Paper::StringConvert::from_utf8(modifiers) + u"]", "#464f55");
             }
         }
     }
@@ -159,7 +160,7 @@ namespace StringUtils
         std::string ppString = std::to_string(pp);
         for (int i = 0; i < 4; i++)
             ppString.pop_back();
-        std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
+        std::u16string s = Paper::StringConvert::from_utf8(ppString) + Resize(u"pp", 50);
         s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
         if (pp > 0.0f && Settings::showScorePP)
         {
@@ -170,7 +171,7 @@ namespace StringUtils
             }
             else
             {
-                return s + u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
+                return s + u" - " + Colorize(u"[" + Paper::StringConvert::from_utf8(modifiers) + u"]", "#464f55");
             }
         }
         else
@@ -181,7 +182,7 @@ namespace StringUtils
             }
             else
             {
-                return u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
+                return u" - " + Colorize(u"[" + Paper::StringConvert::from_utf8(modifiers) + u"]", "#464f55");
             }
         }
     }
@@ -229,7 +230,7 @@ namespace StringUtils
 
     std::u16string Colorize(std::u16string s, std::string color)
     {
-        return color_prefix_u16 + to_utf16(color) + u">" + s + color_suffix_u16;
+        return color_prefix_u16 + Paper::StringConvert::from_utf8(color) + u">" + s + color_suffix_u16;
     }
 
     std::string Resize(std::string s, int sizePercent)
@@ -239,7 +240,7 @@ namespace StringUtils
 
     std::u16string Resize(std::u16string s, int sizePercent)
     {
-        return size_prefix_u16 + to_utf16(to_string(sizePercent)) + u"\%>" + s + size_suffix_u16;
+        return size_prefix_u16 + Paper::StringConvert::from_utf8(to_string(sizePercent)) + u"\%>" + s + size_suffix_u16;
     }
 
     std::string Truncate(std::string str, size_t width, bool show_ellipsis = true)
@@ -297,8 +298,8 @@ namespace StringUtils
             case GlobalNamespace::OVRPlugin::SystemHeadset::None: return "None";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Quest: return "Oculus_Quest";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Quest_2: return "Oculus_Quest_2";
-            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_10: return "Placeholder_10";
-            case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_11: return "Placeholder_11";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Meta_Quest_Pro: return "Meta_Quest_Pro";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Meta_Quest_3: return "Meta_Quest_3";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_12: return "Placeholder_12";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_13: return "Placeholder_13";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Placeholder_14: return "Placeholder_14";
@@ -309,8 +310,8 @@ namespace StringUtils
             case GlobalNamespace::OVRPlugin::SystemHeadset::Rift_S: return "Rift_S";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Link_Quest: return "Oculus_Link_Quest";
             case GlobalNamespace::OVRPlugin::SystemHeadset::Oculus_Link_Quest_2: return "Oculus_Link_Quest_2";
-            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4103: return "PC_Placeholder_4103";
-            case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4104: return "PC_Placeholder_4104";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Meta_Link_Quest_Pro: return "Meta_Link_Quest_Pro";
+            case GlobalNamespace::OVRPlugin::SystemHeadset::Meta_Link_Quest_3: return "Meta_Link_Quest_3";
             case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4105: return "PC_Placeholder_4105";
             case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4106: return "PC_Placeholder_4106";
             case GlobalNamespace::OVRPlugin::SystemHeadset::PC_Placeholder_4107: return "PC_Placeholder_4107";

@@ -1,5 +1,6 @@
 #include "Data/Badge.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
+#include <beatsaber-hook/shared/utils/utils.h>
+#include "paper/shared/string_convert.hpp"
 
 namespace ScoreSaber::Data
 {
@@ -11,8 +12,8 @@ namespace ScoreSaber::Data
 
     Badge::Badge(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value)
     {
-        description = to_utf8(value[u"description"].GetString());
-        image = to_utf8(value[u"image"].GetString());
+        description = Paper::StringConvert::from_utf16(value[u"description"].GetString());
+        image = Paper::StringConvert::from_utf16(value[u"image"].GetString());
     }
 
     Badge::Badge(rapidjson::GenericObject<true, rapidjson::Value> value)
@@ -23,7 +24,7 @@ namespace ScoreSaber::Data
 
     Badge::Badge(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value)
     {
-        description = to_utf8(value[u"description"].GetString());
-        image = to_utf8(value[u"image"].GetString());
+        description = Paper::StringConvert::from_utf16(value[u"description"].GetString());
+        image = Paper::StringConvert::from_utf16(value[u"image"].GetString());
     }
 }

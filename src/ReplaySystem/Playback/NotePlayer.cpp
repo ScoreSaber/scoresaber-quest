@@ -1,17 +1,17 @@
 #include "ReplaySystem/Playback/NotePlayer.hpp"
-#include "GlobalNamespace/ColorType.hpp"
-#include "GlobalNamespace/ISaberMovementData.hpp"
-#include "GlobalNamespace/ISaberSwingRatingCounter.hpp"
-#include "GlobalNamespace/NoteCutInfo.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/SaberMovementData.hpp"
-#include "GlobalNamespace/SaberSwingRatingCounter.hpp"
-#include "GlobalNamespace/SaberType.hpp"
-#include "GlobalNamespace/SaberTypeObject.hpp"
-#include "GlobalNamespace/ScoringElement.hpp"
+#include <GlobalNamespace/ColorType.hpp>
+#include <GlobalNamespace/ISaberMovementData.hpp>
+#include <GlobalNamespace/ISaberSwingRatingCounter.hpp>
+#include <GlobalNamespace/NoteCutInfo.hpp>
+#include <GlobalNamespace/Saber.hpp>
+#include <GlobalNamespace/SaberMovementData.hpp>
+#include <GlobalNamespace/SaberSwingRatingCounter.hpp>
+#include <GlobalNamespace/SaberType.hpp>
+#include <GlobalNamespace/SaberTypeObject.hpp>
+#include <GlobalNamespace/ScoringElement.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Transform.hpp"
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Transform.hpp>
 #include "logging.hpp"
 #include <algorithm>
 
@@ -28,10 +28,10 @@ namespace ScoreSaber::ReplaySystem::Playback
         _saberManager = saberManager;
         _audioTimeSyncController = audioTimeSyncController;
         _basicBeatmapObjectManager = basicBeatmapObjectManager;
-        _gameNotePool = basicBeatmapObjectManager->basicGameNotePoolContainer;
-        _burstSliderHeadNotePool = basicBeatmapObjectManager->burstSliderHeadGameNotePoolContainer;
-        _burstSliderNotePool = basicBeatmapObjectManager->burstSliderGameNotePoolContainer;
-        _bombNotePool = basicBeatmapObjectManager->bombNotePoolContainer;
+        _gameNotePool = basicBeatmapObjectManager->_basicGameNotePoolContainer;
+        _burstSliderHeadNotePool = basicBeatmapObjectManager->_burstSliderHeadGameNotePoolContainer;
+        _burstSliderNotePool = basicBeatmapObjectManager->_burstSliderGameNotePoolContainer;
+        _bombNotePool = basicBeatmapObjectManager->_bombNotePoolContainer;
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         std::sort(_sortedNoteEvents.begin(), _sortedNoteEvents.end(), [](const auto& lhs, const auto& rhs) {
             return lhs.Time < rhs.Time;
@@ -48,30 +48,30 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         bool foundNote = false;
         if (activeEvent.EventType == NoteEventType::GoodCut || activeEvent.EventType == NoteEventType::BadCut) {
-            auto itemsNotes = _gameNotePool->get_activeItems();
-            for (int i = 0; i < itemsNotes->get_Count(); i++) {
+            auto itemsNotes = _gameNotePool->activeItems;
+            for (int i = 0; i < itemsNotes->Count; i++) {
                 auto noteController = itemsNotes->get_Item(i);
                 if (HandleEvent(activeEvent, noteController)) {
                     return;
                 }
             }
-            auto itemsSliderHeads = _burstSliderHeadNotePool->get_activeItems();
-            for (int i = 0; i < itemsSliderHeads->get_Count(); i++) {
+            auto itemsSliderHeads = _burstSliderHeadNotePool->activeItems;
+            for (int i = 0; i < itemsSliderHeads->Count; i++) {
                 auto noteController = itemsSliderHeads->get_Item(i);
                 if (HandleEvent(activeEvent, noteController)) {
                     return;
                 }
             }
-            auto itemsSliderNotes = _burstSliderNotePool->get_activeItems();
-            for (int i = 0; i < itemsSliderNotes->get_Count(); i++) {
+            auto itemsSliderNotes = _burstSliderNotePool->activeItems;
+            for (int i = 0; i < itemsSliderNotes->Count; i++) {
                 auto noteController = itemsSliderNotes->get_Item(i);
                 if (HandleEvent(activeEvent, noteController)) {
                     return;
                 }
             }
         } else if (activeEvent.EventType == NoteEventType::Bomb) {
-            auto items = _bombNotePool->get_activeItems();
-            for (int i = 0; i < items->get_Count(); i++) {
+            auto items = _bombNotePool->activeItems;
+            for (int i = 0; i < items->Count; i++) {
                 auto bombController = items->get_Item(i);
                 if (HandleEvent(activeEvent, bombController)) {
                     return;
@@ -89,7 +89,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             auto noteCutInfo = GlobalNamespace::NoteCutInfo(noteController->noteData,
                                                             activeEvent.SaberSpeed > 2.0f,
                                                             activeEvent.DirectionOK,
-                                                            activeEvent.SaberType == correctSaber->saberType->saberType.value,
+                                                            activeEvent.SaberType == (int)correctSaber->saberType,
                                                             false,
                                                             activeEvent.SaberSpeed,
                                                             VRVector3(activeEvent.SaberDirection),
@@ -100,13 +100,13 @@ namespace ScoreSaber::ReplaySystem::Playback
                                                             VRVector3(activeEvent.CutNormal),
                                                             activeEvent.CutAngle,
                                                             activeEvent.CutDistanceToCenter,
-                                                            noteController->get_worldRotation(),
-                                                            noteController->get_inverseWorldRotation(),
-                                                            noteTransform->get_rotation(),
-                                                            noteTransform->get_position(),
+                                                            noteController->worldRotation,
+                                                            noteController->inverseWorldRotation,
+                                                            noteTransform->rotation,
+                                                            noteTransform->position,
                                                             il2cpp_utils::try_cast<GlobalNamespace::ISaberMovementData>(correctSaber->movementData).value_or(nullptr));
             _recognizedNoteCutInfos.emplace_back(noteCutInfo, activeEvent);
-            il2cpp_utils::RunMethodUnsafe(noteController, "SendNoteWasCutEvent", byref(noteCutInfo));
+            noteController->SendNoteWasCutEvent(byref(noteCutInfo));
             return true;
         }
         return false;
@@ -115,17 +115,17 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         if (!Mathf::Approximately(id.Time, noteData->time) ||
             id.LineIndex != noteData->lineIndex ||
-            id.LineLayer != noteData->noteLineLayer ||
-            id.ColorType != noteData->colorType ||
-            id.CutDirection != noteData->cutDirection) {
+            id.LineLayer != (int)noteData->noteLineLayer ||
+            id.ColorType != (int)noteData->colorType ||
+            id.CutDirection != (int)noteData->cutDirection) {
             return false;
         }
 
-        if (id.GameplayType.has_value() && id.GameplayType.value() != noteData->gameplayType.value) {
+        if (id.GameplayType.has_value() && id.GameplayType.value() != (int)noteData->gameplayType) {
             return false;
         }
         
-        if (id.ScoringType.has_value() && id.ScoringType.value() != noteData->scoringType.value) {
+        if (id.ScoringType.has_value() && id.ScoringType.value() != (int)noteData->scoringType) {
             return false;
         }
         
@@ -172,10 +172,10 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         if (!scoringElement->isFinished)
         {
-            auto ratingCounter = cutScoreBuffer->saberSwingRatingCounter;
+            auto ratingCounter = cutScoreBuffer->_saberSwingRatingCounter;
 
-            ratingCounter->afterCutRating = activeEvent.AfterCutRating;
-            ratingCounter->beforeCutRating = activeEvent.BeforeCutRating;
+            ratingCounter->_afterCutRating = activeEvent.AfterCutRating;
+            ratingCounter->_beforeCutRating = activeEvent.BeforeCutRating;
 
             cutScoreBuffer->HandleSaberSwingRatingCounterDidFinish(il2cpp_utils::try_cast<GlobalNamespace::ISaberSwingRatingCounter>(ratingCounter).value_or(nullptr));
             scoringElement->isFinished = true;

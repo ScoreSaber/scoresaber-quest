@@ -5,16 +5,15 @@
 #include "Data/Player.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 
-#include "HMUI/ImageView.hpp"
-#include "HMUI/TableCell.hpp"
-#include "HMUI/TableView.hpp"
-#include "HMUI/TableView_IDataSource.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "UnityEngine/Coroutine.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include <HMUI/ImageView.hpp>
+#include <HMUI/TableCell.hpp>
+#include <HMUI/TableView.hpp>
+#include <TMPro/TextMeshProUGUI.hpp>
+#include <UnityEngine/Coroutine.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
+#include <custom-types/shared/macros.hpp>
+#include "questui/CustomTypes/Components/Backgroundable.hpp"
 
 #define GET_FIND_METHOD(mPtr) \
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()

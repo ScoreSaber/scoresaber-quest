@@ -1,6 +1,7 @@
 #pragma once
 #include "Utils/StringUtils.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
+#include "paper/shared/string_convert.hpp"
 
 #include <iostream>
 #include <string>
@@ -9,6 +10,7 @@
 #include "../extern/includes/beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
 #include "../extern/includes/beatsaber-hook/shared/rapidjson/include/rapidjson/stringbuffer.h"
 #include "../extern/includes/beatsaber-hook/shared/rapidjson/include/rapidjson/writer.h"
+
 
 using namespace std;
 using namespace rapidjson;
@@ -50,7 +52,7 @@ namespace ScoreSaber::Data::Private
         {
             writer.StartObject();
             writer.String("playerName");
-            writer.String(to_utf8(playerName).c_str());
+            writer.String(Paper::StringConvert::from_utf16(playerName).c_str());
             writer.String("playerId");
             writer.String(playerId.c_str());
             writer.String("score");

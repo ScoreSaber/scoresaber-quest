@@ -1,11 +1,10 @@
 #include "ReplaySystem/UI/ImberSpecsReporter.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/SaberMovementData.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Vector2.hpp"
+#include <GlobalNamespace/Saber.hpp>
+#include <GlobalNamespace/SaberMovementData.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Vector2.hpp>
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -30,7 +29,7 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         if (DidReport != nullptr)
         {
-            DidReport(pose.FPS, _saberManager->leftSaber->movementData->get_bladeSpeed(), _saberManager->rightSaber->movementData->get_bladeSpeed());
+            DidReport(pose.FPS, _saberManager->leftSaber->movementData->bladeSpeed, _saberManager->rightSaber->movementData->bladeSpeed);
         }
     }
     void ImberSpecsReporter::Dispose()

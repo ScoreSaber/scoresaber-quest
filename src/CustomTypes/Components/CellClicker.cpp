@@ -1,16 +1,15 @@
 #include "CustomTypes/Components/CellClicker.hpp"
 
-#include "GlobalNamespace/MenuShockwave.hpp"
-#include "GlobalNamespace/Signal.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
-#include "UnityEngine/Transform.hpp"
+#include <GlobalNamespace/MenuShockwave.hpp>
+#include <GlobalNamespace/Signal.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Time.hpp>
+#include <UnityEngine/Transform.hpp>
+#include <UnityEngine/Vector3.hpp>
 
-#include "bsml/shared/BSML.hpp"
-#include "custom-types/shared/coroutine.hpp"
-#include "questui/shared/QuestUI.hpp"
-
-#include "logging.hpp"
+#include <custom-types/shared/coroutine.hpp>
+#include <beatsaber-hook/shared/utils/typedefs-wrappers.hpp>
+#include "Utils/OperatorOverloads.hpp"
 
 using namespace HMUI;
 using namespace UnityEngine;
@@ -18,24 +17,25 @@ using namespace UnityEngine::EventSystems;
 
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, CellClicker);
 
+
 namespace ScoreSaber::CustomTypes::Components {
     // copied from BSML to get the button click sound
-    GlobalNamespace::Signal* get_imageClickedSignal() {
+    GlobalNamespace::Signal* getImageClickedSignal() {
         static SafePtrUnity<GlobalNamespace::Signal> imageClickedSignal;
         if (!imageClickedSignal) {
-            auto menuShockWave = Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>().FirstOrDefault();
-            imageClickedSignal = menuShockWave ? menuShockWave->buttonClickEvents.LastOrDefault() : nullptr;
+            auto menuShockWave = Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>().front_or_default();
+            imageClickedSignal = menuShockWave ? menuShockWave->_buttonClickEvents.back_or_default() : nullptr;
         }
         return imageClickedSignal.ptr();
     }
 
     void CellClicker::Start() {
-        originalScale = seperator->get_transform()->get_localScale();
+        originalScale = seperator->transform->localScale;
     }
 
     void CellClicker::OnPointerClick(PointerEventData* data) {
         // simulate BeatSaberUI.BasicUIAudioManager.HandleButtonClickEvent();
-        auto signal = get_imageClickedSignal();
+        auto signal = getImageClickedSignal();
         if(signal) signal->Raise();
 
         if (onClick != nullptr) {
@@ -47,21 +47,22 @@ namespace ScoreSaber::CustomTypes::Components {
         float elapsedTime = 0.0f;
         while (elapsedTime < duration) {
             float t = elapsedTime / duration;
-            target->set_color(Color::Lerp(startColor, endColor, t));
-            target->set_color0(Color::Lerp(startColor0, endColor0, t));
-            target->set_color1(Color::Lerp(startColor1, endColor1, t));
+            target->color = Color::Lerp(startColor, endColor, t);
+            target->color0 = Color::Lerp(startColor0, endColor0, t);
+            target->color1 = Color::Lerp(startColor1, endColor1, t);
             elapsedTime += Time::get_deltaTime();
             co_yield nullptr;
         }
-        target->set_color(endColor);
-        target->set_color0(endColor0);
-        target->set_color1(endColor1);
+        target->color = endColor;
+        target->color0 = endColor0;
+        target->color1 = endColor1;
         co_return;
     }
 
     void CellClicker::OnPointerEnter(PointerEventData* eventData) {
         if (!isScaled) {
-            seperator->get_transform()->set_localScale(originalScale * 1.8f);
+            //seperator->transform->localScale = Vector3::op_Multiply(originalScale, 1.8f);
+            seperator->transform->localScale = originalScale * 1.8f;
             isScaled = true;
         }
 
@@ -72,26 +73,26 @@ namespace ScoreSaber::CustomTypes::Components {
         float lerpDuration = 0.15f;
 
         StopAllCoroutines();
-        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(LerpColors(seperator, seperator->get_color(), targetColor, seperator->color0, targetColor0, seperator->color1, targetColor1, lerpDuration)));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(LerpColors(seperator, seperator->color, targetColor, seperator->color0, targetColor0, seperator->color1, targetColor1, lerpDuration)));
     }
 
     void CellClicker::OnPointerExit(PointerEventData* eventData) {
         if (isScaled) {
-            seperator->get_transform()->set_localScale(originalScale);
+            seperator->transform->localScale = originalScale;
             isScaled = false;
         }
 
         float lerpDuration = 0.05f;
 
         StopAllCoroutines();
-        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(LerpColors(seperator, seperator->get_color(), origColour, seperator->color0, origColour0, seperator->color1, origColour1, lerpDuration)));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(LerpColors(seperator, seperator->color, origColour, seperator->color0, origColour0, seperator->color1, origColour1, lerpDuration)));
     }
 
     void CellClicker::OnDestroy() {
         StopAllCoroutines();
         onClick = nullptr;
-        seperator->set_color(origColour);
-        seperator->set_color0(origColour0);
-        seperator->set_color1(origColour1);
+        seperator->color = origColour;
+        seperator->color0 = origColour0;
+        seperator->color1 = origColour1;
     }
 }

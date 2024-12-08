@@ -4,8 +4,8 @@
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 
-#include "HMUI/ViewController_AnimationDirection.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
+#include <HMUI/ViewController_AnimationDirection.hpp>
+#include <HMUI/ViewController_AnimationType.hpp>
 #include "questui/shared/BeatSaberUI.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::FlowCoordinators, ScoreSaberSettingsFlowCoordinator);
@@ -26,7 +26,7 @@ namespace ScoreSaber::UI::FlowCoordinators
         if (firstActivation)
         {
             SetTitle("ScoreSaber Settings", ViewController::AnimationType::In);
-            set_showBackButton(true);
+            showBackButton = true;
             mainSettingsViewController = CreateViewController<ScoreSaber::UI::ViewControllers::MainSettingsViewController*>();
 
             ProvideInitialViewControllers(mainSettingsViewController, nullptr, nullptr, nullptr, nullptr);

@@ -1,13 +1,13 @@
 #include "ReplaySystem/Recorders/HeightEventRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/PlayerHeightDetector.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/PlayerHeightDetector.hpp>
+#include <System/Action_1.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Time.hpp>
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 using namespace UnityEngine;

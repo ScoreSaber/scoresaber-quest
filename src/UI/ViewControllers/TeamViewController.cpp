@@ -5,17 +5,17 @@
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
 
-#include "HMUI/TextPageScrollView.hpp"
-#include "HMUI/Touchable.hpp"
+#include <HMUI/TextPageScrollView.hpp>
+#include <HMUI/Touchable.hpp>
 
-#include "UnityEngine/Application.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Rect.hpp"
-#include "UnityEngine/RectOffset.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
-#include "UnityEngine/Texture2D.hpp"
-#include "UnityEngine/UI/LayoutElement.hpp"
+#include <UnityEngine/Application.hpp>
+#include <UnityEngine/GameObject.hpp>
+#include <UnityEngine/Rect.hpp>
+#include <UnityEngine/RectOffset.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/SpriteMeshType.hpp>
+#include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
 
 #include "logging.hpp"
 
@@ -28,11 +28,11 @@ using namespace UnityEngine::UI;
 using namespace HMUI;
 
 #define SetPreferredSize(identifier, width, height)                                         \
-    auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \
+    auto layout##identifier = identifier->gameObject->GetComponent<LayoutElement*>(); \
     if (!layout##identifier)                                                                \
-        layout##identifier = identifier->get_gameObject()->AddComponent<LayoutElement*>();  \
-    layout##identifier->set_preferredWidth(width);                                          \
-    layout##identifier->set_preferredHeight(height)
+        layout##identifier = identifier->gameObject->AddComponent<LayoutElement*>();  \
+    layout##identifier->preferredWidth = width;                                          \
+    layout##identifier->preferredHeight = height
 
 static std::vector<std::string> teamAndContributorsNamesIdentifiers = {
     "Backend",
@@ -51,24 +51,24 @@ namespace ScoreSaber::UI::ViewControllers
     {
         if (firstActivation)
         {
-            get_gameObject()->AddComponent<HMUI::Touchable*>();
-            auto headerHorizontal = CreateHorizontalLayoutGroup(get_transform());
-            auto headerRectTransform = headerHorizontal->get_rectTransform();
-            headerRectTransform->set_anchoredPosition(Vector2(0, 45.0f));
-            headerRectTransform->set_sizeDelta(Vector2(-40.0f, 0.0f));
+            gameObject->AddComponent<HMUI::Touchable*>();
+            auto headerHorizontal = CreateHorizontalLayoutGroup(transform);
+            auto headerRectTransform = headerHorizontal->rectTransform;
+            headerRectTransform->anchoredPosition = Vector2(0, 45.0f);
+            headerRectTransform->sizeDelta = Vector2(-40.0f, 0.0f);
             SetPreferredSize(headerHorizontal, 40.0f, 10.0f);
-            headerHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
-            auto headerText = CreateText(headerHorizontal->get_transform(), "Team and Contributors");
+            headerHorizontal->childAlignment = TextAnchor::MiddleCenter;
+            auto headerText = CreateText(headerHorizontal->transform, "Team and Contributors");
             SetPreferredSize(headerText, 40.0f, 10.0f);
-            headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
-            headerText->set_fontSize(7.0f);
-            auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
+            headerText->alignment = TMPro::TextAlignmentOptions::Center;
+            headerText->fontSize = 7.0f;
+            auto headerBG = headerHorizontal->gameObject->AddComponent<Backgroundable*>();
             headerBG->ApplyBackgroundWithAlpha("round-rect-panel", 0.5f);
 
-            auto segmentedHorizontal = CreateHorizontalLayoutGroup(get_transform());
+            auto segmentedHorizontal = CreateHorizontalLayoutGroup(transform);
             SetPreferredSize(segmentedHorizontal, 80.0f, 6.0f);
-            segmentedHorizontal->get_rectTransform()->set_anchoredPosition(Vector2(0, 35.0f));
-            auto segmentedController = BeatSaberUI::CreateTextSegmentedControl(segmentedHorizontal->get_transform(), {0, 0}, {0, 0}, ArrayW<StringW>(il2cpp_array_size_t(0)), std::bind(&TeamViewController::Show, this, std::placeholders::_1));
+            segmentedHorizontal->rectTransform->anchoredPosition = Vector2(0, 35.0f);
+            auto segmentedController = BeatSaberUI::CreateTextSegmentedControl(segmentedHorizontal->transform, {0, 0}, {0, 0}, ArrayW<StringW>(il2cpp_array_size_t(0)), std::bind(&TeamViewController::Show, this, std::placeholders::_1));
 
             segmentedController->overrideCellSize = true;
             segmentedController->fontSize *= 0.75f;
@@ -84,7 +84,7 @@ namespace ScoreSaber::UI::ViewControllers
             teamAndContributorsNames[7] = "QAT";
             teamAndContributorsNames[8] = "CAT";
 
-            segmentedController->set_texts(teamAndContributorsNames);
+            segmentedController->texts = teamAndContributorsNames;
 
             creditTabs = Array<GameObject*>::NewLength(teamAndContributorsNames.size());
 
@@ -116,41 +116,41 @@ namespace ScoreSaber::UI::ViewControllers
     // this method is a fucking mess, but then again, that's just ui
     UnityEngine::GameObject* TeamViewController::CreateCreditTab(int idx)
     {
-        auto rootTab = CreateVerticalLayoutGroup(get_transform());
-        rootTab->set_padding(RectOffset::New_ctor(4, 4, 4, 4));
-        rootTab->get_rectTransform()->set_anchoredPosition(Vector2(0, -10.0f));
-        rootTab->get_rectTransform()->set_sizeDelta(Vector2(0, -5.0f));
-        rootTab->set_childForceExpandWidth(true);
-        rootTab->set_childControlWidth(true);
-        auto rootBG = rootTab->get_gameObject()->AddComponent<Backgroundable*>();
+        auto rootTab = CreateVerticalLayoutGroup(transform);
+        rootTab->padding = RectOffset::New_ctor(4, 4, 4, 4);
+        rootTab->rectTransform->anchoredPosition = Vector2(0, -10.0f);
+        rootTab->rectTransform->sizeDelta = Vector2(0, -5.0f);
+        rootTab->childForceExpandWidth = true;
+        rootTab->childControlWidth = true;
+        auto rootBG = rootTab->gameObject->AddComponent<Backgroundable*>();
         rootBG->ApplyBackgroundWithAlpha("round-rect-panel", 1.0f);
 
-        UnityEngine::GameObject* scrollViewGO = BeatSaberUI::CreateScrollView(rootTab->get_transform());
+        UnityEngine::GameObject* scrollViewGO = BeatSaberUI::CreateScrollView(rootTab->transform);
         auto externalComponents = scrollViewGO->GetComponent<ExternalComponents*>();
         auto scrollView = externalComponents->Get<HMUI::ScrollView*>();
         SetPreferredSize(scrollView, 115, -1);
         auto viewport = scrollView->viewport;
-        viewport->set_sizeDelta({0, 0});
+        viewport->sizeDelta = {0, 0};
         auto scrollRectT = scrollViewGO->GetComponent<RectTransform*>();
-        scrollRectT->set_sizeDelta({0.0f, 0.0f});
-        auto gridParentHorizon = CreateHorizontalLayoutGroup(scrollViewGO->get_transform());
-        gridParentHorizon->set_childForceExpandWidth(true);
-        gridParentHorizon->set_childControlWidth(true);
+        scrollRectT->sizeDelta = {0.0f, 0.0f};
+        auto gridParentHorizon = CreateHorizontalLayoutGroup(scrollViewGO->transform);
+        gridParentHorizon->childForceExpandWidth = true;
+        gridParentHorizon->childControlWidth = true;
         SetPreferredSize(gridParentHorizon, 115, -1);
-        auto gridParent = CreateVerticalLayoutGroup(gridParentHorizon->get_transform());
+        auto gridParent = CreateVerticalLayoutGroup(gridParentHorizon->transform);
         SetPreferredSize(gridParent, 115, -1);
 
-        auto grid = CreateGridLayoutGroup(gridParent->get_transform());
-        grid->set_cellSize(Vector2(30, 15));
-        grid->set_spacing(Vector2(3, 3));
-        grid->set_startAxis(GridLayoutGroup::Axis::Horizontal);
-        grid->set_startCorner(GridLayoutGroup::Corner::UpperLeft);
+        auto grid = CreateGridLayoutGroup(gridParent->transform);
+        grid->cellSize = Vector2(30, 15);
+        grid->spacing = Vector2(3, 3);
+        grid->startAxis = GridLayoutGroup::Axis::Horizontal;
+        grid->startCorner = GridLayoutGroup::Corner::UpperLeft;
         auto& members = TeamUtils::get_members(teamAndContributorsNamesIdentifiers[idx]);
 
         for (auto& mem : members)
         {
-            UIUtils::CreateTeamMemberLayout(grid->get_transform(), mem);
+            UIUtils::CreateTeamMemberLayout(grid->transform, mem);
         }
-        return rootTab->get_gameObject();
+        return rootTab->gameObject;
     }
 } // namespace ScoreSaber::UI::ViewControllers

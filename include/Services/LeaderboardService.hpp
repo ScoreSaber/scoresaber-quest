@@ -1,6 +1,6 @@
 #pragma once
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
+#include <GlobalNamespace/IDifficultyBeatmap.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
 
 using namespace GlobalNamespace;
 using namespace ScoreSaber;

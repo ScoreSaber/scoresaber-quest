@@ -3,15 +3,15 @@
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Private/Settings.hpp"
 
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
-#include "GlobalNamespace/BeatmapDifficulty.hpp"
-#include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
-#include "GlobalNamespace/GameplayModifierParamsSO.hpp"
-#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
+#include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
+#include <GlobalNamespace/BeatmapDifficulty.hpp>
+#include <GlobalNamespace/BeatmapDifficultyMethods.hpp>
+#include <GlobalNamespace/GameplayModifierParamsSO.hpp>
+#include <GlobalNamespace/IDifficultyBeatmapSet.hpp>
+#include <GlobalNamespace/IPreviewBeatmapLevel.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp>
+#include <GlobalNamespace/SharedCoroutineStarter.hpp>
 #include "Services/LeaderboardService.hpp"
 #include "Utils/BeatmapUtils.hpp"
 
@@ -19,8 +19,8 @@
 #include "Utils/WebUtils.hpp"
 
 #include "Services/PlayerService.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 #include "logging.hpp"
 #include "static.hpp"
 
@@ -44,7 +44,7 @@ namespace ScoreSaber::Services::LeaderboardService
 
         try
         {
-            previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
+            previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->level);
         }
         catch (const std::exception& e)
         {
@@ -55,11 +55,11 @@ namespace ScoreSaber::Services::LeaderboardService
             return "";
         }
 
-        auto levelId = previewBeatmapLevel->get_levelID();
+        auto levelId = previewBeatmapLevel->levelID;
         std::string levelHash = StringUtils::GetFormattedHash(levelId);
 
-        std::string gameMode = "Solo" + difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
-        int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
+        std::string gameMode = "Solo" + difficultyBeatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->serializedName;
+        int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->difficulty);
         
         bool hasPage = true;
 

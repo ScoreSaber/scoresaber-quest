@@ -1,28 +1,22 @@
 #include "CustomTypes/Components/ImageButton.hpp"
 
-#include "GlobalNamespace/OVRInput.hpp"
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "GlobalNamespace/VRController.hpp"
-#include "HMUI/ButtonSpriteSwap.hpp"
-#include "HMUI/ImageView.hpp"
-#include "UnityEngine/Collider.hpp"
-#include "UnityEngine/MeshRenderer.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/Physics.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/RaycastHit.hpp"
-#include "UnityEngine/RectTransform.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
-#include "UnityEngine/Transform.hpp"
-#include "UnityEngine/Vector3.hpp"
-#include "VRUIControls/VRPointer.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
-#include "custom-types/shared/coroutine.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "main.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
+#include <GlobalNamespace/OVRInput.hpp>
+#include <GlobalNamespace/VRController.hpp>
+#include <HMUI/ButtonSpriteSwap.hpp>
+#include <HMUI/ImageView.hpp>
+#include <UnityEngine/Collider.hpp>
+#include <UnityEngine/Physics.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/RaycastHit.hpp>
+#include <UnityEngine/RectTransform.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Transform.hpp>
+#include <UnityEngine/Vector3.hpp>
+#include <VRUIControls/VRPointer.hpp>
+#include <custom-types/shared/coroutine.hpp>
+#include <custom-types/shared/macros.hpp>
+#include "questui/QuestUI.hpp"
+#include "Utils/OperatorOverloads.hpp"
 
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ImageButton);
 
@@ -46,20 +40,20 @@ custom_types::Helpers::Coroutine Update(ImageButton* self)
         if (self->button->isPointerInside)
         {
             auto images = self->button->GetComponentsInChildren<HMUI::ImageView*>();
-            for (int i = 0; i < images->Length(); i++)
+            for (int i = 0; i < images.size(); i++)
             {
-                HMUI::ImageView* image = images->get(i);
-                image->set_color(UnityEngine::Color(self->r * 0.6, self->g * 0.8f, self->b * 1.0f, 1.0f));
+                HMUI::ImageView* image = images[i];
+                image->color = UnityEngine::Color(self->r * 0.6, self->g * 0.8f, self->b * 1.0f, 1.0f);
             }
         }
         else
         {
             auto images = self->button->GetComponentsInChildren<HMUI::ImageView*>();
-            if (images->get(0)->get_color().r != self->r)
+            if (images[0]->color.r != self->r)
             {
-                for (int i = 0; i < images->Length(); i++)
+                for (int i = 0; i < images.size(); i++)
                 {
-                    HMUI::ImageView* image = images->get(i);
+                    HMUI::ImageView* image = images[i];
                     image->set_color(
                         UnityEngine::Color(self->r, self->g, self->b, self->a));
                 }
@@ -74,33 +68,33 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
 {
     if (anchoredPosition != Vector2(0.0f, 0.0f))
     {
-        button = QuestUI::BeatSaberUI::CreateUIButton(parent, std::string(), "SettingsButton", anchoredPosition, sizeDelta, onClick);
+        button = QuestUI::CreateUIButton(parent, std::string(), "SettingsButton", anchoredPosition, sizeDelta, onClick);
     }
     else
     {
-        button = QuestUI::BeatSaberUI::CreateUIButton(parent, std::string(), "SettingsButton", onClick);
+        button = QuestUI::CreateUIButton(parent, std::string(), "SettingsButton", onClick);
     }
-    BeatSaberUI::SetButtonSprites(button, sprite, sprite);
-    button->get_gameObject()->AddComponent<Collider*>();
+    QuestUI::SetButtonSprites(button, sprite, sprite);
+    button->gameObject->AddComponent<Collider*>();
 
     if (sizeDelta != Vector2(0.0f, 0.0f))
     {
-        RectTransform* rectTransform = reinterpret_cast<RectTransform*>(button->get_transform()->GetChild(0));
-        rectTransform->set_sizeDelta(sizeDelta);
+        
+        UnityW<RectTransform> rectTransform = button->transform->GetChild(0).cast<RectTransform>();
+        rectTransform->sizeDelta = sizeDelta;
     }
 
     this->pointerArray = UnityEngine::Resources::FindObjectsOfTypeAll<VRUIControls::VRPointer*>();
     HMUI::ButtonSpriteSwap* swap = this->GetComponent<HMUI::ButtonSpriteSwap*>();
 
     auto images = button->GetComponentsInChildren<HMUI::ImageView*>();
-    for (int i = 0; i < images->Length(); i++)
+    for (HMUI::ImageView* img : images)
     {
-        HMUI::ImageView* img = images->get(i);
-        this->r = img->get_color().r;
-        this->g = img->get_color().g;
-        this->b = img->get_color().b;
-        this->a = img->get_color().a;
+        this->r = img->color.r;
+        this->g = img->color.g;
+        this->b = img->color.b;
+        this->a = img->color.a;
     }
 
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Update(this)));
+    this->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Update(this)));
 }

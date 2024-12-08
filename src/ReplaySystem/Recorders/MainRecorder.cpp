@@ -9,7 +9,7 @@
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "ReplaySystem/Recorders/ScoreEventRecorder.hpp"
 #include "Services/ReplayService.hpp"
-#include "beatsaber-hook/shared/utils/hooking.hpp"
+#include <beatsaber-hook/shared/utils/hooking.hpp>
 #include "logging.hpp"
 
 using namespace ScoreSaber::ReplaySystem;

@@ -1,6 +1,6 @@
 #include "ReplaySystem/Installers/PlaybackInstaller.hpp"
 
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include "ReplaySystem/Playback/ComboPlayer.hpp"
 #include "ReplaySystem/Playback/EnergyPlayer.hpp"
 #include "ReplaySystem/Playback/HeightPlayer.hpp"
@@ -11,11 +11,11 @@
 #include "ReplaySystem/Playback/ScorePlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "ReplaySystem/UI/GameReplayUI.hpp"
-#include "Zenject/ConcreteBinderGeneric_1.hpp"
-#include "Zenject/ConcreteIdBinderGeneric_1.hpp"
-#include "Zenject/DiContainer.hpp"
-#include "Zenject/FromBinderNonGeneric.hpp"
-#include "lapiz/shared/utilities/ZenjectExtensions.hpp"
+#include <Zenject/ConcreteBinderGeneric_1.hpp>
+#include <Zenject/ConcreteIdBinderGeneric_1.hpp>
+#include <Zenject/DiContainer.hpp>
+#include <Zenject/FromBinderNonGeneric.hpp>
+#include <lapiz/shared/utilities/ZenjectExtensions.hpp>
 #include "logging.hpp"
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::Installers, PlaybackInstaller);
@@ -32,7 +32,7 @@ namespace ScoreSaber::ReplaySystem::Installers
     void PlaybackInstaller::InstallBindings()
     {
         if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying) {
-            auto container = get_Container();
+            auto container = Container;
             container->BindInterfacesAndSelfTo<Playback::PosePlayer*>()->AsSingle();
             container->BindInterfacesAndSelfTo<Playback::NotePlayer*>()->AsSingle();
             container->Bind<Playback::EnergyPlayer*>()->AsSingle(); // needs to be injected before the ScorePlayer to make the TimeUpdate methods run in the correct order (order fixed in case we can ever use interfaces)

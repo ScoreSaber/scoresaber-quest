@@ -3,39 +3,37 @@
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ScoreSaberUploadData.hpp"
 #include "Data/Private/Settings.hpp"
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
-#include "GlobalNamespace/BeatmapDifficulty.hpp"
-#include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
-#include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
-#include "GlobalNamespace/HMTask.hpp"
-#include "GlobalNamespace/IBeatmapLevel.hpp"
-#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/MultiplayerLevelCompletionResults.hpp"
-#include "GlobalNamespace/MultiplayerPlayerResultsData.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
-#include "GlobalNamespace/PracticeViewController.hpp"
-#include "GlobalNamespace/OVRPlugin.hpp"
-#include "GlobalNamespace/OVRPlugin_Controller.hpp"
-#include "GlobalNamespace/OVRPlugin_SystemHeadset.hpp"
+#include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
+#include <GlobalNamespace/BeatmapDifficulty.hpp>
+#include <GlobalNamespace/BeatmapDifficultyMethods.hpp>
+#include <GlobalNamespace/BeatmapDifficultySerializedMethods.hpp>
+#include <GlobalNamespace/HMTask.hpp>
+#include <GlobalNamespace/IBeatmapLevel.hpp>
+#include <GlobalNamespace/IDifficultyBeatmapSet.hpp>
+#include <GlobalNamespace/IPreviewBeatmapLevel.hpp>
+#include <GlobalNamespace/MultiplayerLevelCompletionResults.hpp>
+#include <GlobalNamespace/MultiplayerPlayerResultsData.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp>
+#include <GlobalNamespace/PracticeViewController.hpp>
+#include <GlobalNamespace/OVRPlugin.hpp>
+#include <GlobalNamespace/OVRPlugin_Controller.hpp>
+#include <GlobalNamespace/OVRPlugin_SystemHeadset.hpp>
 #include "ReplaySystem/Recorders/MainRecorder.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "Services/FileService.hpp"
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
 #include "Services/ReplayService.hpp"
-#include "System/Action.hpp"
+#include <System/Action.hpp>
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
-#include "UnityEngine/Application.hpp"
-#include "UnityEngine/Resources.hpp"
+#include <UnityEngine/Application.hpp>
+#include <UnityEngine/Resources.hpp>
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include "static.hpp"
 #include <chrono>
 #include <thread>
@@ -87,7 +85,7 @@ namespace ScoreSaber::Services::UploadService
         }
 
         PracticeViewController* practiceViewController = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<PracticeViewController*>());
-        if (practiceViewController->get_isInViewControllerHierarchy())
+        if (practiceViewController->isInViewControllerHierarchy)
         {
             ReplayService::WriteSerializedReplay();
             return;
@@ -95,8 +93,8 @@ namespace ScoreSaber::Services::UploadService
 
         if (gameMode == "Solo" || gameMode == "Multiplayer")
         {
-            auto level = difficultyBeatmap->get_level()->i_IPreviewBeatmapLevel();
-            INFO("Starting upload process for %s:%s", ((string)(level->get_levelID())).c_str(), ((string)(level->get_songName())).c_str());
+            auto level = difficultyBeatmap->level->i_IPreviewBeatmapLevel();
+            INFO("Starting upload process for %s:%s", ((string)(level->levelID)).c_str(), ((string)(level->songName)).c_str());
             if (practicing) {
                 ReplayService::WriteSerializedReplay();
                 return;
@@ -126,13 +124,13 @@ namespace ScoreSaber::Services::UploadService
         std::string encryptedPacket = CreateScorePacket(beatmap, levelCompletionResults->multipliedScore, levelCompletionResults->modifiedScore,
                                                         levelCompletionResults->fullCombo, levelCompletionResults->badCutsCount, levelCompletionResults->missedCount,
                                                         levelCompletionResults->maxCombo, levelCompletionResults->energy, levelCompletionResults->gameplayModifiers);
-        auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level());
+        auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->level);
 
-        std::string levelHash = GetFormattedHash(previewBeatmapLevel->get_levelID());
+        std::string levelHash = GetFormattedHash(previewBeatmapLevel->levelID);
 
-        std::string characteristic = beatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
-        std::string songName = previewBeatmapLevel->get_songName();
-        std::string difficultyName = BeatmapDifficultySerializedMethods::SerializedName(beatmap->get_difficulty());
+        std::string characteristic = beatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->serializedName;
+        std::string songName = previewBeatmapLevel->songName;
+        std::string difficultyName = BeatmapDifficultySerializedMethods::SerializedName(beatmap->difficulty);
 
         std::string replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic,
                                                                                           ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id, songName);
@@ -253,18 +251,18 @@ namespace ScoreSaber::Services::UploadService
                                   int modifiedScore, bool fullCombo, int badCutsCount, int missedCount, int maxCombo, float energy,
                                   GlobalNamespace::GameplayModifiers* gameplayModifiers)
     {
-        auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
+        auto previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->level);
 
-        std::string levelHash = GetFormattedHash(previewBeatmapLevel->get_levelID());
+        std::string levelHash = GetFormattedHash(previewBeatmapLevel->levelID);
 
-        std::string gameMode = "Solo" + difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
-        int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
+        std::string gameMode = "Solo" + difficultyBeatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->serializedName;
+        int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->difficulty);
 
-        std::string songName = previewBeatmapLevel->get_songName();
-        std::string songSubName = previewBeatmapLevel->get_songSubName();
-        std::string songAuthorName = previewBeatmapLevel->get_songAuthorName();
-        std::string levelAuthorName = previewBeatmapLevel->get_levelAuthorName();
-        int bpm = previewBeatmapLevel->get_beatsPerMinute();
+        std::string songName = previewBeatmapLevel->songName;
+        std::string songSubName = previewBeatmapLevel->songSubName;
+        std::string songAuthorName = previewBeatmapLevel->songAuthorName;
+        std::string levelAuthorName = previewBeatmapLevel->levelAuthorName;
+        int bpm = previewBeatmapLevel->beatsPerMinute;
 
         std::u16string playerName = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name;
         std::string playerId = ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.id;

@@ -52,6 +52,7 @@ extern.cmake
 build/
 extern/
 .vscode/
+.cache/
 mod.json
 *.log
 *.txt

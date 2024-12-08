@@ -608,7 +608,7 @@ LzFind_SaturSub_128(UInt32 subValue, CLzRef *items, const CLzRef *lim)
     #ifdef MY_CPU_ARM_OR_ARM64
       vdupq_n_u32(subValue);
     #else
-      _mm_set_epi32((Int32)subValue, (Int32)subValue, (Int32)subValue, (Int32)subValue);
+      _mm_epi32 = (Int32)subValue, (Int32)subValue, (Int32)subValue, (Int32)subValue;
     #endif
   do
   {

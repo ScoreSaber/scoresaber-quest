@@ -3,27 +3,27 @@
 #include "main.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
-#include "GlobalNamespace/HapticFeedbackController.hpp"
-#include "GlobalNamespace/MenuShockwave.hpp"
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "HMUI/ButtonSpriteSwap.hpp"
-#include "HMUI/CurvedCanvasSettingsHelper.hpp"
-#include "HMUI/ImageView.hpp"
-#include "HMUI/StackLayoutGroup.hpp"
+#include <GlobalNamespace/HapticFeedbackController.hpp>
+#include <GlobalNamespace/MenuShockwave.hpp>
+#include <GlobalNamespace/SharedCoroutineStarter.hpp>
+#include <HMUI/ButtonSpriteSwap.hpp>
+#include <HMUI/CurvedCanvasSettingsHelper.hpp>
+#include <HMUI/ImageView.hpp>
+#include <HMUI/StackLayoutGroup.hpp>
 #include "Libraries/HM/HMLib/VR/HapticPresetSO.hpp"
-#include "UnityEngine/Application.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/ScriptableObject.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
-#include "UnityEngine/SpriteRenderer.hpp"
-#include "UnityEngine/Texture2D.hpp"
-#include "UnityEngine/UI/LayoutElement.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <UnityEngine/Application.hpp>
+#include <UnityEngine/GameObject.hpp>
+#include <UnityEngine/Networking/DownloadHandlerTexture.hpp>
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/ScriptableObject.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/SpriteMeshType.hpp>
+#include <UnityEngine/SpriteRenderer.hpp>
+#include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
+#include <UnityEngine/Vector3.hpp>
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
@@ -39,24 +39,24 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 
 #define SetPreferredSize(identifier, width, height)                                         \
-    auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \
+    auto layout##identifier = identifier->gameObject->GetComponent<LayoutElement*>(); \
     if (!layout##identifier)                                                                \
-        layout##identifier = identifier->get_gameObject()->AddComponent<LayoutElement*>();  \
-    layout##identifier->set_preferredWidth(width);                                          \
-    layout##identifier->set_preferredHeight(height)
+        layout##identifier = identifier->gameObject->AddComponent<LayoutElement*>();  \
+    layout##identifier->preferredWidth = width;                                          \
+    layout##identifier->preferredHeight = height
 
 #define SocialButton(identifier)                                                                                                                                                             \
     std::string str##identifier = member.get_##identifier();                                                                                                                                 \
     if (str##identifier != "")                                                                                                                                                               \
     {                                                                                                                                                                                        \
         auto identifier##_sprite = Base64ToSprite(identifier##_base64);                                                                                                                      \
-        auto btn##identifier = CreateClickableImage(socialHorizontal->get_transform(), identifier##_sprite, {0, 0}, {0, 0}, [str##identifier]() { Application::OpenURL(str##identifier); }); \
+        auto btn##identifier = CreateClickableImage(socialHorizontal->transform, identifier##_sprite, {0, 0}, {0, 0}, [str##identifier]() { Application::OpenURL(str##identifier); }); \
         SetPreferredSize(btn##identifier, 3, 3);                                                                                                                                             \
-        AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                 \
+        AddHoverHint(btn##identifier->gameObject, "Opens in Browser");                                                                                                                 \
     }
 
-#define BeginCoroutine(method)                                               \
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
+#define BeginCoroutine(method) \
+    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
         custom_types::Helpers::CoroutineHelper::New(method));
 
 using HapticPresetSO = Libraries::HM::HMLib::VR::HapticPresetSO;
@@ -68,7 +68,7 @@ namespace UIUtils
     {
         auto clickableText = CreateClickableText(parent, text, anchoredPosition, sizeDelta);
         if (onClick)
-            clickableText->get_onPointerClickEvent() += [onClick](auto _) { onClick(); };
+            clickableText->onPointerClickEvent += [onClick](auto _) { onClick(); };
         return clickableText;
     }
 
@@ -76,7 +76,7 @@ namespace UIUtils
     {
         auto clickableText = CreateClickableText(parent, text);
         if (onClick)
-            clickableText->get_onPointerClickEvent() += [onClick](auto _) { onClick(); };
+            clickableText->onPointerClickEvent += [onClick](auto _) { onClick(); };
         return clickableText;
     }
 
@@ -86,19 +86,19 @@ namespace UIUtils
         gameObj->SetActive(false);
 
         ScoreSaber::CustomTypes::Components::ClickableText* textMesh = gameObj->AddComponent<ScoreSaber::CustomTypes::Components::ClickableText*>();
-        RectTransform* rectTransform = textMesh->get_rectTransform();
+        RectTransform* rectTransform = textMesh->rectTransform;
         rectTransform->SetParent(parent, false);
-        textMesh->set_font(GetMainTextFont());
-        textMesh->set_fontSharedMaterial(GetMainUIFontMaterial());
+        textMesh->font = GetMainTextFont();
+        textMesh->fontSharedMaterial = GetMainUIFontMaterial();
 
-        textMesh->set_text(text);
-        textMesh->set_fontSize(4.0f);
-        textMesh->set_color(UnityEngine::Color::get_white());
-        textMesh->set_richText(true);
-        rectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 0.5f));
-        rectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 0.5f));
-        rectTransform->set_anchoredPosition(anchoredPosition);
-        rectTransform->set_sizeDelta(sizeDelta);
+        textMesh->text = text;
+        textMesh->fontSize = 4.0f;
+        textMesh->color = UnityEngine::Color::white;
+        textMesh->richText = true;
+        rectTransform->anchorMin = UnityEngine::Vector2(0.5f, 0.5f);
+        rectTransform->anchorMax = UnityEngine::Vector2(0.5f, 0.5f);
+        rectTransform->anchoredPosition = anchoredPosition;
+        rectTransform->sizeDelta = sizeDelta;
 
         gameObj->AddComponent<LayoutElement*>();
 
@@ -124,14 +124,14 @@ namespace UIUtils
 
     ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
     {
-        return CreateClickableText(parent, to_utf16(text), anchoredPosition, sizeDelta);
+        return CreateClickableText(parent, Paper::StringConvert::from_utf8(text), anchoredPosition, sizeDelta);
     };
 
     UnityEngine::GameObject* CreateLoadingIndicator(UnityEngine::Transform* parent)
     {
-        auto original = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<GameObject*>(), [](auto el) { return to_utf8(csstrtostr(el->get_name())) == "LoadingIndicator"; });
+        auto original = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<GameObject*>(), [](auto el) { return Paper::StringConvert::from_utf16(el->name) == "LoadingIndicator"; });
         auto loadingIndicator = Object::Instantiate(original, parent, false);
-        loadingIndicator->set_name("ScoreSaberLoadingIndicator");
+        loadingIndicator->name = "ScoreSaberLoadingIndicator";
 
         loadingIndicator->AddComponent<LayoutElement*>();
         return loadingIndicator;
@@ -141,9 +141,9 @@ namespace UIUtils
     {
         auto horizontal = CreateHorizontalLayoutGroup(parent);
         SetPreferredSize(horizontal, 30, -1);
-        horizontal->set_spacing(2.0f);
-        auto url = member.get_profilePicture();
-        auto image = CreateImage(horizontal->get_transform(), Base64ToSprite(oculus_base64), Vector2(0, 0), Vector2(0, 0));
+        horizontal->spacing = 2.0f;
+        auto url = member.profilePicture;
+        auto image = CreateImage(horizontal->transform, Base64ToSprite(oculus_base64), Vector2(0, 0), Vector2(0, 0));
         if (url.ends_with(".gif"))
         {
             BeginCoroutine(WebUtils::WaitForGifDownload(url, image));
@@ -153,19 +153,19 @@ namespace UIUtils
             BeginCoroutine(WebUtils::WaitForImageDownload(url, image));
         }
         SetPreferredSize(image, 12, 12);
-        image->set_preserveAspect(true);
+        image->preserveAspect = true;
 
-        auto infoVertical = CreateVerticalLayoutGroup(horizontal->get_transform());
+        auto infoVertical = CreateVerticalLayoutGroup(horizontal->transform);
         SetPreferredSize(infoVertical, -1, 15);
-        auto nameVertical = CreateVerticalLayoutGroup(infoVertical->get_transform());
+        auto nameVertical = CreateVerticalLayoutGroup(infoVertical->transform);
         SetPreferredSize(nameVertical, 15, -1);
-        auto socialHorizontal = CreateHorizontalLayoutGroup(infoVertical->get_transform());
-        socialHorizontal->set_childAlignment(TextAnchor::LowerLeft);
-        socialHorizontal->set_childForceExpandWidth(false);
-        socialHorizontal->set_childForceExpandHeight(false);
+        auto socialHorizontal = CreateHorizontalLayoutGroup(infoVertical->transform);
+        socialHorizontal->childAlignment = TextAnchor::LowerLeft;
+        socialHorizontal->childForceExpandWidth = false;
+        socialHorizontal->childForceExpandHeight = false;
         SetPreferredSize(socialHorizontal, 15, 5);
 
-        auto nameText = CreateText(nameVertical->get_transform(), to_utf16(member.get_name()));
+        auto nameText = CreateText(nameVertical->transform, Paper::StringConvert::from_utf8(member.name));
         SocialButton(discord);
         SocialButton(github);
         SocialButton(twitch);
@@ -179,7 +179,7 @@ namespace UIUtils
         auto image = CreateClickableImage(parent, sprite, anchoredPosition, sizeDelta);
         if (onClick)
         {
-            image->get_onPointerClickEvent() += [onClick](auto _) { onClick(); };
+            image->onPointerClickEvent += [onClick](auto _) { onClick(); };
         }
         return image;
     }
@@ -189,13 +189,13 @@ namespace UIUtils
         auto go = GameObject::New_ctor("ScoreSaberClickableImage");
 
         auto image = go->AddComponent<ScoreSaber::CustomTypes::Components::ClickableImage*>();
-        auto mat_UINoGlow = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return to_utf8(csstrtostr(x->get_name())) == "UINoGlow"; });
-        image->set_material(mat_UINoGlow);
+        auto mat_UINoGlow = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return Paper::StringConvert::from_utf16(x->name) == "UINoGlow"; });
+        image->material = mat_UINoGlow;
 
-        go->get_transform()->SetParent(parent, false);
-        image->get_rectTransform()->set_sizeDelta(sizeDelta);
-        image->get_rectTransform()->set_anchoredPosition(anchoredPosition);
-        image->set_sprite(sprite);
+        go->transform->SetParent(parent, false);
+        image->rectTransform->sizeDelta = sizeDelta;
+        image->rectTransform->anchoredPosition = anchoredPosition;
+        image->sprite = sprite;
 
         go->AddComponent<LayoutElement*>();
 
@@ -222,18 +222,18 @@ namespace UIUtils
                                         UnityEngine::Color color)
     {
         VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(parent);
-        vertical->get_rectTransform()->set_anchoredPosition({0.0f, 45.0f});
-        HorizontalLayoutGroup* horizontal = CreateHorizontalLayoutGroup(vertical->get_transform());
+        vertical->rectTransform->anchoredPosition = {0.0f, 45.0f};
+        HorizontalLayoutGroup* horizontal = CreateHorizontalLayoutGroup(vertical->transform);
 
-        Backgroundable* background = horizontal->get_gameObject()->AddComponent<Backgroundable*>();
+        Backgroundable* background = horizontal->gameObject->AddComponent<Backgroundable*>();
         background->ApplyBackgroundWithAlpha("panel-top", 1.0f);
 
-        ImageView* imageView = background->get_gameObject()->GetComponentInChildren<ImageView*>();
+        ImageView* imageView = background->gameObject->GetComponentInChildren<ImageView*>();
         imageView->gradient = true;
         imageView->gradientDirection = 0;
-        imageView->set_color(Color::get_white());
-        imageView->set_color0(color);
-        imageView->set_color1(color);
+        imageView->color = Color::white;
+        imageView->color0 = color;
+        imageView->color1 = color;
         imageView->curvedCanvasSettingsHelper->Reset();
 
         return horizontal;
@@ -246,21 +246,21 @@ namespace UIUtils
     {
         ScoreSaber::CustomTypes::Components::ImageButton* button = parent->AddComponent<ScoreSaber::CustomTypes::Components::ImageButton*>();
         button->sprite = sprite;
-        button->Init(parent->get_transform(), anchoredPosition, sizeDelta, onClick);
+        button->Init(parent->transform, anchoredPosition, sizeDelta, onClick);
         return button;
     }
 
     UnityEngine::GameObject* CreateStackLayoutGroup(UnityEngine::Transform* parent)
     {
         auto stack = GameObject::New_ctor("ScoreSaberStackLayoutGroup");
-        stack->get_transform()->SetParent(parent, false);
+        stack->transform->SetParent(parent, false);
         stack->AddComponent<HMUI::StackLayoutGroup*>();
         stack->AddComponent<ContentSizeFitter*>();
         stack->AddComponent<Backgroundable*>();
-        auto rowStackRect = reinterpret_cast<RectTransform*>(stack->get_transform());
-        rowStackRect->set_anchorMin({0, 0});
-        rowStackRect->set_anchorMax({1, 1});
-        rowStackRect->set_sizeDelta({0, 0});
+        auto rowStackRect = reinterpret_cast<RectTransform*>(stack->transform);
+        rowStackRect->anchorMin = {0, 0};
+        rowStackRect->anchorMax = {1, 1};
+        rowStackRect->sizeDelta = {0, 0};
         stack->AddComponent<LayoutElement*>();
 
         return stack;

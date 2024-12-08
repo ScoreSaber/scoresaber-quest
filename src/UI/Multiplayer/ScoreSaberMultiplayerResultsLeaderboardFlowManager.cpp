@@ -1,11 +1,11 @@
 #include "UI/Multiplayer/ScoreSaberMultiplayerResultsLeaderboardFlowManager.hpp"
 
-#include "GlobalNamespace/GameServerLobbyFlowCoordinator.hpp"
-#include "GlobalNamespace/MenuTransitionsHelper.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
+#include <GlobalNamespace/GameServerLobbyFlowCoordinator.hpp>
+#include <GlobalNamespace/MenuTransitionsHelper.hpp>
+#include <HMUI/ViewController.hpp>
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include "hooks.hpp"
 #include <functional>
 
@@ -45,22 +45,23 @@ namespace ScoreSaber::UI::Multiplayer
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didActivateEvent(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         auto currentFlowCoordinator = _mainFlowCoordinator->YoungestChildFlowCoordinatorOrSelf();
-        if (!il2cpp_utils::try_cast<GameServerLobbyFlowCoordinator>(currentFlowCoordinator).has_value())
+        if (!currentFlowCoordinator.try_cast<GameServerLobbyFlowCoordinator>().has_value())
             return;
 
-        _platformLeaderboardViewController->SetData(_lastCompletedBeatmap);
+        _platformLeaderboardViewController->SetData(_lastCompletedBeatmapKey);
         currentFlowCoordinator->SetRightScreenViewController(_platformLeaderboardViewController, HMUI::ViewController::AnimationType::In);
     }
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didDeactivateEvent(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        if (removedFromHierarchy || screenSystemDisabling)
-            _lastCompletedBeatmap = nullptr;
+        // we can't really set this to null anymore
+        /*if (removedFromHierarchy || screenSystemDisabling)
+            _lastCompletedBeatmap = nullptr;*/
     }
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerLevelDidFinish(MultiplayerLevelScenesTransitionSetupDataSO* transitionSetupData, MultiplayerResultsData* results)
     {
-        _lastCompletedBeatmap = transitionSetupData->difficultyBeatmap;
+        _lastCompletedBeatmapKey = transitionSetupData->beatmapKey;
     }
 } // namespace ScoreSaber::UI::Multiplayer
 

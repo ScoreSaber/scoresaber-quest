@@ -1,10 +1,10 @@
 #include "ReplaySystem/Playback/EnergyPlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Playables/PlayableDirector.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/UI/Image.hpp"
+#include <System/Action_1.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Playables/PlayableDirector.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/UI/Image.hpp>
 #include "logging.hpp"
 #include <algorithm>
 
@@ -37,7 +37,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         UpdateEnergy(0.5f);
         auto lastEvent = _sortedEnergyEvents[_sortedEnergyEvents.size() - 1];
-        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::_get_Epsilon())
+        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::Epsilon)
         {
             UpdateEnergy(0.0f);
         }
@@ -45,21 +45,21 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void EnergyPlayer::UpdateEnergy(float energy)
     {
-        bool isFailingEnergy = energy <= Mathf::_get_Epsilon();
+        bool isFailingEnergy = energy <= Mathf::Epsilon;
         bool noFail = _gameEnergyCounter->noFail;
         _gameEnergyCounter->noFail = false;
-        _gameEnergyCounter->didReach0Energy = isFailingEnergy;
+        _gameEnergyCounter->_didReach0Energy = isFailingEnergy;
         _gameEnergyCounter->ProcessEnergyChange(energy);
-        _gameEnergyCounter->nextFrameEnergyChange = 0.0f;
+        _gameEnergyCounter->_nextFrameEnergyChange = 0.0f;
         _gameEnergyCounter->energy = energy;
         _gameEnergyCounter->noFail = noFail;
 
         if (_gameEnergyUIPanel != nullptr) {
             _gameEnergyUIPanel->Init();
-            auto director = _gameEnergyUIPanel->playableDirector;
+            auto director = _gameEnergyUIPanel->_playableDirector;
             director->Stop();
             director->Evaluate();
-            _gameEnergyUIPanel->energyBar->set_enabled(!isFailingEnergy);
+            _gameEnergyUIPanel->_energyBar->enabled = !isFailingEnergy;
         }
         if (_gameEnergyCounter->gameEnergyDidChangeEvent != nullptr)
         {

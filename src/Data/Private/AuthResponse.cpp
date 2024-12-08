@@ -1,5 +1,6 @@
 #include "Data/Private/AuthResponse.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
+#include <beatsaber-hook/shared/utils/utils.h>
+#include "paper/shared/string_convert.hpp"
 
 namespace ScoreSaber::Data::Private
 {
@@ -11,8 +12,8 @@ namespace ScoreSaber::Data::Private
 
     AuthResponse::AuthResponse(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value)
     {
-        a = to_utf8(value[u"a"].GetString());
-        e = to_utf8(value[u"e"].GetString());
+        a = Paper::StringConvert::from_utf16(value[u"a"].GetString());
+        e = Paper::StringConvert::from_utf16(value[u"e"].GetString());
     }
 
     AuthResponse::AuthResponse(rapidjson::GenericObject<true, rapidjson::Value> value)
@@ -23,7 +24,7 @@ namespace ScoreSaber::Data::Private
 
     AuthResponse::AuthResponse(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value)
     {
-        a = to_utf8(value[u"a"].GetString());
-        e = to_utf8(value[u"e"].GetString());
+        a = Paper::StringConvert::from_utf16(value[u"a"].GetString());
+        e = Paper::StringConvert::from_utf16(value[u"e"].GetString());
     }
 }

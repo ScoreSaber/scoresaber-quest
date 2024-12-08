@@ -1,9 +1,9 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
 #include "Data/LeaderboardInfo.hpp"
 #include "Data/Score.hpp"
-#include "beatsaber-hook/shared/utils/typedefs.h"
+#include <beatsaber-hook/shared/utils/typedefs.h>
 #include <vector>
 
 namespace ScoreSaber::Data

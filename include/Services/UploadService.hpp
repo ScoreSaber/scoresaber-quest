@@ -1,10 +1,9 @@
 #pragma once
-#include "GlobalNamespace/GameplayModifiers.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/LevelCompletionResults.hpp"
-#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"
-#include "GlobalNamespace/MultiplayerResultsData.hpp"
-#include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp"
+#include <GlobalNamespace/GameplayModifiers.hpp>
+#include <GlobalNamespace/LevelCompletionResults.hpp>
+#include <GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp>
+#include <GlobalNamespace/MultiplayerResultsData.hpp>
+#include <GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp>
 
 #include <iomanip>
 #include <sstream>

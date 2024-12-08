@@ -1,9 +1,9 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
 #include "Data/Leaderboard.hpp"
-#include "GlobalNamespace/LeaderboardTableView_ScoreData.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
+#include <GlobalNamespace/LeaderboardTableView.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
 #include <vector>
 
 using namespace GlobalNamespace;

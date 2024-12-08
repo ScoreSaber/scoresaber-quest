@@ -1,24 +1,24 @@
 #pragma once
 
 // #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
-#include "GlobalNamespace/LoadingControl.hpp"
-#include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
-#include "HMUI/CurvedTextMeshPro.hpp"
-#include "HMUI/ModalView.hpp"
-#include "HMUI/Screen.hpp"
-#include "HMUI/ViewController.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/UI/Button.hpp"
-#include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
-#include "custom-types/shared/coroutine.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "custom-types/shared/register.hpp"
-#include "custom-types/shared/types.hpp"
-#include "custom-types/shared/util.hpp"
+#include <GlobalNamespace/LoadingControl.hpp>
+#include <GlobalNamespace/PlatformLeaderboardViewController.hpp>
+#include <HMUI/CurvedTextMeshPro.hpp>
+#include <HMUI/ModalView.hpp>
+#include <HMUI/Screen.hpp>
+#include <HMUI/ViewController.hpp>
+#include <TMPro/TextMeshProUGUI.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/UI/Button.hpp>
+#include <UnityEngine/UI/HorizontalLayoutGroup.hpp>
+#include <custom-types/shared/coroutine.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <custom-types/shared/register.hpp>
+#include <custom-types/shared/types.hpp>
+#include <custom-types/shared/util.hpp>
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
-#include "questui/shared/QuestUI.hpp"
+#include "questui/QuestUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;

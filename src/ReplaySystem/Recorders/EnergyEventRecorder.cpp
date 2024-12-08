@@ -1,10 +1,10 @@
 #include "ReplaySystem/Recorders/EnergyEventRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/GameEnergyCounter.hpp"
-#include "System/Action_1.hpp"
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/GameEnergyCounter.hpp>
+#include <System/Action_1.hpp>
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 using namespace UnityEngine;

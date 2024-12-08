@@ -1,5 +1,5 @@
 #include "CustomTypes/Components/ClickableImage.hpp"
-#include "VRUIControls/VRPointer.hpp"
+#include <VRUIControls/VRPointer.hpp>
 #include "logging.hpp"
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ClickableImage);
 
@@ -27,79 +27,79 @@ namespace ScoreSaber::CustomTypes::Components
 
     void ClickableImage::OnPointerClick(EventSystems::PointerEventData* eventData)
     {
-        set_isHighlighted(false);
+        isHighlighted = false;
         if (buttonClickedSignal) buttonClickedSignal->Raise();
         onClickEvent.invoke(eventData);
     }
 
     void ClickableImage::OnPointerEnter(EventSystems::PointerEventData* eventData)
     {
-        set_isHighlighted(true);
+        isHighlighted = true;
         pointerEnterEvent.invoke(eventData);
-        Vibrate(!VRUIControls::VRPointer::_get__lastControllerUsedWasRight());
+        Vibrate(!VRUIControls::VRPointer::____lastSelectedControllerWasRight);
     }
 
     void ClickableImage::OnPointerExit(EventSystems::PointerEventData* eventData)
     {
-        set_isHighlighted(false);
+        isHighlighted = false;
         pointerExitEvent.invoke(eventData);
     }
 
     void ClickableImage::Vibrate(bool left)
     {
         UnityEngine::XR::XRNode node = left ? UnityEngine::XR::XRNode::LeftHand : UnityEngine::XR::XRNode::RightHand;
-        hapticFeedbackController->PlayHapticFeedback(node, hapticFeedbackPresetSO);
+        hapticFeedbackManager->PlayHapticFeedback(node, hapticFeedbackPresetSO);
     }
 
     void ClickableImage::UpdateHighlight()
     {
-        set_color(get_isHighlighted() ? get_highlightColor() : get_defaultColor());
+        color = isHighlighted ? highlightColor : defaultColor;
     }
 
-    void ClickableImage::set_highlightColor(UnityEngine::Color color)
+    void ClickableImage::highlightColor = UnityEngine::Color color
     {
         highlightColor = color;
         UpdateHighlight();
     }
 
-    UnityEngine::Color ClickableImage::get_highlightColor()
+    UnityEngine::Color ClickableImage::highlightColor
     {
         return highlightColor;
     }
 
-    void ClickableImage::set_defaultColor(UnityEngine::Color color)
+    void ClickableImage::defaultColor = UnityEngine::Color color
     {
         defaultColor = color;
         UpdateHighlight();
     }
 
-    UnityEngine::Color ClickableImage::get_defaultColor()
+    UnityEngine::Color ClickableImage::defaultColor
     {
         return defaultColor;
     }
 
-    bool ClickableImage::get_isHighlighted()
+    bool ClickableImage::isHighlighted
     {
         return isHighlighted;
     }
 
-    void ClickableImage::set_isHighlighted(bool value)
+    void ClickableImage::isHighlighted = bool value
     {
         isHighlighted = value;
         UpdateHighlight();
     }
 
-    ClickableImage::OnPointerClickEvent& ClickableImage::get_onPointerClickEvent()
+    ClickableImage::OnPointerClickEvent& ClickableImage::onPointerClickEvent
     {
         return onClickEvent;
     }
 
-    ClickableImage::OnPointerEnterEvent& ClickableImage::get_onPointerEnterEvent()
+    ClickableImage::OnPointerEnterEvent& ClickableImage::onPointerEnterEvent
     {
         return pointerEnterEvent;
     }
 
-    ClickableImage::OnPointerExitEvent& ClickableImage::get_onPointerExitEvent()
+    ClickableImage::OnPointerExitEvent& ClickableImage::onPointerExitEvent
     {
         return pointerExitEvent;
     }

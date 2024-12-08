@@ -1,21 +1,19 @@
 #include "ReplaySystem/Playback/PosePlayer.hpp"
-#include "GlobalNamespace/FloatSO.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/VRController.hpp"
-#include "GlobalNamespace/Vector3SO.hpp"
+#include <GlobalNamespace/Saber.hpp>
+#include <GlobalNamespace/VRController.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Object.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/StereoTargetEyeMask.hpp"
-#include "UnityEngine/Time.hpp"
-#include "UnityEngine/Transform.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <UnityEngine/GameObject.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Object.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/StereoTargetEyeMask.hpp>
+#include <UnityEngine/Time.hpp>
+#include <UnityEngine/Transform.hpp>
+#include <UnityEngine/Vector3.hpp>
 
-#include "GlobalNamespace/SaberManager.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <GlobalNamespace/SaberManager.hpp>
+#include <UnityEngine/Vector3.hpp>
 #include "logging.hpp"
 
 using namespace UnityEngine;
@@ -25,50 +23,50 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, PosePlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void PosePlayer::ctor(GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController)
+    void PosePlayer::ctor(GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController)
     {
         INVOKE_CTOR();
-        _sortedPoses = ReplayLoader::LoadedReplay->poseKeyframes;
         _mainCamera = mainCamera;
         _saberManager = saberManager;
+        _sortedPoses = ReplayLoader::LoadedReplay->poseKeyframes;
         _returnToMenuController = returnToMenuController;
-        _playerTransforms = playerTransforms;
-        _audioTimeSyncController = audioTimeSyncController;
         _spectatorOffset = Vector3(0, 0, -2);
-        _mainSettingsModelSO = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::MainSettingsModelSO*>()->values[0];
+        _playerTransforms = playerTransforms;
+        _mainSettingsHandler = mainSettingsHandler;
+        _audioTimeSyncController = audioTimeSyncController;
     }
     void PosePlayer::Initialize()
     {
         SetupCameras();
-        _saberManager->leftSaber->get_transform()->GetComponentInParent<GlobalNamespace::VRController*>()->set_enabled(false);
-        _saberManager->rightSaber->get_transform()->GetComponentInParent<GlobalNamespace::VRController*>()->set_enabled(false);
+        _saberManager->leftSaber->transform->GetComponentInParent<GlobalNamespace::VRController*>()->enabled = false;
+        _saberManager->rightSaber->transform->GetComponentInParent<GlobalNamespace::VRController*>()->enabled = false;
     }
     void PosePlayer::SetupCameras()
     {
-        _mainCamera->set_enabled(false);
-        _mainCamera->get_gameObject()->SetActive(false);
-        _desktopCamera = Resources::FindObjectsOfTypeAll<Camera*>().First([&](Camera* camera) {
-            return camera->get_name() == "RecorderCamera";
+        _mainCamera->enabled = false;
+        _mainCamera->gameObject->SetActive(false);
+        _desktopCamera = Resources::FindObjectsOfTypeAll<Camera*>()->First([&](Camera* camera) {
+            return camera->name == "RecorderCamera";
         });
 
-        _desktopCamera->set_fieldOfView(65.0f);
-        auto desktopCameraTransform = _desktopCamera->get_transform();
-        desktopCameraTransform->set_position(Vector3(desktopCameraTransform->get_position().x, desktopCameraTransform->get_position().y, desktopCameraTransform->get_position().z));
-        // _desktopCamera->get_gameObject()->SetActive(true);
-        _desktopCamera->set_tag("MainCamera");
-        _desktopCamera->set_depth(1);
+        _desktopCamera->fieldOfView = 65.0f;
+        auto desktopCameraTransform = _desktopCamera->transform;
+        desktopCameraTransform->position = Vector3(desktopCameraTransform->position.x, desktopCameraTransform->position.y, desktopCameraTransform->position.z);
+        // _desktopCamera->gameObject->SetActive(true);
+        _desktopCamera->tag = "MainCamera";
+        _desktopCamera->depth = 1;
 
         //_mainCamera->camera = _desktopCamera;
 
         GameObject* spectatorObject = GameObject::New_ctor("SpectatorParent");
         _spectatorCamera = UnityEngine::Object::Instantiate(_desktopCamera);
-        spectatorObject->get_transform()->set_position(Vector3(_mainSettingsModelSO->roomCenter->value.x + _spectatorOffset.x, _mainSettingsModelSO->roomCenter->value.y + _spectatorOffset.y, _mainSettingsModelSO->roomCenter->value.z + _spectatorOffset.z));
-        Quaternion rotation = Quaternion::Euler(0.0f, _mainSettingsModelSO->roomRotation->value, 0.0f);
-        spectatorObject->get_transform()->set_rotation(rotation);
-        _spectatorCamera->set_stereoTargetEye(StereoTargetEyeMask::Both);
-        _spectatorCamera->get_gameObject()->SetActive(true);
-        _spectatorCamera->set_depth(0);
-        _spectatorCamera->get_transform()->SetParent(spectatorObject->get_transform());
+        spectatorObject->transform->position = Vector3(_mainSettingsHandler->instance->roomCenter.x + _spectatorOffset.x, _mainSettingsHandler->instance->roomCenter.y + _spectatorOffset.y, _mainSettingsHandler->instance->roomCenter.z + _spectatorOffset.z);
+        Quaternion rotation = Quaternion::Euler(0.0f, _mainSettingsHandler->instance->roomRotation, 0.0f);
+        spectatorObject->transform->rotation = rotation;
+        _spectatorCamera->stereoTargetEye = StereoTargetEyeMask::Both;
+        _spectatorCamera->gameObject->SetActive(true);
+        _spectatorCamera->depth = 0;
+        _spectatorCamera->transform->SetParent(spectatorObject->transform);
     }
     void PosePlayer::Tick()
     {
@@ -101,9 +99,9 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     void PosePlayer::UpdatePoses(Data::Private::VRPoseGroup activePose, Data::Private::VRPoseGroup nextPose)
     {
-        float lerpTime = (_audioTimeSyncController->get_songTime() - activePose.Time) / Mathf::Max(0.0001f, nextPose.Time - activePose.Time);
+        float lerpTime = (_audioTimeSyncController->songTime - activePose.Time) / Mathf::Max(0.0001f, nextPose.Time - activePose.Time);
 
-        _playerTransforms->headTransform->SetPositionAndRotation(VRVector3(activePose.Head.Position), VRQuaternion(activePose.Head.Rotation));
+        _playerTransforms->_headTransform->SetPositionAndRotation(VRVector3(activePose.Head.Position), VRQuaternion(activePose.Head.Rotation));
 
         _saberManager->leftSaber->OverridePositionAndRotation(Vector3::Lerp(VRVector3(activePose.Left.Position), VRVector3(nextPose.Left.Position), lerpTime),
                                                               Quaternion::Lerp(VRQuaternion(activePose.Left.Rotation), VRQuaternion(nextPose.Left.Rotation), lerpTime));
@@ -114,11 +112,11 @@ namespace ScoreSaber::ReplaySystem::Playback
         auto pos = Vector3::Lerp(VRVector3(activePose.Head.Position), VRVector3(nextPose.Head.Position), lerpTime);
         auto rot = Quaternion::Lerp(VRQuaternion(activePose.Head.Rotation), VRQuaternion(nextPose.Head.Rotation), lerpTime);
 
-        auto eulerAngles = rot.get_eulerAngles();
+        auto eulerAngles = rot.eulerAngles;
         // TODO: Apply rotation offset
 
         float t2 = 4.0f == 0.0f ? 1.0f : Time::get_deltaTime() * 6.0f;
-        _desktopCamera->get_transform()->SetPositionAndRotation(Vector3::Lerp(_desktopCamera->get_transform()->get_position(), pos, t2), Quaternion::Lerp(_desktopCamera->get_transform()->get_rotation(), rot, t2));
+        _desktopCamera->transform->SetPositionAndRotation(Vector3::Lerp(_desktopCamera->transform->position, pos, t2), Quaternion::Lerp(_desktopCamera->transform->rotation, rot, t2));
 
         // TODO: Move camera
 
@@ -145,7 +143,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
 
     void PosePlayer::SetSpectatorOffset(Vector3 value) {
-        _spectatorCamera->get_transform()->get_parent()->set_position(Vector3(_mainSettingsModelSO->roomCenter->value.x + value.x, _mainSettingsModelSO->roomCenter->value.y + value.y, _mainSettingsModelSO->roomCenter->value.z + value.z));
+        _spectatorCamera->transform->parent->position = Vector3(_mainSettingsHandler->instance->roomCenter.x + value.x, _mainSettingsHandler->instance->roomCenter.y + value.y, _mainSettingsHandler->instance->roomCenter.z + value.z);
         _spectatorOffset = value;
     }
 

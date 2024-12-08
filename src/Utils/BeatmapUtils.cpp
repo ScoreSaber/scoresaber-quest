@@ -1,21 +1,21 @@
 #include "Utils/BeatmapUtils.hpp"
-#include "GlobalNamespace/BeatmapDataItem.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/PlayerData.hpp"
-#include "GlobalNamespace/ScoreModel.hpp"
-// #include "System::Threading::Tasks::Task_1.hpp"
+#include <GlobalNamespace/BeatmapDataItem.hpp>
+#include <GlobalNamespace/IDifficultyBeatmap.hpp>
+#include <GlobalNamespace/PlayerData.hpp>
+#include <GlobalNamespace/ScoreModel.hpp>
+// #include <System::Threading::Tasks::Task_1.hpp>
 // System::Collections::Generic::LinkedListNode_1
 
-#include "GlobalNamespace/BeatmapEnvironmentHelper.hpp"
-#include "GlobalNamespace/EnvironmentInfoSO.hpp"
-#include "GlobalNamespace/EnvironmentsListSO.hpp"
-#include "GlobalNamespace/IBeatmapDataBasicInfo.hpp"
-#include "GlobalNamespace/SliderData.hpp"
-#include "System/Collections/Generic/LinkedListNode_1.hpp"
+#include <GlobalNamespace/BeatmapEnvironmentHelper.hpp>
+#include <GlobalNamespace/EnvironmentInfoSO.hpp>
+#include <GlobalNamespace/EnvironmentsListSO.hpp>
+#include <GlobalNamespace/IBeatmapDataBasicInfo.hpp>
+#include <GlobalNamespace/SliderData.hpp>
+#include <System/Collections/Generic/LinkedListNode_1.hpp>
 //
-#include "System/Collections/Generic/LinkedList_1.hpp"
-#include "System/Threading/Tasks/Task_1.hpp"
-#include "UnityEngine/Resources.hpp"
+#include <System/Collections/Generic/LinkedList_1.hpp>
+#include <System/Threading/Tasks/Task_1.hpp>
+#include <UnityEngine/Resources.hpp>
 #include "logging.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include <tuple>
@@ -28,7 +28,7 @@ namespace BeatmapUtils
 
     int getDiff(IDifficultyBeatmap* beatmap)
     {
-        return beatmap->get_difficultyRank();
+        return beatmap->difficultyRank;
     }
 
     custom_types::Helpers::Coroutine getMaxScoreCoroutine(IDifficultyBeatmap* difficultyBeatmap, std::function<void(int maxScore)> callback)
@@ -41,9 +41,9 @@ namespace BeatmapUtils
         routines.push_back(crIndex);
         auto* envInfo = BeatmapEnvironmentHelper::GetEnvironmentInfo(difficultyBeatmap);
         auto* result = difficultyBeatmap->GetBeatmapDataAsync(envInfo, playerDataModel->playerData->playerSpecificSettings);
-        while (!result->get_IsCompleted())
+        while (!result->IsCompleted)
             co_yield nullptr;
-        auto* data = result->get_ResultOnSuccess();
+        auto* data = result->ResultOnSuccess;
         if (routines.empty() || routines.size() != crIndex)
             co_return;
         ClearVector<int>(&routines);
@@ -68,11 +68,11 @@ namespace BeatmapUtils
         QuestUI::MainThreadScheduler::Schedule([&]() {
             result = beatmap->GetBeatmapDataAsync(environmentInfo, playerDataModel->playerData->playerSpecificSettings);
         });
-        while (!result || !result->get_IsCompleted())
+        while (!result || !result->IsCompleted)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        auto data = result->get_ResultOnSuccess();
+        auto data = result->ResultOnSuccess;
         auto beatmapDataBasicInfo = il2cpp_utils::try_cast<IBeatmapDataBasicInfo>(data).value_or(nullptr);
         return std::make_tuple(beatmapDataBasicInfo, data);
     }

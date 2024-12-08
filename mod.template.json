@@ -1,4 +1,5 @@
 {
+   "$schema": "https://raw.githubusercontent.com/Lauriethefish/QuestPatcher.QMod/main/QuestPatcher.QMod/Resources/qmod.schema.json",
    "_QPVersion": "0.1.1",
    "name": "${mod_name}",
    "id": "${mod_id}",
@@ -6,14 +7,18 @@
    "version": "${version}",
    "coverImage": "logo.jpg",
    "packageId": "com.beatgames.beatsaber",
-   "packageVersion": "1.28.0_4124311467",
+   "packageVersion": "1.37.0_figurethisoutlater",
    "description": "Allows you to upload scores to an online leaderboard at https://scoresaber.com. Earn PP from ranked maps and compare scores with others.",
    "modFiles": [],
+   "lateModFiles": [
+      "${binary}"
+   ],
    "libraryFiles": [],
    "fileCopies": [
       {
          "name": "scoresaber_DO_NOT_SHARE.scary",
          "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaber/scoresaber_DO_NOT_SHARE.scary"
       }
-   ]
+   ],
+   "copyExtensions": []
 }

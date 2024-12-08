@@ -1,5 +1,5 @@
 #include "Data/Difficulty.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
+#include <beatsaber-hook/shared/utils/utils.h>
 
 namespace ScoreSaber::Data
 {
@@ -15,8 +15,8 @@ namespace ScoreSaber::Data
     {
         // leaderboardId = value[u"leaderboardId"].GetInt();
         // difficulty = value[u"difficulty"].GetInt();
-        // gameMode = to_utf8(value[u"gameMode"].GetString());
-        // difficultyRaw = to_utf8(value[u"difficultyRaw"].GetString());
+        // gameMode = Paper::StringConvert::from_utf16(value[u"gameMode"].GetString());
+        // difficultyRaw = Paper::StringConvert::from_utf16(value[u"difficultyRaw"].GetString());
     }
 
     Difficulty::Difficulty(rapidjson::GenericObject<true, rapidjson::Value> value)
@@ -31,8 +31,8 @@ namespace ScoreSaber::Data
     {
         // leaderboardId = value[u"leaderboardId"].GetInt();
         // difficulty = value[u"difficulty"].GetInt();
-        // gameMode = to_utf8(value[u"gameMode"].GetString());
-        // difficultyRaw = to_utf8(value[u"difficultyRaw"].GetString());
+        // gameMode = Paper::StringConvert::from_utf16(value[u"gameMode"].GetString());
+        // difficultyRaw = Paper::StringConvert::from_utf16(value[u"difficultyRaw"].GetString());
     }
     Difficulty::Difficulty() {}
 }

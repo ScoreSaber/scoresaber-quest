@@ -2,15 +2,14 @@
 #include "Utils/WebUtils.hpp"
 
 #include "Data/Private/AuthResponse.hpp"
-#include "GlobalNamespace/HMTask.hpp"
-#include "System/IO/Directory.hpp"
-#include "System/Action.hpp"
+#include <GlobalNamespace/HMTask.hpp>
+#include <System/IO/Directory.hpp>
+#include <System/Action.hpp>
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Utils/StringUtils.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
+#include <custom-types/shared/delegate.hpp>
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "static.hpp"
 #include <chrono>
@@ -186,12 +185,12 @@ namespace ScoreSaber::Services::PlayerService
         if (!fromMainThread)
         {
             QuestUI::MainThreadScheduler::Schedule([=]() {
-                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
+                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->loading = true;
             });
         }
         else
         {
-            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
+            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->loading = true;
         }
 
         GetPlayerInfo(playerInfo.localPlayerData.id, true, [=](std::optional<Data::Player> playerData) {
@@ -199,7 +198,7 @@ namespace ScoreSaber::Services::PlayerService
             {
                 playerInfo.localPlayerData = playerData.value();
                 QuestUI::MainThreadScheduler::Schedule([=]() {
-                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_ranking(playerInfo.localPlayerData.rank, playerInfo.localPlayerData.pp);
+                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->ranking = playerInfo.localPlayerData.rank, playerInfo.localPlayerData.pp;
                 });
             }
         });

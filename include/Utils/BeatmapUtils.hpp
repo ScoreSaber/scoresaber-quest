@@ -1,14 +1,13 @@
 #pragma once
 
-#include "GlobalNamespace/BeatmapData.hpp"
-#include "GlobalNamespace/GameplayModifiers.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/PlayerDataModel.hpp"
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include <GlobalNamespace/BeatmapData.hpp>
+#include <GlobalNamespace/GameplayModifiers.hpp>
+#include <GlobalNamespace/PlayerDataModel.hpp>
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
 
-#include "custom-types/shared/coroutine.hpp"
-#include "custom-types/shared/register.hpp"
-#include "custom-types/shared/types.hpp"
+#include <custom-types/shared/coroutine.hpp>
+#include <custom-types/shared/register.hpp>
+#include <custom-types/shared/types.hpp>
 
 namespace BeatmapUtils
 {

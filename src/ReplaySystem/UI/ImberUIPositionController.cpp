@@ -2,10 +2,10 @@
 
 #include "Data/Private/Settings.hpp"
 
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/WaitForEndOfFrame.hpp"
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/WaitForEndOfFrame.hpp>
 #include "logging.hpp"
+#include "Utils/OperatorOverloads.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -22,13 +22,12 @@ namespace ScoreSaber::ReplaySystem::UI
         _imberScrubber = imberScrubber;
         _mainImberPanelView = mainImberPanelView;
         _vrControllerAccessor = vrControllerAccessor;
-        _pauseMenuManagerTransform = pauseMenuManager->get_transform();
+        _pauseMenuManagerTransform = pauseMenuManager->transform;
         _menuWrapperTransform = _pauseMenuManagerTransform->Find("Wrapper/MenuWrapper");
-        _menuControllerTransform = _vrControllerAccessor->_leftController->get_transform()->get_parent();
+        _menuControllerTransform = _vrControllerAccessor->_leftController->transform->parent;
         _vrGraphicRaycaster = _menuWrapperTransform->GetComponentInChildren<VRUIControls::VRGraphicRaycaster*>();
         _canvas = _vrGraphicRaycaster->GetComponent<Canvas*>();
         _curve = _canvas->GetComponent<HMUI::CurvedCanvasSettings*>();
-        _mainSettingsModelSO = Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>()->get(0);
         _controllerOffset = Vector3(0.0f, 0.0f, -2.0f);
     }
     void ImberUIPositionController::Initialize()
@@ -43,7 +42,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _didPauseDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidPause);
         _gamePause->add_didResumeEvent(_didResumeDelegate);
         _gamePause->add_didPauseEvent(_didPauseDelegate);
-        _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
+        _pauseMenuManagerTransform->position = Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z);
 
         if (Settings::leftHandedReplayUI) {
             _handTrack = XR::XRNode::RightHand;
@@ -52,17 +51,17 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberUIPositionController::GamePause_didResumeEvent()
     {
         _isPaused = false;
-        _menuWrapperTransform->get_gameObject()->SetActive(_isActive);
-        _menuControllerTransform->get_gameObject()->SetActive(_isActive);
-        _vrGraphicRaycaster->set_enabled(_isActive);
+        _menuWrapperTransform->gameObject->SetActive(_isActive);
+        _menuControllerTransform->gameObject->SetActive(_isActive);
+        _vrGraphicRaycaster->enabled = _isActive;
     }
     void ImberUIPositionController::GamePause_didPauseEvent()
     {
         _isPaused = true;
-        _menuWrapperTransform->get_gameObject()->SetActive(false);
-        _curve->set_enabled(true);
-        _canvas->set_enabled(true);
-        _menuControllerTransform->get_gameObject()->SetActive(true);
+        _menuWrapperTransform->gameObject->SetActive(false);
+        _curve->enabled = true;
+        _canvas->enabled = true;
+        _menuControllerTransform->gameObject->SetActive(true);
     }
     void ImberUIPositionController::Tick()
     {
@@ -73,7 +72,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
         else
         {
-            if (controller->get_triggerValue() >= _senstivityToClick && !_isClicking)
+            if (controller->triggerValue >= _senstivityToClick && !_isClicking)
             {
                 _isClicking = true;
                 if (_didClickOnce)
@@ -84,14 +83,14 @@ namespace ScoreSaber::ReplaySystem::UI
                     _imberScrubber->set_visibility(_isActive);
                     _mainImberPanelView->set_visibility(_isActive);
                     OpenedUI();
-                    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(KillMe(controller)));
+                    _mainImberPanelView->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(KillMe(controller)));
                     if (!_isPaused)
                     {
-                        _curve->set_enabled(!_isActive);
-                        _canvas->set_enabled(!_isActive);
-                        _menuWrapperTransform->get_gameObject()->SetActive(_isActive);
-                        _menuControllerTransform->get_gameObject()->SetActive(_isActive);
-                        _vrGraphicRaycaster->set_enabled(_isActive);
+                        _curve->enabled = !_isActive;
+                        _canvas->enabled = !_isActive;
+                        _menuWrapperTransform->gameObject->SetActive(_isActive);
+                        _menuControllerTransform->gameObject->SetActive(_isActive);
+                        _vrGraphicRaycaster->enabled = _isActive;
                     }
                 }
                 else
@@ -100,7 +99,7 @@ namespace ScoreSaber::ReplaySystem::UI
                     _didClickOnce = true;
                 }
             }
-            else if (controller->get_triggerValue() < _senstivityToClick && _isClicking)
+            else if (controller->triggerValue < _senstivityToClick && _isClicking)
             {
                 _isClicking = false;
             }
@@ -125,11 +124,11 @@ namespace ScoreSaber::ReplaySystem::UI
         Vector3 viewOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.25f, 0.25f, 0.25f) : Vector3(-0.25f, 0.25f, 0.25f);
         Vector3 scrubberOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.46f, -0.06f, 0.25f) : Vector3(-0.46f, -0.06f, 0.25f);
 
-        _mainImberPanelView->get_Transform()->set_localPosition(controller->get_transform()->TransformPoint(viewOffset));
-        _mainImberPanelView->get_Transform()->set_localRotation(controller->get_transform()->get_rotation());
+        _mainImberPanelView->transform->localPosition = controller->transform->TransformPoint(viewOffset);
+        _mainImberPanelView->transform->localRotation = controller->transform->rotation;
 
-        _imberScrubber->get_transform()->set_localPosition(controller->get_transform()->TransformPoint(scrubberOffset));
-        _imberScrubber->get_transform()->set_localRotation(controller->get_transform()->get_rotation());
+        _imberScrubber->get_transform()->localPosition = controller->transform->TransformPoint(scrubberOffset);
+        _imberScrubber->get_transform()->localRotation = controller->transform->rotation;
     }
 
     void ImberUIPositionController::OpenedUI()
@@ -152,7 +151,7 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberUIPositionController::SetControllerOffset(Vector3 offset)
     {
         _controllerOffset = offset;
-        _pauseMenuManagerTransform->set_position(Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z));
+        _pauseMenuManagerTransform->position = Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z);
     }
 
     void ImberUIPositionController::SetActiveState(bool value)

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "HMUI/CurvedTextMeshPro.hpp"
+#include <HMUI/CurvedTextMeshPro.hpp>
 #include "ReplaySystem/UI/Components/AmeNode.hpp"
-#include "UnityEngine/Camera.hpp"
-#include "UnityEngine/Material.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/RectTransform.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "lapiz/shared/macros.hpp"
+#include <UnityEngine/Camera.hpp>
+#include <UnityEngine/Material.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/RectTransform.hpp>
+#include <UnityEngine/Vector2.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <lapiz/shared/macros.hpp>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeBar, UnityEngine::MonoBehaviour,
                       DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _rectTransform);

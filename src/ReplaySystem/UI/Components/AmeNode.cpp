@@ -1,8 +1,7 @@
 #include "ReplaySystem/UI/Components/AmeNode.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Vector2.hpp>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -11,7 +10,7 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::UI::Components, AmeNode);
 
 namespace ScoreSaber::ReplaySystem::UI::Components
 {
-    bool AmeNode::get_isBeingDragged()
+    bool AmeNode::isBeingDragged
     {
         return _handle->dragged;
     }

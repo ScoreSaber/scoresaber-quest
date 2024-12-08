@@ -1,11 +1,11 @@
 #pragma once
 
 #include "ReplaySystem/UI/Components/AmeHandle.hpp"
-#include "UnityEngine/Camera.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "lapiz/shared/macros.hpp"
+#include <UnityEngine/Camera.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/Vector2.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <lapiz/shared/macros.hpp>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeNode, UnityEngine::MonoBehaviour,
                       DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _rectTransform);

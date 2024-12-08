@@ -1,6 +1,6 @@
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
-#include "HMUI/ViewController_AnimationDirection.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
+#include <HMUI/ViewController_AnimationDirection.hpp>
+#include <HMUI/ViewController_AnimationType.hpp>
 #include "questui/shared/BeatSaberUI.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::FlowCoordinators, ScoreSaberFlowCoordinator);
@@ -22,17 +22,17 @@ namespace ScoreSaber::UI::FlowCoordinators
             teamViewController = CreateViewController<ScoreSaber::UI::ViewControllers::TeamViewController*>();
 
             SetTitle("ScoreSaber", ViewController::AnimationType::Out);
-            set_showBackButton(true);
+            showBackButton = true;
             ProvideInitialViewControllers(globalViewController, teamViewController, faqViewController, nullptr, nullptr);
         }
         // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
-        faqViewController->get_gameObject()->SetActive(true);
+        faqViewController->gameObject->SetActive(true);
     }
 
     void ScoreSaberFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* topViewController)
     {
         // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
-        faqViewController->get_gameObject()->SetActive(false);
+        faqViewController->gameObject->SetActive(false);
         this->parentFlowCoordinator->DismissFlowCoordinator(this, ViewController::AnimationDirection::Horizontal, nullptr, false);
     }
 }

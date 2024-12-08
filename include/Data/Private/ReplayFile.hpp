@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "GlobalNamespace/NoteData.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <GlobalNamespace/NoteData.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Vector3.hpp>
 
 using namespace std;
 

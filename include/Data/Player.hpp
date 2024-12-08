@@ -1,5 +1,5 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
 #include "Data/Badge.hpp"
 #include "Data/ScoreStats.hpp"

@@ -3,17 +3,17 @@
 #include <iomanip>
 #include <sstream>
 
-#include "GlobalNamespace/HMTask.hpp"
-#include "System/Action.hpp"
-#include "UnityEngine/Networking/DownloadHandler.hpp"
-#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
-#include "UnityEngine/Texture2D.hpp"
+#include <GlobalNamespace/HMTask.hpp>
+#include <System/Action.hpp>
+#include <UnityEngine/Networking/DownloadHandler.hpp>
+#include <UnityEngine/Networking/DownloadHandlerTexture.hpp>
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/SpriteMeshType.hpp>
+#include <UnityEngine/Texture2D.hpp>
 #include "Utils/StringUtils.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include "gif-lib/shared/gif_lib.h"
 #include "libcurl/shared/curl.h"
 #include "libcurl/shared/easy.h"
@@ -75,7 +75,7 @@ struct Gif
 
     Texture2D* get_frame(int idx)
     {
-        if (!gif || idx > get_length())
+        if (!gif || idx > length)
             return nullptr;
 
         GifColorType* color;
@@ -108,8 +108,8 @@ struct Gif
         }
 
         // entire texture size;
-        int width = get_width();
-        int height = get_height();
+        int width = width;
+        int height = height;
         auto texture = Texture2D::New_ctor(width, height);
         // entire texture
         auto pixelData = texture->GetPixels32();
@@ -140,15 +140,15 @@ struct Gif
         texture->Apply();
         return texture;
     }
-    int get_width()
+    int width
     {
         return gif ? gif->SWidth : 0;
     };
-    int get_height()
+    int height
     {
         return gif ? gif->SHeight : 0;
     };
-    int get_length()
+    int length
     {
         return gif ? gif->ImageCount : 0;
     };
@@ -605,10 +605,10 @@ namespace WebUtils
     {
         UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-        auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
-        auto texture = downloadHandlerTexture->get_texture();
-        auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-        out->set_sprite(sprite);
+        auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->downloadHandler);
+        auto texture = downloadHandlerTexture->texture;
+        auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        out->sprite = sprite;
         co_return;
     }
 
@@ -616,7 +616,7 @@ namespace WebUtils
     {
         UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-        auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->get_downloadHandler());
+        auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->downloadHandler);
         auto gifDataArr = downloadHandler->GetData();
         Gif gif(gifDataArr);
         int error = gif.Parse();
@@ -625,8 +625,8 @@ namespace WebUtils
         {
             co_yield nullptr;
             auto texture = gif.get_frame(0);
-            auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)gif.get_width(), (float)gif.get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-            out->set_sprite(sprite);
+            auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)gif.width, (float)gif.height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+            out->sprite = sprite;
         }
         else
         {

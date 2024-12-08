@@ -1,5 +1,5 @@
 #include "Data/InternalLeaderboard.hpp"
-#include "beatsaber-hook/shared/utils/utils-functions.h"
+#include <beatsaber-hook/shared/utils/utils-functions.h>
 
 inline rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> getdoc(std::u16string_view string)
 {

@@ -1,7 +1,7 @@
 #include "Data/Private/ReplayFile.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Vector3.hpp>
 
 namespace ScoreSaber::Data::Private
 {

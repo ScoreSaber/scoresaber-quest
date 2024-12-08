@@ -1,23 +1,23 @@
 #pragma once
 
-#include "TMPro/TMP_SubMeshUI.hpp"
+#include <TMPro/TMP_SubMeshUI.hpp>
 
-#include "UnityEngine/Material.hpp"
+#include <UnityEngine/Material.hpp>
 
-#include "HMUI/CurvedTextMeshPro.hpp"
-#include "UnityEngine/Color.hpp"
-#include "UnityEngine/EventSystems/IEventSystemHandler.hpp"
-#include "UnityEngine/EventSystems/IPointerClickHandler.hpp"
-#include "UnityEngine/EventSystems/IPointerEnterHandler.hpp"
-#include "UnityEngine/EventSystems/IPointerExitHandler.hpp"
-#include "UnityEngine/EventSystems/PointerEventData.hpp"
-#include "custom-types/shared/macros.hpp"
+#include <HMUI/CurvedTextMeshPro.hpp>
+#include <UnityEngine/Color.hpp>
+#include <UnityEngine/EventSystems/IEventSystemHandler.hpp>
+#include <UnityEngine/EventSystems/IPointerClickHandler.hpp>
+#include <UnityEngine/EventSystems/IPointerEnterHandler.hpp>
+#include <UnityEngine/EventSystems/IPointerExitHandler.hpp>
+#include <UnityEngine/EventSystems/PointerEventData.hpp>
+#include <custom-types/shared/macros.hpp>
 
-#include "GlobalNamespace/HapticFeedbackController.hpp"
-#include "GlobalNamespace/Signal.hpp"
+#include <GlobalNamespace/HapticFeedbackManager.hpp>
+#include <GlobalNamespace/Signal.hpp>
 #include "Libraries/HM/HMLib/VR/HapticPresetSO.hpp"
 
-#include "beatsaber-hook/shared/utils/typedefs-wrappers.hpp"
+#include <beatsaber-hook/shared/utils/typedefs-wrappers.hpp>
 
 #define TextInterfaces                                                                                                                                                                                                                           \
     {                                                                                                                                                                                                                                            \
@@ -31,15 +31,15 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::CustomTypes::Components, Clickab
                                     DECLARE_INSTANCE_METHOD(UnityEngine::Color, get_defaultColor);
                                     DECLARE_INSTANCE_METHOD(void, Vibrate, bool left);
 
-                                    DECLARE_OVERRIDE_METHOD(void, OnPointerClick, il2cpp_utils::il2cpp_type_check::MetadataGetter<&UnityEngine::EventSystems::IPointerClickHandler::OnPointerClick>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
-                                    DECLARE_OVERRIDE_METHOD(void, OnPointerEnter, il2cpp_utils::il2cpp_type_check::MetadataGetter<&UnityEngine::EventSystems::IPointerEnterHandler::OnPointerEnter>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
-                                    DECLARE_OVERRIDE_METHOD(void, OnPointerExit, il2cpp_utils::il2cpp_type_check::MetadataGetter<&UnityEngine::EventSystems::IPointerExitHandler::OnPointerExit>::get(), UnityEngine::EventSystems::PointerEventData* eventData);
+                                    DECLARE_OVERRIDE_METHOD_MATCH(void, OnPointerClick, &UnityEngine::EventSystems::IPointerClickHandler::OnPointerClick, UnityEngine::EventSystems::PointerEventData* eventData);
+                                    DECLARE_OVERRIDE_METHOD_MATCH(void, OnPointerEnter, &UnityEngine::EventSystems::IPointerEnterHandler::OnPointerEnter, UnityEngine::EventSystems::PointerEventData* eventData);
+                                    DECLARE_OVERRIDE_METHOD_MATCH(void, OnPointerExit, &UnityEngine::EventSystems::IPointerExitHandler::OnPointerExit, UnityEngine::EventSystems::PointerEventData* eventData);
 
                                     // purely here because CurvedTextMeshPro is larger than it says it is
                                     DECLARE_INSTANCE_FIELD(void*, padding1);
                                     DECLARE_INSTANCE_FIELD(void*, padding2);
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::Signal*, buttonClickedSignal);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::HapticFeedbackController*, hapticFeedbackController);
+                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::HapticFeedbackManager*, hapticFeedbackManager);
                                     DECLARE_INSTANCE_FIELD(Libraries::HM::HMLib::VR::HapticPresetSO*, hapticFeedbackPresetSO);
 
                                     DECLARE_CTOR(ctor);

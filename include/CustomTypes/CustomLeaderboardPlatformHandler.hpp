@@ -3,19 +3,19 @@
 // #include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
 // #include "UI/Other/Banner.hpp"
 
-// #include "GlobalNamespace/HMAsyncRequest.hpp"
-// #include "GlobalNamespace/IDifficultyBeatmap.hpp"
-// #include "GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp"
-// #include "GlobalNamespace/PlatformLeaderboardsHandler.hpp"
-// #include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
-// #include "GlobalNamespace/PlatformLeaderboardsModel_GetScoresCompletionHandler.hpp"
-// #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
-// #include "GlobalNamespace/PlatformLeaderboardsModel_UploadScoreCompletionHandler.hpp"
-// #include "TMPro/TextMeshProUGUI.hpp"
-// #include "custom-types/shared/macros.hpp"
-// #include "custom-types/shared/register.hpp"
-// #include "custom-types/shared/types.hpp"
-// #include "custom-types/shared/util.hpp"
+// #include <GlobalNamespace/HMAsyncRequest.hpp>
+// #include <GlobalNamespace/IDifficultyBeatmap.hpp>
+// #include <GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp>
+// #include <GlobalNamespace/PlatformLeaderboardsHandler.hpp>
+// #include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
+// #include <GlobalNamespace/PlatformLeaderboardsModel_GetScoresCompletionHandler.hpp>
+// #include <GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp>
+// #include <GlobalNamespace/PlatformLeaderboardsModel_UploadScoreCompletionHandler.hpp>
+// #include <TMPro/TextMeshProUGUI.hpp>
+// #include <custom-types/shared/macros.hpp>
+// #include <custom-types/shared/register.hpp>
+// #include <custom-types/shared/types.hpp>
+// #include <custom-types/shared/util.hpp>
 // #define GET_FIND_METHOD(mPtr) \
 //     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 

@@ -1,16 +1,16 @@
 #pragma once
 
-#include "HMUI/ImageView.hpp"
-#include "HMUI/ModalView.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/Transform.hpp"
-#include "UnityEngine/UI/GridLayoutGroup.hpp"
-#include "custom-types/shared/coroutine.hpp"
-#include "custom-types/shared/macros.hpp"
+#include <HMUI/ImageView.hpp>
+#include <HMUI/ModalView.hpp>
+#include <TMPro/TextMeshProUGUI.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/Transform.hpp>
+#include <UnityEngine/UI/GridLayoutGroup.hpp>
+#include <custom-types/shared/coroutine.hpp>
+#include <custom-types/shared/macros.hpp>
 #include <string_view>
 
-#include "UnityEngine/Coroutine.hpp"
+#include <UnityEngine/Coroutine.hpp>
 
 #include "Data/Badge.hpp"
 #include "Data/Player.hpp"

@@ -2,8 +2,8 @@
 
 #include "CustomTypes/Components/ClickableImage.hpp"
 #include "UI/Other/ScoreInfoModal.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "custom-types/shared/macros.hpp"
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <custom-types/shared/macros.hpp>
 
 #include "Data/Score.hpp"
 #include <vector>

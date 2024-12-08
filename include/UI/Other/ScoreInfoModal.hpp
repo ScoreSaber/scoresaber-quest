@@ -2,11 +2,12 @@
 #include "Data/Score.hpp"
 
 #include "CustomTypes/Components/ClickableImage.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "HMUI/ModalView.hpp"
+#include <GlobalNamespace/BeatmapKey.hpp>
+#include <GlobalNamespace/BeatmapLevel.hpp>
+#include <HMUI/ModalView.hpp>
 #include "UI/Other/PlayerProfileModal.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "custom-types/shared/macros.hpp"
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <custom-types/shared/macros.hpp>
 #include <optional>
 #include <string>
 
@@ -23,7 +24,8 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBe
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, missedNotes);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, modifiers);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, timeSet);
-                      DECLARE_INSTANCE_FIELD(GlobalNamespace::IDifficultyBeatmap*, currentBeatmap);
+                      DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapLevel*, currentBeatmapLevel);
+                      DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapKey, currentBeatmapKey);
 
                       public
                       :

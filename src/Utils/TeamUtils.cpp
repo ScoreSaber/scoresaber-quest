@@ -97,37 +97,37 @@ namespace TeamUtils
         youtube = other.youtube;
     }
 
-    std::string TeamMember::get_name()
+    std::string TeamMember::name
     {
         return name;
     }
 
-    std::string TeamMember::get_profilePicture()
+    std::string TeamMember::profilePicture
     {
         return string_format("https://raw.githubusercontent.com/ScoreSaber/ScoreSaber-Team/main/images/%s", profilePicture.c_str());
     }
 
-    std::string TeamMember::get_discord()
+    std::string TeamMember::discord
     {
         return discord != "" ? string_format("https://discordapp.com/users/%s", discord.c_str()) : "";
     }
 
-    std::string TeamMember::get_github()
+    std::string TeamMember::github
     {
         return github != "" ? string_format("https://github.com/%s", github.c_str()) : "";
     }
 
-    std::string TeamMember::get_twitch()
+    std::string TeamMember::twitch
     {
         return twitch != "" ? string_format("https://twitch.tv/%s", twitch.c_str()) : "";
     }
 
-    std::string TeamMember::get_twitter()
+    std::string TeamMember::twitter
     {
         return twitter != "" ? string_format("https://twitter.com/%s", twitter.c_str()) : "";
     }
 
-    std::string TeamMember::get_youtube()
+    std::string TeamMember::youtube
     {
         return youtube != "" ? string_format("https://youtube.com/channel/%s", youtube.c_str()) : "";
     }

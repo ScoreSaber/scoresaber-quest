@@ -1,5 +1,5 @@
 #include "CustomTypes/Components/ClickableText.hpp"
-#include "VRUIControls/VRPointer.hpp"
+#include <VRUIControls/VRPointer.hpp>
 #include "logging.hpp"
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ClickableText);
 
@@ -27,33 +27,33 @@ namespace ScoreSaber::CustomTypes::Components
 
     void ClickableText::OnPointerClick(EventSystems::PointerEventData* eventData)
     {
-        set_isHighlighted(false);
+        isHighlighted = false;
         if (buttonClickedSignal) buttonClickedSignal->Raise();
         onClickEvent.invoke(eventData);
     }
 
     void ClickableText::OnPointerEnter(EventSystems::PointerEventData* eventData)
     {
-        set_isHighlighted(true);
+        isHighlighted = true;
         pointerEnterEvent.invoke(eventData);
-        Vibrate(!VRUIControls::VRPointer::_get__lastControllerUsedWasRight());
+        Vibrate(!VRUIControls::VRPointer::__lastControllerUsedWasRight);
     }
 
     void ClickableText::OnPointerExit(EventSystems::PointerEventData* eventData)
     {
-        set_isHighlighted(false);
+        isHighlighted = false;
         pointerExitEvent.invoke(eventData);
     }
 
     void ClickableText::Vibrate(bool left)
     {
         UnityEngine::XR::XRNode node = left ? UnityEngine::XR::XRNode::LeftHand : UnityEngine::XR::XRNode::RightHand;
-        hapticFeedbackController->PlayHapticFeedback(node, hapticFeedbackPresetSO);
+        hapticFeedbackManager->PlayHapticFeedback(node, hapticFeedbackPresetSO);
     }
 
     void ClickableText::UpdateHighlight()
     {
-        set_color(get_isHighlighted() ? get_highlightColor() : get_defaultColor());
+        color = isHighlighted ? highlightColor : defaultColor;
     }
 
     void ClickableText::set_highlightColor(UnityEngine::Color color)

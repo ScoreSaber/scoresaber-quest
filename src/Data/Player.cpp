@@ -1,5 +1,6 @@
 #include "Data/Player.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
+#include <beatsaber-hook/shared/utils/utils.h>
+#include "paper/shared/string_convert.hpp"
 #include <sstream>
 namespace ScoreSaber::Data
 {
@@ -14,7 +15,7 @@ namespace ScoreSaber::Data
     Player::Player(const rapidjson::Value&& value)
     {
         id = value["id"].GetString();
-        name = to_utf16(value["name"].GetString());
+        name = Paper::StringConvert::from_utf8(value["name"].GetString());
         profilePicture = value["profilePicture"].GetString();
         country = value["country"].GetString();
         pp = value["pp"].GetDouble();
@@ -45,21 +46,21 @@ namespace ScoreSaber::Data
 
     Player::Player(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value)
     {
-        id = to_utf8(value[u"id"].GetString());
+        id = Paper::StringConvert::from_utf16(value[u"id"].GetString());
         name = std::u16string(value[u"name"].GetString());
-        profilePicture = to_utf8(value[u"profilePicture"].GetString());
-        country = to_utf8(value[u"country"].GetString());
+        profilePicture = Paper::StringConvert::from_utf16(value[u"profilePicture"].GetString());
+        country = Paper::StringConvert::from_utf16(value[u"country"].GetString());
         pp = value[u"pp"].GetDouble();
         rank = value[u"rank"].GetInt();
         countryRank = value[u"countryRank"].GetInt();
         auto roleItr = value.FindMember(u"role");
         if (roleItr != value.MemberEnd() && roleItr->value.IsString())
-            role = to_utf8(roleItr->value.GetString());
+            role = Paper::StringConvert::from_utf16(roleItr->value.GetString());
         auto badgesItr = value.FindMember(u"badges");
         if (!badgesItr->value.IsNull() && badgesItr->value.IsArray())
             for (auto& badge : badgesItr->value.GetArray())
                 badges.emplace_back(badge.GetObject());
-        std::string parsed, histories = ::to_utf8(value[u"histories"].GetString());
+        std::string parsed, histories = ::Paper::StringConvert::from_utf16(value[u"histories"].GetString());
         std::stringstream s(histories);
 
         while (std::getline(s, parsed, ','))
@@ -77,7 +78,7 @@ namespace ScoreSaber::Data
     Player::Player(rapidjson::GenericObject<true, rapidjson::Value> value)
     {
         id = value["id"].GetString();
-        name = to_utf16(value["name"].GetString());
+        name = Paper::StringConvert::from_utf8(value["name"].GetString());
         profilePicture = value["profilePicture"].GetString();
         country = value["country"].GetString();
         pp = value["pp"].GetDouble();
@@ -108,21 +109,21 @@ namespace ScoreSaber::Data
 
     Player::Player(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value)
     {
-        id = to_utf8(value[u"id"].GetString());
+        id = Paper::StringConvert::from_utf16(value[u"id"].GetString());
         name = std::u16string(value[u"name"].GetString());
-        profilePicture = to_utf8(value[u"profilePicture"].GetString());
-        country = to_utf8(value[u"country"].GetString());
+        profilePicture = Paper::StringConvert::from_utf16(value[u"profilePicture"].GetString());
+        country = Paper::StringConvert::from_utf16(value[u"country"].GetString());
         pp = value[u"pp"].GetDouble();
         rank = value[u"rank"].GetInt();
         countryRank = value[u"countryRank"].GetInt();
         auto roleItr = value.FindMember(u"role");
         if (roleItr != value.MemberEnd() && roleItr->value.IsString())
-            role = to_utf8(roleItr->value.GetString());
+            role = Paper::StringConvert::from_utf16(roleItr->value.GetString());
         auto badgesItr = value.FindMember(u"badges");
         if (!badgesItr->value.IsNull() && badgesItr->value.IsArray())
             for (auto& badge : badgesItr->value.GetArray())
                 badges.emplace_back(badge.GetObject());
-        std::string parsed, histories = ::to_utf8(value[u"histories"].GetString());
+        std::string parsed, histories = ::Paper::StringConvert::from_utf16(value[u"histories"].GetString());
         std::stringstream s(histories);
 
         while (std::getline(s, parsed, ','))

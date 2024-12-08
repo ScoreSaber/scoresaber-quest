@@ -1,21 +1,21 @@
 #include "UI/Other/PlayerProfileModal.hpp"
 
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "HMUI/CurvedCanvasSettingsHelper.hpp"
-#include "HMUI/ImageView.hpp"
+#include <GlobalNamespace/SharedCoroutineStarter.hpp>
+#include <HMUI/CurvedCanvasSettingsHelper.hpp>
+#include <HMUI/ImageView.hpp>
 #include "Sprites.hpp"
-#include "UnityEngine/Application.hpp"
-#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
-#include "UnityEngine/Rect.hpp"
-#include "UnityEngine/RectOffset.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
-#include "UnityEngine/TextAnchor.hpp"
-#include "UnityEngine/Texture2D.hpp"
-#include "UnityEngine/UI/ContentSizeFitter.hpp"
-#include "UnityEngine/UI/LayoutElement.hpp"
+#include <UnityEngine/Application.hpp>
+#include <UnityEngine/Networking/DownloadHandlerTexture.hpp>
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
+#include <UnityEngine/Rect.hpp>
+#include <UnityEngine/RectOffset.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/SpriteMeshType.hpp>
+#include <UnityEngine/TextAnchor.hpp>
+#include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
 #include "Utils/UIUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
@@ -32,15 +32,15 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 
 #define SetPreferredSize(identifier, width, height)                                         \
-    auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \
+    auto layout##identifier = identifier->gameObject->GetComponent<LayoutElement*>(); \
     if (!layout##identifier)                                                                \
-        layout##identifier = identifier->get_gameObject()->AddComponent<LayoutElement*>();  \
-    layout##identifier->set_preferredWidth(width);                                          \
-    layout##identifier->set_preferredHeight(height)
+        layout##identifier = identifier->gameObject->AddComponent<LayoutElement*>();  \
+    layout##identifier->preferredWidth = width;                                          \
+    layout##identifier->preferredHeight = height
 
-#define BeginCoroutine(method)                                               \
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method))
+#define BeginCoroutine(method) \
+    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
+        custom_types::Helpers::CoroutineHelper::New(method));
 
 #define WIDTH 90.0f
 #define HEIGHT 60.0f
@@ -53,9 +53,9 @@ namespace ScoreSaber::UI::Other
         std::string url = string_format("%s/api/player/%s/full", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
         UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
-        if (!webRequest->get_isNetworkError())
+        if (!webRequest->isNetworkError)
         {
-            std::u16string response = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
+            std::u16string response = std::u16string(webRequest->downloadHandler->text);
             rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> doc;
             doc.Parse(response.c_str());
             ScoreSaber::Data::Player player(doc.GetObject());
@@ -66,11 +66,11 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::SetPlayerData(ScoreSaber::Data::Player& player)
     {
-        set_player(player.name);
-        set_globalRanking(player.rank);
-        set_performancePoints(player.pp);
-        set_averageRankedAccuracy(player.scoreStats->averageRankedAccuracy);
-        set_totalScore(player.scoreStats->totalScore);
+        player = player.name;
+        globalRanking = player.rank;
+        performancePoints = player.pp;
+        averageRankedAccuracy = player.scoreStats->averageRankedAccuracy;
+        totalScore = player.scoreStats->totalScore;
 
         int i = 0;
         profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, pfpImage));
@@ -86,7 +86,7 @@ namespace ScoreSaber::UI::Other
     PlayerProfileModal* PlayerProfileModal::Create(UnityEngine::Transform* parent)
     {
         auto modal = CreateModal(parent, Vector2(WIDTH, HEIGHT), nullptr);
-        auto ppmodal = modal->get_gameObject()->AddComponent<PlayerProfileModal*>();
+        auto ppmodal = modal->gameObject->AddComponent<PlayerProfileModal*>();
         ppmodal->modal = modal;
         ppmodal->Setup();
         return ppmodal;
@@ -108,90 +108,90 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::Setup()
     {
-        auto vertical = CreateVerticalLayoutGroup(get_transform());
+        auto vertical = CreateVerticalLayoutGroup(transform);
         SetPreferredSize(vertical, WIDTH, HEIGHT);
 
         // header stuff
-        auto headerHorizon = CreateHorizontalLayoutGroup(vertical->get_transform());
+        auto headerHorizon = CreateHorizontalLayoutGroup(vertical->transform);
         SetPreferredSize(headerHorizon, 90, -1);
 
-        auto bg = headerHorizon->get_gameObject()->AddComponent<Backgroundable*>();
+        auto bg = headerHorizon->gameObject->AddComponent<Backgroundable*>();
         bg->ApplyBackgroundWithAlpha("title-gradient", 1.0f);
 
-        auto bgImage = bg->get_gameObject()->GetComponentInChildren<ImageView*>();
+        auto bgImage = bg->gameObject->GetComponentInChildren<ImageView*>();
         bgImage->gradient = false;
-        bgImage->set_color0(Color(1, 1, 1, 1));
-        bgImage->set_color1(Color(1, 1, 1, 1));
+        bgImage->color0 = Color(1, 1, 1, 1);
+        bgImage->color1 = Color(1, 1, 1, 1);
 
         // placeholder color
-        bgImage->set_color(Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1));
+        bgImage->color = Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1);
         bgImage->curvedCanvasSettingsHelper->Reset();
 
-        headerText = UIUtils::CreateClickableText(headerHorizon->get_transform(), u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
+        headerText = UIUtils::CreateClickableText(headerHorizon->transform, u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
         SetPreferredSize(headerText, 90, -1);
-        headerHorizon->set_childAlignment(TextAnchor::MiddleCenter);
-        headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
+        headerHorizon->childAlignment = TextAnchor::MiddleCenter;
+        headerText->alignment = TMPro::TextAlignmentOptions::Center;
         // actual data stuff
-        auto dataHorizon = CreateHorizontalLayoutGroup(vertical->get_transform());
-        dataHorizon->set_padding(RectOffset::New_ctor(2, 2, 2, 2));
+        auto dataHorizon = CreateHorizontalLayoutGroup(vertical->transform);
+        dataHorizon->padding = RectOffset::New_ctor(2, 2, 2, 2);
         SetPreferredSize(dataHorizon, 90.0f, 55.0f);
-        dataHorizon->set_childForceExpandHeight(false);
+        dataHorizon->childForceExpandHeight = false;
 
-        auto leftVertical = CreateVerticalLayoutGroup(dataHorizon->get_transform());
-        auto seperatorVertical = CreateVerticalLayoutGroup(dataHorizon->get_transform());
-        auto dataVertical = CreateVerticalLayoutGroup(dataHorizon->get_transform());
-        leftVertical->set_childForceExpandHeight(false);
+        auto leftVertical = CreateVerticalLayoutGroup(dataHorizon->transform);
+        auto seperatorVertical = CreateVerticalLayoutGroup(dataHorizon->transform);
+        auto dataVertical = CreateVerticalLayoutGroup(dataHorizon->transform);
+        leftVertical->childForceExpandHeight = false;
 
         SetPreferredSize(leftVertical, 35, -1);
         SetPreferredSize(seperatorVertical, 0.75f, 40.0f);
         SetPreferredSize(dataVertical, 40.0, 45.0f);
 
         // pfp setup
-        auto pfpVertical = CreateVerticalLayoutGroup(leftVertical->get_transform());
+        auto pfpVertical = CreateVerticalLayoutGroup(leftVertical->transform);
         SetPreferredSize(pfpVertical, 35.0, -1);
-        pfpVertical->set_childForceExpandHeight(true);
-        auto contentSizeFitter = pfpVertical->get_gameObject()->GetComponent<ContentSizeFitter*>();
+        pfpVertical->childForceExpandHeight = true;
+        auto contentSizeFitter = pfpVertical->gameObject->GetComponent<ContentSizeFitter*>();
         if (!contentSizeFitter)
-            contentSizeFitter = pfpVertical->get_gameObject()->AddComponent<ContentSizeFitter*>();
-        contentSizeFitter->set_verticalFit(ContentSizeFitter::FitMode::Unconstrained);
-        pfpVertical->set_padding(RectOffset::New_ctor(2, 2, 2, 2));
+            contentSizeFitter = pfpVertical->gameObject->AddComponent<ContentSizeFitter*>();
+        contentSizeFitter->verticalFit = ContentSizeFitter::FitMode::Unconstrained;
+        pfpVertical->padding = RectOffset::New_ctor(2, 2, 2, 2);
         auto oculusSprite = Base64ToSprite(oculus_base64);
-        pfpImage = CreateImage(pfpVertical->get_transform(), oculusSprite, Vector2(0, 0), Vector2(0, 0));
-        pfpImage->set_preserveAspect(true);
+        pfpImage = CreateImage(pfpVertical->transform, oculusSprite, Vector2(0, 0), Vector2(0, 0));
+        pfpImage->preserveAspect = true;
         SetPreferredSize(pfpImage, -1, -1);
 
-        badgeParent = CreateGridLayoutGroup(leftVertical->get_transform());
-        badgeParent->set_cellSize({9, 3.5});
-        badgeParent->set_spacing({2, 2});
-        badgeParent->set_constraint(GridLayoutGroup::Constraint::Flexible);
-        badgeParent->set_childAlignment(TextAnchor::MiddleCenter);
+        badgeParent = CreateGridLayoutGroup(leftVertical->transform);
+        badgeParent->cellSize = {9, 3.5};
+        badgeParent->spacing = {2, 2};
+        badgeParent->constraint = GridLayoutGroup::Constraint::Flexible;
+        badgeParent->childAlignment = TextAnchor::MiddleCenter;
 
         SetPreferredSize(badgeParent, 42, 3.5f);
 
         // seperator setup
-        auto texture = Texture2D::get_whiteTexture();
-        auto seperatorSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        auto texture = Texture2D::whiteTexture;
+        auto seperatorSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
-        auto image = CreateImage(seperatorVertical->get_transform(), seperatorSprite, Vector2(0, 0), Vector2(0, 0));
-        auto imageLayout = image->get_gameObject()->AddComponent<LayoutElement*>();
-        imageLayout->set_preferredWidth(1.0f);
+        auto image = CreateImage(seperatorVertical->transform, seperatorSprite, Vector2(0, 0), Vector2(0, 0));
+        auto imageLayout = image->gameObject->AddComponent<LayoutElement*>();
+        imageLayout->preferredWidth = 1.0f;
 
         // data setup
-        CreateText(dataVertical->get_transform(), "Global Player Ranking");
-        globalRanking = CreateText(dataVertical->get_transform(), "#Placeholder");
-        CreateText(dataVertical->get_transform(), "Performance Points");
-        performancePoints = CreateText(dataVertical->get_transform(), "Placeholder pp");
-        CreateText(dataVertical->get_transform(), "Average Ranked Accuracy");
-        averageRankedAccuracy = CreateText(dataVertical->get_transform(), "Placeholder%");
-        CreateText(dataVertical->get_transform(), "Total Score");
-        totalScore = CreateText(dataVertical->get_transform(), "Placeholder");
+        CreateText(dataVertical->transform, "Global Player Ranking");
+        globalRanking = CreateText(dataVertical->transform, "#Placeholder");
+        CreateText(dataVertical->transform, "Performance Points");
+        performancePoints = CreateText(dataVertical->transform, "Placeholder pp");
+        CreateText(dataVertical->transform, "Average Ranked Accuracy");
+        averageRankedAccuracy = CreateText(dataVertical->transform, "Placeholder%");
+        CreateText(dataVertical->transform, "Total Score");
+        totalScore = CreateText(dataVertical->transform, "Placeholder");
 
         badgeRoutines = List<UnityEngine::Coroutine*>::New_ctor();
-        set_player(u"Placeholder");
-        set_globalRanking(0);
-        set_performancePoints(420.69f);
-        set_averageRankedAccuracy(69.69f);
-        set_totalScore(42042069);
+        player = u"Placeholder";
+        globalRanking = 0;
+        performancePoints = 420.69f;
+        averageRankedAccuracy = 69.69f;
+        totalScore = 42042069;
     }
 
     void PlayerProfileModal::OpenPlayerUrl()
@@ -203,12 +203,12 @@ namespace ScoreSaber::UI::Other
     {
         if (!badgeParent)
             return;
-        auto transform = badgeParent->get_transform();
-        int childCount = transform->get_childCount();
+        auto transform = badgeParent->transform;
+        int childCount = transform->childCount;
         for (int i = childCount - 1; i >= 0; i--)
         {
             auto child = transform->GetChild(i);
-            auto go = child->get_gameObject();
+            auto go = child->gameObject;
             Object::DestroyImmediate(go);
         }
     }
@@ -216,15 +216,15 @@ namespace ScoreSaber::UI::Other
     void PlayerProfileModal::AddBadge(ScoreSaber::Data::Badge& badge, int index)
     {
         constexpr const float generalSize = 5.0f;
-        // auto badgeVertical = CreateVerticalLayoutGroup(badgeParent->get_transform());
+        // auto badgeVertical = CreateVerticalLayoutGroup(badgeParent->transform);
         // SetPreferredSize(badgeVertical, 9, 3.5);
-        auto texture = Texture2D::get_blackTexture();
-        auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        auto texture = Texture2D::blackTexture;
+        auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
-        auto image = CreateImage(badgeParent->get_transform(), sprite, Vector2(0, 0), Vector2(0, 0));
+        auto image = CreateImage(badgeParent->transform, sprite, Vector2(0, 0), Vector2(0, 0));
         SetPreferredSize(image, 9, 3.5);
-        image->set_preserveAspect(true);
-        AddHoverHint(image->get_gameObject(), badge.description);
+        image->preserveAspect = true;
+        AddHoverHint(image->gameObject, badge.description);
 
         if (badge.image.ends_with(".gif"))
         {
@@ -236,40 +236,40 @@ namespace ScoreSaber::UI::Other
         }
     }
 
-    void PlayerProfileModal::set_player(std::u16string_view header)
+    void PlayerProfileModal::player = std::u16string_view header
     {
-        set_header(std::u16string(header) + u"'s Profile");
+        header = std::u16string(header) + u"'s Profile";
     }
 
-    void PlayerProfileModal::set_header(std::u16string_view header)
+    void PlayerProfileModal::header = std::u16string_view header
     {
-        headerText->set_text(u"<i>" + std::u16string(header) + u"</i>");
+        headerText->text = u"<i>" + std::u16string(header) + u"</i>";
     }
 
-    void PlayerProfileModal::set_globalRanking(int globalRanking)
+    void PlayerProfileModal::globalRanking = int globalRanking
     {
-        this->globalRanking->set_text(string_format("<i>#%d</i>", globalRanking));
+        this->globalRanking->text = string_format("<i>#%d</i>", globalRanking);
     }
 
-    void PlayerProfileModal::set_performancePoints(float performancePoints)
+    void PlayerProfileModal::performancePoints = float performancePoints
     {
-        this->performancePoints->set_text(string_format("<i><color=#6772E5>%.2fpp</color></i>", performancePoints));
+        this->performancePoints->text = string_format("<i><color=#6772E5>%.2fpp</color></i>", performancePoints);
     }
 
-    void PlayerProfileModal::set_averageRankedAccuracy(float averageRankedAccuracy)
+    void PlayerProfileModal::averageRankedAccuracy = float averageRankedAccuracy
     {
-        this->averageRankedAccuracy->set_text(string_format("<i>%.2f</i>", averageRankedAccuracy));
+        this->averageRankedAccuracy->text = string_format("<i>%.2f</i>", averageRankedAccuracy);
     }
 
-    void PlayerProfileModal::set_totalScore(long totalScore)
+    void PlayerProfileModal::totalScore = long totalScore
     {
-        this->totalScore->set_text(string_format("<i>%ld</i>", totalScore));
+        this->totalScore->text = string_format("<i>%ld</i>", totalScore);
     }
 
     void PlayerProfileModal::stopProfileRoutine()
     {
         if (profileRoutine)
-            GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(profileRoutine);
+            GlobalNamespace::SharedCoroutineStarter::instance->StopCoroutine(profileRoutine);
         profileRoutine = nullptr;
     }
 
@@ -277,11 +277,11 @@ namespace ScoreSaber::UI::Other
     {
         if (badgeRoutines)
         {
-            int length = badgeRoutines->get_Count();
+            int length = badgeRoutines->Count;
             for (int i = 0; i < length; i++)
             {
                 auto routine = badgeRoutines->get_Item(i);
-                GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(routine);
+                GlobalNamespace::SharedCoroutineStarter::instance->StopCoroutine(routine);
             }
 
             badgeRoutines->Clear();

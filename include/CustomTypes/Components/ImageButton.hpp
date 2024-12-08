@@ -1,14 +1,14 @@
 #pragma once
 
-#include "UnityEngine/Collider.hpp"
-#include "UnityEngine/MeshRenderer.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/UI/Button.hpp"
-#include "VRUIControls/VRPointer.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "custom-types/shared/register.hpp"
-#include "custom-types/shared/util.hpp"
+#include <UnityEngine/Collider.hpp>
+#include <UnityEngine/MeshRenderer.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/UI/Button.hpp>
+#include <VRUIControls/VRPointer.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <custom-types/shared/register.hpp>
+#include <custom-types/shared/util.hpp>
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::CustomTypes::Components, ImageButton,

@@ -1,11 +1,11 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
 #include "Data/Metadata.hpp"
 #include "Data/Score.hpp"
 #include <optional>
 #include <vector>
-#include "beatsaber-hook/shared/utils/typedefs.h"
+#include <beatsaber-hook/shared/utils/typedefs.h>
 
 namespace ScoreSaber::Data
 {

@@ -1,8 +1,9 @@
 #pragma once
-#include "HMUI/ImageView.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "System/Threading/CancellationToken.hpp"
+#include <HMUI/ImageView.hpp>
+#include <UnityEngine/GameObject.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <System/Threading/CancellationToken.hpp>
+#include <beatsaber-hook/shared/utils/typedefs-wrappers.hpp>
 #include <string>
 
 namespace ScoreSaber::UI::Other {

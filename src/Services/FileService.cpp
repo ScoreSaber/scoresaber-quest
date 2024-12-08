@@ -1,6 +1,6 @@
-#include "System/IO/Directory.hpp"
+#include <System/IO/Directory.hpp>
 #include "Utils/StringUtils.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 #include "logging.hpp"
 #include "static.hpp"
 

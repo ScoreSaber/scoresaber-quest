@@ -1,21 +1,19 @@
 #include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
 #include "CustomTypes/Components/GlobalLeaderboardTableCell.hpp"
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "HMUI/ScrollView.hpp"
-#include "HMUI/Touchable.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Networking/DownloadHandler.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "UnityEngine/RectOffset.hpp"
-#include "UnityEngine/WaitForSeconds.hpp"
+#include <HMUI/ScrollView.hpp>
+#include <HMUI/Touchable.hpp>
+#include <System/Action_1.hpp>
+#include <GlobalNamespace/ICoroutineStarter.hpp>
+#include <UnityEngine/Networking/DownloadHandler.hpp>
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <UnityEngine/RectOffset.hpp>
+#include <UnityEngine/WaitForSeconds.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include "Utils/StringUtils.hpp"
 #include "Utils/UIUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
 #include "main.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
-#include "questui/shared/QuestUI.hpp"
 #include "static.hpp"
 
 #include "Data/PlayerCollection.hpp"
@@ -25,30 +23,29 @@ DEFINE_TYPE(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData);
 
 using namespace ScoreSaber::CustomTypes::Components;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
 using namespace TMPro;
 using namespace ScoreSaber;
 
-#define BeginCoroutine(method)                                               \
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
+#define BeginCoroutine(method) \
+    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
         custom_types::Helpers::CoroutineHelper::New(method));
 
 Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData* self)
 {
-    std::string url = self->get_leaderboardURL();
+    std::string url = self->leaderboardURL;
     UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
     webRequest->SetRequestHeader("Cookie", WebUtils::cookie);
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
-    if (!webRequest->get_isNetworkError())
+    if (!webRequest->isNetworkError)
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document
 
-        auto s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
+        auto s = std::u16string(webRequest->downloadHandler->text);
 
         // implicit constructor poggers
-        playerCollection = webRequest->get_downloadHandler()->get_text();
+        playerCollection = webRequest->downloadHandler->text;
 
         self->initialized = true;
     }
@@ -76,7 +73,7 @@ namespace ScoreSaber::CustomTypes::Components
         return size < 5 ? size : 5;
     }
 
-    void GlobalLeaderboardTableData::set_leaderboardType(LeaderboardType type)
+    void GlobalLeaderboardTableData::SetLeaderboardType(LeaderboardType type)
     {
         // if the new type is the same as the old type
         bool sameType = leaderboardType == type;
@@ -88,7 +85,7 @@ namespace ScoreSaber::CustomTypes::Components
         StartRefresh();
     }
 
-    std::string GlobalLeaderboardTableData::get_leaderboardURL()
+    std::string GlobalLeaderboardTableData::GetleaderboardURL()
     {
         std::string playersUrl = ScoreSaber::Static::BASE_URL + "/api/game/players";
         switch (leaderboardType)
@@ -139,41 +136,41 @@ namespace ScoreSaber::CustomTypes::Components
         {
             return;
         }
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Refresh()));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(Refresh()));
     }
 
     /// really just here because of the way it reloads twice by doing ReloadData and then RefreshCells(true, true), now it's combined
     void ReloadTableViewData(HMUI::TableView* self)
     {
-        if (!self->isInitialized)
+        if (!self->_isInitialized)
         {
             self->LazyInit();
         }
-        auto visibleCells = self->visibleCells;
-        int length = visibleCells->get_Count();
+        auto visibleCells = self->_visibleCells;
+        int length = visibleCells->Count;
         for (int i = 0; i < length; i++)
         {
-            auto tableCell = visibleCells->get_Item(i);
-            tableCell->get_gameObject()->SetActive(false);
+            auto tableCell = visibleCells->Item[i];
+            tableCell->gameObject->SetActive(false);
             self->AddCellToReusableCells(tableCell);
         }
-        self->visibleCells->Clear();
+        self->_visibleCells->Clear();
         if (self->dataSource != nullptr)
         {
-            self->numberOfCells = self->dataSource->NumberOfCells();
-            self->cellSize = self->dataSource->CellSize();
+            self->_numberOfCells = self->dataSource->NumberOfCells();
+            self->_cellSize = self->dataSource->CellSize();
         }
         else
         {
-            self->numberOfCells = 0;
-            self->cellSize = 1.0f;
+            self->_numberOfCells = 0;
+            self->_cellSize = 1.0f;
         }
 
-        self->scrollView->fixedCellSize = self->cellSize;
+        self->scrollView->_fixedCellSize = self->cellSize;
         self->RefreshContentSize();
-        if (!self->get_gameObject()->get_activeInHierarchy())
+        if (!self->gameObject->activeInHierarchy)
         {
-            self->refreshCellsOnEnable = true;
+            self->_refreshCellsOnEnable = true;
         }
         else
         {
@@ -201,16 +198,16 @@ namespace ScoreSaber::CustomTypes::Components
 
     HMUI::TableCell* GlobalLeaderboardTableData::CellForIdx(HMUI::TableView* tableView, int idx)
     {
-        GlobalLeaderboardTableCell* playerCell = reinterpret_cast<GlobalLeaderboardTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
+        UnityW<GlobalLeaderboardTableCell> playerCell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier).cast<GlobalLeaderboardTableCell>();
 
         if (!playerCell)
         {
             playerCell = GlobalLeaderboardTableCell::CreateCell();
             playerCell->playerProfileModal = playerProfileModal;
-            // playerCell->get_transform()->SetParent(tableView->get_transform()->GetChild(0)->GetChild(0), false);
+            // playerCell->transform->SetParent(tableView->transform->GetChild(0)->GetChild(0), false);
         }
 
-        playerCell->set_reuseIdentifier(reuseIdentifier);
+        playerCell->reuseIdentifier = reuseIdentifier;
         if (initialized)
         {
             playerCell->Refresh(playerCollection[idx], leaderboardType);

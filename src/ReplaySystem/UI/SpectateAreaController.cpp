@@ -2,21 +2,20 @@
 
 #include "Data/Private/Settings.hpp"
 
-#include "GlobalNamespace/ColorExtensions.hpp"
-#include "GlobalNamespace/ColorNoteVisuals.hpp"
-#include "GlobalNamespace/MaterialPropertyBlockController.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/SaberMovementData.hpp"
-#include "System/Action.hpp"
-#include "System/Action_1.hpp"
+#include <GlobalNamespace/ColorExtensions.hpp>
+#include <GlobalNamespace/ColorNoteVisuals.hpp>
+#include <GlobalNamespace/MaterialPropertyBlockController.hpp>
+#include <GlobalNamespace/Saber.hpp>
+#include <GlobalNamespace/SaberMovementData.hpp>
+#include <System/Action.hpp>
+#include <System/Action_1.hpp>
 #include "Tweening/Vector3Tween.hpp"
-#include "UnityEngine/MaterialPropertyBlock.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Vector2.hpp"
+#include <UnityEngine/MaterialPropertyBlock.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Vector2.hpp>
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
+#include <custom-types/shared/delegate.hpp>
 
 #include <functional>
 
@@ -49,18 +48,18 @@ namespace ScoreSaber::ReplaySystem::UI
 
         if (_activeNote == nullptr) {
             _activeNote = _gameNoteControllerPool->Spawn();
-            _activeNote->set_enabled(false);
-            _activeNote->get_transform()->set_localScale(Vector3::get_zero());
-            _initialQuaternion = _activeNote->noteTransform->get_localRotation();
-            _activeNote->get_transform()->set_localPosition(*pose);
-            _activeNote->get_transform()->set_localRotation(Quaternion::get_identity());
-            _activeNote->noteTransform->set_localPosition(Vector3::get_zero());
-            _activeNote->noteTransform->set_localRotation(Quaternion::Euler(45, 45, 45));
+            _activeNote->enabled = false;
+            _activeNote->transform->localScale = Vector3::zero;
+            _initialQuaternion = _activeNote->noteTransform->localRotation;
+            _activeNote->transform->localPosition = *pose;
+            _activeNote->transform->localRotation = Quaternion::identity;
+            _activeNote->noteTransform->localPosition = Vector3::zero;
+            _activeNote->noteTransform->localRotation = Quaternion::Euler(45, 45, 45);
 
             auto visuals = _activeNote->GetComponent<ColorNoteVisuals*>();
-            visuals->set_showCircle(false);
-            visuals->set_showArrow(false);
-            auto color = ColorExtensions::ColorWithAlpha(Color::get_cyan(), 3.0f);
+            visuals->showCircle = false;
+            visuals->showArrow = false;
+            auto color = ColorExtensions::ColorWithAlpha(Color::cyan, 3.0f);
             visuals->noteColor = color;
 
             // iteral visuals materialPropertyBlockControllers
@@ -76,9 +75,9 @@ namespace ScoreSaber::ReplaySystem::UI
         }
 
         if (_despawned) {
-            _activeNote->get_gameObject()->SetActive(true);
+            _activeNote->gameObject->SetActive(true);
             auto updateNoteScaleDelegate = custom_types::MakeDelegate<System::Action_1<Vector3>*>(classof(System::Action_1<Vector3>*), (std::function<void(Vector3)>)[&](Vector3 scale) { UpdateNoteScale(scale); });
-            _statusTween = Tweening::Vector3Tween::New_ctor(Vector3::get_zero(), Vector3::get_one(), updateNoteScaleDelegate, 0.5f, EaseType::OutElastic, 0);
+            _statusTween = Tweening::Vector3Tween::New_ctor(Vector3::zero, Vector3::one, updateNoteScaleDelegate, 0.5f, EaseType::OutElastic, 0);
             _timeTweeningManager->AddTween(_statusTween, _activeNote);
             _despawned = false;
         }
@@ -86,11 +85,11 @@ namespace ScoreSaber::ReplaySystem::UI
         if (_movementTween != nullptr) {
             _movementTween->Kill();
         }
-        _activeNote->get_gameObject()->SetActive(true);
+        _activeNote->gameObject->SetActive(true);
         auto movementTweenDelegate = custom_types::MakeDelegate<System::Action_1<Vector3>*>(classof(System::Action_1<Vector3>*), (std::function<void(Vector3)>)[&](Vector3 val) {
-            _activeNote->get_transform()->set_localPosition(val);
+            _activeNote->transform->localPosition = val;
         });
-        _movementTween = Tweening::Vector3Tween::New_ctor(_activeNote->get_transform()->get_localPosition(), *pose, movementTweenDelegate, 0.75f, EaseType::OutQuart, 0);
+        _movementTween = Tweening::Vector3Tween::New_ctor(_activeNote->transform->localPosition, *pose, movementTweenDelegate, 0.75f, EaseType::OutQuart, 0);
         _timeTweeningManager->AddTween(_movementTween, _activeNote);
     }
 
@@ -102,7 +101,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
 
         if (DidUpdatePlayerSpectatorPose != nullptr) {
-            DidUpdatePlayerSpectatorPose(*pose, Quaternion::get_identity());
+            DidUpdatePlayerSpectatorPose(*pose, Quaternion::identity);
         }
     }
 
@@ -120,7 +119,7 @@ namespace ScoreSaber::ReplaySystem::UI
             _movementTween->Kill();
         }
         auto updateNoteScaleDelegate = custom_types::MakeDelegate<System::Action_1<Vector3>*>(classof(System::Action_1<Vector3>*), (std::function<void(Vector3)>)[&](Vector3 scale) { UpdateNoteScale(scale); });
-        _statusTween = Tweening::Vector3Tween::New_ctor(Vector3::get_one(), Vector3::get_zero(), updateNoteScaleDelegate, 0.5f, EaseType::OutQuart, 0);
+        _statusTween = Tweening::Vector3Tween::New_ctor(Vector3::one, Vector3::zero, updateNoteScaleDelegate, 0.5f, EaseType::OutQuart, 0);
         _statusTween->onCompleted = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), (std::function<void()>)[&]() { DespawnActiveNote(); });
         _timeTweeningManager->AddTween(_statusTween, _activeNote);
     }
@@ -128,14 +127,14 @@ namespace ScoreSaber::ReplaySystem::UI
     void SpectateAreaController::Tick()
     {
         if (_activeNote != nullptr) {
-            _activeNote->get_transform()->Rotate(Vector3::get_up() * 0.5);
+            _activeNote->transform->Rotate(Vector3::up * 0.5);
         }
     }
 
     void SpectateAreaController::UpdateNoteScale(Vector3 scale)
     {
         if (_activeNote != nullptr) {
-            _activeNote->get_transform()->set_localScale(scale);
+            _activeNote->transform->localScale = scale;
         }
     }
     void SpectateAreaController::DespawnActiveNote()
@@ -147,7 +146,7 @@ namespace ScoreSaber::ReplaySystem::UI
         if (_movementTween != nullptr) {
             _movementTween->Kill();
         }
-        _activeNote->get_gameObject()->set_active(false);
+        _activeNote->gameObject->active = false;
     }
     std::optional<Vector3> SpectateAreaController::TryGetPose(StringW poseID)
     {

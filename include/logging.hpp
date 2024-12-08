@@ -1,16 +1,12 @@
 #pragma once
-#include "beatsaber-hook/shared/utils/logging.hpp"
-#include <string_view>
+#include "paper/shared/logger.hpp"
 
 namespace ScoreSaber
 {
-    class Logging
-    {
-    public:
-        static Logger& getLogger();
-        static LoggerContextObject& getContextLogger(const char* fun, const char* file, int line);
-    };
+    namespace Logging {
+        constexpr auto Logger = Paper::ConstLoggerContext("ScoreSaber");
+    }
 }
-#define INFO(...) ::ScoreSaber::Logging::getContextLogger(__PRETTY_FUNCTION__, __FILE__, __LINE__).info(__VA_ARGS__)
-#define ERROR(...) ::ScoreSaber::Logging::getContextLogger(__PRETTY_FUNCTION__, __FILE__, __LINE__).error(__VA_ARGS__)
-#define CRITICAL(...) ::ScoreSaber::Logging::getContextLogger(__PRETTY_FUNCTION__, __FILE__, __LINE__).critical(__VA_ARGS__)
+#define INFO(...) ::ScoreSaber::Logging::Logger.info(__VA_ARGS__)
+#define ERROR(...) ::ScoreSaber::Logging::Logger.error(__VA_ARGS__)
+#define CRITICAL(...) ::ScoreSaber::Logging::Logger.critical(__VA_ARGS__)

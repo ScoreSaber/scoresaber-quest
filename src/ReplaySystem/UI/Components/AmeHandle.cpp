@@ -1,9 +1,8 @@
 #include "ReplaySystem/UI/Components/AmeHandle.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Vector2.hpp"
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Vector2.hpp>
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -33,7 +32,7 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         }
         if (_handleMoveCallback != nullptr)
         {
-            _handleMoveCallback(this, eventData->position, eventData->get_pressEventCamera());
+            _handleMoveCallback(this, eventData->position, eventData->pressEventCamera);
         }
     }
 

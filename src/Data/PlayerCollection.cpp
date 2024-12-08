@@ -1,5 +1,5 @@
 #include "Data/PlayerCollection.hpp"
-#include "beatsaber-hook/shared/utils/utils-functions.h"
+#include <beatsaber-hook/shared/utils/utils-functions.h>
 
 inline rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> getdoc(std::u16string_view string)
 {
@@ -70,7 +70,7 @@ namespace ScoreSaber::Data
     }
 
     PlayerCollection::PlayerCollection(StringW string)
-        : PlayerCollection(getdoc(csstrtostr(string))){};
+        : PlayerCollection(getdoc(string)){};
 
     PlayerCollection::PlayerCollection(std::string_view string)
         : PlayerCollection(getdoc(string)){};

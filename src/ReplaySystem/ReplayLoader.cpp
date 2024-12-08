@@ -2,28 +2,24 @@
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ReplayReader.hpp"
 #include "Data/Score.hpp"
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
-#include "GlobalNamespace/BeatmapDifficultySerializedMethods.hpp"
-#include "GlobalNamespace/ColorScheme.hpp"
-#include "GlobalNamespace/ColorSchemesSettings.hpp"
-#include "GlobalNamespace/HMTask.hpp"
-#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/MenuTransitionsHelper.hpp"
-#include "GlobalNamespace/PlayerData.hpp"
-#include "GlobalNamespace/PlayerDataModel.hpp"
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
+#include <GlobalNamespace/BeatmapDifficultySerializedMethods.hpp>
+#include <GlobalNamespace/ColorScheme.hpp>
+#include <GlobalNamespace/ColorSchemesSettings.hpp>
+#include <GlobalNamespace/MenuTransitionsHelper.hpp>
+#include <GlobalNamespace/PlayerData.hpp>
+#include <GlobalNamespace/PlayerDataModel.hpp>
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 
 #include "ReplaySystem/Playback/NotePlayer.hpp"
 #include "Services/FileService.hpp"
-#include "System/Action.hpp"
-#include "System/Action_2.hpp"
+#include <System/Action.hpp>
+#include <System/Action_2.hpp>
 
-#include "custom-types/shared/delegate.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include "logging.hpp"
 #include "static.hpp"
 #include <custom-types/shared/delegate.hpp>
@@ -53,7 +49,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         NotePlayerInstance = nullptr;
     }
 
-    void StartReplay(IDifficultyBeatmap* beatmap)
+    void StartReplay(GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey)
     {
         if (playerDataModel == nullptr)
         {
@@ -84,7 +80,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
             classof(System::Action_2<StandardLevelScenesTransitionSetupDataSO*, LevelCompletionResults*>*),
             ReplayEndCallback);
 
-        auto previewBeatmapLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(beatmap->get_level());
+        auto previewBeatmapLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(beatmap->level);
         menuTransitionsHelper->StartStandardLevel("Replay", beatmap, previewBeatmapLevel,
                                                   playerData->overrideEnvironmentSettings,
                                                   playerData->colorSchemesSettings->GetOverrideColorScheme(), BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers),
@@ -92,7 +88,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         IsPlaying = true;
     }
 
-    void Load(const std::vector<char> &replayData, GlobalNamespace::IDifficultyBeatmap* beatmap, std::string modifiers, std::u16string playerName) {
+    void Load(const std::vector<char> &replayData, GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, std::string modifiers, std::u16string playerName) {
         CurrentLevel = beatmap;
         CurrentPlayerName = playerName;
         CurrentModifiers = modifiers;
@@ -104,7 +100,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         });
     }
 
-    void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished)
+    void GetReplayData(GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished)
     {
         std::string localPath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
 

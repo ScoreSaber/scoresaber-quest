@@ -1,24 +1,24 @@
 #pragma once
 
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "beatsaber-hook/shared/utils/logging.hpp"
+#include <beatsaber-hook/shared/utils/hooking.hpp>
+#include "logging.hpp"
 #include <vector>
 
 class Hooks
 {
   private:
-    inline static std::vector<void (*)(Logger& logger)> installFuncs;
+    inline static std::vector<void (*)(decltype(::ScoreSaber::Logging::Logger)&)> installFuncs;
 
   public:
-    static void AddInstallFunc(void (*installFunc)(Logger& logger))
+    static void AddInstallFunc(void (*installFunc)(decltype(::ScoreSaber::Logging::Logger)&))
     {
         installFuncs.push_back(installFunc);
     }
 
-    static inline void InstallHooks(Logger& logger)
+    static inline void InstallHooks()
     {
         for (auto& func : installFuncs)
-            func(logger);
+            func(::ScoreSaber::Logging::Logger);
     }
 };
 
@@ -32,59 +32,6 @@ class Hooks
     };                                                                     \
     static Auto_Hook_##name_ Auto_Hook_Instance_##name_;
 
-#define MAKE_AUTO_HOOK_MATCH(name_, mPtr, retval, ...)                                                                                              \
-    struct Hook_##name_                                                                                                                             \
-    {                                                                                                                                               \
-        using funcType = retval (*)(__VA_ARGS__);                                                                                                   \
-        static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
-        constexpr static const char* name()                                                                                                         \
-        {                                                                                                                                           \
-            return #name_;                                                                                                                          \
-        }                                                                                                                                           \
-        static const MethodInfo* getInfo()                                                                                                          \
-        {                                                                                                                                           \
-            return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get();                                                                  \
-        }                                                                                                                                           \
-        static funcType* trampoline()                                                                                                               \
-        {                                                                                                                                           \
-            return &name_;                                                                                                                          \
-        }                                                                                                                                           \
-        static inline retval (*name_)(__VA_ARGS__) = nullptr;                                                                                       \
-        static funcType hook()                                                                                                                      \
-        {                                                                                                                                           \
-            return hook_##name_;                                                                                                                    \
-        }                                                                                                                                           \
-        static retval hook_##name_(__VA_ARGS__);                                                                                                    \
-    };                                                                                                                                              \
-    AUTO_INSTALL(name_)                                                                                                                             \
-    retval Hook_##name_::hook_##name_(__VA_ARGS__)
-
-#define MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(name_, namespaze, klassName, mName, retval, ...)            \
-    struct Hook_##name_                                                                                       \
-    {                                                                                                         \
-        constexpr static const char* name()                                                                   \
-        {                                                                                                     \
-            return #name_;                                                                                    \
-        }                                                                                                     \
-        static const MethodInfo* getInfo()                                                                    \
-        {                                                                                                     \
-            return ::il2cpp_utils::MethodTypeCheck<funcType>::find_unsafe(namespaze, klassName, mName, true); \
-        }                                                                                                     \
-        using funcType = retval (*)(__VA_ARGS__);                                                             \
-        static funcType* trampoline()                                                                         \
-        {                                                                                                     \
-            return &name_;                                                                                    \
-        }                                                                                                     \
-        static inline retval (*name_)(__VA_ARGS__) = nullptr;                                                 \
-        static funcType hook()                                                                                \
-        {                                                                                                     \
-            return hook_##name_;                                                                              \
-        }                                                                                                     \
-        static retval hook_##name_(__VA_ARGS__);                                                              \
-    };                                                                                                        \
-    AUTO_INSTALL(name_);                                                                                      \
-    retval Hook_##name_::hook_##name_(__VA_ARGS__)
-
 #define AUTO_INSTALL_ORIG(name_)                                               \
     struct Auto_Hook_##name_                                                   \
     {                                                                          \
@@ -93,31 +40,33 @@ class Hooks
             ::Hooks::AddInstallFunc(::Hooking::InstallOrigHook<Hook_##name_>); \
         }                                                                      \
     };                                                                         \
-    static Auto_Hook_##name_ Auto_Hook_Instance_##name_;
 
-#define MAKE_AUTO_HOOK_ORIG_MATCH(name_, mPtr, retval, ...)                                                                                         \
-    struct Hook_##name_                                                                                                                             \
-    {                                                                                                                                               \
-        using funcType = retval (*)(__VA_ARGS__);                                                                                                   \
+#define MAKE_AUTO_HOOK_MATCH(name_, mPtr, retval, ...) \
+    struct Hook_##name_ { \
+        using funcType = retval (*)(__VA_ARGS__); \
+        static_assert(MATCH_HOOKABLE_ASSERT(mPtr)); \
         static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
-        constexpr static const char* name()                                                                                                         \
-        {                                                                                                                                           \
-            return #name_;                                                                                                                          \
-        }                                                                                                                                           \
-        static const MethodInfo* getInfo()                                                                                                          \
-        {                                                                                                                                           \
-            return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get();                                                                  \
-        }                                                                                                                                           \
-        static funcType* trampoline()                                                                                                               \
-        {                                                                                                                                           \
-            return &name_;                                                                                                                          \
-        }                                                                                                                                           \
-        static inline retval (*name_)(__VA_ARGS__) = nullptr;                                                                                       \
-        static funcType hook()                                                                                                                      \
-        {                                                                                                                                           \
-            return hook_##name_;                                                                                                                    \
-        }                                                                                                                                           \
-        static retval hook_##name_(__VA_ARGS__);                                                                                                    \
-    };                                                                                                                                              \
-    AUTO_INSTALL_ORIG(name_)                                                                                                                        \
+        constexpr static const char* name() { return #name_; } \
+        static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo(); } \
+        static funcType* trampoline() { return &name_; } \
+        static inline retval (*name_)(__VA_ARGS__) = nullptr; \
+        static funcType hook() { return &::Hooking::HookCatchWrapper<&hook_##name_, funcType>::wrapper; } \
+        static retval hook_##name_(__VA_ARGS__); \
+    }; \
+    AUTO_INSTALL(name_) \
+    retval Hook_##name_::hook_##name_(__VA_ARGS__)
+
+#define MAKE_AUTO_HOOK_ORIG_MATCH(name_, mPtr, retval, ...) \
+    struct Hook_##name_ { \
+        using funcType = retval (*)(__VA_ARGS__); \
+        static_assert(MATCH_HOOKABLE_ASSERT(mPtr)); \
+        static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
+        constexpr static const char* name() { return #name_; } \
+        static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo(); } \
+        static funcType* trampoline() { return &name_; } \
+        static inline retval (*name_)(__VA_ARGS__) = nullptr; \
+        static funcType hook() { return &::Hooking::HookCatchWrapper<&hook_##name_, funcType>::wrapper; } \
+        static retval hook_##name_(__VA_ARGS__); \
+    }; \
+    AUTO_INSTALL_ORIG(name_) \
     retval Hook_##name_::hook_##name_(__VA_ARGS__)
