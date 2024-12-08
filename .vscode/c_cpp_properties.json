@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "defines": [
+                "MOD_ID=\"ScoreSaber\"",
+                "VERSION=\"1.0.0\"",
+                "scoresaber_EXPORTS",
+                "__GNUC__",
+                "__aarch64__"
+            ],
+            "includePath": [
+                "${workspaceFolder}/submodules/css-color-parser-cpp",
+                "${workspaceFolder}/submodules/EasyGifReader",
+                "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
+                "${workspaceFolder}/extern/includes/bs-cordl/include",
+                "${workspaceFolder}/extern/includes/codegen/include",
+                "${workspaceFolder}/extern/includes/fmt/fmt/include",
+                "${workspaceFolder}/extern/includes",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/shared",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}",
+                "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android",
+                "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include",
+                "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/*",
+                "${ndkPath}/sources/cxx-stl/llvm-libc++abi/include",
+                "${ndkPath}/sources/cxx-stl/llvm-libc++/include",
+                "${ndkPath}/"
+            ],
+            "compilerPath": "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/bin/aarch64-linux-android24-clang.cmd",
+            "name": "Quest",
+            "cStandard": "c11",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "linux-clang-arm64",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

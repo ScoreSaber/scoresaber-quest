@@ -51,7 +51,6 @@ qpm_defines.cmake
 extern.cmake
 build/
 extern/
-.vscode/
 .cache/
 mod.json
 *.log
