@@ -25,7 +25,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, PlayerProfileModal, UnityEngine::Mo
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, averageRankedAccuracy);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, totalScore);
                       DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
-                      DECLARE_INSTANCE_FIELD(List<UnityEngine::Coroutine*>*, badgeRoutines);
+                      DECLARE_INSTANCE_FIELD(ListW<UnityEngine::Coroutine*>, badgeRoutines);
 
                       public
                       :

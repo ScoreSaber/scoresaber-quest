@@ -2,6 +2,7 @@
 #include <HMUI/CurvedTextMeshPro.hpp>
 #include "ReplaySystem/UI/Components/AmeClicker.hpp"
 #include <UnityEngine/AdditionalCanvasShaderChannels.hpp>
+#include <UnityEngine/Canvas.hpp>
 #include <UnityEngine/GameObject.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/RectTransformUtility.hpp>
@@ -10,9 +11,10 @@
 #include <UnityEngine/Vector2.hpp>
 #include <VRUIControls/VRGraphicRaycaster.hpp>
 #include <bsml/shared/Helpers/utilities.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include "logging.hpp"
-#include "questui/shared/ArrayUtil.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
+#include "questui/ArrayUtil.hpp"
+#include "Utils/OperatorOverloads.hpp"
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
@@ -23,11 +25,11 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::UI, ImberScrubber);
 
 namespace ScoreSaber::ReplaySystem::UI
 {
-    Transform* ImberScrubber::transform
+    Transform* ImberScrubber::get_transform()
     {
         return _parent;
     }
-    void ImberScrubber::loopMode = bool value
+    void ImberScrubber::set_loopMode(bool value)
     {
         _loopMode = value;
         _loopNode->gameObject->SetActive(value);
@@ -36,15 +38,15 @@ namespace ScoreSaber::ReplaySystem::UI
 
         _mainNode->max = _maxPercent; // uwu owo owo uwu EVENTUALLY REPLACE WITH LEVEL FAILED TIME YEA YEA
     }
-    void ImberScrubber::visibility = bool value
+    void ImberScrubber::set_visibility(bool value)
     {
         _parent->gameObject->SetActive(value);
     }
-    float ImberScrubber::mainNodeValue
+    float ImberScrubber::get_mainNodeValue()
     {
         return _bar->GetNodePercent(_mainNode);
     }
-    void ImberScrubber::mainNodeValue = float value
+    void ImberScrubber::set_mainNodeValue(float value)
     {
         _bar->AssignNodeToPercent(_mainNode, value);
     }
@@ -65,10 +67,10 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberScrubber::Initialize()
     {
         _bar = ImberScrubber::Create(_mainCamera->camera, Vector2(500.0f, 100.0f));
-        _bar->transform->localScale = Vector3::one * 0.001f;
+        _bar->transform->localScale = Vector3::get_one() * 0.001f;
 
         float initialSongTime = _audioTimeSyncController->songTime / _audioTimeSyncController->songEndTime;
-        _bar->barFill = initialSongTime;
+        _bar->set_barFill(initialSongTime);
 
         auto barRectTransform = _bar->GetComponent<RectTransform*>();
 
@@ -78,8 +80,8 @@ namespace ScoreSaber::ReplaySystem::UI
         _bar->RegisterNode(_mainNode);
         _bar->RegisterNode(_loopNode);
         _bar->AssignNodeToPercent(_mainNode, initialSongTime);
-        _bar->endTime = _audioTimeSyncController->songEndTime;
-        loopMode = _loopMode;
+        _bar->set_endTime(_audioTimeSyncController->songEndTime);
+        set_loopMode(_loopMode);
 
         _mainNode->PositionDidChange = [&](float value) {
             MainNode_PositionDidChange(value);
@@ -112,17 +114,17 @@ namespace ScoreSaber::ReplaySystem::UI
         _bar->gameObject->transform->SetParent(gameObject->transform, false);
         _parent = gameObject->transform;
         gameObject->layer = 5;
-        visibility = false;
+        set_visibility(false);
     }
 
     void ImberScrubber::MainNode_PositionDidChange(float value)
     {
-        _bar->barFill = value;
+        _bar->set_barFill(value);
         if (DidCalculateNewTime != nullptr)
         {
             DidCalculateNewTime(_audioTimeSyncController->songLength * value);
         }
-        _bar->currentTime = _audioTimeSyncController->songLength * value;
+        _bar->set_currentTime(_audioTimeSyncController->songLength * value);
         _loopNode->min = value + _minNodeDistance;
     }
 
@@ -134,20 +136,20 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberScrubber::Tick()
     {
         float currentAudioProgress = _audioTimeSyncController->songTime / _audioTimeSyncController->songEndTime;
-        if (!_mainNode->isBeingDragged)
+        if (!_mainNode->get_isBeingDragged())
         {
             if (!_loopMode)
             {
-                mainNodeValue = currentAudioProgress;
+                set_mainNodeValue(currentAudioProgress);
             }
-            _bar->currentTime = _audioTimeSyncController->songTime;
-            _bar->barFill = currentAudioProgress;
+            _bar->set_currentTime(_audioTimeSyncController->songTime);
+            _bar->set_barFill(currentAudioProgress);
         }
         if (_loopMode)
         {
             if (currentAudioProgress >= _bar->GetNodePercent(_loopNode))
             {
-                MainNode_PositionDidChange(mainNodeValue);
+                MainNode_PositionDidChange(get_mainNodeValue());
             }
         }
     }
@@ -183,10 +185,10 @@ namespace ScoreSaber::ReplaySystem::UI
         // Create the backwall for proper raycast events.
         auto borderElement = CreateImage(rectTransform);
         auto borderRectTransform = borderElement->rectTransform;
-        borderRectTransform->anchorMin = Vector2::zero;
-        borderRectTransform->anchorMax = Vector2::one;
+        borderRectTransform->anchorMin = Vector2::get_zero();
+        borderRectTransform->anchorMax = Vector2::get_one();
         borderRectTransform->sizeDelta = rectTransform->sizeDelta * 1.5f;
-        borderElement->color = Color::clear;
+        borderElement->color = Color::get_clear();
         borderElement->name = "Box Border";
 
         // Create the background bar image
@@ -195,7 +197,7 @@ namespace ScoreSaber::ReplaySystem::UI
         backgroundRectTransform->sizeDelta = barSize;
         backgroundRectTransform->anchorMin = Vector2(0.0f, 0.5f);
         backgroundRectTransform->anchorMax = Vector2(1.0f, 0.5f);
-        backgroundImage->color = Color::gray;
+        backgroundImage->color = Color::get_gray();
         backgroundImage->name = "Background Bar";
 
         // Create the progress bar image
@@ -212,7 +214,7 @@ namespace ScoreSaber::ReplaySystem::UI
         clickScrubRectTransform->sizeDelta = Vector2(barSize.x, barSize.y * 2.25f);
         clickScrubRectTransform->anchorMin = Vector2(0.0f, 0.5f);
         clickScrubRectTransform->anchorMax = Vector2(1.0f, 0.5f);
-        clickScrubImage->color = Color::clear;
+        clickScrubImage->color = Color::get_clear();
         auto clicker = clickScrubImage->gameObject->AddComponent<AmeClicker*>();
         clicker->Setup([&](float value) {
             ClickedBackground(value);
@@ -227,7 +229,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberScrubber::ClickedBackground(float value)
     {
-        if (_mainNode->isBeingDragged)
+        if (_mainNode->get_isBeingDragged())
         {
             if (DidCalculateNewTime != nullptr)
             {
@@ -240,7 +242,8 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         auto imageGameObject = GameObject::New_ctor("ImberImage");
         auto image = imageGameObject->AddComponent<HMUI::ImageView*>();
-        image->material = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return x->name == "UINoGlow"; });
+        
+        image->material = BSML::Helpers::GetUINoGlowMat();
         image->sprite = BSML::Utilities::ImageResources::GetWhitePixel();
         image->rectTransform->SetParent(parent, false);
         return image;
@@ -252,13 +255,13 @@ namespace ScoreSaber::ReplaySystem::UI
         auto rectTransform = nodeGameObject->AddComponent<RectTransform*>();
         rectTransform->SetParent(transform, false);
         rectTransform->anchoredPosition = Vector2(-6.0f, -50.0f);
-        rectTransform->sizeDelta = Vector2::one * 100.0f;
-        rectTransform->anchorMin = Vector2::one / 2.0f;
-        rectTransform->anchorMin = Vector2::one / 2.0f;
+        rectTransform->sizeDelta = Vector2::get_one() * 100.0f;
+        rectTransform->anchorMin = Vector2::get_one() / 2.0f;
+        rectTransform->anchorMin = Vector2::get_one() / 2.0f;
 
         auto nodeImage = CreateImage(rectTransform);
         auto nodeImageRectTransform = nodeImage->rectTransform;
-        nodeImageRectTransform->sizeDelta = Vector2::one * 25.0f;
+        nodeImageRectTransform->sizeDelta = Vector2::get_one() * 25.0f;
         nodeImageRectTransform->anchorMin = Vector2(0.5f, 1.0f);
         nodeImageRectTransform->anchorMax = Vector2(0.5f, 1.0f);
         nodeImage->name = "Marker";
@@ -267,17 +270,17 @@ namespace ScoreSaber::ReplaySystem::UI
         auto nodeStemRectTransform = nodeStem->rectTransform;
         nodeStemRectTransform->anchoredPosition = Vector2(0.0f, 15.0f);
         nodeStemRectTransform->sizeDelta = Vector2(2.5f, 75.0f);
-        nodeStemRectTransform->anchorMin = Vector2::one / 2.0f;
-        nodeStemRectTransform->anchorMax = Vector2::one / 2.0f;
+        nodeStemRectTransform->anchorMin = Vector2::get_one() / 2.0f;
+        nodeStemRectTransform->anchorMax = Vector2::get_one() / 2.0f;
         nodeStem->name = "Stem";
 
         auto nodeHandle = CreateImage(rectTransform);
         auto nodeHandleRectTransform = nodeHandle->rectTransform;
         nodeHandleRectTransform->localRotation = Quaternion::Euler(0.0f, 0.0f, 45.0f);
         nodeHandleRectTransform->anchoredPosition = Vector2(0.0f, -25.0f);
-        nodeHandleRectTransform->sizeDelta = Vector2::one * 30.0f;
-        nodeHandleRectTransform->anchorMin = Vector2::one / 2.0f;
-        nodeHandleRectTransform->anchorMax = Vector2::one / 2.0f;
+        nodeHandleRectTransform->sizeDelta = Vector2::get_one() * 30.0f;
+        nodeHandleRectTransform->anchorMin = Vector2::get_one() / 2.0f;
+        nodeHandleRectTransform->anchorMax = Vector2::get_one() / 2.0f;
         nodeHandle->name = "Handle";
 
         auto node = nodeGameObject->AddComponent<AmeNode*>();
@@ -292,13 +295,13 @@ namespace ScoreSaber::ReplaySystem::UI
         auto rectTransform = nodeGameObject->AddComponent<RectTransform*>();
         rectTransform->SetParent(transform, false);
         rectTransform->anchoredPosition = Vector2(-6.0f, -50.0f);
-        rectTransform->sizeDelta = Vector2::one * 100.0f;
-        rectTransform->anchorMin = Vector2::one / 2.0f;
-        rectTransform->anchorMin = Vector2::one / 2.0f;
+        rectTransform->sizeDelta = Vector2::get_one() * 100.0f;
+        rectTransform->anchorMin = Vector2::get_one() / 2.0f;
+        rectTransform->anchorMin = Vector2::get_one() / 2.0f;
 
         auto nodeImage = CreateImage(rectTransform);
         auto nodeImageRectTransform = nodeImage->rectTransform;
-        nodeImageRectTransform->sizeDelta = Vector2::one * 25.0f;
+        nodeImageRectTransform->sizeDelta = Vector2::get_one() * 25.0f;
         nodeImageRectTransform->anchorMin = Vector2(0.5f, 1.0f);
         nodeImageRectTransform->anchorMax = Vector2(0.5f, 1.0f);
         nodeImage->name = "Marker";
@@ -308,8 +311,8 @@ namespace ScoreSaber::ReplaySystem::UI
         textGameObject->transform->SetParent(rectTransform, false);
 
         auto curvedText = textGameObject->AddComponent<HMUI::CurvedTextMeshPro*>();
-        curvedText->font = QuestUI::BeatSaberUI::GetMainTextFont();
-        curvedText->fontSharedMaterial = QuestUI::BeatSaberUI::GetMainUIFontMaterial();
+        curvedText->font = BSML::Helpers::GetMainTextFont();
+        curvedText->fontSharedMaterial = BSML::Helpers::GetMainUIFontMaterial();
         curvedText->text = initialText;
         curvedText->rectTransform->anchorMin = Vector2(0.5f, 0.5f);
         curvedText->rectTransform->anchorMax = Vector2(0.5f, 0.5f);

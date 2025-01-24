@@ -3,22 +3,21 @@
 #include <iomanip>
 #include <sstream>
 
-#include <GlobalNamespace/HMTask.hpp>
 #include <System/Action.hpp>
 #include <UnityEngine/Networking/DownloadHandler.hpp>
 #include <UnityEngine/Networking/DownloadHandlerTexture.hpp>
 #include <UnityEngine/Networking/UnityWebRequest.hpp>
 #include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
 #include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/Color32.hpp>
 #include <UnityEngine/SpriteMeshType.hpp>
 #include <UnityEngine/Texture2D.hpp>
 #include "Utils/StringUtils.hpp"
 #include <custom-types/shared/delegate.hpp>
-#include "gif-lib/shared/gif_lib.h"
-#include "libcurl/shared/curl.h"
-#include "libcurl/shared/easy.h"
+#include <gif-lib/shared/gif_lib.h>
+#include <libcurl/shared/curl.h>
+#include <libcurl/shared/easy.h>
 #include "logging.hpp"
-#include "main.hpp"
 #include <tuple>
 
 // #include "gif_read.h"
@@ -75,7 +74,7 @@ struct Gif
 
     Texture2D* get_frame(int idx)
     {
-        if (!gif || idx > length)
+        if (!gif || idx > get_length())
             return nullptr;
 
         GifColorType* color;
@@ -108,12 +107,12 @@ struct Gif
         }
 
         // entire texture size;
-        int width = width;
-        int height = height;
+        int width = get_width();
+        int height = get_height();
         auto texture = Texture2D::New_ctor(width, height);
         // entire texture
         auto pixelData = texture->GetPixels32();
-        uint8_t* px = reinterpret_cast<uint8_t*>(pixelData->values);
+        uint8_t* px = reinterpret_cast<uint8_t*>(pixelData->_values);
         // top -> top + height
 
         // left -> left + width
@@ -133,22 +132,22 @@ struct Gif
 
                 color = &colorMap->Colors[frame->RasterBits[loc]];
                 long locWithinFrame = (frameInfo->Height - y - 1) * frameInfo->Width + x + pixelDataOffset;
-                pixelData->values[locWithinFrame] = Color32(color->Red, color->Green, color->Blue, 0xff);
+                pixelData->_values[locWithinFrame]._ctor(color->Red, color->Green, color->Blue, 0xff);
             }
         }
         texture->SetAllPixels32(pixelData, 0);
         texture->Apply();
         return texture;
     }
-    int width
+    int get_width()
     {
         return gif ? gif->SWidth : 0;
     };
-    int height
+    int get_height()
     {
         return gif ? gif->SHeight : 0;
     };
-    int length
+    int get_length()
     {
         return gif ? gif->ImageCount : 0;
     };
@@ -173,7 +172,7 @@ struct Gif
 
         vectorwrapbuf(Array<CharT>*& arr)
         {
-            this->std::basic_streambuf<CharT, TraitsT>::setg(arr->values, arr->values, arr->values + arr->Length());
+            this->std::basic_streambuf<CharT, TraitsT>::setg(arr->_values, arr->_values, arr->_values + arr->get_Length());
         }
     };
 
@@ -264,7 +263,7 @@ namespace WebUtils
         catch (std::bad_alloc& e)
         {
             // handle memory problem
-            getLogger().critical("Failed to allocate string of size: %lu", newLength);
+            CRITICAL("Failed to allocate string of size: {:d}", newLength);
             return 0;
         }
         return newLength;
@@ -282,7 +281,7 @@ namespace WebUtils
         catch (std::bad_alloc& e)
         {
             // handle memory problem
-            getLogger().critical("Failed to allocate vector of size: %lu", newLength);
+            CRITICAL("Failed to allocate vector of size: {:d}", newLength);
             return 0;
         }
         return newLength;
@@ -342,8 +341,7 @@ namespace WebUtils
         /* Check for errors */
         if (res != CURLE_OK)
         {
-            getLogger().critical("curl_easy_perform() failed: %u: %s", res,
-                                 curl_easy_strerror(res));
+            CRITICAL("curl_easy_perform() failed: {:d}: {:s}", (int)res, curl_easy_strerror(res));
         }
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
         curl_easy_cleanup(curl);
@@ -364,10 +362,10 @@ namespace WebUtils
                 finished(responseCode, response);
             }).detach();
         } else {
-            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[url, timeout, finished]() {
+            il2cpp_utils::il2cpp_aware_thread([url, timeout, finished]() {
                 auto [responseCode, response] = GetSync(url, timeout);
                 finished(responseCode, response);
-            }), nullptr)->Run();
+            }).detach();
         }
     }
 
@@ -416,7 +414,7 @@ namespace WebUtils
         /* Check for errors */
         if (res != CURLE_OK)
         {
-            getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+            CRITICAL("curl_easy_perform() failed: {:d}: {:s}", (int)res, curl_easy_strerror(res));
         }
 
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
@@ -433,10 +431,10 @@ namespace WebUtils
                 finished(responseCode, response);
             }).detach();
         } else {
-            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[url, postData, timeout, finished]() {
+            il2cpp_utils::il2cpp_aware_thread([url, postData, timeout, finished]() {
                 auto [responseCode, response] = PostSync(url, postData, timeout);
                 finished(responseCode, response);
-            }), nullptr)->Run();
+            }).detach();
         }
     }
 
@@ -500,7 +498,7 @@ namespace WebUtils
         /* Check for errors */
         if (res != CURLE_OK)
         {
-            getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+            CRITICAL("curl_easy_perform() failed: {:d}: {:s}", (int)res, curl_easy_strerror(res));
         }
 
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
@@ -513,10 +511,10 @@ namespace WebUtils
     // intentionally copy replayData so we don't accidentally access something in a thread-unsafe manner
     void PostWithReplayAsync(std::string url, const std::vector<char> replayData, std::string postData, long timeout, std::function<void(long, std::string)> finished)
     {
-        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[url, replayData, postData, timeout, finished] {
+        il2cpp_utils::il2cpp_aware_thread([url, replayData, postData, timeout, finished] {
             auto [responseCode, response] = PostWithReplaySync(url, replayData, postData, timeout);
             finished(responseCode, response);
-        }), nullptr)->Run();
+        }).detach();
     }
 
     long DownloadReplaySync(std::string url, std::vector<char>& replayData, long timeout)
@@ -556,8 +554,7 @@ namespace WebUtils
         /* Check for errors */
         if (res != CURLE_OK)
         {
-            getLogger().critical("curl_easy_perform() failed: %u: %s", res,
-                                 curl_easy_strerror(res));
+            CRITICAL("curl_easy_perform() failed: {:d}: {:s}", (int)res, curl_easy_strerror(res));
         }
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
         curl_easy_cleanup(curl);
@@ -605,10 +602,10 @@ namespace WebUtils
     {
         UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-        auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->downloadHandler);
-        auto texture = downloadHandlerTexture->texture;
-        auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-        out->sprite = sprite;
+        auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
+        auto texture = downloadHandlerTexture->get_texture();
+        auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        out->set_sprite(sprite);
         co_return;
     }
 
@@ -616,7 +613,7 @@ namespace WebUtils
     {
         UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-        auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->downloadHandler);
+        auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->get_downloadHandler());
         auto gifDataArr = downloadHandler->GetData();
         Gif gif(gifDataArr);
         int error = gif.Parse();
@@ -625,8 +622,8 @@ namespace WebUtils
         {
             co_yield nullptr;
             auto texture = gif.get_frame(0);
-            auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)gif.width, (float)gif.height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-            out->sprite = sprite;
+            auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)gif.get_width(), (float)gif.get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+            out->set_sprite(sprite);
         }
         else
         {

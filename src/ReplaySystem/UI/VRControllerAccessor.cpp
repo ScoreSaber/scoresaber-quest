@@ -2,6 +2,7 @@
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Vector2.hpp>
+#include <UnityEngine/Transform.hpp>
 #include "logging.hpp"
 
 using namespace UnityEngine;

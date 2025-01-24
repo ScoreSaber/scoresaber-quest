@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CustomTypes/Components/ClickableText.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 
 #include <HMUI/ImageView.hpp>
@@ -12,16 +11,18 @@
 #include <UnityEngine/UI/VerticalLayoutGroup.hpp>
 #include <custom-types/shared/coroutine.hpp>
 #include <custom-types/shared/macros.hpp>
-#include "questui/CustomTypes/Components/Backgroundable.hpp"
+#include <paper/shared/string_convert.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
 #include <string_view>
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::UI::Other, Banner, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_METHOD(void, Update);
-    DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
+    DECLARE_INSTANCE_FIELD(BSML::Backgroundable*, bg);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, bgImage);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, topText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, bottomText);
+    DECLARE_INSTANCE_FIELD(BSML::ClickableText*, topText);
+    DECLARE_INSTANCE_FIELD(BSML::ClickableText*, bottomText);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
     DECLARE_INSTANCE_FIELD(UnityEngine::UI::VerticalLayoutGroup*, loadingVertical);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, promptText);

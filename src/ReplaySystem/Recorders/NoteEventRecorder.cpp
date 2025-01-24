@@ -6,7 +6,10 @@
 #include <GlobalNamespace/NoteController.hpp>
 #include <GlobalNamespace/NoteCutInfo.hpp>
 #include <GlobalNamespace/NoteData.hpp>
+#include <GlobalNamespace/GoodCutScoringElement.hpp>
+#include <GlobalNamespace/IReadonlyCutScoreBuffer.hpp>
 #include <GlobalNamespace/ScoreController.hpp>
+#include <GlobalNamespace/ScoringElement.hpp>
 #include <System/Action_1.hpp>
 #include <UnityEngine/Quaternion.hpp>
 #include <UnityEngine/Resources.hpp>
@@ -82,7 +85,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
                                                noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
                                                noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
                                                goodCut->cutScoreBuffer->beforeCutSwingRating, goodCut->cutScoreBuffer->afterCutSwingRating,
-                                               cutTime, Time::timeScale, _audioTimeSyncController->timeScale,
+                                               cutTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
                                                
                                                noteCutInfo.timeDeviation, VRRotation(noteCutInfo.worldRotation), VRRotation(noteCutInfo.inverseWorldRotation),
                                                VRRotation(noteCutInfo.noteRotation), VRPosition(noteCutInfo.notePosition)));
@@ -97,7 +100,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
                                                (int)noteCutInfo.saberType, noteCutInfo.directionOK,
                                                noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
                                                noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
-                                               0, 0, _audioTimeSyncController->songTime, Time::timeScale, _audioTimeSyncController->timeScale,
+                                               0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
                                                
                                                noteCutInfo.timeDeviation, VRRotation(noteCutInfo.worldRotation), VRRotation(noteCutInfo.inverseWorldRotation),
                                                VRRotation(noteCutInfo.noteRotation), VRPosition(noteCutInfo.notePosition)));
@@ -106,7 +109,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
         {
             _noteKeyframes.push_back(NoteEvent(noteID, NoteEventType::Miss, VRPosition(), VRPosition(), VRPosition(), (int)noteData->colorType,
                                                false, 0,
-                                               0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::timeScale, _audioTimeSyncController->timeScale,
+                                               0, 0, 0, 0, 0, _audioTimeSyncController->songTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
                                                
                                                // I couldn't find where to grab these for misses
                                                0, VRRotation(), VRRotation(),

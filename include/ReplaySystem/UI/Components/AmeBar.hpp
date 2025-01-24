@@ -16,7 +16,6 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeBar, UnityEng
                       DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _endTimeText);
                       DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _currentTimeText);
                       DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _otherTransform);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::Material*, _mainUIFontMaterial);
                       DECLARE_INSTANCE_METHOD(void, Setup, UnityEngine::RectTransform* fillBarTransform, UnityEngine::RectTransform* otherTransform);
                       DECLARE_INSTANCE_METHOD(void, RegisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);
                       DECLARE_INSTANCE_METHOD(void, UnregisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);

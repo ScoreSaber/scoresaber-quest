@@ -9,6 +9,9 @@
 #include <UnityEngine/Sprite.hpp>
 #include <UnityEngine/SpriteMeshType.hpp>
 #include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
 
 #include "Sprites.hpp"
 #include "Utils/StringUtils.hpp"
@@ -17,7 +20,6 @@
 
 #include "logging.hpp"
 #include "main.hpp"
-#include "questui/QuestUI.hpp"
 
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell);
 
@@ -26,8 +28,8 @@ using namespace StringUtils;
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
 using namespace TMPro;
+using namespace BSML::Lite;
 
 using LeaderboardType = ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType;
 
@@ -42,7 +44,7 @@ void GlobalLeaderboardTableCell::ctor()
 VerticalLayoutGroup* CreateHost(Transform* parent, Vector2 anchoredPos,
                                 Vector2 size)
 {
-    VerticalLayoutGroup* group = QuestUI::CreateVerticalLayoutGroup(parent);
+    VerticalLayoutGroup* group = CreateVerticalLayoutGroup(parent);
     group->rectTransform->anchoredPosition = anchoredPos;
 
     LayoutElement* elem = group->GetComponent<LayoutElement*>();
@@ -62,7 +64,7 @@ std::string flag_url(std::string_view COUNTRY)
     {
         c = tolower(c);
     }
-    auto url = string_format("https://github.com/hampusborgos/country-flags/raw/main/png250px/%s.png", country.c_str());
+    auto url = fmt::format("https://github.com/hampusborgos/country-flags/raw/main/png250px/{:s}.png", country.c_str());
     return url;
 }
 
@@ -90,14 +92,14 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
 
     if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
-        this->rank->text = string_format("#%d", player.rank);
+        this->rank->text = fmt::format("#{:d}", player.rank);
     }
     else
     {
-        this->rank->text = string_format("#%d (#%d)", player.countryRank, player.rank);
+        this->rank->text = fmt::format("#{:d} (#{:d})", player.countryRank, player.rank);
     }
 
-    this->pp->text = string_format("<color=#6872e5>%.0fpp</color>", player.pp);
+    this->pp->text = fmt::format("<color=#6872e5>{:.0f}pp</color>", player.pp);
     flag->sprite = Base64ToSprite(country_base64);
 
     flagRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(flag_url(player.country), flag));
@@ -123,15 +125,15 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     std::string result;
     if (weeklyChange > 0)
     {
-        result = string_format("<color=green>+%d</color>", weeklyChange);
+        result = fmt::format("<color=green>+{:d}</color>", weeklyChange);
     }
     else if (weeklyChange < 0)
     {
-        result = string_format("<color=red>%d</color>", weeklyChange);
+        result = fmt::format("<color=red>{:d}</color>", weeklyChange);
     }
     else
     {
-        result = string_format("%d", weeklyChange);
+        result = fmt::format("{:d}", weeklyChange);
     }
     weekly->text = result;
 
@@ -147,7 +149,7 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     cellGO->AddComponent<HMUI::Touchable*>();
     playerCell->interactable = false;
 
-    auto verticalLayoutGroup = QuestUI::CreateVerticalLayoutGroup(
+    auto verticalLayoutGroup = CreateVerticalLayoutGroup(
         playerCell->transform);
 
     auto layout = verticalLayoutGroup->gameObject->GetComponent<UnityEngine::UI::LayoutElement*>();
@@ -156,12 +158,12 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 
     Transform* t = playerCell->transform;
 
-    playerCell->profile = UIUtils::CreateClickableImage(
+    playerCell->profile = CreateClickableImage(
         CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->transform,
-        Base64ToSprite(oculus_base64), {0.0f, 0.0f},
-        {10.0f, 10.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+        Base64ToSprite(oculus_base64), std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell),
+        {0.0f, 0.0f}, {10.0f, 10.0f});
 
-    playerCell->name = UIUtils::CreateClickableText(
+    playerCell->name = CreateClickableText(
         CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->transform,
         u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
 
@@ -169,33 +171,33 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     playerCell->name->alignment = TextAlignmentOptions::Left;
     playerCell->name->fontSize = 5.0f;
 
-    playerCell->rank = QuestUI::CreateText(
+    playerCell->rank = CreateText(
         CreateHost(t, {-18.0f, -2.0f}, {40.0f, 8.0f})->transform,
         "#---", false,
         {0.0f, 0.0f});
 
     playerCell->rank->alignment = TextAlignmentOptions::Left;
 
-    playerCell->pp = QuestUI::CreateText(
+    playerCell->pp = CreateText(
         CreateHost(t, {27.0f, 0.0f}, {20.0f, 11.0f})->transform,
         "---<color=#6872e5>pp</color>", false, {0.0f, 0.0f});
 
     playerCell->pp->fontSize = 5.0f;
     playerCell->pp->overflowMode = TextOverflowModes::Ellipsis;
 
-    playerCell->flag = QuestUI::CreateImage(
+    playerCell->flag = CreateImage(
         CreateHost(t, {19.42f, -1.65f}, {4.0f, 3.0f})->transform,
         Base64ToSprite(country_base64), {0.0f, 0.0f},
         {4.0, 3.0f});
 
     playerCell->flag->preserveAspect = true;
 
-    playerCell->country = QuestUI::CreateText(
+    playerCell->country = CreateText(
         CreateHost(t, {31.0f, -2.0f}, {17.0f, 0.0f})->transform, "N/A", false, {0.0f, 0.0f});
     playerCell->country->alignment = TextAlignmentOptions::Left;
     playerCell->country->fontSize = 3.5f;
 
-    playerCell->weekly = QuestUI::CreateText(
+    playerCell->weekly = CreateText(
         CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->transform, "0", false,
         {0.0f, 0.0f});
 

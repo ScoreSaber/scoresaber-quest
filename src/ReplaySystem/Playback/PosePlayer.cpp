@@ -1,6 +1,7 @@
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include <GlobalNamespace/Saber.hpp>
 #include <GlobalNamespace/VRController.hpp>
+#include <BeatSaber/GameSettings/MainSettings.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <UnityEngine/GameObject.hpp>
 #include <UnityEngine/Mathf.hpp>

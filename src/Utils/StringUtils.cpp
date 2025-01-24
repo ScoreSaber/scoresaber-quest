@@ -11,7 +11,8 @@
 #include <System/IO/Path.hpp>
 #include <System/String.hpp>
 #include "logging.hpp"
-#include "paper/shared/string_convert.hpp"
+#include <paper/shared/string_convert.hpp>
+#include "Utils/StrippedMethods.hpp"
 
 static std::string color_prefix = "<color=";
 static std::string color_suffix = "</color>";
@@ -58,7 +59,7 @@ namespace StringUtils
 
     std::string ReplaceInvalidChars(std::string fileName)
     {
-        auto splitChars = StringW(fileName)->Split(System::IO::Path::GetInvalidFileNameChars());
+        auto splitChars = StringW(fileName)->Split(StrippedMethods::System::IO::Path::GetInvalidFileNameChars());
         auto result = System::String::Join(StringW("_"), splitChars);
         return result;
     }
@@ -78,7 +79,7 @@ namespace StringUtils
 
     std::u16string FormatScore(double s)
     {
-        return Paper::StringConvert::from_utf8(string_format(" - (<color=#ffd42a>%.2f%%</color>)", s));
+        return Paper::StringConvert::from_utf8(fmt::format(" - (<color=#ffd42a>{:.2f}%</color>)", s));
     }
 
     std::string FormatScore(std::string s)

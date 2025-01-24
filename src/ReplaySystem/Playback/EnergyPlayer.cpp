@@ -5,6 +5,7 @@
 #include <UnityEngine/Playables/PlayableDirector.hpp>
 #include <UnityEngine/Resources.hpp>
 #include <UnityEngine/UI/Image.hpp>
+#include <UnityEngine/Mathf.hpp>
 #include "logging.hpp"
 #include <algorithm>
 
@@ -37,7 +38,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         UpdateEnergy(0.5f);
         auto lastEvent = _sortedEnergyEvents[_sortedEnergyEvents.size() - 1];
-        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::Epsilon)
+        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::getStaticF_Epsilon())
         {
             UpdateEnergy(0.0f);
         }
@@ -45,7 +46,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void EnergyPlayer::UpdateEnergy(float energy)
     {
-        bool isFailingEnergy = energy <= Mathf::Epsilon;
+        bool isFailingEnergy = energy <= Mathf::getStaticF_Epsilon();
         bool noFail = _gameEnergyCounter->noFail;
         _gameEnergyCounter->noFail = false;
         _gameEnergyCounter->_didReach0Energy = isFailingEnergy;

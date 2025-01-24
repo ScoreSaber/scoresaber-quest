@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
-#include "CustomTypes/Components/ImageButton.hpp"
 #include "Data/Player.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 
@@ -12,8 +11,8 @@
 #include <UnityEngine/Coroutine.hpp>
 #include <UnityEngine/MonoBehaviour.hpp>
 #include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
 #include <custom-types/shared/macros.hpp>
-#include "questui/CustomTypes/Components/Backgroundable.hpp"
 
 #define GET_FIND_METHOD(mPtr) \
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
@@ -27,7 +26,7 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, name);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, flag);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, profile);
-    DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
+    DECLARE_INSTANCE_FIELD(BSML::Backgroundable*, bg);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, flagRoutine);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);

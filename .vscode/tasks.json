@@ -65,7 +65,7 @@
             "label": "Copy",
             "detail": "Builds and copies the library to the Quest using ADB and force-quits Beat Saber",
             "type": "shell",
-            "command": "./scripts/copy.ps1",
+            "command": "./scripts/copy.ps1 -UseDebug",
             "group": "build",
             "options": {
                 "env": {}
@@ -76,12 +76,14 @@
             "detail": "Begin logging from the Quest to the console",
             "type": "shell",
             "command": "./scripts/start-logging.ps1",
+            "problemMatcher": []
         },
         {
             "label": "Start logging to file",
             "detail": "Begin logging from the Quest to the console and saving output to a file 'logcat.log'",
             "type": "shell",
-            "command": "./scripts/start-logging.ps1 --file",
+            "command": "./scripts/start-logging.ps1 -File ../logcat.log",
+            "problemMatcher": []
         },
         {
             "label": "Build QMOD",
@@ -106,7 +108,7 @@
             "label": "Process Stack",
             "detail": "Processes a tombstone using the debug .so to find file locations",
             "type": "shell",
-            "command": "./scripts/ndk-stack.ps1",
+            "command": "./scripts/ndk-stack.ps1 logcat.log",
             "problemMatcher": []
         },
         {

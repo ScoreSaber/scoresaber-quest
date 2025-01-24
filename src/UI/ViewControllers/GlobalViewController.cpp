@@ -2,8 +2,7 @@
 
 #include "CustomTypes/Components/GlobalLeaderboardTableCell.hpp"
 #include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
-#include <GlobalNamespace/SharedCoroutineStarter.hpp>
-#include <HMUI/TableView_ScrollPositionType.hpp>
+#include <HMUI/TableView.hpp>
 
 #include "Sprites.hpp"
 #include <UnityEngine/Application.hpp>
@@ -13,10 +12,11 @@
 #include <UnityEngine/Sprite.hpp>
 #include <UnityEngine/SpriteMeshType.hpp>
 #include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
 #include "Utils/UIUtils.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/QuestUI.hpp"
+#include "Utils/StrippedMethods.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::ViewControllers, GlobalViewController);
 
@@ -24,8 +24,8 @@ using namespace ScoreSaber::CustomTypes::Components;
 using namespace TMPro;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML;
+using namespace BSML::Lite;
 
 custom_types::Helpers::Coroutine WaitForInit(
     SafePtrUnity<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>
@@ -53,7 +53,7 @@ namespace ScoreSaber::UI::ViewControllers
     {
         if (firstActivation)
         {
-            VerticalLayoutGroup* vertical = BeatSaberUI::CreateVerticalLayoutGroup(transform);
+            VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(transform);
             vertical->spacing = 2.0f;
             vertical->childControlHeight = false;
             vertical->childAlignment = TextAnchor::MiddleCenter;
@@ -73,7 +73,7 @@ namespace ScoreSaber::UI::ViewControllers
             textHorizontal->childAlignment = TextAnchor::MiddleCenter;
             SetPreferredSize(textHorizontal, 80.0f, -1);
             textHorizontal->rectTransform->sizeDelta = Vector2(-40.0f, 0.0f);
-            auto headerText = UIUtils::CreateClickableText(textHorizontal->transform, u"Global Leaderboards", Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f), []() { Application::OpenURL("https://scoresaber.com/rankings"); });
+            auto headerText = CreateClickableText(textHorizontal->transform, u"Global Leaderboards", Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f), []() { StrippedMethods::UnityEngine::Application::OpenURL("https://scoresaber.com/rankings"); });
 
             headerText->alignment = TMPro::TextAlignmentOptions::Center;
             headerText->fontSize = 7.0f;
@@ -86,10 +86,12 @@ namespace ScoreSaber::UI::ViewControllers
             textObject->alignment = TMPro::TextAlignmentOptions::Left;
 
             auto headerBG = headerHorizontal->gameObject->AddComponent<Backgroundable*>();
-            headerBG->ApplyBackgroundWithAlpha("round-rect-panel", 0.5f);
-            auto headerImageView = headerBG->gameObject->GetComponentInChildren<HMUI::ImageView*>()->skew = 0.18f;
+            headerBG->ApplyBackground("round-rect-panel");
+            headerBG->ApplyAlpha(0.5f);
+            auto headerImageView = headerBG->gameObject->GetComponentInChildren<HMUI::ImageView*>();
+            headerImageView->_skew = 0.18f;
 
-            HorizontalLayoutGroup* globalHost = BeatSaberUI::CreateHorizontalLayoutGroup(vertical->transform);
+            HorizontalLayoutGroup* globalHost = CreateHorizontalLayoutGroup(vertical->transform);
             globalHost->spacing = 1.0f;
 
             ContentSizeFitter* globalHostFitter = globalHost->GetComponent<ContentSizeFitter*>();
@@ -99,15 +101,15 @@ namespace ScoreSaber::UI::ViewControllers
             LayoutElement* globalHostElement = globalHost->GetComponent<LayoutElement*>();
             globalHostElement->preferredWidth = 120.0f;
 
-            VerticalLayoutGroup* scoreScopesHost = BeatSaberUI::CreateVerticalLayoutGroup(globalHost->transform);
+            VerticalLayoutGroup* scoreScopesHost = CreateVerticalLayoutGroup(globalHost->transform);
 
             LayoutElement* scoreScopesHostElement = scoreScopesHost->GetComponent<LayoutElement*>();
             scoreScopesHostElement->preferredWidth = 9.0f;
 
-            auto arrow = UIUtils::CreateClickableImage(scoreScopesHost->transform, Base64ToSprite(carat_up_base64), {0.0f, 25.0f}, {9.0f, 9.0f},
-                                                       std::bind(&GlobalViewController::UpButtonWasPressed, this));
+            auto arrow = CreateClickableImage(scoreScopesHost->transform, Base64ToSprite(carat_up_base64),
+                                                       std::bind(&GlobalViewController::UpButtonWasPressed, this), {0.0f, 25.0f}, {9.0f, 9.0f});
 
-            VerticalLayoutGroup* scoreScopes = BeatSaberUI::CreateVerticalLayoutGroup(scoreScopesHost->transform);
+            VerticalLayoutGroup* scoreScopes = CreateVerticalLayoutGroup(scoreScopesHost->transform);
 
             RectOffset* scoreScopesPad = scoreScopes->padding;
             scoreScopesPad->bottom = 1;
@@ -120,9 +122,10 @@ namespace ScoreSaber::UI::ViewControllers
             scoreScopesElement->preferredHeight = 40.0f;
 
             Backgroundable* background = scoreScopes->gameObject->AddComponent<Backgroundable*>();
-            background->ApplyBackgroundWithAlpha("round-rect-panel", 1.0f);
+            background->ApplyBackground("round-rect-panel");
+            background->ApplyAlpha(1.0f);
 
-            VerticalLayoutGroup* imagesGroup = BeatSaberUI::CreateVerticalLayoutGroup(scoreScopes->transform);
+            VerticalLayoutGroup* imagesGroup = CreateVerticalLayoutGroup(scoreScopes->transform);
 
             LayoutElement* imagesGroupElement = imagesGroup->GetComponent<LayoutElement*>();
             imagesGroupElement->preferredWidth = 4.0f;
@@ -133,29 +136,36 @@ namespace ScoreSaber::UI::ViewControllers
             auto playerSprite = Base64ToSprite(player_base64);
             auto friendsSprite = Base64ToSprite(friends_base64);
 
-            auto globalButton = UIUtils::CreateClickableImage(imagesGroup->transform,
-                                                              globalSprite, {0.0f, 0.0f},
-                                                              {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global));
+            auto globalButton = CreateClickableImage(imagesGroup->transform,
+                                                     globalSprite,
+                                                     std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global),
+                                                     {0.0f, 0.0f},
+                                                     {4.0f, 4.0f});
             globalButton->preserveAspect = true;
-            auto aroundYouButton = UIUtils::CreateClickableImage(imagesGroup->transform,
-                                                                 playerSprite, {0.0f, 0.0f},
-                                                                 {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::AroundYou));
+            auto aroundYouButton = CreateClickableImage(imagesGroup->transform,
+                                                        playerSprite, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::AroundYou),
+                                                        {0.0f, 0.0f},
+                                                        {4.0f, 4.0f});
             aroundYouButton->preserveAspect = true;
-            auto friendsButton = UIUtils::CreateClickableImage(imagesGroup->transform,
-                                                               friendsSprite, {0.0f, 0.0f},
-                                                               {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Friends));
+            auto friendsButton = CreateClickableImage(imagesGroup->transform,
+                                                      friendsSprite,
+                                                      std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Friends),
+                                                      {0.0f, 0.0f},
+                                                      {4.0f, 4.0f});
             friendsButton->preserveAspect = true;
-            auto countryButton = UIUtils::CreateClickableImage(imagesGroup->transform,
-                                                               countrySprite, {0.0f, 0.0f},
-                                                               {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country));
+            auto countryButton = CreateClickableImage(imagesGroup->transform,
+                                                      countrySprite,
+                                                      std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country),
+                                                      {0.0f, 0.0f},
+                                                      {4.0f, 4.0f});
             countryButton->preserveAspect = true;
 
-            auto downrrow = UIUtils::CreateClickableImage(scoreScopesHost->transform, Base64ToSprite(carat_down_base64),
-                                                          {0.0f, 25.0f}, {9.0f, 9.0f}, std::bind(&GlobalViewController::DownButtonWasPressed, this));
+            auto downrrow = CreateClickableImage(scoreScopesHost->transform, Base64ToSprite(carat_down_base64),
+                                                          std::bind(&GlobalViewController::DownButtonWasPressed, this), {0.0f, 25.0f}, {9.0f, 9.0f});
 
-            VerticalLayoutGroup* globalVerticalHost = BeatSaberUI::CreateVerticalLayoutGroup(globalHost->transform);
+            VerticalLayoutGroup* globalVerticalHost = CreateVerticalLayoutGroup(globalHost->transform);
 
-            VerticalLayoutGroup* playersHost = BeatSaberUI::CreateVerticalLayoutGroup(globalVerticalHost->transform);
+            VerticalLayoutGroup* playersHost = CreateVerticalLayoutGroup(globalVerticalHost->transform);
 
             auto loadingVertical = CreateVerticalLayoutGroup(transform);
             SetPreferredSize(loadingVertical, 10, 10);
@@ -166,12 +176,13 @@ namespace ScoreSaber::UI::ViewControllers
 
             loadingIndicator = UIUtils::CreateLoadingIndicator(loadingHorizontal->transform);
             auto loadingIndicatorLayout = loadingIndicator->GetComponent<LayoutElement*>();
-            auto loadingIndicatorRectTransform = reinterpret_cast<RectTransform*>(loadingIndicator->transform);
+            auto loadingIndicatorRectTransform = loadingIndicator->transform.cast<RectTransform>();
 
             playersHost->padding = RectOffset::New_ctor(2, 2, 2, 2);
 
             Backgroundable* playersHostBg = playersHost->gameObject->AddComponent<Backgroundable*>();
-            playersHostBg->ApplyBackgroundWithAlpha("round-rect-panel", 1.0f);
+            playersHostBg->ApplyBackground("round-rect-panel");
+            playersHostBg->ApplyAlpha(1.0f);
 
             LayoutElement* playersHostElement = playersHost->GetComponent<LayoutElement*>();
             playersHostElement->preferredWidth = 105.0f;
@@ -194,7 +205,7 @@ namespace ScoreSaber::UI::ViewControllers
         }
     }
 
-    void GlobalViewController::loading = bool value
+    void GlobalViewController::set_loading(bool value)
     {
         loadingIndicator->SetActive(value);
     }
@@ -249,7 +260,7 @@ namespace ScoreSaber::UI::ViewControllers
             auto buttonHorizontal = CreateHorizontalLayoutGroup(textVertical->transform);
             auto dismiss = CreateUIButton(buttonHorizontal->transform, "Dismiss", [&]() { moreInfoModal->Hide(true, nullptr); });
 
-            auto moreInfo = CreateUIButton(buttonHorizontal->transform, "More Info", []() { Application::OpenURL("https://wiki.scoresaber.com/ranking-system.html"); });
+            auto moreInfo = CreateUIButton(buttonHorizontal->transform, "More Info", []() { StrippedMethods::UnityEngine::Application::OpenURL("https://wiki.scoresaber.com/ranking-system.html"); });
         }
         moreInfoModal->Show(true, true, nullptr);
     }

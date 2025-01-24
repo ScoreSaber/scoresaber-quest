@@ -9,20 +9,19 @@
 #include <UnityEngine/RectOffset.hpp>
 #include <UnityEngine/WaitForSeconds.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
-#include "Utils/StringUtils.hpp"
-#include "Utils/UIUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
-#include "main.hpp"
 #include "static.hpp"
 
 #include "Data/PlayerCollection.hpp"
 #include "UI/ViewControllers/GlobalViewController.hpp"
+#include "Utils/StrippedMethods.hpp"
 
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData);
 
 using namespace ScoreSaber::CustomTypes::Components;
 using namespace UnityEngine::UI;
+using namespace UnityEngine::Networking;
 using namespace TMPro;
 using namespace ScoreSaber;
 
@@ -34,11 +33,11 @@ Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData* self)
 {
-    std::string url = self->leaderboardURL;
-    UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
-    webRequest->SetRequestHeader("Cookie", WebUtils::cookie);
+    std::string url = self->GetLeaderboardURL();
+    UnityWebRequest* webRequest = UnityWebRequest::Get(url);
+    StrippedMethods::UnityEngine::Networking::UnityWebRequest::SetRequestHeader(webRequest, "Cookie", WebUtils::cookie);
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
-    if (!webRequest->isNetworkError)
+    if (webRequest->result != UnityWebRequest::Result::ProtocolError || webRequest->result != UnityWebRequest::Result::ConnectionError)
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document
 
@@ -85,7 +84,7 @@ namespace ScoreSaber::CustomTypes::Components
         StartRefresh();
     }
 
-    std::string GlobalLeaderboardTableData::GetleaderboardURL()
+    std::string GlobalLeaderboardTableData::GetLeaderboardURL()
     {
         std::string playersUrl = ScoreSaber::Static::BASE_URL + "/api/game/players";
         switch (leaderboardType)
@@ -94,16 +93,16 @@ namespace ScoreSaber::CustomTypes::Components
                 [[fallthrough]];
             case LeaderboardType::Global:
                 // Global leaderboard
-                return string_format("%s?page=%d", playersUrl.c_str(), page);
+                return fmt::format("{:s}?page={:d}", playersUrl.c_str(), page);
                 break;
             case LeaderboardType::AroundYou:
-                return string_format("%s/around-player", playersUrl.c_str());
+                return fmt::format("{:s}/around-player", playersUrl.c_str());
                 break;
             case LeaderboardType::Friends:
-                return string_format("%s/around-friends?page=%d", playersUrl.c_str(), page);
+                return fmt::format("{:s}/around-friends?page={:d}", playersUrl.c_str(), page);
                 break;
             case LeaderboardType::Country:
-                return string_format("%s/around-country?page=%d", playersUrl.c_str(), page);
+                return fmt::format("{:s}/around-country?page={:d}", playersUrl.c_str(), page);
                 break;
         }
     }

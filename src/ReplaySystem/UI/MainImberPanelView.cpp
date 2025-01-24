@@ -1,12 +1,11 @@
 #include "ReplaySystem/UI/MainImberPanelView.hpp"
-#include <HMUI/ViewController_AnimationType.hpp>
+#include <HMUI/ViewController.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Vector2.hpp>
 #include "assets.hpp"
 #include <bsml/shared/BSML.hpp>
 #include "logging.hpp"
-#include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 #include <sstream>
 #include <iomanip>
 
@@ -20,12 +19,12 @@ namespace ScoreSaber::ReplaySystem::UI
 
     // Props
 
-    Transform* MainImberPanelView::transform
+    Transform* MainImberPanelView::get_Transform()
     {
         return _floatingScreen->transform;
     }
 
-    void MainImberPanelView::visibility = bool value
+    void MainImberPanelView::set_visibility(bool value)
     {
         if (_floatingScreen != nullptr)
         {
@@ -33,7 +32,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    void MainImberPanelView::fps = int value
+    void MainImberPanelView::set_fps(int value)
     {
         if (fpsText != nullptr)
         {
@@ -53,7 +52,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    void MainImberPanelView::leftSaberSpeed = float value
+    void MainImberPanelView::set_leftSaberSpeed(float value)
     {
         if (leftSpeedText != nullptr) {
             std::stringstream ss;
@@ -63,7 +62,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    void MainImberPanelView::rightSaberSpeed = float value
+    void MainImberPanelView::set_rightSaberSpeed(float value)
     {
         if (rightSpeedText != nullptr) {
             std::stringstream ss;
@@ -73,17 +72,17 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    void MainImberPanelView::didParse = bool value
+    void MainImberPanelView::set_didParse(bool value)
     {
         _didParse = value;
     }
 
-    bool MainImberPanelView::didParse
+    bool MainImberPanelView::get_didParse()
     {
         return _didParse;
     }
 
-    void MainImberPanelView::timeSync = float value
+    void MainImberPanelView::set_timeSync(float value)
     {
         _timeSync = Mathf::Approximately(_initialTime, value) ? _initialTime : value;
         if (DidTimeSyncChange != nullptr)
@@ -92,32 +91,32 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    float MainImberPanelView::timeSync
+    float MainImberPanelView::get_timeSync()
     {
         return _timeSync;
     }
 
-    void MainImberPanelView::loopText = StringW value
+    void MainImberPanelView::set_loopText(StringW value)
     {
         _loopText = value;
     }
 
-    StringW MainImberPanelView::loopText
+    StringW MainImberPanelView::get_loopText()
     {
         return _loopText;
     }
 
-    void MainImberPanelView::playPauseText = StringW value
+    void MainImberPanelView::set_playPauseText(StringW value)
     {
         _playPauseText = value;
     }
 
-    StringW MainImberPanelView::playPauseText
+    StringW MainImberPanelView::get_playPauseText()
     {
         return _playPauseText;
     }
 
-    void MainImberPanelView::location = StringW value
+    void MainImberPanelView::set_location(StringW value)
     {
         _location = value;
         if (DidPositionPreviewChange != nullptr)
@@ -126,7 +125,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    StringW MainImberPanelView::location
+    StringW MainImberPanelView::get_location()
     {
         return _location;
     }
@@ -148,11 +147,11 @@ namespace ScoreSaber::ReplaySystem::UI
         if (firstActivation) {
             BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, transform, this);
         }
-        didSelectDelegate = custom_types::MakeDelegate<System::Action_2<HMUI::SegmentedControl*, int>*>((std::function<void(HMUI::SegmentedControl*, int)>)[&](HMUI::SegmentedControl* segmentedControl, int idx) {
+        didSelectDelegate = custom_types::MakeDelegate<System::Action_2<UnityW<HMUI::SegmentedControl>, int>*>((std::function<void(UnityW<HMUI::SegmentedControl>, int)>)[&](UnityW<HMUI::SegmentedControl> segmentedControl, int idx) {
             DidSelect(segmentedControl, idx);
         });
         tabSelector->textSegmentedControl->add_didSelectCellEvent(didSelectDelegate);
-        didParse = true;
+        set_didParse(true);
         if (firstActivation)
         {
             Vector3 localScale = tabSelector->transform->localScale;

@@ -1,10 +1,9 @@
 #pragma once
 
 #include <GlobalNamespace/GameNoteController.hpp>
-#include <GlobalNamespace/GameNoteController_Pool.hpp>
 #include <System/IDisposable.hpp>
-#include "Tweening/TimeTweeningManager.hpp"
-#include "Tweening/Tween.hpp"
+#include <Tweening/TimeTweeningManager.hpp>
+#include <Tweening/Tween.hpp>
 #include <UnityEngine/Quaternion.hpp>
 #include <UnityEngine/Shader.hpp>
 #include <UnityEngine/Vector3.hpp>

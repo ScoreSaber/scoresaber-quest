@@ -12,9 +12,10 @@
 #include <UnityEngine/Transform.hpp>
 #include <UnityEngine/XR/XRNode.hpp>
 #include <beatsaber-hook/shared/utils/typedefs.h>
+#include <System/Collections/Generic/List_1.hpp>
 
 #include <bsml/shared/BSML/FloatingScreen/FloatingScreen.hpp>
-
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
 #include <bsml/shared/BSML/Components/TabSelector.hpp>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::ViewController,
@@ -42,7 +43,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       DECLARE_BSML_PROPERTY(StringW, playPauseText);
                       DECLARE_BSML_PROPERTY(StringW, location);
 
-                      DECLARE_INSTANCE_FIELD_PRIVATE_DEFAULT(List<Il2CppObject*>*, locations, List<Il2CppObject*>::New_ctor());
+                      DECLARE_INSTANCE_FIELD_PRIVATE_DEFAULT(ListW<StringW>, locations, ListW<StringW>::New());
                       DECLARE_INSTANCE_FIELD_PRIVATE(BSML::TabSelector*, tabSelector);
                       DECLARE_INSTANCE_FIELD_PRIVATE(HMUI::CurvedTextMeshPro*, fpsText);
                       DECLARE_INSTANCE_FIELD_PRIVATE(HMUI::CurvedTextMeshPro*, leftSpeedText);
@@ -66,7 +67,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       /* Use the ctor to set default values like _playPauseText = "PAUSE"; */
                       DECLARE_CTOR(ctor);
                       private:
-                        System::Action_2<HMUI::SegmentedControl*, int> *didSelectDelegate;
+                        System::Action_2<UnityW<HMUI::SegmentedControl>, int> *didSelectDelegate;
                       public: 
                       std::function<void(bool)> DidPositionTabVisibilityChange;
                       std::function<void(std::string)> DidPositionPreviewChange;

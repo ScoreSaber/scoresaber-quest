@@ -6,13 +6,14 @@
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Vector2.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
+using namespace BSML::Lite;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::UI, ImberManager);
 
@@ -129,16 +130,16 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::GamePause_didResumeEvent()
     {
-        _mainImberPanelView->playPauseText = "PAUSE";
+        _mainImberPanelView->_playPauseText = "PAUSE";
     }
 
     void ImberManager::ImberSpecsReporter_DidReport(int fps, float leftSaberSpeed, float rightSaberSpeed)
     {
-        if (_mainImberPanelView->didParse)
+        if (_mainImberPanelView->_didParse)
         {
-            _mainImberPanelView->fps = fps;
-            _mainImberPanelView->leftSaberSpeed = leftSaberSpeed * (_initialTimeScale / _audioTimeSyncController->timeScale);
-            _mainImberPanelView->rightSaberSpeed = rightSaberSpeed * (_initialTimeScale / _audioTimeSyncController->timeScale);
+            _mainImberPanelView->set_fps(fps);
+            _mainImberPanelView->set_leftSaberSpeed(leftSaberSpeed * (_initialTimeScale / _audioTimeSyncController->timeScale));
+            _mainImberPanelView->set_rightSaberSpeed(rightSaberSpeed * (_initialTimeScale / _audioTimeSyncController->timeScale));
         }
     }
 
@@ -162,7 +163,7 @@ namespace ScoreSaber::ReplaySystem::UI
         auto curvedCanvasSettigns = _watermarkObject->AddComponent<HMUI::CurvedCanvasSettings*>();
         curvedCanvasSettigns->SetRadius(0.0f);
 
-        auto curvedTextMeshPro = QuestUI::BeatSaberUI::CreateText(canvasRectTransform, "Double click left trigger to open Replay menu", Vector2(0.0f, 0.0f));
+        auto curvedTextMeshPro = CreateText(canvasRectTransform, "Double click left trigger to open Replay menu", Vector2(0.0f, 0.0f));
         curvedTextMeshPro->alignment = TMPro::TextAlignmentOptions::Center;
         curvedTextMeshPro->fontSize = 4.0f;
         curvedTextMeshPro->color = Color(0.95f, 0.95f, 0.95f, 0.95f);
@@ -173,7 +174,7 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         if (value)
         {
-            _spectateAreaController->AnimateTo(_mainImberPanelView->location);
+            _spectateAreaController->AnimateTo(_mainImberPanelView->_location);
         }
         else
         {
@@ -188,7 +189,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::MainImberPanelView_DidPositionJump()
     {
-        _spectateAreaController->JumpToCallback(_mainImberPanelView->location);
+        _spectateAreaController->JumpToCallback(_mainImberPanelView->_location);
     }
 
     void ImberManager::ImberScrubber_DidCalculateNewTime(float newTime)
@@ -198,8 +199,8 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::MainImberPanelView_DidClickLoop()
     {
-        _imberScrubber->loopMode = !_imberScrubber->_loopMode;
-        _mainImberPanelView->loopText = _imberScrubber->_loopMode ? "UNLOOP" : "LOOP";
+        _imberScrubber->_loopMode = !_imberScrubber->_loopMode;
+        _mainImberPanelView->_loopText = _imberScrubber->_loopMode ? "UNLOOP" : "LOOP";
     }
 
     void ImberManager::MainImberPanelView_DidClickRestart()
@@ -212,12 +213,12 @@ namespace ScoreSaber::ReplaySystem::UI
         if (_audioTimeSyncController->state == GlobalNamespace::AudioTimeSyncController::State::Playing)
         {
             _replayTimeSyncController->CancelAllHitSounds();
-            _mainImberPanelView->playPauseText = "PLAY";
+            _mainImberPanelView->_playPauseText = "PLAY";
             _audioTimeSyncController->Pause();
         }
         else if (_audioTimeSyncController->state == GlobalNamespace::AudioTimeSyncController::State::Paused)
         {
-            _mainImberPanelView->playPauseText = "PAUSE";
+            _mainImberPanelView->_playPauseText = "PAUSE";
             _audioTimeSyncController->Resume();
         }
     }
@@ -230,8 +231,8 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberManager::MainImberPanelView_DidChangeVisibility(bool value)
     {
         _imberUIPositionController->SetActiveState(value);
-        _mainImberPanelView->visibility = value;
-        _imberScrubber->visibility = value;
+        _mainImberPanelView->set_visibility(value);
+        _imberScrubber->set_visibility(value);
         if (!value)
         {
             _spectateAreaController->Dismiss();

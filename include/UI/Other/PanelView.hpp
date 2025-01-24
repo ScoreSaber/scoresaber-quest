@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
 #include <GlobalNamespace/LoadingControl.hpp>
 #include <GlobalNamespace/PlatformLeaderboardViewController.hpp>
 #include <HMUI/CurvedTextMeshPro.hpp>
@@ -16,9 +15,6 @@
 #include <custom-types/shared/register.hpp>
 #include <custom-types/shared/types.hpp>
 #include <custom-types/shared/util.hpp>
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
-#include "questui/QuestUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;

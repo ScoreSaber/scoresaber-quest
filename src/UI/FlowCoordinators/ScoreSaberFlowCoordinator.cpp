@@ -1,15 +1,13 @@
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
-#include <HMUI/ViewController_AnimationDirection.hpp>
-#include <HMUI/ViewController_AnimationType.hpp>
-#include "questui/shared/BeatSaberUI.hpp"
+#include <HMUI/ViewController.hpp>
+#include <bsml/shared/Helpers/creation.hpp>
 
 DEFINE_TYPE(ScoreSaber::UI::FlowCoordinators, ScoreSaberFlowCoordinator);
 
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
+using namespace BSML::Helpers;
 
 namespace ScoreSaber::UI::FlowCoordinators
 {
@@ -33,6 +31,6 @@ namespace ScoreSaber::UI::FlowCoordinators
     {
         // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
         faqViewController->gameObject->SetActive(false);
-        this->parentFlowCoordinator->DismissFlowCoordinator(this, ViewController::AnimationDirection::Horizontal, nullptr, false);
+        this->_parentFlowCoordinator->DismissFlowCoordinator(this, ViewController::AnimationDirection::Horizontal, nullptr, false);
     }
 }

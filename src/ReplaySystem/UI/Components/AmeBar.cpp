@@ -5,36 +5,37 @@
 #include <UnityEngine/Rect.hpp>
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Resources.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include "logging.hpp"
-#include "questui/QuestUI.hpp"
 #include <sstream>
 #include <iomanip>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
+using namespace BSML::Helpers;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::UI::Components, AmeBar);
 
 namespace ScoreSaber::ReplaySystem::UI::Components
 {
-    float AmeBar::barFill
+    float AmeBar::get_barFill()
     {
         return _fillBarTransform->anchorMax.x;
     }
 
-    void AmeBar::barFill = float value
+    void AmeBar::set_barFill(float value)
     {
         _fillBarTransform->anchorMax = Vector2(Mathf::Lerp(-1.0f, 1.0f, value), _fillBarTransform->anchorMax.y);
     }
 
-    void AmeBar::currentTime = float value
+    void AmeBar::set_currentTime(float value)
     {
         std::stringstream ss;
         ss << int(value / 60) << ":" << std::setw(2) << std::setfill('0') << int(fmod(value, 60));
         _currentTimeText->text = ss.str();
     }
 
-    void AmeBar::endTime = float value
+    void AmeBar::set_endTime(float value)
     {
         std::stringstream ss;
         ss << int(value / 60) << ":" << std::setw(2) << std::setfill('0') << int(fmod(value, 60));
@@ -63,7 +64,7 @@ namespace ScoreSaber::ReplaySystem::UI::Components
 
     void AmeBar::RegisterNode(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node)
     {
-        node->AddCallback([=](ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
+        node->AddCallback([=, this](ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
             DragCallback(node, x, camera);
         });
     }
@@ -86,7 +87,7 @@ namespace ScoreSaber::ReplaySystem::UI::Components
     void AmeBar::DragCallback(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera)
     {
         Vector2 computedVector;
-        RectTransformUtility::ScreenPointToLocalPointInRectangle(_rectTransform, x, camera, &computedVector);
+        RectTransformUtility::ScreenPointToLocalPointInRectangle(_rectTransform, x, camera, byref(computedVector));
         if (System::Single::IsNaN(computedVector.x) || System::Single::IsNaN(computedVector.y))
         {
             return;
@@ -122,11 +123,11 @@ namespace ScoreSaber::ReplaySystem::UI::Components
         GameObject* textGameObject = GameObject::New_ctor("AmeText");
         textGameObject->transform->SetParent(transform, false);
         HMUI::CurvedTextMeshPro* curvedText = textGameObject->AddComponent<HMUI::CurvedTextMeshPro*>();
-        curvedText->font = QuestUI::BeatSaberUI::GetMainTextFont();
-        curvedText->fontSharedMaterial = QuestUI::BeatSaberUI::GetMainUIFontMaterial();
+        curvedText->font = GetMainTextFont();
+        curvedText->fontSharedMaterial = GetMainUIFontMaterial();
         curvedText->text = "";
-        curvedText->rectTransform->anchorMin = Vector2::zero;
-        curvedText->rectTransform->anchorMax = Vector2::one;
+        curvedText->rectTransform->anchorMin = Vector2::get_zero();
+        curvedText->rectTransform->anchorMax = Vector2::get_one();
         return curvedText;
     }
 

@@ -1,6 +1,5 @@
 #include "UI/Other/PlayerProfileModal.hpp"
 
-#include <GlobalNamespace/SharedCoroutineStarter.hpp>
 #include <HMUI/CurvedCanvasSettingsHelper.hpp>
 #include <HMUI/ImageView.hpp>
 #include "Sprites.hpp"
@@ -16,20 +15,24 @@
 #include <UnityEngine/Texture2D.hpp>
 #include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/UI/LayoutElement.hpp>
+#include <GlobalNamespace/ICoroutineStarter.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include "Utils/UIUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "static.hpp"
+#include "Utils/StrippedMethods.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::Other, PlayerProfileModal);
 
 using namespace HMUI;
 using namespace UnityEngine;
+using namespace UnityEngine::Networking;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML;
+using namespace BSML::Lite;
 
 #define SetPreferredSize(identifier, width, height)                                         \
     auto layout##identifier = identifier->gameObject->GetComponent<LayoutElement*>(); \
@@ -40,7 +43,7 @@ using namespace QuestUI::BeatSaberUI;
 
 #define BeginCoroutine(method) \
     BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method));
+        custom_types::Helpers::CoroutineHelper::New(method))
 
 #define WIDTH 90.0f
 #define HEIGHT 60.0f
@@ -50,10 +53,10 @@ namespace ScoreSaber::UI::Other
     {
         if (playerId == "")
             co_return;
-        std::string url = string_format("%s/api/player/%s/full", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
-        UnityEngine::Networking::UnityWebRequest* webRequest = UnityEngine::Networking::UnityWebRequest::Get(url);
+        std::string url = fmt::format("{:s}/api/player/{:s}/full", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
+        UnityWebRequest* webRequest = UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
-        if (!webRequest->isNetworkError)
+        if (webRequest->result != UnityWebRequest::Result::ConnectionError && webRequest->result != UnityWebRequest::Result::ProtocolError)
         {
             std::u16string response = std::u16string(webRequest->downloadHandler->text);
             rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> doc;
@@ -66,12 +69,12 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::SetPlayerData(ScoreSaber::Data::Player& player)
     {
-        player = player.name;
-        globalRanking = player.rank;
-        performancePoints = player.pp;
-        averageRankedAccuracy = player.scoreStats->averageRankedAccuracy;
-        totalScore = player.scoreStats->totalScore;
-
+        set_player(player.name);
+        set_globalRanking(player.rank);
+        set_performancePoints(player.pp);
+        set_averageRankedAccuracy(player.scoreStats->averageRankedAccuracy);
+        set_totalScore(player.scoreStats->totalScore);
+        
         int i = 0;
         profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, pfpImage));
         for (auto& badge : player.badges)
@@ -116,7 +119,8 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(headerHorizon, 90, -1);
 
         auto bg = headerHorizon->gameObject->AddComponent<Backgroundable*>();
-        bg->ApplyBackgroundWithAlpha("title-gradient", 1.0f);
+        bg->ApplyBackground("title-gradient");
+        bg->ApplyAlpha(1.0f);
 
         auto bgImage = bg->gameObject->GetComponentInChildren<ImageView*>();
         bgImage->gradient = false;
@@ -125,9 +129,9 @@ namespace ScoreSaber::UI::Other
 
         // placeholder color
         bgImage->color = Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1);
-        bgImage->curvedCanvasSettingsHelper->Reset();
+        bgImage->_curvedCanvasSettingsHelper->Reset();
 
-        headerText = UIUtils::CreateClickableText(headerHorizon->transform, u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
+        headerText = CreateClickableText(headerHorizon->transform, u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
         SetPreferredSize(headerText, 90, -1);
         headerHorizon->childAlignment = TextAnchor::MiddleCenter;
         headerText->alignment = TMPro::TextAlignmentOptions::Center;
@@ -169,7 +173,7 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(badgeParent, 42, 3.5f);
 
         // seperator setup
-        auto texture = Texture2D::whiteTexture;
+        auto texture = Texture2D::get_whiteTexture();
         auto seperatorSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
         auto image = CreateImage(seperatorVertical->transform, seperatorSprite, Vector2(0, 0), Vector2(0, 0));
@@ -186,17 +190,17 @@ namespace ScoreSaber::UI::Other
         CreateText(dataVertical->transform, "Total Score");
         totalScore = CreateText(dataVertical->transform, "Placeholder");
 
-        badgeRoutines = List<UnityEngine::Coroutine*>::New_ctor();
-        player = u"Placeholder";
-        globalRanking = 0;
-        performancePoints = 420.69f;
-        averageRankedAccuracy = 69.69f;
-        totalScore = 42042069;
+        badgeRoutines = ListW<UnityEngine::Coroutine*>::New();
+        set_player(u"Placeholder");
+        set_globalRanking(0);
+        set_performancePoints(420.69f);
+        set_averageRankedAccuracy(69.69f);
+        set_totalScore(42042069);
     }
 
     void PlayerProfileModal::OpenPlayerUrl()
     {
-        Application::OpenURL(string_format("https://scoresaber.com/u/%s", playerId.c_str()));
+        StrippedMethods::UnityEngine::Application::OpenURL(fmt::format("https://scoresaber.com/u/{:s}", playerId.c_str()));
     }
 
     void PlayerProfileModal::ClearBadges()
@@ -218,7 +222,7 @@ namespace ScoreSaber::UI::Other
         constexpr const float generalSize = 5.0f;
         // auto badgeVertical = CreateVerticalLayoutGroup(badgeParent->transform);
         // SetPreferredSize(badgeVertical, 9, 3.5);
-        auto texture = Texture2D::blackTexture;
+        auto texture = Texture2D::get_blackTexture();
         auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
         auto image = CreateImage(badgeParent->transform, sprite, Vector2(0, 0), Vector2(0, 0));
@@ -236,40 +240,40 @@ namespace ScoreSaber::UI::Other
         }
     }
 
-    void PlayerProfileModal::player = std::u16string_view header
+    void PlayerProfileModal::set_player(std::u16string_view header)
     {
         header = std::u16string(header) + u"'s Profile";
     }
 
-    void PlayerProfileModal::header = std::u16string_view header
+    void PlayerProfileModal::set_header(std::u16string_view header)
     {
         headerText->text = u"<i>" + std::u16string(header) + u"</i>";
     }
 
-    void PlayerProfileModal::globalRanking = int globalRanking
+    void PlayerProfileModal::set_globalRanking(int globalRanking)
     {
-        this->globalRanking->text = string_format("<i>#%d</i>", globalRanking);
+        this->globalRanking->text = fmt::format("<i>#{:d}</i>", globalRanking);
     }
 
-    void PlayerProfileModal::performancePoints = float performancePoints
+    void PlayerProfileModal::set_performancePoints(float performancePoints)
     {
-        this->performancePoints->text = string_format("<i><color=#6772E5>%.2fpp</color></i>", performancePoints);
+        this->performancePoints->text = fmt::format("<i><color=#6772E5>{:.2f}pp</color></i>", performancePoints);
     }
 
-    void PlayerProfileModal::averageRankedAccuracy = float averageRankedAccuracy
+    void PlayerProfileModal::set_averageRankedAccuracy(float averageRankedAccuracy)
     {
-        this->averageRankedAccuracy->text = string_format("<i>%.2f</i>", averageRankedAccuracy);
+        this->averageRankedAccuracy->text = fmt::format("<i>{:.2f}</i>", averageRankedAccuracy);
     }
 
-    void PlayerProfileModal::totalScore = long totalScore
+    void PlayerProfileModal::set_totalScore(long totalScore)
     {
-        this->totalScore->text = string_format("<i>%ld</i>", totalScore);
+        this->totalScore->text = fmt::format("<i>{:d}</i>", totalScore);
     }
 
     void PlayerProfileModal::stopProfileRoutine()
     {
         if (profileRoutine)
-            GlobalNamespace::SharedCoroutineStarter::instance->StopCoroutine(profileRoutine);
+            BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StopCoroutine(profileRoutine);
         profileRoutine = nullptr;
     }
 
@@ -281,7 +285,7 @@ namespace ScoreSaber::UI::Other
             for (int i = 0; i < length; i++)
             {
                 auto routine = badgeRoutines->get_Item(i);
-                GlobalNamespace::SharedCoroutineStarter::instance->StopCoroutine(routine);
+                BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StopCoroutine(routine);
             }
 
             badgeRoutines->Clear();

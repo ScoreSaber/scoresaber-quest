@@ -6,7 +6,6 @@
 #include "logging.hpp"
 
 using namespace UnityEngine;
-using namespace QuestUI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
@@ -36,7 +35,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
         Vector3 rightControllerPosition = _playerTransforms->rightHandPseudoLocalPos;
         Quaternion rightControllerRotation = _playerTransforms->rightHandPseudoLocalRot;
 
-        int fps = (int)(1 / Time::unscaledDeltaTime);
+        int fps = (int)(1 / Time::get_unscaledDeltaTime());
         _vrPoseGroup.push_back(VRPoseGroup(
             VRPose(VRPosition(headPos.x, headPos.y,
                               headPos.z),

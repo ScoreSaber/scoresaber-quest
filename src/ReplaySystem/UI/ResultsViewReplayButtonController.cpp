@@ -4,13 +4,13 @@
 #include "Services/ReplayService.hpp"
 #include "Services/UploadService.hpp"
 
-#include <GlobalNamespace/HMTask.hpp>
-
 #include <bsml/shared/BSML.hpp>
 #include <custom-types/shared/delegate.hpp>
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
+#include "Utils/OperatorOverloads.hpp"
 #include "logging.hpp"
 
+using namespace BSML;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::UI, ResultsViewReplayButtonController);
 
@@ -25,8 +25,8 @@ namespace ScoreSaber::ReplaySystem::UI
     void ResultsViewReplayButtonController::Initialize()
     {
         didActivateDelegate = custom_types::MakeDelegate<HMUI::ViewController::DidActivateDelegate*>(classof(HMUI::ViewController::DidActivateDelegate*), (std::function<void(bool, bool, bool)>)[&](bool a, bool b, bool c){ ResultsViewController_didActivateEvent(a, b, c);});
-        continueButtonPressedDelegate = custom_types::MakeDelegate<System::Action_1<GlobalNamespace::ResultsViewController*>*>(classof(System::Action_1<GlobalNamespace::ResultsViewController*>*), (std::function<void(GlobalNamespace::ResultsViewController*)>)[&](GlobalNamespace::ResultsViewController* o){ ResultsViewController_continueButtonPressedEvent(o);});
-        restartButtonPressedDelegate = custom_types::MakeDelegate<System::Action_1<GlobalNamespace::ResultsViewController*>*>(classof(System::Action_1<GlobalNamespace::ResultsViewController*>*), (std::function<void(GlobalNamespace::ResultsViewController*)>)[&](GlobalNamespace::ResultsViewController* o){ ResultsViewController_restartButtonPressedEvent(o);});
+        continueButtonPressedDelegate = custom_types::MakeDelegate<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*>(classof(System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*), (std::function<void(UnityW<GlobalNamespace::ResultsViewController>)>)[&](UnityW<GlobalNamespace::ResultsViewController> o){ ResultsViewController_continueButtonPressedEvent(o);});
+        restartButtonPressedDelegate = custom_types::MakeDelegate<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*>(classof(System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*), (std::function<void(UnityW<GlobalNamespace::ResultsViewController>)>)[&](UnityW<GlobalNamespace::ResultsViewController> o){ ResultsViewController_restartButtonPressedEvent(o);});
         
         _resultsViewController->add_didActivateEvent(didActivateDelegate);
         _resultsViewController->add_continueButtonPressedEvent(continueButtonPressedDelegate);
@@ -47,8 +47,9 @@ namespace ScoreSaber::ReplaySystem::UI
         }
         _replayReady = _serializedReplay.size() > 0;
         watchReplayButton->interactable = _replayReady;
-        _difficultyBeatmap = _resultsViewController->difficultyBeatmap;
-        _levelCompletionResults = _resultsViewController->levelCompletionResults;
+        _beatmapLevel = _resultsViewController->_beatmapLevel;
+        _beatmapKey = _resultsViewController->_beatmapKey;
+        _levelCompletionResults = _resultsViewController->_levelCompletionResults;
         WaitForReplay();
     }
 
@@ -72,14 +73,14 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::WaitForReplay()
     {
-        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[&](){
+        il2cpp_utils::il2cpp_aware_thread([&](){
             while(!_replayReady) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(25));
             }
-            QuestUI::MainThreadScheduler::Schedule([&]() {
+            MainThreadScheduler::Schedule([&]() {
                 watchReplayButton->interactable = true;
             });
-        }), nullptr)->Run();
+        }).detach();
     }
 
     void ResultsViewReplayButtonController::Dispose()
@@ -92,15 +93,15 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::ClickedReplayButton()
     {
-        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[=](){
+        il2cpp_utils::il2cpp_aware_thread([=, this](){
             std::vector<std::string> modifiersVec = Services::UploadService::GetModifierList(_levelCompletionResults->gameplayModifiers, _levelCompletionResults->energy);
             std::string modifiers;
             for(int i = 0; i < modifiersVec.size(); ++i) {
                 if(i > 0) modifiers += ',';
                 modifiers += modifiersVec[i];
             }
-            ReplayLoader::Load(_serializedReplay, _difficultyBeatmap, modifiers, ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name);
-        }), nullptr)->Run();
+            ReplayLoader::Load(_serializedReplay, _beatmapLevel, _beatmapKey, modifiers, ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name);
+        }).detach();
         watchReplayButton->interactable = false;
     }
 }

@@ -10,52 +10,52 @@ using namespace ScoreSaber::Data::Private;
 DEFINE_TYPE(ScoreSaber::UI::ViewControllers, MainSettingsViewController);
 
 namespace ScoreSaber::UI::ViewControllers {
-    bool MainSettingsViewController::showScorePP {
+    bool MainSettingsViewController::get_showScorePP() {
         return Settings::showScorePP;
     }
 
-    void MainSettingsViewController::showScorePP = bool value {
+    void MainSettingsViewController::set_showScorePP(bool value) {
         Settings::showScorePP = value;
     }
 
-    bool MainSettingsViewController::showLocalPlayerRank {
+    bool MainSettingsViewController::get_showLocalPlayerRank() {
         return Settings::showLocalPlayerRank;
     }
 
-    void MainSettingsViewController::showLocalPlayerRank = bool value {
+    void MainSettingsViewController::set_showLocalPlayerRank(bool value) {
         Settings::showLocalPlayerRank = value;
     }
     
-    bool MainSettingsViewController::hideNAScores {
+    bool MainSettingsViewController::get_hideNAScores() {
         return Settings::hideNAScoresFromLeaderboard;
     }
 
-    void MainSettingsViewController::hideNAScores = bool value {
+    void MainSettingsViewController::set_hideNAScores(bool value) {
         Settings::hideNAScoresFromLeaderboard = value;
     }
     
-    StringW MainSettingsViewController::locationFilterMode {
+    StringW MainSettingsViewController::get_locationFilterMode() {
         return Settings::locationFilterMode;
     }
 
-    void MainSettingsViewController::locationFilterMode = StringW value {
+    void MainSettingsViewController::set_locationFilterMode(StringW value) {
         Settings::locationFilterMode = (std::string)value;
     }
     
-    bool MainSettingsViewController::enableCountryLeaderboards {
+    bool MainSettingsViewController::get_enableCountryLeaderboards() {
         return Settings::enableCountryLeaderboards;
     }
 
-    void MainSettingsViewController::enableCountryLeaderboards = bool value {
+    void MainSettingsViewController::set_enableCountryLeaderboards(bool value) {
         Settings::enableCountryLeaderboards = value;
     }
     
-    bool MainSettingsViewController::saveLocalReplays {
+    bool MainSettingsViewController::get_saveLocalReplays() {
         INFO("read");
         return Settings::saveLocalReplays;
     }
 
-    void MainSettingsViewController::saveLocalReplays = bool value {
+    void MainSettingsViewController::set_saveLocalReplays(bool value) {
         INFO("written");
         Settings::saveLocalReplays = value;
     }

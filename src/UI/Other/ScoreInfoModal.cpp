@@ -3,9 +3,7 @@
 #include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
 #include <GlobalNamespace/BeatmapDifficulty.hpp>
 #include <GlobalNamespace/BeatmapDifficultySerializedMethods.hpp>
-#include <GlobalNamespace/IDifficultyBeatmapSet.hpp>
 #include <GlobalNamespace/PlatformLeaderboardViewController.hpp>
-#include <GlobalNamespace/SharedCoroutineStarter.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
 #include "Services/FileService.hpp"
 #include "Sprites.hpp"
@@ -23,29 +21,24 @@
 #include <UnityEngine/SystemInfo.hpp>
 #include <UnityEngine/Texture2D.hpp>
 #include <UnityEngine/UI/HorizontalLayoutGroup.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/UI/LayoutElement.hpp>
 #include <UnityEngine/UI/VerticalLayoutGroup.hpp>
-#include "Utils/BeatmapUtils.hpp"
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
 #include "Utils/StringUtils.hpp"
-#include "Utils/UIUtils.hpp"
-#include "logging.hpp"
-#include "main.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "static.hpp"
-#include <map>
 #include <sstream>
 
 DEFINE_TYPE(ScoreSaber::UI::Other, ScoreInfoModal);
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
 using namespace GlobalNamespace;
-using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 using namespace System;
 using namespace StringUtils;
+using namespace BSML;
+using namespace BSML::Lite;
 
 #define SetPreferredSize(identifier, width, height)                                         \
     auto layout##identifier = identifier->gameObject->GetComponent<LayoutElement*>(); \
@@ -116,10 +109,12 @@ std::string GetDate(std::string date)
     int scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, scoreMillisec;
     sscanf(date.c_str(), "%d-%d-%dT%d:%d:%d.%dZ", &scoreYear, &scoreMonth, &scoreDay, &scoreHour, &scoreMin, &scoreSec, &scoreMillisec);
 
-    DateTime scoreDate = DateTime(scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, scoreMillisec);
+    DateTime scoreDate;
+    // manual ctor call, ugly af, but apparently the only way now with cordl :(
+    scoreDate._ctor(scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, scoreMillisec);
     int daysInMo = DateTime::DaysInMonth(scoreYear, scoreMonth);
 
-    DateTime now = DateTime::UtcNow;
+    DateTime now = DateTime::get_UtcNow();
 
     TimeSpan diff = TimeSpan(now.Ticks - scoreDate.Ticks);
 
@@ -184,68 +179,65 @@ namespace ScoreSaber::UI::Other
         modal->Hide(true, nullptr);
     }
 
-    void ScoreInfoModal::Show(ScoreSaber::Data::Score& score, int leaderboardId)
+    void ScoreInfoModal::Show(ScoreSaber::Data::Score& score, BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, int leaderboardId, int maxScore)
     {
         this->leaderboardId = leaderboardId;
         if (score.leaderboardPlayerInfo.name.has_value())
         {
-            player = score.leaderboardPlayerInfo.name.value();
+            set_player(score.leaderboardPlayerInfo.name.value());
         }
 
         if (score.deviceHmd) {
-            device_hmd = *score.deviceHmd;
+            set_device_hmd(*score.deviceHmd);
         } else {
-            device_hmd = GetDevice(score.hmd);
+            set_device_hmd(GetDevice(score.hmd));
         }
 
         // Not sure if this is the best way to get the beatmap
         // but it works
-        PlatformLeaderboardViewController* lb = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlatformLeaderboardViewController*>());
+        PlatformLeaderboardViewController* lb = Resources::FindObjectsOfTypeAll<PlatformLeaderboardViewController*>()->First();
 
-        currentBeatmap = lb->difficultyBeatmap;
         currentScore = score;
+        currentBeatmapLevel = beatmapLevel;
+        currentBeatmapKey = beatmapKey;
 
-        SharedCoroutineStarter::instance
-            ->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(BeatmapUtils::getMaxScoreCoroutine(currentBeatmap, [&](int maxScore) {
-                score = score.modifiedScore, ((double)score.modifiedScore / (double)maxScore) * 100.0;
-                pp = score.pp;
-                if (score.maxCombo != 0) {
-                    combo = score.maxCombo;
-                    fullCombo = score.fullCombo;
-                    badCuts = score.badCuts;
-                    missedNotes = score.missedNotes;
-                } else {
-                    combo = nullopt;
-                    fullCombo = nullopt;
-                    badCuts = nullopt;
-                    missedNotes = nullopt;
-                }
-                modifiers = score.modifiers;
-                timeSet = GetDate(score.timeSet);
+        set_score(score.modifiedScore, ((double)score.modifiedScore / (double)maxScore) * 100.0);
+        set_pp(score.pp);
+        if (score.maxCombo != 0) {
+            set_combo(score.maxCombo);
+            set_fullCombo(score.fullCombo);
+            set_badCuts(score.badCuts);
+            set_missedNotes(score.missedNotes);
+        } else {
+            set_combo(nullopt);
+            set_fullCombo(nullopt);
+            set_badCuts(nullopt);
+            set_missedNotes(nullopt);
+        }
+        set_modifiers(score.modifiers);
+        set_timeSet(GetDate(score.timeSet));
 
-                if (score.leaderboardPlayerInfo.id.has_value())
-                {
-                    playerId = score.leaderboardPlayerInfo.id.value();
-                }
+        if (score.leaderboardPlayerInfo.id.has_value())
+        {
+            playerId = score.leaderboardPlayerInfo.id.value();
+        }
 
-                auto previewBeatmapLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(currentBeatmap->level);
-                std::string levelHash = StringUtils::GetFormattedHash(previewBeatmapLevel->levelID);
-                std::string characteristic = currentBeatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->serializedName;
-                std::string songName = previewBeatmapLevel->songName;
-                std::string difficultyName = GlobalNamespace::BeatmapDifficultySerializedMethods::SerializedName(currentBeatmap->difficulty);
-                replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic, score.leaderboardPlayerInfo.id.value(), songName);
-                replayEnabled = score.hasReplay;
-                modal->Show(true, true, nullptr);
-                if (fileexists(ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat"))
-                {
-                    replayEnabled = true;
-                }
-                
-                if(!ScoreSaberLeaderboardView::IsReplayWatchingAllowed())
-                    replayEnabled = false;
+        std::string levelHash = StringUtils::GetFormattedHash(currentBeatmapKey.levelId);
+        std::string characteristic = currentBeatmapKey.beatmapCharacteristic->serializedName;
+        std::string songName = currentBeatmapLevel->songName;
+        std::string difficultyName = GlobalNamespace::BeatmapDifficultySerializedMethods::SerializedName(currentBeatmapKey.difficulty);
+        replayFileName = ScoreSaber::Services::FileService::GetReplayFileName(levelHash, difficultyName, characteristic, score.leaderboardPlayerInfo.id.value(), songName);
+        replayEnabled = score.hasReplay;
+        modal->Show(true, true, nullptr);
+        if (fileexists(ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat"))
+        {
+            replayEnabled = true;
+        }
+        
+        if(!ScoreSaberLeaderboardView::IsReplayWatchingAllowed())
+            replayEnabled = false;
 
-                SetReplayButtonState(replayEnabled);
-            })));
+        SetReplayButtonState(replayEnabled);
     }
 
     ScoreInfoModal* ScoreInfoModal::Create(UnityEngine::Transform* parent)
@@ -292,11 +284,11 @@ namespace ScoreSaber::UI::Other
         buttonHorizontal->spacing = 0.2f;
 
         auto userSprite = Base64ToSprite(user_base64);
-        auto userImage = UIUtils::CreateClickableImage(buttonHorizontal->transform, userSprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
+        auto userImage = CreateClickableImage(buttonHorizontal->transform, userSprite, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this), {0, 0}, {0, 0});
         userImage->preserveAspect = true;
 
         auto replaySprite = Base64ToSprite(replay_base64);
-        replayImage = UIUtils::CreateClickableImage(buttonHorizontal->transform, replaySprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::PlayReplay, this));
+        replayImage = CreateClickableImage(buttonHorizontal->transform, replaySprite, std::bind(&ScoreInfoModal::PlayReplay, this), {0, 0}, {0, 0});
         replayImage->preserveAspect = true;
 
         auto seperatorHorizontal = CreateHorizontalLayoutGroup(mainVertical->transform);
@@ -306,7 +298,7 @@ namespace ScoreSaber::UI::Other
 
         seperatorLayout->preferredHeight = 0.4f;
 
-        auto texture = Texture2D::whiteTexture;
+        auto texture = Texture2D::get_whiteTexture();
         auto whiteSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->height, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
         auto seperatorImage = CreateImage(seperatorHorizontal->transform, whiteSprite, {0, 0}, {0, 0});
         seperatorImage->rectTransform->sizeDelta = {48.0f, 0.4f};
@@ -325,78 +317,78 @@ namespace ScoreSaber::UI::Other
         CreateDefaultTextAndSetSize(modifiers, 3.5f);
         CreateDefaultTextAndSetSize(timeSet, 3.5f);
 
-        player = u"placeholder";
-        device_hmd = "Unknown";
-        score = 0, 0;
-        pp = 0;
-        combo = 0;
-        fullCombo = 0;
-        badCuts = 0;
-        missedNotes = 0;
-        modifiers = "";
-        timeSet = "";
+        set_player(u"placeholder");
+        set_device_hmd("Unknown");
+        set_score(0, 0);
+        set_pp(0);
+        set_combo(0);
+        set_fullCombo(0);
+        set_badCuts(0);
+        set_missedNotes(0);
+        set_modifiers("");
+        set_timeSet("");
     }
 
-    void ScoreInfoModal::player = std::u16string player
+    void ScoreInfoModal::set_player(std::u16string player)
     {
         this->player->text = player + u"'s Score";
     }
 
-    void ScoreInfoModal::device_hmd = std::string_view device
+    void ScoreInfoModal::set_device_hmd(std::string_view device)
     {
-        this->deviceHmd->text = string_format("<color=#6F6F6F>HMD:</color> %s", device.data());
+        this->deviceHmd->text = fmt::format("<color=#6F6F6F>HMD:</color> {:s}", device.data());
     }
 
-    void ScoreInfoModal::score = long score, double percent
+    void ScoreInfoModal::set_score(long score, double percent)
     {
-        this->score->text = string_format("<color=#6F6F6F>Score:</color> %s (<color=#ffd42a>%.2f%s</color>)", FormatNumber((int)score).c_str(), percent, "%");
+        this->score->text = fmt::format("<color=#6F6F6F>Score:</color> {:s} (<color=#ffd42a>{:.2f}{:s}</color>)", FormatNumber((int)score).c_str(), percent, "%");
     }
 
-    void ScoreInfoModal::pp = double pp
+    void ScoreInfoModal::set_pp(double pp)
     {
-        this->pp->text = string_format("<color=#6F6F6F>Performance Points:</color> <color=#6872e5>%.2fpp</color>", pp);
+        this->pp->text = fmt::format("<color=#6F6F6F>Performance Points:</color> <color=#6872e5>{:.2f}pp</color>", pp);
     }
 
-    void ScoreInfoModal::combo = std::optional<int> combo
+    void ScoreInfoModal::set_combo(std::optional<int> combo)
     {
         if (combo)
-            this->combo->text = string_format("<color=#6F6F6F>Combo:</color> %s", FormatNumber(*combo).c_str());
+            this->combo->text = fmt::format("<color=#6F6F6F>Combo:</color> {:s}", FormatNumber(*combo).c_str());
         else
             this->missedNotes->text = "<color=#6F6F6F>Combo:</color> N/A";
     }
 
-    void ScoreInfoModal::fullCombo = std::optional<bool> value
+    void ScoreInfoModal::set_fullCombo(std::optional<bool> value)
     {
         if (value)
-            this->fullCombo->text = string_format("<color=#6F6F6F>Full Combo:</color> %s", *value ? "<color=#13fd81>Yes</color>" : "<color=\"red\">No</color>");
+            this->fullCombo->text = fmt::format("<color=#6F6F6F>Full Combo:</color> {:s}", *value ? "<color=#13fd81>Yes</color>" : "<color=\"red\">No</color>");
         else
             this->missedNotes->text = "<color=#6F6F6F>Full Combo:</color> N/A";
     }
 
-    void ScoreInfoModal::badCuts = std::optional<int> badCuts
+    void ScoreInfoModal::set_badCuts(std::optional<int> badCuts)
     {
         if (badCuts)
-            this->badCuts->text = string_format("<color=#6F6F6F>Bad Cuts:</color> %s", FormatNumber(*badCuts).c_str());
+            this->badCuts->text = fmt::format("<color=#6F6F6F>Bad Cuts:</color> {:s}", FormatNumber(*badCuts).c_str());
         else
             this->missedNotes->text = "<color=#6F6F6F>Bad Cuts:</color> N/A";
     }
 
-    void ScoreInfoModal::missedNotes = std::optional<int> missedNotes
+    void ScoreInfoModal::set_missedNotes(std::optional<int> missedNotes)
     {
         if (missedNotes)
-            this->missedNotes->text = string_format("<color=#6F6F6F>Missed Notes:</color> %s", FormatNumber(*missedNotes).c_str());
+            this->missedNotes->text = fmt::format("<color=#6F6F6F>Missed Notes:</color> {:s}", FormatNumber(*missedNotes).c_str());
         else
             this->missedNotes->text = "<color=#6F6F6F>Missed Notes:</color> N/A";
     }
 
-    void ScoreInfoModal::modifiers = std::string_view modifiers
+    void ScoreInfoModal::set_modifiers(std::string_view modifiers)
     {
-        this->modifiers->text = string_format("<color=#6F6F6F>Modifiers:</color> %s", modifiers.data());
+        this->modifiers->text = fmt::format("<color=#6F6F6F>Modifiers:</color> {:s}", modifiers.data());
     }
 
-    void ScoreInfoModal::timeSet = std::string_view timeSet
+    void ScoreInfoModal::set_timeSet(std::string_view timeSet)
     {
-        this->timeSet->text = string_format("<color=#6F6F6F>Time Set:</color> %s", timeSet.data());
+        this->timeSet->text = fmt::format("<color=#6F6F6F>Time Set:</color> {:s}", timeSet.data());
     }
 
     void ScoreInfoModal::ShowPlayerProfileModal()
@@ -433,17 +425,17 @@ namespace ScoreSaber::UI::Other
             SetReplayButtonState(false);
             replayEnabled = false;
             Hide();
-            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->prompt = "Loading Replay...", -1;
-            ScoreSaber::ReplaySystem::ReplayLoader::GetReplayData(currentBeatmap, leaderboardId, replayFileName, currentScore, [=](bool result) {
-                QuestUI::MainThreadScheduler::Schedule([=]() {
+            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Loading Replay...", -1);
+            ScoreSaber::ReplaySystem::ReplayLoader::GetReplayData(currentBeatmapLevel, currentBeatmapKey, leaderboardId, replayFileName, currentScore, [=, this](bool result) {
+                MainThreadScheduler::Schedule([=, this]() {
                     if (result)
                     {
-                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->prompt = "Replay loaded!", 3;
-                        ScoreSaber::ReplaySystem::ReplayLoader::StartReplay(currentBeatmap);
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Replay loaded!", 3);
+                        ScoreSaber::ReplaySystem::ReplayLoader::StartReplay(currentBeatmapLevel, currentBeatmapKey);
                     }
                     else
                     {
-                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->prompt = "Failed to load replay", 3;
+                        ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_prompt("Failed to load replay", 3);
                     }
                     SetReplayButtonState(true);
                     replayEnabled = true;

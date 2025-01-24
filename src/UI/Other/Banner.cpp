@@ -1,11 +1,9 @@
 #include "UI/Other/Banner.hpp"
 
 #include "Data/Private/Settings.hpp"
-#include <GlobalNamespace/HMTask.hpp>
-#include <GlobalNamespace/SharedCoroutineStarter.hpp>
 #include <HMUI/CurvedCanvasSettingsHelper.hpp>
 #include <HMUI/ImageView.hpp>
-#include <HMUI/ViewController_AnimationDirection.hpp>
+#include <HMUI/ViewController.hpp>
 #include "Services/PlayerService.hpp"
 #include "Sprites.hpp"
 #include <System/Action.hpp>
@@ -21,14 +19,17 @@
 #include <UnityEngine/Texture2D.hpp>
 #include <UnityEngine/Time.hpp>
 #include <UnityEngine/UI/LayoutElement.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/WaitForSeconds.hpp>
 #include "Utils/UIUtils.hpp"
 #include "logging.hpp"
 #include <custom-types/shared/delegate.hpp>
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/Helpers/creation.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include <chrono>
+#include "Utils/StrippedMethods.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::Other, Banner);
 
@@ -36,8 +37,9 @@ using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML;
+using namespace BSML::Helpers;
+using namespace BSML::Lite;
 using namespace ScoreSaber::Data::Private;
 
 #define SetPreferredSize(identifier, width, height)                                         \
@@ -99,63 +101,64 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(settingsVertical, 6, 10);
 
         bg = horizon->gameObject->AddComponent<Backgroundable*>();
-        bg->ApplyBackgroundWithAlpha("title-gradient", 1.0f);
+        bg->ApplyBackground("title-gradient");
+        bg->ApplyAlpha(1.0f);
 
         bgImage = bg->gameObject->GetComponentInChildren<ImageView*>();
-        bgImage->skew = 0.18f;
-        bgImage->gradient = true;
-        bgImage->gradientDirection = 0;
-        bgImage->color0 = Color(1, 1, 1, 1);
-        bgImage->color1 = Color(1, 1, 1, 0);
-        bgImage->curvedCanvasSettingsHelper->Reset();
+        bgImage->_skew = 0.18f;
+        bgImage->_gradient = true;
+        bgImage->_gradientDirection = 0;
+        bgImage->_color0 = Color(1, 1, 1, 1);
+        bgImage->_color1 = Color(1, 1, 1, 0);
+        bgImage->_curvedCanvasSettingsHelper->Reset();
 
-        color = defaultColor;
+        set_color(defaultColor);
 
         // main menu button setup
         float buttonSize = 10.0f;
         auto btn = CreateUIButton(buttonVertical->transform, "", "SettingsButton", Vector2(0, 0), Vector2(buttonSize, buttonSize), std::bind(&Banner::OpenMainMenuFlowCoordinator, this));
-        reinterpret_cast<RectTransform*>(btn->transform->GetChild(0))->sizeDelta = {buttonSize, buttonSize};
+        btn->transform->GetChild(0).cast<RectTransform>()->sizeDelta = {buttonSize, buttonSize};
 
         auto scoresaber_active = Base64ToSprite(ScoreSaber_Active);
         auto scoresaber_inactive = Base64ToSprite(ScoreSaber_Inactive);
         SetButtonSprites(btn, scoresaber_inactive, scoresaber_active);
         auto btnImageView = btn->gameObject->GetComponentInChildren<ImageView*>();
-        btnImageView->skew = 0.18f;
-        AddHoverHint(btn->gameObject, "Opens the ScoreSaber main menu");
+        btnImageView->_skew = 0.18f;
+        BSML::Lite::AddHoverHint(btn->gameObject, "Opens the ScoreSaber main menu");
         auto btnLayout = buttonVertical->gameObject->AddComponent<LayoutElement*>();
         btnLayout->preferredWidth = buttonSize;
 
         // seperator setup
-        auto texture = Texture2D::whiteTexture;
+        auto texture = Texture2D::get_whiteTexture();
         auto seperatorSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->width, (float)texture->height), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 
         auto image = CreateImage(seperatorVertical->transform, seperatorSprite, Vector2(0, 0), Vector2(0, 0));
-        image->skew = 0.18f;
+        image->_skew = 0.18f;
         auto imageLayout = image->gameObject->AddComponent<LayoutElement*>();
         imageLayout->preferredWidth = 1.0f;
 
         // info setup
-        topText = UIUtils::CreateClickableText(infoVertical->transform, "");
-        bottomText = UIUtils::CreateClickableText(infoVertical->transform, "");
+        topText = CreateClickableText(infoVertical->transform, "");
+        bottomText = CreateClickableText(infoVertical->transform, "");
 
-        topText->onPointerClickEvent += [&](auto _) { OpenPlayerInfoModal(); };
-        bottomText->onPointerClickEvent += [&](auto _) { OpenSongInBrowser(); };
+        topText->onClick += [&]() { OpenPlayerInfoModal(); };
+        bottomText->onClick += [&]() { OpenSongInBrowser(); };
 
         auto loadingHorizontal = CreateHorizontalLayoutGroup(loadingVertical->transform);
         UIUtils::CreateLoadingIndicator(loadingHorizontal->transform);
         SetPreferredSize(loadingHorizontal, 10, 10);
 
         // settings button setup
-        auto setbtn = CreateClickableImage(settingsVertical->transform, GetGameSprite("SettingsIcon"), Vector2(0, 0), Vector2(6, 6), std::bind(&Banner::OpenSettingsFlowCoordinator, this));
+        auto setbtn = CreateClickableImage(settingsVertical->transform, GetGameSprite("SettingsIcon"), std::bind(&Banner::OpenSettingsFlowCoordinator, this), Vector2(0, 0), Vector2(6, 6));
         setbtn->preserveAspect = true;
-        AddHoverHint(setbtn->gameObject, "Opens the ScoreSaber Settings menu");
+        BSML::Lite::AddHoverHint(setbtn->gameObject, "Opens the ScoreSaber Settings menu");
         auto setbtnLayout = settingsVertical->gameObject->AddComponent<LayoutElement*>();
         setbtnLayout->preferredWidth = 6;
         auto setbtnRectTransform = settingsVertical->rectTransform;
         setbtnRectTransform->anchoredPosition = {35.0f, 0.0f};
 
 
-        auto promptRoot = BeatSaberUI::CreateHorizontalLayoutGroup(transform);
+        auto promptRoot = CreateHorizontalLayoutGroup(transform);
         promptRoot->childAlignment = TextAnchor::UpperLeft;
         promptRoot->childForceExpandWidth = false;
         promptRoot->spacing = 1.0f;
@@ -170,11 +173,10 @@ namespace ScoreSaber::UI::Other
         ContentSizeFitter* promptFitter = promptRoot->GetComponent<ContentSizeFitter*>();
         promptFitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
 
-        HorizontalLayoutGroup* textGroup =
-            BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
+        HorizontalLayoutGroup* textGroup = CreateHorizontalLayoutGroup(promptRootRect);
         textGroup->rectTransform->anchoredPosition = {0.0f, 10.0f};
 
-        promptText = BeatSaberUI::CreateText(textGroup->transform, "...", false);
+        promptText = CreateText(textGroup->transform, "...", false);
         promptText->alignment = TMPro::TextAlignmentOptions::BottomLeft;
     }
 
@@ -184,7 +186,7 @@ namespace ScoreSaber::UI::Other
         auto mainfc = GetMainFlowCoordinator();
         auto youngest = mainfc->YoungestChildFlowCoordinatorOrSelf();
 
-        auto fc = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>());
+        auto fc = Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>()->First();
         if (!fc)
         {
             fc = CreateFlowCoordinator<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>();
@@ -199,7 +201,7 @@ namespace ScoreSaber::UI::Other
         auto mainfc = GetMainFlowCoordinator();
         auto youngest = mainfc->YoungestChildFlowCoordinatorOrSelf();
 
-        auto fc = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberSettingsFlowCoordinator*>());
+        auto fc = Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberSettingsFlowCoordinator*>()->First();
         if (!fc)
         {
             fc = CreateFlowCoordinator<ScoreSaber::UI::FlowCoordinators::ScoreSaberSettingsFlowCoordinator*>();
@@ -219,11 +221,11 @@ namespace ScoreSaber::UI::Other
 
     void Banner::OpenSongInBrowser()
     {
-        auto songURL = string_format("https://scoresaber.com/leaderboard/%d", scoreboardId);
-        Application::OpenURL(songURL);
+        auto songURL = fmt::format("https://scoresaber.com/leaderboard/{:d}", scoreboardId);
+        StrippedMethods::UnityEngine::Application::OpenURL(songURL);
     }
 
-    void Banner::rainbow = bool value
+    void Banner::set_rainbow(bool value)
     {
         rainbow = value;
     }
@@ -235,13 +237,13 @@ namespace ScoreSaber::UI::Other
         {
             // set bg color to default
             wasRainbow = false;
-            color = defaultColor;
+            set_color(defaultColor);
         }
         else if (rainbow)
         {
             wasRainbow = true;
             // make this color dependent on some kind of rainbow / gradient source
-            colorAngle += Time::deltaTime * 0.1f;
+            colorAngle += Time::get_deltaTime() * 0.1f;
             colorAngle = std::fmod(colorAngle, 1.0f);
             UnityEngine::Color color = UnityEngine::Color::HSVToRGB(colorAngle, 1.0f, 1.0f);
             color = color;
@@ -251,9 +253,7 @@ namespace ScoreSaber::UI::Other
     void Banner::Prompt(std::string status, bool loadingIndicator, float dismiss,
                         std::function<void()> callback)
     {
-        GlobalNamespace::SharedCoroutineStarter::instance->StartCoroutine(
-
-            custom_types::Helpers::CoroutineHelper::New(SetPrompt(status, loadingIndicator, dismiss, callback)));
+        this->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetPrompt(status, loadingIndicator, dismiss, callback)));
     }
 
     custom_types::Helpers::Coroutine Banner::SetPrompt(
@@ -264,7 +264,7 @@ namespace ScoreSaber::UI::Other
             co_return;
         }
 
-        this->promptText->SetText(status);
+        this->promptText->text = status;
 
         std::string text = status;
 
@@ -280,7 +280,7 @@ namespace ScoreSaber::UI::Other
                 if (i % 4 != 0)
                 {
                     text = text + ".";
-                    promptText->SetText(text);
+                    promptText->text = text;
                 }
                 else
                 {
@@ -288,7 +288,7 @@ namespace ScoreSaber::UI::Other
                     {
                         text.pop_back();
                     }
-                    promptText->SetText(text);
+                    promptText->text = text;
                 }
             }
         }
@@ -306,7 +306,7 @@ namespace ScoreSaber::UI::Other
         co_return;
     }
 
-    void Banner::prompt = std::string text, int dismissTime
+    void Banner::set_prompt(std::string text, int dismissTime)
     {
         if (!Settings::showStatusText) {
             return;
@@ -315,51 +315,51 @@ namespace ScoreSaber::UI::Other
         promptText->text = text;
         if (dismissTime != -1)
         {
-            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[dismissTime, this] {
+            il2cpp_utils::il2cpp_aware_thread([dismissTime, this] {
                 std::this_thread::sleep_for(std::chrono::seconds(dismissTime));
-                QuestUI::MainThreadScheduler::Schedule([=]() {
+                MainThreadScheduler::Schedule([=, this]() {
                     this->promptText->text = std::string();
                 });
-            }), nullptr)->Run();
+            }).detach();
         }
     }
 
-    void Banner::color = UnityEngine::Color color
+    void Banner::set_color(UnityEngine::Color color)
     {
         bgImage->color = color;
     }
 
-    void Banner::loading = bool value
+    void Banner::set_loading(bool value)
     {
         loadingVertical->gameObject->SetActive(value);
         topText->gameObject->SetActive(!value);
         bottomText->gameObject->SetActive(!value);
     }
 
-    void Banner::ranking = int rank, float pp
+    void Banner::set_ranking(int rank, float pp)
     {
         if (Settings::showLocalPlayerRank) {
-            topText = string_format("<b><color=#FFDE1A>Global Ranking: </color></b>#%d<size=3> (<color=#6772E5>%.2fpp</color></size>)", rank, pp);
+            set_topText(fmt::format("<b><color=#FFDE1A>Global Ranking: </color></b>#{:d}<size=3> (<color=#6772E5>{:.2f}pp</color></size>)", rank, pp));
         } else {
-            topText = "<b>Hidden</b>";
+            set_topText("<b>Hidden</b>");
         }
-        loading = false;
+        set_loading(false);
     }
 
-    void Banner::status = std::string_view status, int scoreboardId
+    void Banner::set_status(std::string_view status, int scoreboardId)
     {
-        bottomText = string_format("<b><color=#FFDE1A>Ranked Status:</color></b> %s", status.data());
+        set_bottomText(fmt::format("<b><color=#FFDE1A>Ranked Status:</color></b> {:s}", status.data()));
         this->scoreboardId = scoreboardId;
-        loading = false;
+        set_loading(false);
     }
 
-    void Banner::topText = std::u16string_view newText
+    void Banner::set_topText(std::u16string_view newText)
     {
         topText->text = u"<i>" + std::u16string(newText) + u"</i>";
         topText->gameObject->SetActive(true);
     }
 
-    void Banner::bottomText = std::u16string_view newText
+    void Banner::set_bottomText(std::u16string_view newText)
     {
         bottomText->text = u"<i>" + std::u16string(newText) + u"</i>";
         bottomText->gameObject->SetActive(true);

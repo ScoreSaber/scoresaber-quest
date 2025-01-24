@@ -1,18 +1,16 @@
 #pragma once
-#include <GlobalNamespace/IDifficultyBeatmap.hpp>
 #include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
-
-using namespace GlobalNamespace;
-using namespace ScoreSaber;
+#include <GlobalNamespace/BeatmapKey.hpp>
+#include "Data/InternalLeaderboard.hpp"
 
 namespace ScoreSaber::Services::LeaderboardService
 {
-    std::string GetLeaderboardUrl(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry);
-    void GetLeaderboardData(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page,
-                            std::function<void(Data::InternalLeaderboard)> finished,
+    std::string GetLeaderboardUrl(GlobalNamespace::BeatmapKey beatmapKey, GlobalNamespace::PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry);
+    void GetLeaderboardData(int maxMultipliedScore, GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, GlobalNamespace::PlatformLeaderboardsModel::ScoresScope scope, int page,
+                            std::function<void(ScoreSaber::Data::InternalLeaderboard)> finished,
                             bool filterAroundCountry);
 
-    Data::InternalLeaderboard GetLeaderboardError(std::string error);
-    Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope,
+    ScoreSaber::Data::InternalLeaderboard GetLeaderboardError(std::string error);
+    ScoreSaber::Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, PlatformLeaderboardsModel::ScoresScope scope,
                                                    int page, bool filterAroundCountry, int maxScore);
 } // namespace ScoreSaber::Services::LeaderboardService

@@ -10,7 +10,7 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::UI::Components, AmeNode);
 
 namespace ScoreSaber::ReplaySystem::UI::Components
 {
-    bool AmeNode::isBeingDragged
+    bool AmeNode::get_isBeingDragged()
     {
         return _handle->dragged;
     }
@@ -21,7 +21,7 @@ namespace ScoreSaber::ReplaySystem::UI::Components
     void AmeNode::AddCallback(std::function<void(AmeNode*, Vector2, Camera*)> callback)
     {
         _callback = callback;
-        _handle->AddCallback([=](ScoreSaber::ReplaySystem::UI::Components::AmeHandle* handle, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
+        _handle->AddCallback([=, this](ScoreSaber::ReplaySystem::UI::Components::AmeHandle* handle, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
             Callback(handle, x, camera);
         });
     }

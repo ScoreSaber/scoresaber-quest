@@ -79,7 +79,7 @@
       },
       {
          "id": "libcurl",
-         "versionRange": "^8.7.1",
+         "versionRange": "=8.5.0",
          "additionalData": {}
       },
       {

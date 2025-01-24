@@ -295,14 +295,14 @@ WRes Thread_Create_With_Affinity(CThread *p, THREAD_FUNC_TYPE func, LPVOID param
   Print("Thread_Create_WithAffinity");
   CCpuSet cs;
   unsigned i;
-  CpuZero = &cs;
+  CpuSet_Zero(&cs);
   for (i = 0; i < sizeof(affinity) * 8; i++)
   {
     if (affinity == 0)
       break;
     if (affinity & 1)
     {
-      CpuSet = &cs, i;
+      CpuSet_Set(&cs, i);
     }
     affinity >>= 1;
   }

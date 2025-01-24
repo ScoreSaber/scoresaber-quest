@@ -8,7 +8,6 @@
 #include <UnityEngine/MonoBehaviour.hpp>
 #include <custom-types/shared/coroutine.hpp>
 #include <custom-types/shared/macros.hpp>
-#include "questui/CustomTypes/Components/Backgroundable.hpp"
 
 #define GET_FIND_METHOD(mPtr) \
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
@@ -58,7 +57,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
         Country};
 
     LeaderboardType leaderboardType = Global;
-    void SetleaderboardType(LeaderboardType type);
+    void SetLeaderboardType(LeaderboardType type);
     std::string GetLeaderboardURL();
     void StartRefresh();
     custom_types::Helpers::Coroutine Refresh();)

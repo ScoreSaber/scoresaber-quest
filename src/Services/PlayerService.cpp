@@ -2,7 +2,6 @@
 #include "Utils/WebUtils.hpp"
 
 #include "Data/Private/AuthResponse.hpp"
-#include <GlobalNamespace/HMTask.hpp>
 #include <System/IO/Directory.hpp>
 #include <System/Action.hpp>
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
@@ -10,11 +9,12 @@
 #include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 #include <custom-types/shared/delegate.hpp>
 #include "logging.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
 #include "static.hpp"
 #include <chrono>
 
 using namespace StringUtils;
+using namespace BSML;
 
 namespace ScoreSaber::Services::PlayerService
 {
@@ -85,7 +85,7 @@ namespace ScoreSaber::Services::PlayerService
             friends = readfile(ScoreSaber::Static::FRIENDS_PATH);
         }
 
-        std::string postData = string_format("at=2&playerId=%s&nonce=%s&friends=%s&name=",
+        std::string postData = fmt::format("at=2&playerId={:s}&nonce={:s}&friends={:s}&name=",
                                              playerId.c_str(), steamKey.c_str(), friends.c_str());
 
         std::string authUrl = ScoreSaber::Static::BASE_URL + "/api/game/auth";
@@ -129,15 +129,15 @@ namespace ScoreSaber::Services::PlayerService
     void GetPlayerInfo(std::string playerId, bool full, std::function<void(std::optional<Data::Player>)> finished)
     {
 
-        std::string url = string_format("%s/api/player/%s", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
+        std::string url = fmt::format("{:s}/api/player/{:s}", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
 
         if (full)
         {
-            url = string_format("%s/full", url.c_str());
+            url = fmt::format("{:s}/full", url.c_str());
         }
         else
         {
-            url = string_format("%s/basic", url.c_str());
+            url = fmt::format("{:s}/basic", url.c_str());
         }
 
         WebUtils::GetAsync(url, [&, finished](long code, std::string result) {
@@ -164,7 +164,7 @@ namespace ScoreSaber::Services::PlayerService
 
     void UpdatePlayerInfoThread()
     {
-        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[] {
+        il2cpp_utils::il2cpp_aware_thread([] {
             while (true)
             {
                 if(ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner == nullptr)
@@ -177,28 +177,28 @@ namespace ScoreSaber::Services::PlayerService
                     std::this_thread::sleep_for(std::chrono::seconds(300));
                 }
             }
-        }), nullptr)->Run();
+        }).detach();
     }
 
     void UpdatePlayerInfo(bool fromMainThread)
     {
         if (!fromMainThread)
         {
-            QuestUI::MainThreadScheduler::Schedule([=]() {
-                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->loading = true;
+            MainThreadScheduler::Schedule([=]() {
+                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
             });
         }
         else
         {
-            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->loading = true;
+            ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
         }
 
         GetPlayerInfo(playerInfo.localPlayerData.id, true, [=](std::optional<Data::Player> playerData) {
             if (playerData.has_value())
             {
                 playerInfo.localPlayerData = playerData.value();
-                QuestUI::MainThreadScheduler::Schedule([=]() {
-                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->ranking = playerInfo.localPlayerData.rank, playerInfo.localPlayerData.pp;
+                MainThreadScheduler::Schedule([=]() {
+                    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_ranking(playerInfo.localPlayerData.rank, playerInfo.localPlayerData.pp);
                 });
             }
         });

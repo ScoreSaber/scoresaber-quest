@@ -1,8 +1,5 @@
 #include <GlobalNamespace/BeatmapDifficulty.hpp>
 #include <GlobalNamespace/EnvironmentInfoSO.hpp>
-#include <GlobalNamespace/IBeatmapLevel.hpp>
-#include <GlobalNamespace/IDifficultyBeatmap.hpp>
-#include <GlobalNamespace/IPreviewBeatmapLevel.hpp>
 #include <HMUI/CurvedCanvasSettings.hpp>
 #include "ReplaySystem/UI/GameReplayUI.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
@@ -39,11 +36,11 @@ namespace ScoreSaber::ReplaySystem::UI
         replayText += "REPLAY MODE - Watching ";
         replayText += ReplaySystem::ReplayLoader::CurrentPlayerName;
         replayText += " play ";
-        replayText += ReplaySystem::ReplayLoader::CurrentLevel->level->i_IPreviewBeatmapLevel()->songAuthorName;
+        replayText += ReplaySystem::ReplayLoader::CurrentBeatmapLevel->songAuthorName;
         replayText += " - ";
-        replayText += ReplaySystem::ReplayLoader::CurrentLevel->level->i_IPreviewBeatmapLevel()->songName;
+        replayText += ReplaySystem::ReplayLoader::CurrentBeatmapLevel->songName;
         replayText += " (";
-        replayText += GetFriendlyDifficulty(ReplaySystem::ReplayLoader::CurrentLevel->difficulty);
+        replayText += GetFriendlyDifficulty(ReplaySystem::ReplayLoader::CurrentBeatmapKey.difficulty);
         replayText += ")";
         float timeScale = 1.0f;
         if (ReplaySystem::ReplayLoader::LoadedReplay->noteKeyframes.size() > 0)
@@ -72,7 +69,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _watermarkCanvas->AddComponent<HMUI::CurvedCanvasSettings*>();
         _canvas->renderMode = RenderMode::WorldSpace;
         _canvas->enabled = false;
-        auto _text = CreateText(reinterpret_cast<RectTransform*>(_canvas->transform), replayText, {0, 10}, {100, 20}, 15.0f);
+        auto _text = CreateText(_canvas->transform.cast<RectTransform>(), replayText, {0, 10}, {100, 20}, 15.0f);
         _text->alignment = TMPro::TextAlignmentOptions::Center;
         auto rectTransform = _text->transform;
         rectTransform->SetParent(_canvas->transform, false);
@@ -84,12 +81,12 @@ namespace ScoreSaber::ReplaySystem::UI
         auto gameObject = GameObject::New_ctor("CustomUIText-ScoreSaber");
         gameObject->SetActive(false);
         auto textMeshProUGUI = gameObject->AddComponent<TMPro::TextMeshProUGUI*>();
-        auto font = UnityEngine::Resources::FindObjectsOfTypeAll<TMPro::TMP_FontAsset*>().First([](TMPro::TMP_FontAsset* t) { return t->name == "Teko-Medium SDF";});
+        auto font = UnityEngine::Resources::FindObjectsOfTypeAll<TMPro::TMP_FontAsset*>()->First([](TMPro::TMP_FontAsset* t) { return t->name == "Teko-Medium SDF";});
         textMeshProUGUI->font = font;
         textMeshProUGUI->rectTransform->SetParent(parent, false);
         textMeshProUGUI->text = text;
         textMeshProUGUI->fontSize = fontSize;
-        textMeshProUGUI->color = Color::white;
+        textMeshProUGUI->color = Color::get_white();
         textMeshProUGUI->rectTransform->anchorMin = {0.5f, 0.5f};
         textMeshProUGUI->rectTransform->anchorMax = {0.5f, 0.5f};
         textMeshProUGUI->rectTransform->sizeDelta = sizeDelta;

@@ -6,25 +6,29 @@
 #include <GlobalNamespace/BeatmapDifficultySerializedMethods.hpp>
 #include <GlobalNamespace/ColorScheme.hpp>
 #include <GlobalNamespace/ColorSchemesSettings.hpp>
+#include <GlobalNamespace/EnvironmentsListModel.hpp>
 #include <GlobalNamespace/MenuTransitionsHelper.hpp>
 #include <GlobalNamespace/PlayerData.hpp>
 #include <GlobalNamespace/PlayerDataModel.hpp>
 #include <GlobalNamespace/PlayerSpecificSettings.hpp>
+#include <GlobalNamespace/RecordingToolManager.hpp>
 #include "Utils/BeatmapUtils.hpp"
-#include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 
 #include "ReplaySystem/Playback/NotePlayer.hpp"
-#include "Services/FileService.hpp"
 #include <System/Action.hpp>
 #include <System/Action_2.hpp>
-
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include <custom-types/shared/delegate.hpp>
 #include "logging.hpp"
 #include "static.hpp"
 #include <custom-types/shared/delegate.hpp>
 
 using namespace GlobalNamespace;
+using namespace BSML;
+using namespace BSML::Helpers;
+
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
 
@@ -32,7 +36,8 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     GlobalNamespace::MenuTransitionsHelper* menuTransitionsHelper;
 
     std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
-    GlobalNamespace::IDifficultyBeatmap* CurrentLevel;
+    GlobalNamespace::BeatmapKey CurrentBeatmapKey;
+    GlobalNamespace::BeatmapLevel* CurrentBeatmapLevel;
     std::u16string CurrentPlayerName;
     std::string CurrentModifiers;
     ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
@@ -43,13 +48,14 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
         playerDataModel = nullptr;
         menuTransitionsHelper = nullptr;
         LoadedReplay = nullptr;
-        CurrentLevel = nullptr;
+        CurrentBeatmapLevel = nullptr;
+        CurrentBeatmapKey = GlobalNamespace::BeatmapKey();
         CurrentPlayerName.clear();
         CurrentModifiers.clear();
         NotePlayerInstance = nullptr;
     }
 
-    void StartReplay(GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey)
+    void StartReplay(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey)
     {
         if (playerDataModel == nullptr)
         {
@@ -70,48 +76,68 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                                localPlayerSettings->advancedHud, localPlayerSettings->autoRestart, localPlayerSettings->saberTrailIntensity,
                                                                localPlayerSettings->noteJumpDurationTypeSettings, localPlayerSettings->noteJumpFixedDuration,
                                                                localPlayerSettings->noteJumpStartBeatOffset, localPlayerSettings->hideNoteSpawnEffect, localPlayerSettings->adaptiveSfx,
-                                                               localPlayerSettings->environmentEffectsFilterDefaultPreset, localPlayerSettings->environmentEffectsFilterExpertPlusPreset);
+                                                               localPlayerSettings->arcsHapticFeedback, localPlayerSettings->arcVisibility,
+                                                               localPlayerSettings->environmentEffectsFilterDefaultPreset, localPlayerSettings->environmentEffectsFilterExpertPlusPreset,
+                                                               localPlayerSettings->headsetHapticIntensity);
 
-        std::function<void(StandardLevelScenesTransitionSetupDataSO*, LevelCompletionResults*)> ReplayEndCallback = [&](StandardLevelScenesTransitionSetupDataSO* standardLevelSceneSetupData, LevelCompletionResults* levelCompletionResults) {
+        std::function<void(UnityW<StandardLevelScenesTransitionSetupDataSO>, LevelCompletionResults*)> ReplayEndCallback = [&](UnityW<StandardLevelScenesTransitionSetupDataSO> standardLevelSceneSetupData, LevelCompletionResults* levelCompletionResults) {
             IsPlaying = false;
         };
 
-        auto replayEndDelegate = custom_types::MakeDelegate<System::Action_2<StandardLevelScenesTransitionSetupDataSO*, LevelCompletionResults*>*>(
-            classof(System::Action_2<StandardLevelScenesTransitionSetupDataSO*, LevelCompletionResults*>*),
+        auto replayEndDelegate = custom_types::MakeDelegate<System::Action_2<UnityW<StandardLevelScenesTransitionSetupDataSO>, LevelCompletionResults*>*>(
+            classof(System::Action_2<UnityW<StandardLevelScenesTransitionSetupDataSO>, LevelCompletionResults*>*),
             ReplayEndCallback);
 
-        auto previewBeatmapLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(beatmap->level);
-        menuTransitionsHelper->StartStandardLevel("Replay", beatmap, previewBeatmapLevel,
-                                                  playerData->overrideEnvironmentSettings,
-                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers),
-                                                  playerSettings, nullptr, "Exit Replay", false, false, nullptr, replayEndDelegate, nullptr);
+        auto _environmentsListModel = Helpers::GetDiContainer()->Resolve<GlobalNamespace::EnvironmentsListModel*>();
+
+        menuTransitionsHelper->StartStandardLevel("Replay", // gameMode
+                                                  byref(beatmapKey), // beatmapKey
+                                                  beatmapLevel, // beatmapLevel
+                                                  playerData->overrideEnvironmentSettings, // overrideEnvironmentSettings
+                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), // overrideColorScheme
+                                                  beatmapLevel->GetColorScheme(beatmapKey.beatmapCharacteristic, beatmapKey.difficulty), // beatmapOverrideColorScheme
+                                                  BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers), // gameplayModifiers
+                                                  playerSettings, // playerSpecificSettings
+                                                  nullptr, // practiceSettings
+                                                  _environmentsListModel, // environmentsListModel
+                                                  "Exit Replay", // backButtonText
+                                                  false, // useTestNoteCutSoundEffects
+                                                  false, // startPaused
+                                                  nullptr, // beforeSceneSwitchToGameplayCallback
+                                                  nullptr, // afterSceneSwitchToGameplayCallback
+                                                  replayEndDelegate, // levelFinishedCallback
+                                                  nullptr, // levelRestartedCallback
+                                                  {false, {}} // recordingToolData (set to null)
+                                                  ); 
         IsPlaying = true;
     }
 
-    void Load(const std::vector<char> &replayData, GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, std::string modifiers, std::u16string playerName) {
-        CurrentLevel = beatmap;
+    void Load(const std::vector<char> &replayData, GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, std::string modifiers, std::u16string playerName) {
+        CurrentBeatmapLevel = beatmapLevel;
+        CurrentBeatmapKey = beatmapKey;
         CurrentPlayerName = playerName;
         CurrentModifiers = modifiers;
 
         LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
 
-        QuestUI::MainThreadScheduler::Schedule([=]() {
-            StartReplay(beatmap);
+        MainThreadScheduler::Schedule([=]() {
+            StartReplay(beatmapLevel, beatmapKey);
         });
     }
 
-    void GetReplayData(GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished)
+    void GetReplayData(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished)
     {
         std::string localPath = ScoreSaber::Static::REPLAY_DIR + "/" + replayFileName + ".dat";
 
-        CurrentLevel = beatmap;
+        CurrentBeatmapLevel = beatmapLevel;
+        CurrentBeatmapKey = beatmapKey;
         CurrentPlayerName = score.leaderboardPlayerInfo.name.value_or(u"unknown");
         CurrentModifiers = score.modifiers;
 
-        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[localPath, replayFileName, leaderboardId, score, finished]() {
+        il2cpp_utils::il2cpp_aware_thread([localPath, replayFileName, leaderboardId, score, finished]() {
             if (fileexists(localPath))
             {
-                INFO("Trying to load local replay: %s", localPath.c_str());
+                INFO("Trying to load local replay: {:s}", localPath.c_str());
                 std::ifstream replayFile(localPath, ios::binary);
                 std::vector<char> replayData((std::istreambuf_iterator<char>(replayFile)), std::istreambuf_iterator<char>());
                 LoadedReplay = ScoreSaber::Data::Private::ReplayReader::Read(replayData);
@@ -126,7 +152,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
             }
             else
             {
-                std::string url = string_format("%s/api/game/telemetry/downloadReplay?playerId=%s&leaderboardId=%d", ScoreSaber::Static::BASE_URL.c_str(), score.leaderboardPlayerInfo.id.value().c_str(), leaderboardId);
+                std::string url = fmt::format("{:s}/api/game/telemetry/downloadReplay?playerId={:s}&leaderboardId={:d}", ScoreSaber::Static::BASE_URL.c_str(), score.leaderboardPlayerInfo.id.value().c_str(), leaderboardId);
                 std::vector<char> replayData;
                 INFO("Starting replay download");
                 long response = WebUtils::DownloadReplaySync(url, replayData, 64);
@@ -144,11 +170,11 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                 }
                 else
                 {
-                    ERROR("Got HTTP error %ld", response);
+                    ERROR("Got HTTP error {:d}", response);
                     finished(false);
                 }
             }
-        }), nullptr)->Run();
+        }).detach();
     }
 
 } // namespace ScoreSaber::ReplaySystem::ReplayLoader

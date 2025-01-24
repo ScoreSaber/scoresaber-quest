@@ -18,10 +18,10 @@
         classof(Zenject::IInitializable*), classof(::System::IDisposable*) \
     }
 
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ResultsViewReplayButtonController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::UI::ResultsViewReplayButtonController", INTERFACES, 0, nullptr,
+___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ResultsViewReplayButtonController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, System::Object, "ScoreSaber::ReplaySystem::UI::ResultsViewReplayButtonController", INTERFACES, 0, nullptr,
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::ResultsViewController*, _resultsViewController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevel*, _beatmapLevel);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapKey*, _beatmapKey);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapKey, _beatmapKey);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::LevelCompletionResults*, _levelCompletionResults);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(UnityEngine::UI::Button*, watchReplayButton);
                                     DECLARE_CTOR(ctor, GlobalNamespace::ResultsViewController* resultsViewController);
@@ -35,8 +35,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ResultsViewRep
                                     std::vector<char> _serializedReplay;
                                     volatile bool _replayReady = false;
                                     HMUI::ViewController::DidActivateDelegate* didActivateDelegate;
-                                    System::Action_1<GlobalNamespace::ResultsViewController*>* continueButtonPressedDelegate;
-                                    System::Action_1<GlobalNamespace::ResultsViewController*>* restartButtonPressedDelegate;
+                                    System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>* continueButtonPressedDelegate;
+                                    System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>* restartButtonPressedDelegate;
                                     void UploadDaemon_ReplaySerialized(const std::vector<char> &serializedReplay);
 
 );

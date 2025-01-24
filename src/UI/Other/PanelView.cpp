@@ -3,24 +3,29 @@
 #include "Data/Private/Settings.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
-#include <GlobalNamespace/SharedCoroutineStarter.hpp>
+#include <GlobalNamespace/ICoroutineStarter.hpp>
 #include <HMUI/CurvedCanvasSettingsHelper.hpp>
-#include <HMUI/ViewController_AnimationDirection.hpp>
-#include <HMUI/ViewController_AnimationType.hpp>
+#include <HMUI/ViewController.hpp>
 #include <System/Collections/IEnumerator.hpp>
 #include <TMPro/TextMeshProUGUI.hpp>
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
 #include <UnityEngine/Events/UnityAction.hpp>
 #include <UnityEngine/Texture2D.hpp>
 #include <UnityEngine/Transform.hpp>
+#include <UnityEngine/Resources.hpp>
 #include <UnityEngine/UI/Button.hpp>
 #include <UnityEngine/UI/VerticalLayoutGroup.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
 #include <UnityEngine/WaitForSeconds.hpp>
 #include "Utils/StringUtils.hpp"
 #include "Utils/UIUtils.hpp"
 #include <beatsaber-hook/shared/utils/il2cpp-functions.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/Helpers/creation.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include "main.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::Other, PanelView);
 
@@ -28,20 +33,20 @@ using namespace ScoreSaber::UI::Other;
 using namespace ScoreSaber::CustomTypes::Components;
 using namespace ScoreSaber::UI::FlowCoordinators;
 using namespace ScoreSaber::Data::Private;
-using namespace QuestUI;
 using namespace UnityEngine::UI;
 using namespace UnityEngine::Events;
 using namespace GlobalNamespace;
+using namespace BSML;
+using namespace BSML::Lite;
+using namespace BSML::Helpers;
 
-#define BeginCoroutine(method) \
-    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method));
+#define BeginCoroutine(method) StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 void PanelView::Init(PlatformLeaderboardViewController* viewController)
 {
     this->leaderboardView = viewController;
 
-    GameObject* canvas = BeatSaberUI::CreateCanvas();
+    GameObject* canvas = CreateCanvas();
 
     HMUI::Screen* screen = canvas->AddComponent<HMUI::Screen*>();
 
@@ -51,12 +56,12 @@ void PanelView::Init(PlatformLeaderboardViewController* viewController)
     rectTransform->sizeDelta = {100.0f, 25.0f};
     transform->SetParent(leaderboardView->transform, false);
     transform->localPosition = {0.0f, 50.0f, 0.0f};
-    transform->eulerAngles = Quaternion::identity.eulerAngles;
-    transform->localScale = Vector3::one;
+    transform->eulerAngles = Quaternion::get_identity().eulerAngles;
+    transform->localScale = Vector3::get_one();
 
     this->floatingScreen = screen;
 
-    promptRoot = BeatSaberUI::CreateHorizontalLayoutGroup(screen->transform);
+    promptRoot = CreateHorizontalLayoutGroup(screen->transform);
     promptRoot->childAlignment = TextAnchor::UpperLeft;
     promptRoot->childForceExpandWidth = false;
     promptRoot->spacing = 1.0f;
@@ -73,15 +78,15 @@ void PanelView::Init(PlatformLeaderboardViewController* viewController)
     promptFitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
 
     HorizontalLayoutGroup* textGroup =
-        BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
+        CreateHorizontalLayoutGroup(promptRootRect);
     textGroup->rectTransform->anchoredPosition = {0.0f, 10.0f};
 
     this->promptText =
-        BeatSaberUI::CreateText(textGroup->transform, "...", false);
+        CreateText(textGroup->transform, "...", false);
     this->promptText->alignment = TMPro::TextAlignmentOptions::BottomLeft;
 
     HorizontalLayoutGroup* indicatorGroup =
-        BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
+        CreateHorizontalLayoutGroup(promptRootRect);
 
     LayoutElement* indicatorElement =
         indicatorGroup->GetComponent<LayoutElement*>();
@@ -98,15 +103,15 @@ void PanelView::Show()
         "Mods/ScoreSaber/Icons/";
 
     VerticalLayoutGroup* vertical =
-        QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
+        CreateVerticalLayoutGroup(
             floatingScreen->transform);
     vertical->rectTransform->anchoredPosition = {0.0f, 0.0f};
     HorizontalLayoutGroup* horizontal =
-        QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(
+        CreateHorizontalLayoutGroup(
             vertical->transform);
 
     TMPro::TextMeshProUGUI* text =
-        QuestUI::BeatSaberUI::CreateText(horizontal->transform, "");
+        CreateText(horizontal->transform, "");
     text->fontSize = text->fontSize * 2.0f;
     text->alignment = TMPro::TextAlignmentOptions::Center;
 
@@ -117,37 +122,37 @@ void PanelView::Show()
 
     Backgroundable* background =
         horizontal->gameObject->AddComponent<Backgroundable*>();
-    background->ApplyBackgroundWithAlpha("title-gradient",
-                                         1.0f);
+    background->ApplyBackground("title-gradient");
+    background->ApplyAlpha(1.0f);
 
     HMUI::ImageView* imageView =
         background->gameObject->GetComponentInChildren<HMUI::ImageView*>();
-    imageView->gradient = true;
-    imageView->gradientDirection = 0;
-    imageView->color = Color::white;
-    imageView->color0 = Color(0.0f, 0.45f, 0.65f, 1.0f);
-    imageView->color1 = Color(0.0f, 0.45f, 0.65f, 0.0f);
-    imageView->curvedCanvasSettingsHelper->Reset();
+    imageView->_gradient = true;
+    imageView->_gradientDirection = 0;
+    imageView->color = Color::get_white();
+    imageView->_color0 = Color(0.0f, 0.45f, 0.65f, 1.0f);
+    imageView->_color1 = Color(0.0f, 0.45f, 0.65f, 0.0f);
+    imageView->_curvedCanvasSettingsHelper->Reset();
 
-    Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
+    Sprite* sprite = FileToSprite(iconPath + "scoresaber.png");
 
     ImageButton* menu = UIUtils::CreateImageButton(
         floatingScreen->gameObject, sprite, {-37.0f, 0.0f}, {12.0f, 12.0f},
         []() {
             HMUI::FlowCoordinator* currentFlowCoordinator =
-                QuestUI::BeatSaberUI::GetMainFlowCoordinator()
+                GetMainFlowCoordinator()
                     ->YoungestChildFlowCoordinatorOrSelf();
-            auto flowCoordinator = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>());
+            auto flowCoordinator = Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>()->First();
             if (!flowCoordinator)
             {
                 flowCoordinator =
-                    BeatSaberUI::CreateFlowCoordinator<ScoreSaberFlowCoordinator*>();
+                    CreateFlowCoordinator<ScoreSaberFlowCoordinator*>();
             }
 
             currentFlowCoordinator->PresentFlowCoordinator(
                 flowCoordinator, nullptr,
                 HMUI::ViewController::AnimationDirection::Horizontal,
-                HMUI::ViewController::AnimationType::In, false);
+                false, false);
         });
     /*
   for (int i = 0; i < 13; i++) {
@@ -164,7 +169,8 @@ void PanelView::Show()
             "disabled)",
             true, Vector2(5.0f, 45.0f));
 */
-    BeginCoroutine(SetPrompt("Connecting to ScoreSaber", true, 5.0f, [=]() { BeginCoroutine(SetPrompt(
+
+    BeginCoroutine(SetPrompt("Connecting to ScoreSaber", true, 5.0f, [=, this]() { BeginCoroutine(SetPrompt(
                                                                                  StringUtils::Colorize("Successfully Connected to ScoreSaber", "green"),
                                                                                  false, 2.0f, nullptr)); }));
 }
@@ -177,7 +183,7 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
         co_return;
     }
 
-    this->promptText->SetText(status);
+    this->promptText->text = status;
 
     std::string text = status;
 
@@ -193,7 +199,7 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
             if (i % 4 != 0)
             {
                 text = text + ".";
-                promptText->SetText(text);
+                promptText->text = text;
             }
             else
             {
@@ -201,12 +207,12 @@ custom_types::Helpers::Coroutine PanelView::SetPrompt(
                 {
                     text.pop_back();
                 }
-                promptText->SetText(text);
+                promptText->text = text;
             }
         }
     }
 
-    promptText->SetText(std::string());
+    promptText->text = "";
 
     if (callback)
     {

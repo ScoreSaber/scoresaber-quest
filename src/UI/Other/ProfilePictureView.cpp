@@ -4,13 +4,17 @@
 #include <UnityEngine/GameObject.hpp>
 #include <UnityEngine/Resources.hpp>
 #include <UnityEngine/Material.hpp>
+#include <UnityEngine/Rect.hpp>
 #include <UnityEngine/SpriteMeshType.hpp>
 #include <UnityEngine/Networking/DownloadHandlerTexture.hpp>
 #include <UnityEngine/Networking/UnityWebRequest.hpp>
 #include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
 #include <bsml/shared/Helpers/utilities.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
+#include <paper/shared/string_convert.hpp>
+#include <custom-types/shared/coroutine.hpp>
 #include "questui/ArrayUtil.hpp"
+#include "Utils/OperatorOverloads.hpp"
 
 #include <map>
 #include <queue>
@@ -89,9 +93,9 @@ namespace ScoreSaber::UI::Other {
     }
 
     custom_types::Helpers::Coroutine GetSpriteAvatar(string url, function<void(Sprite*, int, string, CancellationToken)> onSuccess, function<void(string, int, CancellationToken)> onFailure, CancellationToken cancellationToken, int pos) {
-        Networking::UnityWebRequest* www = Networking::UnityWebRequestTexture::GetTexture(url);
+        UnityWebRequest* www = UnityWebRequestTexture::GetTexture(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-        auto handler = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->downloadHandler);
+        auto handler = reinterpret_cast<DownloadHandlerTexture*>(www->downloadHandler);
 
         while (!www->isDone) {
             if (cancellationToken.IsCancellationRequested) {
@@ -101,17 +105,16 @@ namespace ScoreSaber::UI::Other {
             co_yield nullptr;
         }
 
-        if (www->isNetworkError || www->isHttpError) {
+        if (www->result == UnityWebRequest::Result::ProtocolError || www->result == UnityWebRequest::Result::ConnectionError) {
             onFailure(www->error, pos, cancellationToken);
             co_return;
         }
-        
-        if (!Il2CppString::IsNullOrEmpty(www->error)) {
+        if (!System::String::IsNullOrEmpty(www->error)) {
             onFailure(www->error, pos, cancellationToken);
             co_return;
         }
 
-        Sprite* sprite = Sprite::Create(handler->texture, Rect(0, 0, handler->texture->width, handler->texture->height), Vector2::one * 0.5f, 100.0f, 0u, SpriteMeshType::Tight, Vector4::zero, false);
+        Sprite* sprite = Sprite::Create(handler->texture, Rect(0, 0, handler->texture->width, handler->texture->height), Vector2::get_one() * 0.5f, 100.0f, 0u, SpriteMeshType::Tight, Vector4::get_zero(), false);
         onSuccess(sprite, pos, url, cancellationToken);
         co_return;
     }

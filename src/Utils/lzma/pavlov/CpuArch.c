@@ -232,7 +232,7 @@ static BoolInt CPU_Sys_Is_SSE_Supported()
 #endif
 
 
-static UInt32 X86_CPUID_ECX_Flags
+static UInt32 X86_CPUID_ECX_Get_Flags()
 {
   Cx86cpuid p;
   CHECK_SYS_SSE_SUPPORT
@@ -243,17 +243,17 @@ static UInt32 X86_CPUID_ECX_Flags
 
 BoolInt CPU_IsSupported_AES()
 {
-  return (X86_CPUID_ECX_Flags >> 25) & 1;
+  return (X86_CPUID_ECX_Get_Flags() >> 25) & 1;
 }
 
 BoolInt CPU_IsSupported_SSSE3()
 {
-  return (X86_CPUID_ECX_Flags >> 9) & 1;
+  return (X86_CPUID_ECX_Get_Flags() >> 9) & 1;
 }
 
 BoolInt CPU_IsSupported_SSE41()
 {
-  return (X86_CPUID_ECX_Flags >> 19) & 1;
+  return (X86_CPUID_ECX_Get_Flags() >> 19) & 1;
 }
 
 BoolInt CPU_IsSupported_SHA()

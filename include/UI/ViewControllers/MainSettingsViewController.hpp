@@ -20,7 +20,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::ViewControllers, MainSettingsViewControlle
                       DECLARE_INSTANCE_METHOD(bool, get_saveLocalReplays);
                       DECLARE_INSTANCE_METHOD(void, set_saveLocalReplays, bool value);
                       
-                      DECLARE_INSTANCE_FIELD_PRIVATE_DEFAULT(List<Il2CppObject*>*, locationFilerOptions, List<Il2CppObject*>::New_ctor());
+                      DECLARE_INSTANCE_FIELD_PRIVATE_DEFAULT(ListW<StringW>, locationFilerOptions, ListW<StringW>::New());
 
                       DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 

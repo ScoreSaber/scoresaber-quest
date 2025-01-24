@@ -15,14 +15,14 @@
 #include <VRUIControls/VRPointer.hpp>
 #include <custom-types/shared/coroutine.hpp>
 #include <custom-types/shared/macros.hpp>
-#include "questui/QuestUI.hpp"
+#include <bsml/shared/BSML-Lite.hpp>
 #include "Utils/OperatorOverloads.hpp"
 
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ImageButton);
 
 using namespace ScoreSaber::CustomTypes::Components;
-using namespace QuestUI;
 using namespace UnityEngine;
+using namespace BSML::Lite;
 
 float grabDist = 0.0f;
 bool isHolding = false;
@@ -68,13 +68,13 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
 {
     if (anchoredPosition != Vector2(0.0f, 0.0f))
     {
-        button = QuestUI::CreateUIButton(parent, std::string(), "SettingsButton", anchoredPosition, sizeDelta, onClick);
+        button = CreateUIButton(parent, std::string(), "SettingsButton", anchoredPosition, sizeDelta, onClick);
     }
     else
     {
-        button = QuestUI::CreateUIButton(parent, std::string(), "SettingsButton", onClick);
+        button = CreateUIButton(parent, std::string(), "SettingsButton", onClick);
     }
-    QuestUI::SetButtonSprites(button, sprite, sprite);
+    SetButtonSprites(button, sprite, sprite);
     button->gameObject->AddComponent<Collider*>();
 
     if (sizeDelta != Vector2(0.0f, 0.0f))
@@ -84,7 +84,7 @@ void ImageButton::Init(Transform* parent, Vector2 anchoredPosition, Vector2 size
         rectTransform->sizeDelta = sizeDelta;
     }
 
-    this->pointerArray = UnityEngine::Resources::FindObjectsOfTypeAll<VRUIControls::VRPointer*>();
+    this->pointerArray = Resources::FindObjectsOfTypeAll<VRUIControls::VRPointer*>();
     HMUI::ButtonSpriteSwap* swap = this->GetComponent<HMUI::ButtonSpriteSwap*>();
 
     auto images = button->GetComponentsInChildren<HMUI::ImageView*>();

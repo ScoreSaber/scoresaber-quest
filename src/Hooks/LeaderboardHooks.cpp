@@ -1,41 +1,24 @@
-#include "Sprites.hpp"
-#include "hooks.hpp"
-
-#include "UI/Other/ScoreSaberLeaderboardView.hpp"
-
-// LeaderboardScoreUploader
-
-#include "Data/Private/ReplayFile.hpp"
 #include <GlobalNamespace/GameplayModifiers.hpp>
 #include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
-#include "ReplaySystem/ReplayLoader.hpp"
-
-// StandardLevelScenesTransitionSetupDataSO
-
+#include <GlobalNamespace/BeatmapLevelsModel.hpp>
 #include <GlobalNamespace/LevelCompletionResults.hpp>
 #include <GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp>
 #include <GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp>
-
 #include <GlobalNamespace/LeaderboardTableView.hpp>
 #include <GlobalNamespace/LoadingControl.hpp>
-#include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
+#include <GlobalNamespace/PlatformLeaderboardViewController.hpp>
 #include <HMUI/SegmentedControl.hpp>
-#include "Services/UploadService.hpp"
 #include <System/Guid.hpp>
-#include "Utils/BeatmapUtils.hpp"
-#include "Utils/StringUtils.hpp"
-
-#include "CustomTypes/Components/CellClicker.hpp"
-#include "Data/Private/ReplayFile.hpp"
-#include "ReplaySystem/Recorders/MainRecorder.hpp"
+#include <System/String.hpp>
 #include <beatsaber-hook/shared/utils/hooking.hpp>
-
 #include <GlobalNamespace/MenuTransitionsHelper.hpp>
 #include <UnityEngine/GameObject.hpp>
-
 #include <bsml/shared/Helpers/getters.hpp>
 
-#include "logging.hpp"
+#include "hooks.hpp"
+#include "UI/Other/ScoreSaberLeaderboardView.hpp"
+#include "Services/UploadService.hpp"
+#include "CustomTypes/Components/CellClicker.hpp"
 
 using namespace HMUI;
 using namespace UnityEngine;
@@ -43,8 +26,6 @@ using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber;
 using namespace ScoreSaber::CustomTypes::Components;
-using namespace ScoreSaber::Data::Private;
-using namespace ScoreSaber::ReplaySystem;
 using namespace ScoreSaber::UI::Other;
 
 int _lastScopeIndex = 0;
@@ -86,14 +67,14 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
 
     self->_hasScoresData = false;
     self->_scores = System::Collections::Generic::List_1<LeaderboardTableView::ScoreData*>::New_ctor();
-    self->_leaderboardTableView->SetScores(self->_scores, self->_playerScorePos[(int)self->_scoresScope]);
-    self->_loadingControl->ShowLoading(System::String::Empty);
+    self->_leaderboardTableView->SetScores(self->_scores, self->_playerScorePos[(int)self->getStaticF__scoresScope()]);
+    self->_loadingControl->ShowLoading(System::String::getStaticF_Empty());
     BeatmapLevelsModel* _beatmapLevelsModel = BSML::Helpers::GetDiContainer()->Resolve<BeatmapLevelsModel*>();
     BeatmapLevel* beatmapLevel = _beatmapLevelsModel->GetBeatmapLevel(self->_beatmapKey.levelId);
-    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(beatmapLevel, self->_beatmapKey, self->_leaderboardTableView, self->_scoresScope, self->_loadingControl,
-                                                                         System::Guid::NewGuid().ToString());
+    static int unique_id = 0;
+    ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(beatmapLevel, self->_beatmapKey, self->_leaderboardTableView, self->getStaticF__scoresScope(), self->_loadingControl, ++unique_id);
 }
-
+/*
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell, &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
                      PlatformLeaderboardViewController* self, SegmentedControl* segmentedControl, int cellNumber)
 {
@@ -102,19 +83,19 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedContr
     switch (cellNumber)
     {
         case 0: {
-            self->__scoresScope = PlatformLeaderboardsModel::ScoresScope::Global;
+            self->setStaticF__scoresScope(PlatformLeaderboardsModel::ScoresScope::Global);
             break;
         }
         case 1: {
-            self->__scoresScope = PlatformLeaderboardsModel::ScoresScope::AroundPlayer;
+            self->setStaticF__scoresScope(PlatformLeaderboardsModel::ScoresScope::AroundPlayer);
             break;
         }
         case 2: {
-            self->__scoresScope = PlatformLeaderboardsModel::ScoresScope::Friends;
+            self->setStaticF__scoresScope(PlatformLeaderboardsModel::ScoresScope::Friends);
             break;
         }
         case 3: {
-            self->__scoresScope = PlatformLeaderboardsModel::ScoresScope::Global;
+            self->setStaticF__scoresScope(PlatformLeaderboardsModel::ScoresScope::Global);
             filterAroundCountry = true;
             break;
         }
@@ -137,4 +118,4 @@ MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Finish, &Global
 {
     ScoreSaber::Services::UploadService::Four(self, multiplayerResultsData);
     MultiplayerLevelScenesTransitionSetupDataSO_Finish(self, multiplayerResultsData);
-}
+}*/

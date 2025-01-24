@@ -1,5 +1,8 @@
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
+#include "Services/UploadService.hpp"
+#include <BeatSaber/GameSettings/MainSettings.hpp>
+#include <GlobalNamespace/BeatmapLevel.hpp>
 #include <GlobalNamespace/AudioTimeSyncController.hpp>
 #include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
 #include <GlobalNamespace/BeatmapDifficulty.hpp>

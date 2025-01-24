@@ -13,15 +13,15 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
     extern std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
     extern GlobalNamespace::BeatmapKey CurrentBeatmapKey;
-    extern GlobalNamespace::BeatmapLevel CurrentBeatmapLevel;
+    extern GlobalNamespace::BeatmapLevel* CurrentBeatmapLevel;
     extern std::u16string CurrentPlayerName;
     extern std::string CurrentModifiers;
     extern ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
 
     extern bool IsPlaying;
-    void StartReplay(GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey);
-    void Load(const std::vector<char> &replayData, GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, std::string modifiers, std::u16string playerName);
-    void GetReplayData(GlobalNamespace::BeatmapLevel beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
+    void StartReplay(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey);
+    void Load(const std::vector<char> &replayData, GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, std::string modifiers, std::u16string playerName);
+    void GetReplayData(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
 
     void OnSoftRestart();
 

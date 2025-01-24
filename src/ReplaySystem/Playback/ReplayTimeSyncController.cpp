@@ -1,6 +1,8 @@
 
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include <GlobalNamespace/CallbacksInTime.hpp>
+#include <GlobalNamespace/BurstSliderGameNoteController.hpp>
+#include <GlobalNamespace/ObstacleController.hpp>
 #include <System/Collections/Generic/Dictionary_2.hpp>
 #include <System/Collections/Generic/LinkedListNode_1.hpp>
 #include <UnityEngine/AudioSource.hpp>
@@ -111,7 +113,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             item->Dissolve(0.0f);
         }
 
-        auto obstacleNotePool = _basicBeatmapObjectManager->activeObstacleControllers();
+        auto obstacleNotePool = _basicBeatmapObjectManager->activeObstacleControllers;
         for (int i = 0; i < obstacleNotePool->Count; i++)
         {
             auto item = obstacleNotePool->get_Item(i);
@@ -152,7 +154,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         CancelAllHitSounds();
         _audioTimeSyncController->_audioSource->pitch = newScale;
         _audioTimeSyncController->_timeScale = newScale;
-        _audioTimeSyncController->_audioStartTimeOffsetSinceStart = (Time::timeSinceLevelLoad * _audioTimeSyncController->timeScale) - (_audioTimeSyncController->songTime + _audioInitData->songTimeOffset);
+        _audioTimeSyncController->_audioStartTimeOffsetSinceStart = (Time::get_timeSinceLevelLoad() * _audioTimeSyncController->timeScale) - (_audioTimeSyncController->songTime + _audioInitData->songTimeOffset);
 
         _audioManagerSO->musicPitch = 1.0f / newScale;
         _audioTimeSyncController->Update();
