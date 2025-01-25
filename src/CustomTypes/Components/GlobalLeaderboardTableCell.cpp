@@ -12,6 +12,7 @@
 #include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/UI/LayoutElement.hpp>
 #include <bsml/shared/BSML-Lite.hpp>
+#include <bsml/shared/BSML/SharedCoroutineStarter.hpp>
 
 #include "Sprites.hpp"
 #include "Utils/StringUtils.hpp"
@@ -29,13 +30,12 @@ using namespace StringUtils;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace TMPro;
+using namespace BSML;
 using namespace BSML::Lite;
 
 using LeaderboardType = ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType;
 
-#define BeginCoroutine(method) \
-    StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method));
+#define BeginCoroutine(method) SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 void GlobalLeaderboardTableCell::ctor()
 {

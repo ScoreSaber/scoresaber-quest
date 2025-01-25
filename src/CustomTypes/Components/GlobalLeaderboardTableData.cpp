@@ -3,12 +3,12 @@
 #include <HMUI/ScrollView.hpp>
 #include <HMUI/Touchable.hpp>
 #include <System/Action_1.hpp>
-#include <GlobalNamespace/ICoroutineStarter.hpp>
 #include <UnityEngine/Networking/DownloadHandler.hpp>
 #include <UnityEngine/Networking/UnityWebRequest.hpp>
 #include <UnityEngine/RectOffset.hpp>
 #include <UnityEngine/WaitForSeconds.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
+#include <bsml/shared/BSML/SharedCoroutineStarter.hpp>
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
 #include "static.hpp"
@@ -25,9 +25,7 @@ using namespace UnityEngine::Networking;
 using namespace TMPro;
 using namespace ScoreSaber;
 
-#define BeginCoroutine(method) \
-    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method));
+#define BeginCoroutine(method) BSML::SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 Data::PlayerCollection playerCollection;
 

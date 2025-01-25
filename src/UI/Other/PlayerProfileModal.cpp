@@ -15,8 +15,8 @@
 #include <UnityEngine/Texture2D.hpp>
 #include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/UI/LayoutElement.hpp>
-#include <GlobalNamespace/ICoroutineStarter.hpp>
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/BSML/SharedCoroutineStarter.hpp>
 #include <bsml/shared/BSML-Lite.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
 #include "Utils/UIUtils.hpp"
@@ -41,9 +41,7 @@ using namespace BSML::Lite;
     layout##identifier->preferredWidth = width;                                          \
     layout##identifier->preferredHeight = height
 
-#define BeginCoroutine(method) \
-    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method))
+#define BeginCoroutine(method) BSML::SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 #define WIDTH 90.0f
 #define HEIGHT 60.0f
@@ -273,7 +271,7 @@ namespace ScoreSaber::UI::Other
     void PlayerProfileModal::stopProfileRoutine()
     {
         if (profileRoutine)
-            BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StopCoroutine(profileRoutine);
+            BSML::SharedCoroutineStarter::StopCoroutine(profileRoutine);
         profileRoutine = nullptr;
     }
 
@@ -285,7 +283,7 @@ namespace ScoreSaber::UI::Other
             for (int i = 0; i < length; i++)
             {
                 auto routine = badgeRoutines->get_Item(i);
-                BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StopCoroutine(routine);
+                BSML::SharedCoroutineStarter::StopCoroutine(routine);
             }
 
             badgeRoutines->Clear();

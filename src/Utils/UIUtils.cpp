@@ -24,6 +24,7 @@
 #include <UnityEngine/Vector3.hpp>
 #include <bsml/shared/BSML-Lite.hpp>
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/BSML/SharedCoroutineStarter.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
 #include <paper/shared/string_convert.hpp>
 #include "questui/ArrayUtil.hpp"
@@ -56,9 +57,7 @@ using namespace BSML::Lite;
         AddHoverHint(btn##identifier->gameObject, "Opens in Browser");                                                                                                                 \
     }
 
-#define BeginCoroutine(method) \
-    BSML::Helpers::GetDiContainer()->Resolve<GlobalNamespace::ICoroutineStarter*>()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method));
+#define BeginCoroutine(method) BSML::SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 using HapticPresetSO = Libraries::HM::HMLib::VR::HapticPresetSO;
 static SafePtrUnity<HapticPresetSO> hapticFeedbackPresetSO;
