@@ -64,7 +64,7 @@ std::string flag_url(std::string_view COUNTRY)
     {
         c = tolower(c);
     }
-    auto url = fmt::format("https://github.com/hampusborgos/country-flags/raw/main/png250px/{:s}.png", country.c_str());
+    auto url = fmt::format("https://cdn.scoresaber.com/flags/{:s}.png", country);
     return url;
 }
 
