@@ -242,7 +242,7 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::set_player(std::u16string_view header)
     {
-        header = std::u16string(header) + u"'s Profile";
+        set_header(std::u16string(header) + u"'s Profile");
     }
 
     void PlayerProfileModal::set_header(std::u16string_view header)
