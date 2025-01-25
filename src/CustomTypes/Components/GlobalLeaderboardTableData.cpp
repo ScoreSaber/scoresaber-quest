@@ -35,6 +35,8 @@ custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components
     UnityWebRequest* webRequest = UnityWebRequest::Get(url);
     StrippedMethods::UnityEngine::Networking::UnityWebRequest::SetRequestHeader(webRequest, "Cookie", WebUtils::cookie);
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
+    while (!webRequest->isDone)
+        co_yield nullptr;
     if (webRequest->result != UnityWebRequest::Result::ProtocolError || webRequest->result != UnityWebRequest::Result::ConnectionError)
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document

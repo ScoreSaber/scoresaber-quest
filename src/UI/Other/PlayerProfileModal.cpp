@@ -54,6 +54,8 @@ namespace ScoreSaber::UI::Other
         std::string url = fmt::format("{:s}/api/player/{:s}/full", ScoreSaber::Static::BASE_URL.c_str(), playerId.c_str());
         UnityWebRequest* webRequest = UnityWebRequest::Get(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
+        while(!webRequest->isDone)
+            co_yield nullptr;
         if (webRequest->result != UnityWebRequest::Result::ConnectionError && webRequest->result != UnityWebRequest::Result::ProtocolError)
         {
             std::u16string response = std::u16string(webRequest->downloadHandler->text);
