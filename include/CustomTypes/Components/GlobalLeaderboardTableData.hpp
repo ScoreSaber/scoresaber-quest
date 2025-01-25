@@ -57,7 +57,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
         Country};
 
     LeaderboardType leaderboardType = Global;
-    void SetLeaderboardType(LeaderboardType type);
-    std::string GetLeaderboardURL();
+    void set_LeaderboardType(LeaderboardType type);
+    std::string get_LeaderboardURL();
     void StartRefresh();
     custom_types::Helpers::Coroutine Refresh();)

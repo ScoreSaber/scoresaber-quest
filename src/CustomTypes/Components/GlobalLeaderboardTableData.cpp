@@ -31,7 +31,7 @@ Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData* self)
 {
-    std::string url = self->GetLeaderboardURL();
+    std::string url = self->get_LeaderboardURL();
     UnityWebRequest* webRequest = UnityWebRequest::Get(url);
     StrippedMethods::UnityEngine::Networking::UnityWebRequest::SetRequestHeader(webRequest, "Cookie", WebUtils::cookie);
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(CRASH_UNLESS(webRequest->SendWebRequest()));
@@ -70,7 +70,7 @@ namespace ScoreSaber::CustomTypes::Components
         return size < 5 ? size : 5;
     }
 
-    void GlobalLeaderboardTableData::SetLeaderboardType(LeaderboardType type)
+    void GlobalLeaderboardTableData::set_LeaderboardType(LeaderboardType type)
     {
         // if the new type is the same as the old type
         bool sameType = leaderboardType == type;
@@ -82,7 +82,7 @@ namespace ScoreSaber::CustomTypes::Components
         StartRefresh();
     }
 
-    std::string GlobalLeaderboardTableData::GetLeaderboardURL()
+    std::string GlobalLeaderboardTableData::get_LeaderboardURL()
     {
         std::string playersUrl = ScoreSaber::Static::BASE_URL + "/api/game/players";
         switch (leaderboardType)
