@@ -3,6 +3,7 @@
 #include <GlobalNamespace/VRController.hpp>
 #include <BeatSaber/GameSettings/MainSettings.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
+#include <UnityEngine/Component.hpp>
 #include <UnityEngine/GameObject.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Object.hpp>
@@ -12,12 +13,14 @@
 #include <UnityEngine/Time.hpp>
 #include <UnityEngine/Transform.hpp>
 #include <UnityEngine/Vector3.hpp>
+#include <UnityEngine/SpatialTracking/TrackedPoseDriver.hpp>
 
 #include <GlobalNamespace/SaberManager.hpp>
 #include <UnityEngine/Vector3.hpp>
 #include "logging.hpp"
 
 using namespace UnityEngine;
+using namespace UnityEngine::SpatialTracking;
 using namespace ScoreSaber::Data::Private;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, PosePlayer);
@@ -65,6 +68,26 @@ namespace ScoreSaber::ReplaySystem::Playback
         Quaternion rotation = Quaternion::Euler(0.0f, _mainSettingsHandler->instance->roomRotation, 0.0f);
         spectatorObject->transform->rotation = rotation;
         _spectatorCamera->stereoTargetEye = StereoTargetEyeMask::Both;
+
+        // copy headset tracking to spectator camera
+        auto oldTrackedPoseDriver = _mainCamera->gameObject->GetComponent<TrackedPoseDriver*>();
+        auto newTrackedPoseDriver = _spectatorCamera->gameObject->AddComponent<TrackedPoseDriver*>();
+        newTrackedPoseDriver->UseRelativeTransform = oldTrackedPoseDriver->UseRelativeTransform;
+        newTrackedPoseDriver->deviceType = oldTrackedPoseDriver->deviceType;
+        newTrackedPoseDriver->m_Device = oldTrackedPoseDriver->m_Device;
+        newTrackedPoseDriver->m_OriginPose = oldTrackedPoseDriver->m_OriginPose;
+        newTrackedPoseDriver->m_PoseProviderComponent = oldTrackedPoseDriver->m_PoseProviderComponent;
+        newTrackedPoseDriver->m_PoseSource = oldTrackedPoseDriver->m_PoseSource;
+        newTrackedPoseDriver->m_TrackingType = oldTrackedPoseDriver->m_TrackingType;
+        newTrackedPoseDriver->m_UpdateType = oldTrackedPoseDriver->m_UpdateType;
+        newTrackedPoseDriver->m_UseRelativeTransform = oldTrackedPoseDriver->m_UseRelativeTransform;
+        newTrackedPoseDriver->originPose = oldTrackedPoseDriver->originPose;
+        newTrackedPoseDriver->poseProviderComponent = oldTrackedPoseDriver->poseProviderComponent;
+        newTrackedPoseDriver->poseSource = oldTrackedPoseDriver->poseSource;
+        newTrackedPoseDriver->trackingType = oldTrackedPoseDriver->trackingType;
+        newTrackedPoseDriver->updateType = oldTrackedPoseDriver->updateType;
+
+
         _spectatorCamera->gameObject->SetActive(true);
         _spectatorCamera->depth = 0;
         _spectatorCamera->transform->SetParent(spectatorObject->transform);
