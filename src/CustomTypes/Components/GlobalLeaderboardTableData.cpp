@@ -197,7 +197,9 @@ namespace ScoreSaber::CustomTypes::Components
 
     HMUI::TableCell* GlobalLeaderboardTableData::CellForIdx(HMUI::TableView* tableView, int idx)
     {
-        UnityW<GlobalLeaderboardTableCell> playerCell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier).cast<GlobalLeaderboardTableCell>();
+        auto cell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier);
+
+        UnityW<GlobalLeaderboardTableCell> playerCell = cell ? cell.cast<GlobalLeaderboardTableCell>() : nullptr;
 
         if (!playerCell)
         {

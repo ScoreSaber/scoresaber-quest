@@ -186,7 +186,7 @@ namespace ScoreSaber::UI::Other
         auto mainfc = GetMainFlowCoordinator();
         auto youngest = mainfc->YoungestChildFlowCoordinatorOrSelf();
 
-        auto fc = Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>()->First();
+        auto fc = Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>()->FirstOrDefault();
         if (!fc)
         {
             fc = CreateFlowCoordinator<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>();
