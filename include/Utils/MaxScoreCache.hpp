@@ -6,6 +6,7 @@
 #include <GlobalNamespace/BeatmapKey.hpp>
 #include <GlobalNamespace/BeatmapDataLoader.hpp>
 #include <GlobalNamespace/BeatmapLevelsEntitlementModel.hpp>
+#include <GlobalNamespace/BeatmapLevelsModel.hpp>
 #include <functional>
 #include <System/Collections/Generic/Dictionary_2.hpp>
 #include <custom-types/shared/macros.hpp>
@@ -39,11 +40,10 @@ namespace std {
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::Utils, MaxScoreCache, Il2CppObject,
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevelLoader*, _beatmapLevelLoader);
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapDataLoader*, _beatmapDataLoader);
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevelsEntitlementModel*, _beatmapLevelsEntitlementModel);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevelsModel*, _beatmapLevelsModel);;
 
-    DECLARE_CTOR(ctor, GlobalNamespace::BeatmapLevelLoader* beatmapLevelLoader, GlobalNamespace::BeatmapDataLoader* beatmapDataLoader, GlobalNamespace::BeatmapLevelsEntitlementModel* beatmapLevelsEntitlementModel);
+    DECLARE_CTOR(ctor, GlobalNamespace::BeatmapDataLoader* beatmapDataLoader, GlobalNamespace::BeatmapLevelsModel* beatmapLevelsModel);
 
     std::unordered_map<GlobalNamespace::BeatmapKey, int> cache;
 public:
