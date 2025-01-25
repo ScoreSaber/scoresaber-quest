@@ -605,6 +605,11 @@ namespace WebUtils
         while(!www->isDone)
             co_yield nullptr;
         auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
+        if(www->result != UnityEngine::Networking::UnityWebRequest::Result::Success)
+        {
+            ERROR("Failed to download image from url {:s} with error messages {:s} and {:s}", url, www->error, downloadHandlerTexture->GetErrorMsg());
+            co_return;
+        }
         auto texture = downloadHandlerTexture->get_texture();
         auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
         out->set_sprite(sprite);
