@@ -627,7 +627,7 @@ namespace WebUtils
         }
         else
         {
-            INFO("Failed to read gif with error code %d", error);
+            INFO("Failed to read gif with error code {}", error);
         }
         co_return;
     }
