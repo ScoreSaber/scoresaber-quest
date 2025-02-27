@@ -77,18 +77,18 @@ namespace ScoreSaber::UI::ViewControllers
             segmentedController->_fontSize *= 0.75f;
 
             auto teamAndContributorsNames = ListW<StringW>::New();
-            teamAndContributorsNames[0] = "BACKEND";
-            teamAndContributorsNames[1] = "FRONTEND";
-            teamAndContributorsNames[2] = "MOD";
-            teamAndContributorsNames[3] = "PPV3";
-            teamAndContributorsNames[4] = "ADMIN";
-            teamAndContributorsNames[5] = "NAT";
-            teamAndContributorsNames[6] = " RT ";
-            teamAndContributorsNames[7] = "QAT";
-            teamAndContributorsNames[8] = "CAT";
-            teamAndContributorsNames[9] = "CCT";
+            teamAndContributorsNames.push_back("BACKEND");
+            teamAndContributorsNames.push_back("FRONTEND");
+            teamAndContributorsNames.push_back("MOD");
+            teamAndContributorsNames.push_back("PPV3");
+            teamAndContributorsNames.push_back("ADMIN");
+            teamAndContributorsNames.push_back("NAT");
+            teamAndContributorsNames.push_back(" RT ");
+            teamAndContributorsNames.push_back("QAT");
+            teamAndContributorsNames.push_back("CAT");
+            teamAndContributorsNames.push_back("CCT");
 
-            segmentedController->_texts = *teamAndContributorsNames.getPtr();
+            segmentedController->SetTexts(teamAndContributorsNames.getPtr()->i___System__Collections__Generic__IReadOnlyList_1_T_());
 
             creditTabs = Array<GameObject*>::NewLength(teamAndContributorsNames.size());
 
