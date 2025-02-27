@@ -130,7 +130,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             if (!_pageUpButton)
             {
-                _pageUpButton = CreateUIButton(self->transform, "", "SettingsButton", Vector2(-40.0f, 20.0f), Vector2(5.0f, 5.0f),
+                _pageUpButton = CreateUIButton(self->transform, "", "SettingsButton", Vector2(20.0f, -21.0f), Vector2(5.0f, 5.0f),
                                                                      [=]() {
                                                                          DirectionalButtonClicked(PageDirection::Up);
                                                                      });
@@ -144,7 +144,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             if (!_pageDownButton)
             {
-                _pageDownButton = CreateUIButton(self->transform, "", "SettingsButton", Vector2(-40.0f, -20.0f), Vector2(5.0f, 5.0f),
+                _pageDownButton = CreateUIButton(self->transform, "", "SettingsButton", Vector2(20.0f, -60.0f), Vector2(5.0f, 5.0f),
                                                                        [=]() {
                                                                            DirectionalButtonClicked(PageDirection::Down);
                                                                        });
