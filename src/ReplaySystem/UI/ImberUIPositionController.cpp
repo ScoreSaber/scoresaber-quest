@@ -124,11 +124,8 @@ namespace ScoreSaber::ReplaySystem::UI
         Vector3 viewOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.25f, 0.25f, 0.25f) : Vector3(-0.25f, 0.25f, 0.25f);
         Vector3 scrubberOffset = _handTrack == XR::XRNode::LeftHand ? Vector3(0.46f, -0.06f, 0.25f) : Vector3(-0.46f, -0.06f, 0.25f);
 
-        _mainImberPanelView->transform->localPosition = controller->transform->TransformPoint(viewOffset);
-        _mainImberPanelView->transform->localRotation = controller->transform->rotation;
-
-        _imberScrubber->get_transform()->localPosition = controller->transform->TransformPoint(scrubberOffset);
-        _imberScrubber->get_transform()->localRotation = controller->transform->rotation;
+        _mainImberPanelView->get_Transform()->SetLocalPositionAndRotation(controller->transform->TransformPoint(viewOffset), controller->transform->rotation);
+        _imberScrubber->get_transform()->SetLocalPositionAndRotation(controller->transform->TransformPoint(scrubberOffset), controller->transform->rotation);
     }
 
     void ImberUIPositionController::OpenedUI()
