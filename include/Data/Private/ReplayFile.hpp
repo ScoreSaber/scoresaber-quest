@@ -88,7 +88,7 @@ namespace ScoreSaber::Data::Private
     {
         NoteID();
         NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection);
-        NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection, int GameplayType, int ScoringType, int CutDirectionAngleOffset);
+        NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection, int GameplayType, int ScoringType, float CutDirectionAngleOffset);
         float Time;
         int LineLayer;
         int LineIndex;
