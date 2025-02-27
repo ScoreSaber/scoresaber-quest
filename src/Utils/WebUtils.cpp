@@ -112,7 +112,6 @@ struct Gif
         auto texture = Texture2D::New_ctor(width, height);
         // entire texture
         auto pixelData = texture->GetPixels32();
-        uint8_t* px = reinterpret_cast<uint8_t*>(pixelData->_values);
         // top -> top + height
 
         // left -> left + width
@@ -125,7 +124,7 @@ struct Gif
             for (x = 0; x < frameInfo->Width; ++x)
             {
                 loc = y * frameInfo->Width + x;
-                if (frame->RasterBits[loc] == ext->Bytes[3] && ext->Bytes[0])
+                if (ext && frame->RasterBits[loc] == ext->Bytes[3] && ext->Bytes[0])
                 {
                     continue;
                 }
