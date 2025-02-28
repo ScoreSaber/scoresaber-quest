@@ -78,7 +78,7 @@ namespace ScoreSaber::UI::ViewControllers
             headerText->alignment = TMPro::TextAlignmentOptions::Center;
             headerText->fontSize = 7.0f;
 
-            auto infoButton = CreateUIButton(headerHorizontal->transform, " ?", Vector2(54.0f, 0.0f), Vector2(10.0f, 8.5f), std::bind(&GlobalViewController::OpenMoreInfoModal, this));
+            auto infoButton = CreateUIButton(headerHorizontal->transform, " ?", Vector2(114.0f, -5.0f), Vector2(10.0f, 8.5f), std::bind(&GlobalViewController::OpenMoreInfoModal, this));
 
             auto layoutinfoButton = infoButton->GetComponent<LayoutElement*>();
             layoutinfoButton->ignoreLayout = true;
@@ -105,9 +105,11 @@ namespace ScoreSaber::UI::ViewControllers
 
             LayoutElement* scoreScopesHostElement = scoreScopesHost->GetComponent<LayoutElement*>();
             scoreScopesHostElement->preferredWidth = 9.0f;
-
-            auto arrow = CreateClickableImage(scoreScopesHost->transform, Base64ToSprite(carat_up_base64),
-                                                       std::bind(&GlobalViewController::UpButtonWasPressed, this), {0.0f, 25.0f}, {9.0f, 9.0f});
+            
+            auto _pageUpButton = CreateUIButton(scoreScopesHost->transform, "", "SettingsButton", Vector2(0.0f, 25.0f), Vector2(9.0f, 9.0f), std::bind(&GlobalViewController::UpButtonWasPressed, this));
+            SetButtonSprites(_pageUpButton, Base64ToSprite(carat_up_inactive_base64), Base64ToSprite(carat_up_base64));
+            auto upRectTransform = _pageUpButton->transform->GetChild(0).cast<RectTransform>();
+            upRectTransform->sizeDelta = {9.0f, 9.0f};
 
             VerticalLayoutGroup* scoreScopes = CreateVerticalLayoutGroup(scoreScopesHost->transform);
 
@@ -160,8 +162,10 @@ namespace ScoreSaber::UI::ViewControllers
                                                       {4.0f, 4.0f});
             countryButton->preserveAspect = true;
 
-            auto downrrow = CreateClickableImage(scoreScopesHost->transform, Base64ToSprite(carat_down_base64),
-                                                          std::bind(&GlobalViewController::DownButtonWasPressed, this), {0.0f, 25.0f}, {9.0f, 9.0f});
+            auto _pageDownButton = CreateUIButton(scoreScopesHost->transform, "", "SettingsButton", Vector2(0.0f, -25.0f), Vector2(9.0f, 9.0f), std::bind(&GlobalViewController::DownButtonWasPressed, this));
+            SetButtonSprites(_pageDownButton, Base64ToSprite(carat_down_inactive_base64), Base64ToSprite(carat_down_base64));
+            auto downRectTransform = _pageDownButton->transform->GetChild(0).cast<RectTransform>();
+            downRectTransform->sizeDelta = {9.0f, 9.0f};
 
             VerticalLayoutGroup* globalVerticalHost = CreateVerticalLayoutGroup(globalHost->transform);
 
@@ -267,6 +271,6 @@ namespace ScoreSaber::UI::ViewControllers
 
     void GlobalViewController::FilterWasClicked(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType type)
     {
-        leaderboardList->leaderboardType = type;
+        leaderboardList->set_LeaderboardType(type);
     }
 } // namespace ScoreSaber::UI::ViewControllers

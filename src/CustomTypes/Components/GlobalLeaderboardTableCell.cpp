@@ -165,7 +165,7 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 
     playerCell->name = CreateClickableText(
         CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->transform,
-        u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+        u"Username", FontStyles::Normal, {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
 
     playerCell->name->overflowMode = TextOverflowModes::Ellipsis;
     playerCell->name->alignment = TextAlignmentOptions::Left;
@@ -173,14 +173,14 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 
     playerCell->rank = CreateText(
         CreateHost(t, {-18.0f, -2.0f}, {40.0f, 8.0f})->transform,
-        "#---", false,
+        "#---", FontStyles::Normal,
         {0.0f, 0.0f});
 
     playerCell->rank->alignment = TextAlignmentOptions::Left;
 
     playerCell->pp = CreateText(
         CreateHost(t, {27.0f, 0.0f}, {20.0f, 11.0f})->transform,
-        "---<color=#6872e5>pp</color>", false, {0.0f, 0.0f});
+        "---<color=#6872e5>pp</color>", FontStyles::Normal, {0.0f, 0.0f});
 
     playerCell->pp->fontSize = 5.0f;
     playerCell->pp->overflowMode = TextOverflowModes::Ellipsis;
@@ -193,12 +193,12 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     playerCell->flag->preserveAspect = true;
 
     playerCell->country = CreateText(
-        CreateHost(t, {31.0f, -2.0f}, {17.0f, 0.0f})->transform, "N/A", false, {0.0f, 0.0f});
+        CreateHost(t, {31.0f, -2.0f}, {17.0f, 0.0f})->transform, "N/A", FontStyles::Normal, {0.0f, 0.0f});
     playerCell->country->alignment = TextAlignmentOptions::Left;
     playerCell->country->fontSize = 3.5f;
 
     playerCell->weekly = CreateText(
-        CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->transform, "0", false,
+        CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->transform, "0", FontStyles::Normal,
         {0.0f, 0.0f});
 
     playerCell->weekly->alignment = TextAlignmentOptions::Right;
