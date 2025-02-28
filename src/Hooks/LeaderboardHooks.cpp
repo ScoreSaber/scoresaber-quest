@@ -74,7 +74,7 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
     static int unique_id = 0;
     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::RefreshLeaderboard(beatmapLevel, self->_beatmapKey, self->_leaderboardTableView, self->getStaticF__scoresScope(), self->_loadingControl, ++unique_id);
 }
-/*
+
 MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_HandleScopeSegmentedControlDidSelectCell, &GlobalNamespace::PlatformLeaderboardViewController::HandleScopeSegmentedControlDidSelectCell, void,
                      PlatformLeaderboardViewController* self, SegmentedControl* segmentedControl, int cellNumber)
 {
@@ -118,4 +118,4 @@ MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Finish, &Global
 {
     ScoreSaber::Services::UploadService::Four(self, multiplayerResultsData);
     MultiplayerLevelScenesTransitionSetupDataSO_Finish(self, multiplayerResultsData);
-}*/
+}
