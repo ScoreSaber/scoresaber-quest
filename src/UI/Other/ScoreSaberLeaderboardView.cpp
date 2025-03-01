@@ -43,7 +43,6 @@
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
 #include "Sprites.hpp"
-#include "UI/Other/PanelView.hpp"
 #include "UI/Other/ProfilePictureView.hpp"
 #include "Utils/MaxScoreCache.hpp"
 #include "Utils/UIUtils.hpp"
@@ -66,7 +65,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
     ScoreSaber::UI::Other::Banner* ScoreSaberBanner;
 
-    ScoreSaber::UI::Other::PanelView* view;
     ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
 
     PlatformLeaderboardViewController* _platformLeaderboardViewController;
@@ -99,7 +97,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         _allowReplayWatching = true;
 
         ScoreSaberBanner = nullptr;
-        view = nullptr;
         leaderboardScoreInfoButtonHandler = nullptr;
         _platformLeaderboardViewController = nullptr;
         _pageUpButton = nullptr;

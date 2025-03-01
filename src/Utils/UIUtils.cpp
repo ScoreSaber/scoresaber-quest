@@ -2,7 +2,6 @@
 #include "Utils/WebUtils.hpp"
 #include "main.hpp"
 
-#include "CustomTypes/Components/ImageButton.hpp"
 #include <GlobalNamespace/MenuShockwave.hpp>
 #include <GlobalNamespace/ICoroutineStarter.hpp>
 #include <HMUI/ButtonSpriteSwap.hpp>
@@ -131,16 +130,5 @@ namespace UIUtils
         imageView->_curvedCanvasSettingsHelper->Reset();
 
         return horizontal;
-    }
-
-    ScoreSaber::CustomTypes::Components::ImageButton* CreateImageButton(GameObject* parent, Sprite* sprite,
-                                                                        Vector2 anchoredPosition,
-                                                                        Vector2 sizeDelta,
-                                                                        std::function<void()> onClick)
-    {
-        ScoreSaber::CustomTypes::Components::ImageButton* button = parent->AddComponent<ScoreSaber::CustomTypes::Components::ImageButton*>();
-        button->sprite = sprite;
-        button->Init(parent->transform, anchoredPosition, sizeDelta, onClick);
-        return button;
     }
 } // namespace UIUtils
