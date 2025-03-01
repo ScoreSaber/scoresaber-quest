@@ -11,6 +11,7 @@
 #include <BeatSaber/GameSettings/MainSettingsHandler.hpp>
 #include <GlobalNamespace/PauseMenuManager.hpp>
 #include <GlobalNamespace/VRController.hpp>
+#include <GlobalNamespace/GamePause.hpp>
 #include <HMUI/CurvedCanvasSettings.hpp>
 #include "ReplaySystem/UI/ImberScrubber.hpp"
 #include "ReplaySystem/UI/MainImberPanelView.hpp"
@@ -27,6 +28,7 @@
 #include <custom-types/shared/coroutine.hpp>
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 #define INTERFACES                                                                                       \
     {                                                                                                    \
@@ -42,7 +44,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberUIPositio
                                     DECLARE_INSTANCE_FIELD_DEFAULT(UnityEngine::XR::XRNode, _handTrack, UnityEngine::XR::XRNode::LeftHand);
                                     DECLARE_INSTANCE_FIELD_DEFAULT(float, _senstivityToClick, 0.5f);
                                     DECLARE_INSTANCE_FIELD_DEFAULT(float, _timeBufferToDoubleClick, 0.75f);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::IGamePause*, _gamePause);
+                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::GamePause*, _gamePause);
                                     DECLARE_INSTANCE_FIELD(ReplaySystem::UI::ImberScrubber*, _imberScrubber);
                                     DECLARE_INSTANCE_FIELD(UnityW<ReplaySystem::UI::MainImberPanelView>, _mainImberPanelView);
                                     DECLARE_INSTANCE_FIELD(ReplaySystem::UI::VRControllerAccessor*, _vrControllerAccessor);
@@ -72,8 +74,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberUIPositio
                                     DECLARE_INSTANCE_METHOD(void, SetControllerOffset, UnityEngine::Vector3 offset);
 
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    System::Action * _didResumeDelegate;
-                                    System::Action * _didPauseDelegate;
+                                    DelegateUtils::DelegateW<System::Action> _didResumeDelegate;
+                                    DelegateUtils::DelegateW<System::Action> _didPauseDelegate;
                                     public:
                                     custom_types::Helpers::Coroutine KillMe(GlobalNamespace::VRController * controller);)
 

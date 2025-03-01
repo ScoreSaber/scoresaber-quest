@@ -39,25 +39,20 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void NoteEventRecorder::Initialize()
     {
-        scoringForNoteStartedDelegate = custom_types::MakeDelegate<System::Action_1<ScoringElement*>*>((function<void(ScoringElement*)>)[&](ScoringElement* element) {ScoreController_scoringForNoteStartedEvent(element);});
-        scoringForNoteFinishedDelegate = custom_types::MakeDelegate<System::Action_1<ScoringElement*>*>((function<void(ScoringElement*)>)[&](ScoringElement* element) {ScoreController_scoringForNoteFinishedEvent(element);});
-        handleNoteWasCutDelegate = custom_types::MakeDelegate<BeatmapObjectManager::NoteWasCutDelegate*>(
-            (function<void(NoteController*, NoteCutInfo*)>)
-            [&](NoteController* noteController, NoteCutInfo* noteCutInfo) {
-                BadCutInfoCollector(noteController, noteCutInfo);
-            }
-        );
+        scoringForNoteStartedDelegate = { &NoteEventRecorder::ScoreController_scoringForNoteStartedEvent, this }; 
+        scoringForNoteFinishedDelegate = { &NoteEventRecorder::ScoreController_scoringForNoteFinishedEvent, this };
+        handleNoteWasCutDelegate = { &NoteEventRecorder::BadCutInfoCollector, this };
         
-        _scoreController->add_scoringForNoteStartedEvent(scoringForNoteStartedDelegate);
-        _scoreController->add_scoringForNoteFinishedEvent(scoringForNoteFinishedDelegate);
-        _beatmapObjectManager->add_noteWasCutEvent(handleNoteWasCutDelegate);
+        _scoreController->___scoringForNoteStartedEvent += scoringForNoteStartedDelegate;
+        _scoreController->___scoringForNoteFinishedEvent += scoringForNoteFinishedDelegate;
+        _beatmapObjectManager->___noteWasCutEvent += handleNoteWasCutDelegate;
     }
 
     void NoteEventRecorder::Dispose()
     {
-        _scoreController->remove_scoringForNoteStartedEvent(scoringForNoteStartedDelegate);
-        _scoreController->remove_scoringForNoteFinishedEvent(scoringForNoteFinishedDelegate);
-        _beatmapObjectManager->remove_noteWasCutEvent(handleNoteWasCutDelegate);
+        _scoreController->___scoringForNoteStartedEvent -= scoringForNoteStartedDelegate;
+        _scoreController->___scoringForNoteFinishedEvent -= scoringForNoteFinishedDelegate;
+        _beatmapObjectManager->___noteWasCutEvent -= handleNoteWasCutDelegate;
     }
 
     void NoteEventRecorder::ScoreController_scoringForNoteStartedEvent(ScoringElement* element)
@@ -117,7 +112,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
         }
     }
 
-    void NoteEventRecorder::BadCutInfoCollector(NoteController* noteController, NoteCutInfo* noteCutInfo)
+    void NoteEventRecorder::BadCutInfoCollector(NoteController* noteController, ByRef<NoteCutInfo> noteCutInfo)
     {
         _collectedBadCutInfos.emplace(noteController->noteData, *noteCutInfo);
     }

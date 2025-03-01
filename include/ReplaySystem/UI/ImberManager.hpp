@@ -4,7 +4,7 @@
 #include <Zenject/DiContainer.hpp>
 
 #include <GlobalNamespace/AudioTimeSyncController.hpp>
-#include <GlobalNamespace/IGamePause.hpp>
+#include <GlobalNamespace/GamePause.hpp>
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include "ReplaySystem/UI/ImberScrubber.hpp"
@@ -19,6 +19,7 @@
 #include <Zenject/IInitializable.hpp>
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 #define INTERFACES                                                         \
     {                                                                      \
@@ -28,7 +29,7 @@
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::UI", INTERFACES, 0, nullptr,
 
                                     DECLARE_INSTANCE_FIELD(float, _initialTimeScale);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::IGamePause*, _gamePause);
+                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::GamePause*, _gamePause);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberScrubber*, _imberScrubber);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberSpecsReporter*, _imberSpecsReporter);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::MainImberPanelView*, _mainImberPanelView);
@@ -71,7 +72,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, 
                                     DECLARE_INSTANCE_METHOD(void, MainImberPanelView_DidChangeVisibility, bool value);
 
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    System::Action * _didResumeDelegate;
+                                    DelegateUtils::DelegateW<System::Action> _didResumeDelegate;
                                     std::vector<std::string> _positions;
 
 )

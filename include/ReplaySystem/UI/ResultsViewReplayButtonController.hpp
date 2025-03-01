@@ -12,6 +12,7 @@
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
 #include <vector>
+#include "Utils/DelegateUtils.hpp"
 
 #define INTERFACES                                                         \
     {                                                                      \
@@ -28,15 +29,15 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ResultsViewRep
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
                                     DECLARE_INSTANCE_METHOD(void, ResultsViewController_didActivateEvent, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
-                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_restartButtonPressedEvent, GlobalNamespace::ResultsViewController* obj);
-                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_continueButtonPressedEvent, GlobalNamespace::ResultsViewController* obj);
+                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_restartButtonPressedEvent, UnityW<GlobalNamespace::ResultsViewController> obj);
+                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_continueButtonPressedEvent, UnityW<GlobalNamespace::ResultsViewController> obj);
                                     DECLARE_INSTANCE_METHOD(void, WaitForReplay);
                                     DECLARE_INSTANCE_METHOD(void, ClickedReplayButton);
                                     std::vector<char> _serializedReplay;
                                     volatile bool _replayReady = false;
-                                    HMUI::ViewController::DidActivateDelegate* didActivateDelegate;
-                                    System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>* continueButtonPressedDelegate;
-                                    System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>* restartButtonPressedDelegate;
+                                    DelegateUtils::DelegateW<HMUI::ViewController::DidActivateDelegate> didActivateDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>> continueButtonPressedDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>> restartButtonPressedDelegate;
                                     void UploadDaemon_ReplaySerialized(const std::vector<char> &serializedReplay);
 
 );

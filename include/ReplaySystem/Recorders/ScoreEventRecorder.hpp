@@ -9,6 +9,7 @@
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
 #include <vector>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -31,9 +32,9 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, ScoreEv
                                     std::vector<Data::Private::ScoreEvent> _scoreKeyFrames;
                                     std::vector<Data::Private::ComboEvent> _comboKeyFrames;
                                     std::vector<Data::Private::MultiplierEvent> _multiplierKeyFrames;
-                                    System::Action_1<int> *comboDidChangeDelegate;
-                                    System::Action_2<int, int> *scoreDidChangeDelegate;
-                                    System::Action_2<int, float> *multiplierDidChangeDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<int>> comboDidChangeDelegate;
+                                    DelegateUtils::DelegateW<System::Action_2<int, int>> scoreDidChangeDelegate;
+                                    DelegateUtils::DelegateW<System::Action_2<int, float>> multiplierDidChangeDelegate;
                                     public:
                                     std::vector<Data::Private::ScoreEvent> ExportScoreKeyframes();
                                     std::vector<Data::Private::ComboEvent> ExportComboKeyframes();

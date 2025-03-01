@@ -16,17 +16,17 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerInitializer::Initialize()
     {
-        didSetupDelegate = custom_types::MakeDelegate<System::Action*>((std::function<void()>)[&]() { GameServerLobbyFlowCoordinator_didSetupEvent(); });
-        didFinishDelegate = custom_types::MakeDelegate<System::Action*>((std::function<void()>)[&]() { GameServerLobbyFlowCoordinator_didFinishEvent(); });
+        didSetupDelegate = { &ScoreSaberMultiplayerInitializer::GameServerLobbyFlowCoordinator_didSetupEvent, this };
+        didFinishDelegate = { &ScoreSaberMultiplayerInitializer::GameServerLobbyFlowCoordinator_didFinishEvent, this };
 
-        _gameServerLobbyFlowCoordinator->add_didSetupEvent(didSetupDelegate);
-        _gameServerLobbyFlowCoordinator->add_didFinishEvent(didFinishDelegate);
+        _gameServerLobbyFlowCoordinator->___didSetupEvent += didSetupDelegate;
+        _gameServerLobbyFlowCoordinator->___didFinishEvent += didFinishDelegate;
     }
 
     void ScoreSaberMultiplayerInitializer::Dispose()
     {
-        _gameServerLobbyFlowCoordinator->remove_didSetupEvent(didSetupDelegate);
-        _gameServerLobbyFlowCoordinator->remove_didFinishEvent(didFinishDelegate);
+        _gameServerLobbyFlowCoordinator->___didSetupEvent -= didSetupDelegate;
+        _gameServerLobbyFlowCoordinator->___didFinishEvent -= didFinishDelegate;
     }
 
     void ScoreSaberMultiplayerInitializer::GameServerLobbyFlowCoordinator_didSetupEvent()

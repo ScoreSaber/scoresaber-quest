@@ -24,13 +24,14 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::Initialize()
     {
-        didActivateDelegate = custom_types::MakeDelegate<HMUI::ViewController::DidActivateDelegate*>(classof(HMUI::ViewController::DidActivateDelegate*), (std::function<void(bool, bool, bool)>)[&](bool a, bool b, bool c){ ResultsViewController_didActivateEvent(a, b, c);});
-        continueButtonPressedDelegate = custom_types::MakeDelegate<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*>(classof(System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*), (std::function<void(UnityW<GlobalNamespace::ResultsViewController>)>)[&](UnityW<GlobalNamespace::ResultsViewController> o){ ResultsViewController_continueButtonPressedEvent(o);});
-        restartButtonPressedDelegate = custom_types::MakeDelegate<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*>(classof(System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>*), (std::function<void(UnityW<GlobalNamespace::ResultsViewController>)>)[&](UnityW<GlobalNamespace::ResultsViewController> o){ ResultsViewController_restartButtonPressedEvent(o);});
+        didActivateDelegate = { &ResultsViewReplayButtonController::ResultsViewController_didActivateEvent, this };
+        continueButtonPressedDelegate = { &ResultsViewReplayButtonController::ResultsViewController_continueButtonPressedEvent, this };
+        restartButtonPressedDelegate = { &ResultsViewReplayButtonController::ResultsViewController_restartButtonPressedEvent, this };
         
-        _resultsViewController->add_didActivateEvent(didActivateDelegate);
-        _resultsViewController->add_continueButtonPressedEvent(continueButtonPressedDelegate);
-        _resultsViewController->add_restartButtonPressedEvent(restartButtonPressedDelegate);
+        _resultsViewController->___didActivateEvent += didActivateDelegate;
+        _resultsViewController->___continueButtonPressedEvent += continueButtonPressedDelegate;
+        _resultsViewController->___restartButtonPressedEvent += restartButtonPressedDelegate;
+
         Services::ReplayService::ReplaySerialized = [&](const std::vector<char> &v) { UploadDaemon_ReplaySerialized(v); };
     }
 
@@ -53,13 +54,13 @@ namespace ScoreSaber::ReplaySystem::UI
         WaitForReplay();
     }
 
-    void ResultsViewReplayButtonController::ResultsViewController_restartButtonPressedEvent(GlobalNamespace::ResultsViewController* obj)
+    void ResultsViewReplayButtonController::ResultsViewController_restartButtonPressedEvent(UnityW<GlobalNamespace::ResultsViewController> obj)
     {
         _serializedReplay.clear();
         _replayReady = false;
     }
 
-    void ResultsViewReplayButtonController::ResultsViewController_continueButtonPressedEvent(GlobalNamespace::ResultsViewController* obj)
+    void ResultsViewReplayButtonController::ResultsViewController_continueButtonPressedEvent(UnityW<GlobalNamespace::ResultsViewController> obj)
     {
         _serializedReplay.clear();
         _replayReady = false;
@@ -85,9 +86,9 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::Dispose()
     {
-        _resultsViewController->remove_didActivateEvent(didActivateDelegate);
-        _resultsViewController->remove_continueButtonPressedEvent(continueButtonPressedDelegate);
-        _resultsViewController->remove_restartButtonPressedEvent(restartButtonPressedDelegate);
+        _resultsViewController->___didActivateEvent -= didActivateDelegate;
+        _resultsViewController->___continueButtonPressedEvent -= continueButtonPressedDelegate;
+        _resultsViewController->___restartButtonPressedEvent -= restartButtonPressedDelegate;
         Services::ReplayService::ReplaySerialized = nullptr;
     }
 

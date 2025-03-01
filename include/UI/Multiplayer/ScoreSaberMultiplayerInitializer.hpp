@@ -6,6 +6,7 @@
 #include <Zenject/IInitializable.hpp>
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace GlobalNamespace;
 
@@ -21,7 +22,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::UI::Multiplayer, ScoreSaberMulti
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
                                     DECLARE_INSTANCE_METHOD(void, GameServerLobbyFlowCoordinator_didSetupEvent);
                                     DECLARE_INSTANCE_METHOD(void, GameServerLobbyFlowCoordinator_didFinishEvent);
-                                    System::Action* didSetupDelegate;
-                                    System::Action* didFinishDelegate;)
+                                    DelegateUtils::DelegateW<System::Action> didSetupDelegate;
+                                    DelegateUtils::DelegateW<System::Action> didFinishDelegate;)
 
 #undef INTERFACES

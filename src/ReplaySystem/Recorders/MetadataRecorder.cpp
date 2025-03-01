@@ -15,6 +15,7 @@
 #include <System/Action.hpp>
 #include <custom-types/shared/delegate.hpp>
 #include <functional>
+#include "logging.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -24,7 +25,7 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, MetadataRecorder);
 
 namespace ScoreSaber::ReplaySystem::Recorders
 {
-    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, IGameEnergyCounter* gameEnergyCounter, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler)
+    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GameEnergyCounter* gameEnergyCounter, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler)
     {
         INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
@@ -36,13 +37,14 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void MetadataRecorder::Initialize()
     {
-        gameEnergyDidReach0Delegate = custom_types::MakeDelegate<System::Action*>((function<void()>)[&]() {GameEnergyCounter_gameEnergyDidReach0Event();});
-        _gameEnergyCounter->add_gameEnergyDidReach0Event(gameEnergyDidReach0Delegate);
+        gameEnergyDidReach0Delegate = { &MetadataRecorder::GameEnergyCounter_gameEnergyDidReach0Event, this };
+        _gameEnergyCounter->___gameEnergyDidReach0Event += gameEnergyDidReach0Delegate;
     }
 
     void MetadataRecorder::Dispose()
     {
-        _gameEnergyCounter->remove_gameEnergyDidReach0Event(gameEnergyDidReach0Delegate);
+        INFO("Disposing MetadataRecorder");
+        _gameEnergyCounter->___gameEnergyDidReach0Event -= gameEnergyDidReach0Delegate;
     }
 
     void MetadataRecorder::GameEnergyCounter_gameEnergyDidReach0Event()

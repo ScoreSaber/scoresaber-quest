@@ -11,6 +11,7 @@
 #include <Zenject/IInitializable.hpp>
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace GlobalNamespace;
 
@@ -30,7 +31,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::UI::Multiplayer, ScoreSaberMulti
                                     DECLARE_INSTANCE_METHOD(void, MultiplayerResultsViewController_didActivateEvent, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
                                     DECLARE_INSTANCE_METHOD(void, MultiplayerResultsViewController_didDeactivateEvent, bool removedFromHierarchy, bool screenSystemDisabling);
                                     DECLARE_INSTANCE_METHOD(void, MultiplayerLevelDidFinish, MultiplayerLevelScenesTransitionSetupDataSO* transitionSetupData, MultiplayerResultsData* results);
-                                    MultiplayerResultsViewController::DidActivateDelegate* didActivateDelegate;
-                                    MultiplayerResultsViewController::DidDeactivateDelegate* didDeactivateDelegate;)
+                                    DelegateUtils::DelegateW<MultiplayerResultsViewController::DidActivateDelegate> didActivateDelegate;
+                                    DelegateUtils::DelegateW<MultiplayerResultsViewController::DidDeactivateDelegate> didDeactivateDelegate;)
 
 #undef INTERFACES

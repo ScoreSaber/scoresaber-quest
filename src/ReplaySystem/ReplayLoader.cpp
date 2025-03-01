@@ -23,7 +23,6 @@
 #include <custom-types/shared/delegate.hpp>
 #include "logging.hpp"
 #include "static.hpp"
-#include <custom-types/shared/delegate.hpp>
 
 using namespace GlobalNamespace;
 using namespace BSML;

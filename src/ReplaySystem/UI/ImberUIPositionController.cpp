@@ -18,7 +18,7 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberUIPositionController::ctor(GlobalNamespace::IGamePause* gamePause, ReplaySystem::UI::ImberScrubber* imberScrubber, GlobalNamespace::PauseMenuManager* pauseMenuManager, ReplaySystem::UI::MainImberPanelView* mainImberPanelView, ReplaySystem::UI::VRControllerAccessor* vrControllerAccessor)
     {
         INVOKE_CTOR();
-        _gamePause = gamePause;
+        _gamePause = il2cpp_utils::try_cast<GamePause>(gamePause).value();
         _imberScrubber = imberScrubber;
         _mainImberPanelView = mainImberPanelView;
         _vrControllerAccessor = vrControllerAccessor;
@@ -32,16 +32,10 @@ namespace ScoreSaber::ReplaySystem::UI
     }
     void ImberUIPositionController::Initialize()
     {
-        std::function<void()> gameDidResume = [&]() {
-            GamePause_didResumeEvent();
-        };
-        std::function<void()> gameDidPause = [&]() {
-            GamePause_didPauseEvent();
-        };
-        _didResumeDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume);
-        _didPauseDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidPause);
-        _gamePause->add_didResumeEvent(_didResumeDelegate);
-        _gamePause->add_didPauseEvent(_didPauseDelegate);
+        _didResumeDelegate = { &ImberUIPositionController::GamePause_didResumeEvent, this };
+        _didPauseDelegate = { &ImberUIPositionController::GamePause_didPauseEvent, this };
+        _gamePause->___didResumeEvent += _didResumeDelegate;
+        _gamePause->___didPauseEvent += _didPauseDelegate;
         _pauseMenuManagerTransform->position = Vector3(_controllerOffset.x, _controllerOffset.y, _controllerOffset.z);
 
         if (Settings::leftHandedReplayUI) {
@@ -158,7 +152,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberUIPositionController::Dispose()
     {
-        _gamePause->remove_didResumeEvent(_didResumeDelegate);
-        _gamePause->remove_didPauseEvent(_didPauseDelegate);
+        _gamePause->___didResumeEvent -= _didResumeDelegate;
+        _gamePause->___didPauseEvent -= _didPauseDelegate;
     }
 } // namespace ScoreSaber::ReplaySystem::UI

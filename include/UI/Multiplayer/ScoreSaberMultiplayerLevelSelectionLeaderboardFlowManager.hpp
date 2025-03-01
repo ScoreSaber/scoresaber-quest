@@ -11,6 +11,7 @@
 #include <Zenject/IInitializable.hpp>
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace GlobalNamespace;
 
@@ -31,10 +32,10 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::UI::Multiplayer, ScoreSaberMulti
                                     DECLARE_INSTANCE_METHOD(void, LevelSelectionNavigationController_didDeactivateEvent, bool removedFromHierarchy, bool screenSystemDisabling);
                                     DECLARE_INSTANCE_METHOD(void, LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent, UnityW<LevelSelectionNavigationController> controller);
                                     DECLARE_INSTANCE_METHOD(void, LevelSelectionNavigationController_didChangeLevelDetailContentEvent, UnityW<LevelSelectionNavigationController> controller, StandardLevelDetailViewController::ContentType contentType);
-                                    LevelSelectionNavigationController::DidActivateDelegate* didActivateDelegate;
-                                    LevelSelectionNavigationController::DidDeactivateDelegate* didDeactivateDelegate;
-                                    System::Action_1<UnityW<LevelSelectionNavigationController>>* didChangeDifficultyBeatmapDelegate;
-                                    System::Action_2<UnityW<LevelSelectionNavigationController>, StandardLevelDetailViewController::ContentType>* didChangeLevelDetailContentDelegate;
+                                    DelegateUtils::DelegateW<LevelSelectionNavigationController::DidActivateDelegate> didActivateDelegate;
+                                    DelegateUtils::DelegateW<LevelSelectionNavigationController::DidDeactivateDelegate> didDeactivateDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<UnityW<LevelSelectionNavigationController>>> didChangeDifficultyBeatmapDelegate;
+                                    DelegateUtils::DelegateW<System::Action_2<UnityW<LevelSelectionNavigationController>, StandardLevelDetailViewController::ContentType>> didChangeLevelDetailContentDelegate;
                                     bool InMulti();
                                     void HideLeaderboard();
                                     void ShowLeaderboard();

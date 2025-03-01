@@ -14,6 +14,7 @@
 #include <lapiz/shared/macros.hpp>
 #include <vector>
 #include <map>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -33,13 +34,13 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, NoteEve
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
                                     DECLARE_INSTANCE_METHOD(void, ScoreController_scoringForNoteStartedEvent, ScoringElement* element);
                                     DECLARE_INSTANCE_METHOD(void, ScoreController_scoringForNoteFinishedEvent, ScoringElement* element);
-                                    DECLARE_INSTANCE_METHOD(void, BadCutInfoCollector, NoteController* noteController, NoteCutInfo* noteCutInfo);
+                                    DECLARE_INSTANCE_METHOD(void, BadCutInfoCollector, NoteController* noteController, ByRef<NoteCutInfo> noteCutInfo);
                                     std::vector<Data::Private::NoteEvent> _noteKeyframes;
                                     std::map<NoteData*, NoteCutInfo> _collectedBadCutInfos;
                                     std::map<GoodCutScoringElement*, float> _scoringStartInfo;
-                                    System::Action_1<ScoringElement*> *scoringForNoteStartedDelegate;
-                                    System::Action_1<ScoringElement*> *scoringForNoteFinishedDelegate;
-                                    BeatmapObjectManager::NoteWasCutDelegate *handleNoteWasCutDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<ScoringElement*>> scoringForNoteStartedDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<ScoringElement*>> scoringForNoteFinishedDelegate;
+                                    DelegateUtils::DelegateW<BeatmapObjectManager::NoteWasCutDelegate> handleNoteWasCutDelegate;
                                     public:
                                     std::vector<Data::Private::NoteEvent> Export();
                                     )

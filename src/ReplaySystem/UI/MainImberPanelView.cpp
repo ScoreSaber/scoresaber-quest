@@ -147,10 +147,8 @@ namespace ScoreSaber::ReplaySystem::UI
         if (firstActivation) {
             BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, transform, this);
         }
-        didSelectDelegate = custom_types::MakeDelegate<System::Action_2<UnityW<HMUI::SegmentedControl>, int>*>((std::function<void(UnityW<HMUI::SegmentedControl>, int)>)[&](UnityW<HMUI::SegmentedControl> segmentedControl, int idx) {
-            DidSelect(segmentedControl, idx);
-        });
-        tabSelector->textSegmentedControl->add_didSelectCellEvent(didSelectDelegate);
+        didSelectDelegate = { &MainImberPanelView::DidSelect, this };
+        tabSelector->textSegmentedControl->___didSelectCellEvent += didSelectDelegate;
         set_didParse(true);
         if (firstActivation)
         {
@@ -161,7 +159,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        tabSelector->textSegmentedControl->remove_didSelectCellEvent(didSelectDelegate);
+        tabSelector->textSegmentedControl->___didSelectCellEvent -= didSelectDelegate;
         //getBase()->DidDeactivate(removedFromHierarchy, screenSystemDisabling);
     }
 
@@ -187,7 +185,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    void MainImberPanelView::DidSelect(HMUI::SegmentedControl* segmentedControl, int selected)
+    void MainImberPanelView::DidSelect(UnityW<HMUI::SegmentedControl> segmentedControl, int selected)
     {
         int positionTabIndex = 2;
         if (_lastTab == 2 || selected == 2)

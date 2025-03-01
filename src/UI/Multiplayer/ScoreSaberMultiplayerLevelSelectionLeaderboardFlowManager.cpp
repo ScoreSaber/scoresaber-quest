@@ -25,18 +25,18 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::Initialize()
     {
-        didActivateDelegate = custom_types::MakeDelegate<LevelSelectionNavigationController::DidActivateDelegate*>((std::function<void(bool, bool, bool)>)[&](bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) { LevelSelectionNavigationController_didActivateEvent(firstActivation, addedToHierarchy, screenSystemEnabling); });
-        didDeactivateDelegate = custom_types::MakeDelegate<LevelSelectionNavigationController::DidDeactivateDelegate*>((std::function<void(bool, bool)>)[&](bool removedFromHierarchy, bool screenSystemDisabling) { LevelSelectionNavigationController_didDeactivateEvent(removedFromHierarchy, screenSystemDisabling); });
+        didActivateDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didActivateEvent, this };
+        didDeactivateDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didDeactivateEvent, this };
 
-        _levelSelectionNavigationController->add_didActivateEvent(didActivateDelegate);
-        _levelSelectionNavigationController->add_didDeactivateEvent(didDeactivateDelegate);
+        _levelSelectionNavigationController->___didActivateEvent += didActivateDelegate;
+        _levelSelectionNavigationController->___didDeactivateEvent += didDeactivateDelegate;
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::Dispose()
     {
-        _levelSelectionNavigationController->remove_didActivateEvent(didActivateDelegate);
+        _levelSelectionNavigationController->___didActivateEvent -= didActivateDelegate;
         // the next one is missing in the pcvr version, so I'll leave it out here aswell
-        // _levelSelectionNavigationController->remove_didDeactivateEvent(didDeactivateDelegate);
+        // _levelSelectionNavigationController->___didDeactivateEvent -= didDeactivateDelegate;
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didActivateEvent(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -49,11 +49,11 @@ namespace ScoreSaber::UI::Multiplayer
 
         _currentlyInMulti = true;
 
-        didChangeDifficultyBeatmapDelegate = custom_types::MakeDelegate<System::Action_1<UnityW<LevelSelectionNavigationController>>*>((std::function<void(UnityW<LevelSelectionNavigationController>)>)[&](UnityW<LevelSelectionNavigationController> controller) { LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent(controller); });
-        didChangeLevelDetailContentDelegate = custom_types::MakeDelegate<System::Action_2<UnityW<LevelSelectionNavigationController>, StandardLevelDetailViewController::ContentType>*>((std::function<void(UnityW<LevelSelectionNavigationController>, StandardLevelDetailViewController::ContentType)>)[&](UnityW<LevelSelectionNavigationController> controller, StandardLevelDetailViewController::ContentType contentType) { LevelSelectionNavigationController_didChangeLevelDetailContentEvent(controller, contentType); });
+        didChangeDifficultyBeatmapDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent, this };
+        didChangeLevelDetailContentDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeLevelDetailContentEvent, this };
 
-        _levelSelectionNavigationController->add_didChangeDifficultyBeatmapEvent(didChangeDifficultyBeatmapDelegate);
-        _levelSelectionNavigationController->add_didChangeLevelDetailContentEvent(didChangeLevelDetailContentDelegate);
+        _levelSelectionNavigationController->___didChangeDifficultyBeatmapEvent += didChangeDifficultyBeatmapDelegate;
+        _levelSelectionNavigationController->___didChangeLevelDetailContentEvent += didChangeLevelDetailContentDelegate;
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didDeactivateEvent(bool removedFromHierarchy, bool screenSystemDisabling)
@@ -62,8 +62,8 @@ namespace ScoreSaber::UI::Multiplayer
             return;
 
         _currentlyInMulti = false;
-        _levelSelectionNavigationController->remove_didChangeDifficultyBeatmapEvent(didChangeDifficultyBeatmapDelegate);
-        _levelSelectionNavigationController->remove_didChangeLevelDetailContentEvent(didChangeLevelDetailContentDelegate);
+        _levelSelectionNavigationController->___didChangeDifficultyBeatmapEvent -= didChangeDifficultyBeatmapDelegate;
+        _levelSelectionNavigationController->___didChangeLevelDetailContentEvent -= didChangeLevelDetailContentDelegate;
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeLevelDetailContentEvent(UnityW<LevelSelectionNavigationController> controller, StandardLevelDetailViewController::ContentType contentType)

@@ -17,6 +17,7 @@
 #include <bsml/shared/BSML/FloatingScreen/FloatingScreen.hpp>
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
 #include <bsml/shared/BSML/Components/TabSelector.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::ViewController,
                       DECLARE_INSTANCE_FIELD(UnityEngine::Pose, defaultPosition);
@@ -52,7 +53,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       /* In DidActivate is when you want to run BSML::parse_and_construct() usually*/
                       DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
                       DECLARE_OVERRIDE_METHOD_MATCH(void, DidDeactivate, &HMUI::ViewController::DidDeactivate, bool removedFromHierarchy, bool screenSystemDisabling);
-                      DECLARE_INSTANCE_METHOD(void, DidSelect, HMUI::SegmentedControl*, int selected);
+                      DECLARE_INSTANCE_METHOD(void, DidSelect, UnityW<HMUI::SegmentedControl>, int selected);
                       DECLARE_INSTANCE_METHOD(void, SwitchHand, UnityEngine::XR::XRNode xrNode);
                       DECLARE_INSTANCE_METHOD(void, PausePlay);
                       DECLARE_INSTANCE_METHOD(void, Restart);
@@ -67,7 +68,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       /* Use the ctor to set default values like _playPauseText = "PAUSE"; */
                       DECLARE_CTOR(ctor);
                       private:
-                        System::Action_2<UnityW<HMUI::SegmentedControl>, int> *didSelectDelegate;
+                        DelegateUtils::DelegateW<System::Action_2<UnityW<HMUI::SegmentedControl>, int>> didSelectDelegate;
                       public: 
                       std::function<void(bool)> DidPositionTabVisibilityChange;
                       std::function<void(std::string)> DidPositionPreviewChange;

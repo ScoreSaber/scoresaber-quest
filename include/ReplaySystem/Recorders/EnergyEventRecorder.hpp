@@ -9,6 +9,7 @@
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
 #include <vector>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace GlobalNamespace;
 
@@ -25,7 +26,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, EnergyE
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
                                     DECLARE_INSTANCE_METHOD(void, GameEnergyCounter_gameEnergyDidChangeEvent, float energy);
                                     std::vector<Data::Private::EnergyEvent> _energyKeyframes;
-                                    System::Action_1<float> *gameEnergyDidChangeDelegate;
+                                    DelegateUtils::DelegateW<System::Action_1<float>> gameEnergyDidChangeDelegate;
                                     public:
                                     std::vector<Data::Private::EnergyEvent> Export();
                                     )

@@ -24,12 +24,12 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::Initialize()
     {
-        didActivateDelegate = custom_types::MakeDelegate<MultiplayerResultsViewController::DidActivateDelegate*>((std::function<void(bool, bool, bool)>)[&](bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) { MultiplayerResultsViewController_didActivateEvent(firstActivation, addedToHierarchy, screenSystemEnabling); });
-        didDeactivateDelegate = custom_types::MakeDelegate<MultiplayerResultsViewController::DidDeactivateDelegate*>((std::function<void(bool, bool)>)[&](bool removedFromHierarchy, bool screenSystemDisabling) { MultiplayerResultsViewController_didDeactivateEvent(removedFromHierarchy, screenSystemDisabling); });
+        didActivateDelegate = { &ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didActivateEvent, this };
+        didDeactivateDelegate = { &ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didDeactivateEvent, this };
 
-        _multiplayerResultsViewController->add_didActivateEvent(didActivateDelegate);
-        _multiplayerResultsViewController->add_didDeactivateEvent(didDeactivateDelegate);
-        HandleMultiplayerLevelDidFinish = (std::function<void(MultiplayerLevelScenesTransitionSetupDataSO*, MultiplayerResultsData*)>)[&](MultiplayerLevelScenesTransitionSetupDataSO * transitionSetupData, MultiplayerResultsData * results)
+        _multiplayerResultsViewController->___didActivateEvent += didActivateDelegate;
+        _multiplayerResultsViewController->___didDeactivateEvent += didDeactivateDelegate;
+        HandleMultiplayerLevelDidFinish = [&](MultiplayerLevelScenesTransitionSetupDataSO * transitionSetupData, MultiplayerResultsData * results)
         {
             MultiplayerLevelDidFinish(transitionSetupData, results);
         };
@@ -37,8 +37,8 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::Dispose()
     {
-        _multiplayerResultsViewController->remove_didActivateEvent(didActivateDelegate);
-        _multiplayerResultsViewController->remove_didDeactivateEvent(didDeactivateDelegate);
+        _multiplayerResultsViewController->___didActivateEvent -= didActivateDelegate;
+        _multiplayerResultsViewController->___didDeactivateEvent -= didDeactivateDelegate;
         HandleMultiplayerLevelDidFinish = std::nullopt;
     }
 

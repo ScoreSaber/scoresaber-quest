@@ -31,7 +31,7 @@ namespace ScoreSaber::ReplaySystem::UI
                             ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer)
     {
         INVOKE_CTOR();
-        _gamePause = gamePause;
+        _gamePause = il2cpp_utils::try_cast<GamePause>(gamePause).value();
         _imberScrubber = imberScrubber;
         _imberSpecsReporter = imberSpecsReporter;
         _mainImberPanelView = mainImberPanelView;
@@ -102,12 +102,8 @@ namespace ScoreSaber::ReplaySystem::UI
         _imberSpecsReporter->DidReport = [&](int fps, float leftSaberSpeed, float rightSaberSpeed) {
             ImberSpecsReporter_DidReport(fps, leftSaberSpeed, rightSaberSpeed);
         };
-
-        std::function<void()> gameDidResume = [&]() {
-            GamePause_didResumeEvent();
-        };
-        _didResumeDelegate = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), gameDidResume);
-        _gamePause->add_didResumeEvent(_didResumeDelegate);
+        _didResumeDelegate = { &ImberManager::GamePause_didResumeEvent, this };
+        _gamePause->___didResumeEvent += _didResumeDelegate;
 
         if (!Settings::hasOpenedReplayUI) {
             CreateWatermark();
@@ -254,7 +250,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _imberScrubber->DidCalculateNewTime = nullptr;
         _imberSpecsReporter->DidReport = nullptr;
 
-        _gamePause->remove_didResumeEvent(_didResumeDelegate);
+        _gamePause->___didResumeEvent -= _didResumeDelegate;
     }
 
 } // namespace ScoreSaber::ReplaySystem::UI

@@ -30,20 +30,20 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void ScoreEventRecorder::Initialize()
     {
-        comboDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<int>*>((function<void(int)>)[&](int combo) {ComboController_comboDidChangeEvent(combo);});
-        scoreDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, int>*>((function<void(int, int)>)[&](int rawScore, int score) {ScoreController_scoreDidChangeEvent(rawScore, score);});
-        multiplierDidChangeDelegate = custom_types::MakeDelegate<System::Action_2<int, float>*>((function<void(int, float)>)[&](int multiplier, float nextMultiplierProgress) {ScoreController_multiplierDidChangeEvent(multiplier, nextMultiplierProgress);});
+        comboDidChangeDelegate = { &ScoreEventRecorder::ComboController_comboDidChangeEvent, this };
+        scoreDidChangeDelegate = { &ScoreEventRecorder::ScoreController_scoreDidChangeEvent, this };
+        multiplierDidChangeDelegate = { &ScoreEventRecorder::ScoreController_multiplierDidChangeEvent, this };
         
-        _comboController->add_comboDidChangeEvent(comboDidChangeDelegate);
-        _scoreController->add_scoreDidChangeEvent(scoreDidChangeDelegate);
-        _scoreController->add_multiplierDidChangeEvent(multiplierDidChangeDelegate);
+        _comboController->___comboDidChangeEvent += comboDidChangeDelegate;
+        _scoreController->___scoreDidChangeEvent += scoreDidChangeDelegate;
+        _scoreController->___multiplierDidChangeEvent += multiplierDidChangeDelegate;
     }
 
     void ScoreEventRecorder::Dispose()
     {
-        _comboController->remove_comboDidChangeEvent(comboDidChangeDelegate);
-        _scoreController->remove_scoreDidChangeEvent(scoreDidChangeDelegate);
-        _scoreController->remove_multiplierDidChangeEvent(multiplierDidChangeDelegate);
+        _comboController->___comboDidChangeEvent -= comboDidChangeDelegate;
+        _scoreController->___scoreDidChangeEvent -= scoreDidChangeDelegate;
+        _scoreController->___multiplierDidChangeEvent -= multiplierDidChangeDelegate;
     }
 
     void ScoreEventRecorder::ComboController_comboDidChangeEvent(int combo)

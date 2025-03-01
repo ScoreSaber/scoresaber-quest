@@ -25,15 +25,15 @@ namespace ScoreSaber::ReplaySystem::Recorders
     void EnergyEventRecorder::Initialize()
     {
         if(_gameEnergyCounter != nullptr) {
-            gameEnergyDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), (function<void(float)>)[&](float energy) {GameEnergyCounter_gameEnergyDidChangeEvent(energy);});
-            _gameEnergyCounter->add_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
+            gameEnergyDidChangeDelegate = { &EnergyEventRecorder::GameEnergyCounter_gameEnergyDidChangeEvent, this };
+            _gameEnergyCounter->___gameEnergyDidChangeEvent += gameEnergyDidChangeDelegate;
         }
     }
 
     void EnergyEventRecorder::Dispose()
     {
         if(_gameEnergyCounter != nullptr && gameEnergyDidChangeDelegate) {
-            _gameEnergyCounter->remove_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
+            _gameEnergyCounter->___gameEnergyDidChangeEvent -= gameEnergyDidChangeDelegate;
         }
     }
 
