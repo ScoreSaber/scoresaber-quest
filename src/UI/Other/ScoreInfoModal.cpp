@@ -201,7 +201,7 @@ namespace ScoreSaber::UI::Other
         currentBeatmapLevel = beatmapLevel;
         currentBeatmapKey = beatmapKey;
 
-        set_score(score.modifiedScore, ((double)score.modifiedScore / (double)maxScore) * 100.0);
+        set_score(score.modifiedScore, ((double)score.baseScore / (double)maxScore) * 100.0);
         set_pp(score.pp);
         if (score.maxCombo != 0) {
             set_combo(score.maxCombo);
