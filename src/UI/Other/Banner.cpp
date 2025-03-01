@@ -176,7 +176,7 @@ namespace ScoreSaber::UI::Other
         HorizontalLayoutGroup* textGroup = CreateHorizontalLayoutGroup(promptRootRect);
         textGroup->rectTransform->anchoredPosition = {0.0f, 10.0f};
 
-        promptText = CreateText(textGroup->transform, "...", false);
+        promptText = CreateText(textGroup->transform, "...", TMPro::FontStyles::Normal);
         promptText->alignment = TMPro::TextAlignmentOptions::BottomLeft;
     }
 
