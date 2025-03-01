@@ -44,7 +44,7 @@ using namespace BSML::Lite;
 #define BeginCoroutine(method) BSML::SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 #define WIDTH 90.0f
-#define HEIGHT 60.0f
+#define HEIGHT 45.0f
 namespace ScoreSaber::UI::Other
 {
     custom_types::Helpers::Coroutine PlayerProfileModal::FetchPlayerData(std::string playerId)
@@ -138,7 +138,7 @@ namespace ScoreSaber::UI::Other
         // actual data stuff
         auto dataHorizon = CreateHorizontalLayoutGroup(vertical->transform);
         dataHorizon->padding = RectOffset::New_ctor(2, 2, 2, 2);
-        SetPreferredSize(dataHorizon, 90.0f, 55.0f);
+        SetPreferredSize(dataHorizon, 90.0f, 40.0f);
         dataHorizon->childForceExpandHeight = false;
 
         auto leftVertical = CreateVerticalLayoutGroup(dataHorizon->transform);
@@ -262,12 +262,12 @@ namespace ScoreSaber::UI::Other
 
     void PlayerProfileModal::set_averageRankedAccuracy(float averageRankedAccuracy)
     {
-        this->averageRankedAccuracy->text = fmt::format("<i>{:.2f}</i>", averageRankedAccuracy);
+        this->averageRankedAccuracy->text = fmt::format("<i>{:.2f}%</i>", averageRankedAccuracy);
     }
 
     void PlayerProfileModal::set_totalScore(long totalScore)
     {
-        this->totalScore->text = fmt::format("<i>{:d}</i>", totalScore);
+        this->totalScore->text = fmt::format("<i>{:L}</i>", totalScore);
     }
 
     void PlayerProfileModal::stopProfileRoutine()
