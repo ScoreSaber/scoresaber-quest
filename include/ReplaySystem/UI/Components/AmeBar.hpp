@@ -11,11 +11,11 @@
 #include <lapiz/shared/macros.hpp>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeBar, UnityEngine::MonoBehaviour,
-                      DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _rectTransform);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _fillBarTransform);
-                      DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _endTimeText);
-                      DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _currentTimeText);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _otherTransform);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::RectTransform>, _rectTransform);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::RectTransform>, _fillBarTransform);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::CurvedTextMeshPro>, _endTimeText);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::CurvedTextMeshPro>, _currentTimeText);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::RectTransform>, _otherTransform);
                       DECLARE_INSTANCE_METHOD(void, Setup, UnityEngine::RectTransform* fillBarTransform, UnityEngine::RectTransform* otherTransform);
                       DECLARE_INSTANCE_METHOD(void, RegisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);
                       DECLARE_INSTANCE_METHOD(void, UnregisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);

@@ -15,8 +15,9 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, ScorePlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void ScorePlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController, GlobalNamespace::IGameEnergyCounter* gameEnergyCounter)
+    void ScorePlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
         _gameEnergyCounter = gameEnergyCounter;

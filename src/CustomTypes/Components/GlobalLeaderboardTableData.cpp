@@ -187,11 +187,12 @@ namespace ScoreSaber::CustomTypes::Components
         isLoading = true;
         playerCollection.clear();
         ReloadTableViewData(tableView);
-        reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
+        auto ourGlobalViewController = globalViewController.cast<ScoreSaber::UI::ViewControllers::GlobalViewController>();
+        ourGlobalViewController->set_loading(true);
         co_yield custom_types::Helpers::CoroutineHelper::New(GetDocument(this));
         ReloadTableViewData(tableView);
         isLoading = false;
-        reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(false);
+        ourGlobalViewController->set_loading(false);
         co_return;
     }
 

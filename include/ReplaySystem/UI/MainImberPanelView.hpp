@@ -21,8 +21,7 @@
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::ViewController,
                       DECLARE_INSTANCE_FIELD(UnityEngine::Pose, defaultPosition);
-                      /* Fix this with the actual type & include, the project I made this header in doesn't use qui */
-                      DECLARE_INSTANCE_FIELD_PRIVATE(BSML::FloatingScreen*, _floatingScreen);
+                      DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<BSML::FloatingScreen>, _floatingScreen);
 
                       /* Default field values are only set if you INVOKE_CTOR() in your own ctor */
                       DECLARE_INSTANCE_FIELD_PRIVATE_DEFAULT(int, _lastTab, 0);
@@ -45,10 +44,10 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, MainImberPanelView, HMUI::Vi
                       DECLARE_BSML_PROPERTY(StringW, location);
 
                       DECLARE_INSTANCE_FIELD_PRIVATE_DEFAULT(ListW<StringW>, locations, ListW<StringW>::New());
-                      DECLARE_INSTANCE_FIELD_PRIVATE(BSML::TabSelector*, tabSelector);
-                      DECLARE_INSTANCE_FIELD_PRIVATE(HMUI::CurvedTextMeshPro*, fpsText);
-                      DECLARE_INSTANCE_FIELD_PRIVATE(HMUI::CurvedTextMeshPro*, leftSpeedText);
-                      DECLARE_INSTANCE_FIELD_PRIVATE(HMUI::CurvedTextMeshPro*, rightSpeedText);
+                      DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<BSML::TabSelector>, tabSelector);
+                      DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<HMUI::CurvedTextMeshPro>, fpsText);
+                      DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<HMUI::CurvedTextMeshPro>, leftSpeedText);
+                      DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<HMUI::CurvedTextMeshPro>, rightSpeedText);
 
                       /* In DidActivate is when you want to run BSML::parse_and_construct() usually*/
                       DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);

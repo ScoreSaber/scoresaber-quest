@@ -90,7 +90,7 @@ namespace ScoreSaber::UI::ViewControllers
 
             segmentedController->SetTexts(teamAndContributorsNames.getPtr()->i___System__Collections__Generic__IReadOnlyList_1_T_());
 
-            creditTabs = Array<GameObject*>::NewLength(teamAndContributorsNames.size());
+            creditTabs = Array<UnityW<GameObject>>::NewLength(teamAndContributorsNames.size());
 
             Show(0);
         }

@@ -26,8 +26,8 @@ using namespace GlobalNamespace;
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, NoteEventRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(AudioTimeSyncController*, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreController*, _scoreController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<ScoreController>, _scoreController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(BeatmapObjectManager*, _beatmapObjectManager);
                                     DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, ScoreController* scoreController, BeatmapObjectManager* beatmapObjectManager);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);

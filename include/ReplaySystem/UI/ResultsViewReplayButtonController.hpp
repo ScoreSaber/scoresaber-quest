@@ -20,11 +20,11 @@
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ResultsViewReplayButtonController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, System::Object, "ScoreSaber::ReplaySystem::UI::ResultsViewReplayButtonController", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::ResultsViewController*, _resultsViewController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ResultsViewController>, _resultsViewController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevel*, _beatmapLevel);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapKey, _beatmapKey);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::LevelCompletionResults*, _levelCompletionResults);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityEngine::UI::Button*, watchReplayButton);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<UnityEngine::UI::Button>, watchReplayButton);
                                     DECLARE_CTOR(ctor, GlobalNamespace::ResultsViewController* resultsViewController);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);

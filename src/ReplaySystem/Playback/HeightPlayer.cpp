@@ -16,6 +16,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void HeightPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::PlayerHeightDetector* playerHeightDetector, GlobalNamespace::GameplayCoreSceneSetupData* gameplayCoreSceneSetupData)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _playerHeightDetector = playerHeightDetector;
         _sortedHeightEvents = ReplayLoader::LoadedReplay->heightKeyframes;

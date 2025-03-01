@@ -24,7 +24,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void EnergyEventRecorder::Initialize()
     {
-        if(_gameEnergyCounter != nullptr) {
+        if(_gameEnergyCounter) {
             gameEnergyDidChangeDelegate = { &EnergyEventRecorder::GameEnergyCounter_gameEnergyDidChangeEvent, this };
             _gameEnergyCounter->___gameEnergyDidChangeEvent += gameEnergyDidChangeDelegate;
         }
@@ -32,7 +32,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void EnergyEventRecorder::Dispose()
     {
-        if(_gameEnergyCounter != nullptr && gameEnergyDidChangeDelegate) {
+        if(_gameEnergyCounter && gameEnergyDidChangeDelegate) {
             _gameEnergyCounter->___gameEnergyDidChangeEvent -= gameEnergyDidChangeDelegate;
         }
     }

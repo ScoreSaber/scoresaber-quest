@@ -14,10 +14,10 @@ DECLARE_CLASS_CODEGEN(
                             &HMUI::ViewController::DidActivate,
                             bool firstActivation, bool addedToHierarchy,
                             bool screenSystemEnabling);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData*, leaderboardList);
-    DECLARE_INSTANCE_FIELD(HMUI::ModalView*, moreInfoModal);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
-    DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, loadingIndicator);
+    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>, leaderboardList);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ModalView>, moreInfoModal);
+    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::UI::Other::PlayerProfileModal>, playerProfileModal);
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::GameObject>, loadingIndicator);
     void set_loading(bool value);
     private
     :

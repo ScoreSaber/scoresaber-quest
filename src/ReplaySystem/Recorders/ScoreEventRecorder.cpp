@@ -41,9 +41,12 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void ScoreEventRecorder::Dispose()
     {
-        _comboController->___comboDidChangeEvent -= comboDidChangeDelegate;
-        _scoreController->___scoreDidChangeEvent -= scoreDidChangeDelegate;
-        _scoreController->___multiplierDidChangeEvent -= multiplierDidChangeDelegate;
+        if(_comboController)
+            _comboController->___comboDidChangeEvent -= comboDidChangeDelegate;
+        if(_scoreController) {
+            _scoreController->___scoreDidChangeEvent -= scoreDidChangeDelegate;
+            _scoreController->___multiplierDidChangeEvent -= multiplierDidChangeDelegate;
+        }
     }
 
     void ScoreEventRecorder::ComboController_comboDidChangeEvent(int combo)

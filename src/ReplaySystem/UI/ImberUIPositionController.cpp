@@ -125,8 +125,8 @@ namespace ScoreSaber::ReplaySystem::UI
     void ImberUIPositionController::OpenedUI()
     {
         if (!Settings::hasOpenedReplayUI) {
-            GameObject* replayPrompt = GameObject::Find("Replay Prompt");
-            if (replayPrompt != nullptr) {
+            auto replayPrompt = GameObject::Find("Replay Prompt");
+            if (replayPrompt) {
                 GameObject::Destroy(replayPrompt);
             }
             Settings::hasOpenedReplayUI = true;

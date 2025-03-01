@@ -43,8 +43,8 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void MetadataRecorder::Dispose()
     {
-        INFO("Disposing MetadataRecorder");
-        _gameEnergyCounter->___gameEnergyDidReach0Event -= gameEnergyDidReach0Delegate;
+        if(_gameEnergyCounter)
+            _gameEnergyCounter->___gameEnergyDidReach0Event -= gameEnergyDidReach0Delegate;
     }
 
     void MetadataRecorder::GameEnergyCounter_gameEnergyDidReach0Event()

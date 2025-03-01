@@ -63,18 +63,18 @@ using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
-    ScoreSaber::UI::Other::Banner* ScoreSaberBanner;
+    SafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
 
-    ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
+    SafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
 
-    PlatformLeaderboardViewController* _platformLeaderboardViewController;
+    SafePtrUnity<PlatformLeaderboardViewController> _platformLeaderboardViewController;
 
-    UnityEngine::UI::Button* _pageUpButton;
-    UnityEngine::UI::Button* _pageDownButton;
+    SafePtrUnity<UnityEngine::UI::Button> _pageUpButton;
+    SafePtrUnity<UnityEngine::UI::Button> _pageDownButton;
 
     std::vector<ProfilePictureView> _ImageHolders;
 
-    std::vector<HMUI::ImageView*> _cellClickingImages;
+    std::vector<SafePtrUnity<HMUI::ImageView>> _cellClickingImages;
 
     SafePtr<System::Threading::CancellationTokenSource> cancellationToken;
 
@@ -132,7 +132,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                                                          DirectionalButtonClicked(PageDirection::Up);
                                                                      });
 
-                SetButtonSprites(_pageUpButton, Base64ToSprite(carat_up_inactive_base64),
+                SetButtonSprites(_pageUpButton.ptr(), Base64ToSprite(carat_up_inactive_base64),
                                                        Base64ToSprite(carat_up_base64));
 
                 auto rectTransform = _pageUpButton->transform->GetChild(0).cast<RectTransform>();
@@ -146,7 +146,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                                                            DirectionalButtonClicked(PageDirection::Down);
                                                                        });
 
-                SetButtonSprites(_pageDownButton, Base64ToSprite(carat_down_inactive_base64),
+                SetButtonSprites(_pageDownButton.ptr(), Base64ToSprite(carat_down_inactive_base64),
                                                        Base64ToSprite(carat_down_base64));
                 auto rectTransform = _pageDownButton->transform->GetChild(0).cast<RectTransform>();
                 rectTransform->sizeDelta = {10.0f, 10.0f};

@@ -25,11 +25,11 @@
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, ReplayTimeSyncController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Playback", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioManagerSO*, _audioManagerSO);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioManagerSO>, _audioManagerSO);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController::InitData*, _audioInitData);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BasicBeatmapObjectManager*, _basicBeatmapObjectManager);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::NoteCutSoundEffectManager*, _noteCutSoundEffectManager);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::NoteCutSoundEffectManager>, _noteCutSoundEffectManager);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapCallbacksController::InitData*, _callbackInitData);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapCallbacksController*, _beatmapObjectCallbackController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::ComboPlayer*, _comboPlayer);

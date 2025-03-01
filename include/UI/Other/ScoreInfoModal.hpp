@@ -11,18 +11,19 @@
 #include <string>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBehaviour,
-                      DECLARE_INSTANCE_FIELD(HMUI::ModalView*, modal);
-                      DECLARE_INSTANCE_FIELD(PlayerProfileModal*, playerProfileModal);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, player);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, deviceHmd);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, score);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, pp);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, combo);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, fullCombo);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, badCuts);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, missedNotes);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, modifiers);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, timeSet);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::ModalView>, modal);
+                      DECLARE_INSTANCE_FIELD(UnityW<PlayerProfileModal>, playerProfileModal);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, player);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, deviceHmd);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, score);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, pp);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, combo);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, fullCombo);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, badCuts);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, missedNotes);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, modifiers);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, timeSet);
+                      DECLARE_INSTANCE_FIELD(UnityW<BSML::ClickableImage>, replayImage);
                       DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapLevel*, currentBeatmapLevel);
                       DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapKey, currentBeatmapKey);
 
@@ -53,7 +54,6 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreInfoModal, UnityEngine::MonoBe
                       std::string playerId;
                       std::string replayFileName;
                       bool replayEnabled;
-                      BSML::ClickableImage * replayImage;
 
                       void ShowPlayerProfileModal();
                       void PlayReplay();

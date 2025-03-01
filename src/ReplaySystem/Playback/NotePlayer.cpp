@@ -24,6 +24,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void NotePlayer::ctor(GlobalNamespace::SaberManager* saberManager, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager)
     {
+        INVOKE_CTOR();
         ReplayLoader::NotePlayerInstance = this;
         _saberManager = saberManager;
         _audioTimeSyncController = audioTimeSyncController;

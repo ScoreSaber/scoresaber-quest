@@ -19,8 +19,8 @@ using namespace GlobalNamespace;
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, EnergyEventRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(AudioTimeSyncController*, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GameEnergyCounter*, _gameEnergyCounter);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GameEnergyCounter>, _gameEnergyCounter);
                                     DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, GameEnergyCounter* gameEnergyCounter);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);

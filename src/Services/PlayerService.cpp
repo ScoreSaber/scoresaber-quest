@@ -167,7 +167,7 @@ namespace ScoreSaber::Services::PlayerService
         il2cpp_utils::il2cpp_aware_thread([] {
             while (true)
             {
-                if(ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner == nullptr)
+                if(!ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner)
                 {
                     std::this_thread::sleep_for(std::chrono::seconds(1));
                 }

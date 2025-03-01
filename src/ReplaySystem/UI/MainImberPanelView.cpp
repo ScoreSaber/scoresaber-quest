@@ -159,7 +159,8 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void MainImberPanelView::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        tabSelector->textSegmentedControl->___didSelectCellEvent -= didSelectDelegate;
+        if(tabSelector && tabSelector->textSegmentedControl)
+            tabSelector->textSegmentedControl->___didSelectCellEvent -= didSelectDelegate;
         //getBase()->DidDeactivate(removedFromHierarchy, screenSystemDisabling);
     }
 

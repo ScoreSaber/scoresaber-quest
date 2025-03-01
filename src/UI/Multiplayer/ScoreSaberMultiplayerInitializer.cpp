@@ -25,8 +25,10 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerInitializer::Dispose()
     {
-        _gameServerLobbyFlowCoordinator->___didSetupEvent -= didSetupDelegate;
-        _gameServerLobbyFlowCoordinator->___didFinishEvent -= didFinishDelegate;
+        if(_gameServerLobbyFlowCoordinator) {
+            _gameServerLobbyFlowCoordinator->___didSetupEvent -= didSetupDelegate;
+            _gameServerLobbyFlowCoordinator->___didFinishEvent -= didFinishDelegate;
+        }
     }
 
     void ScoreSaberMultiplayerInitializer::GameServerLobbyFlowCoordinator_didSetupEvent()

@@ -32,9 +32,9 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, 
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::GamePause*, _gamePause);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberScrubber*, _imberScrubber);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberSpecsReporter*, _imberSpecsReporter);
-                                    DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::MainImberPanelView*, _mainImberPanelView);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::ReplaySystem::UI::MainImberPanelView>, _mainImberPanelView);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::SpectateAreaController*, _spectateAreaController);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::Playback::ReplayTimeSyncController*, _replayTimeSyncController);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberUIPositionController*, _imberUIPositionController);
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::AudioTimeSyncController::InitData*, _initData);

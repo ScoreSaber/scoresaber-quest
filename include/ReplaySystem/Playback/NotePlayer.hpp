@@ -37,8 +37,8 @@ struct RecognizedNoteCutInfo
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, NotePlayer, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Playback", INTERFACES, 0, nullptr,
                                     DECLARE_INSTANCE_FIELD_PRIVATE(int, _nextIndex);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::SaberManager*, _saberManager);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::SaberManager>, _saberManager);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BasicBeatmapObjectManager*, _basicBeatmapObjectManager);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::MemoryPoolContainer_1<UnityW<GlobalNamespace::GameNoteController>>*, _gameNotePool);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::MemoryPoolContainer_1<UnityW<GlobalNamespace::GameNoteController>>*, _burstSliderHeadNotePool);

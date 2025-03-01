@@ -86,9 +86,11 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::Dispose()
     {
-        _resultsViewController->___didActivateEvent -= didActivateDelegate;
-        _resultsViewController->___continueButtonPressedEvent -= continueButtonPressedDelegate;
-        _resultsViewController->___restartButtonPressedEvent -= restartButtonPressedDelegate;
+        if(_resultsViewController) {
+            _resultsViewController->___didActivateEvent -= didActivateDelegate;
+            _resultsViewController->___continueButtonPressedEvent -= continueButtonPressedDelegate;
+            _resultsViewController->___restartButtonPressedEvent -= restartButtonPressedDelegate;
+        }
         Services::ReplayService::ReplaySerialized = nullptr;
     }
 

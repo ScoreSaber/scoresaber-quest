@@ -28,8 +28,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, PosePlay
                                     DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::PlayerTransforms>, _playerTransforms);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(int, _nextIndex);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityEngine::Camera*, _spectatorCamera);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityEngine::Camera*, _desktopCamera);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<UnityEngine::Camera>, _spectatorCamera);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<UnityEngine::Camera>, _desktopCamera);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(UnityEngine::Vector3, _spectatorOffset);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(BeatSaber::GameSettings::MainSettingsHandler*, _mainSettingsHandler);
                                     DECLARE_CTOR(ctor, GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController);

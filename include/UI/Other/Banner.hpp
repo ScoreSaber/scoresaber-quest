@@ -19,13 +19,13 @@
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::UI::Other, Banner, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_METHOD(void, Update);
-    DECLARE_INSTANCE_FIELD(BSML::Backgroundable*, bg);
-    DECLARE_INSTANCE_FIELD(HMUI::ImageView*, bgImage);
-    DECLARE_INSTANCE_FIELD(BSML::ClickableText*, topText);
-    DECLARE_INSTANCE_FIELD(BSML::ClickableText*, bottomText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
-    DECLARE_INSTANCE_FIELD(UnityEngine::UI::VerticalLayoutGroup*, loadingVertical);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, promptText);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::Backgroundable>, bg);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ImageView>, bgImage);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::ClickableText>, topText);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::ClickableText>, bottomText);
+    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::UI::Other::PlayerProfileModal>, playerProfileModal);
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>, loadingVertical);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, promptText);
 
     public
     :

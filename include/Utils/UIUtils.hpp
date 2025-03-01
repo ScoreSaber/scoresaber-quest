@@ -16,6 +16,4 @@ namespace UIUtils
     UnityEngine::UI::HorizontalLayoutGroup* CreateTeamMemberLayout(UnityEngine::Transform* parent, TeamUtils::TeamMember& member);
     UnityEngine::GameObject* CreateLoadingIndicator(UnityEngine::Transform* parent);
     UnityEngine::UI::HorizontalLayoutGroup* CreateHeader(UnityEngine::Transform* parent, UnityEngine::Color color);
-    UnityEngine::UI::HorizontalLayoutGroup* CreateHeader(
-        UnityEngine::Transform* parent, UnityEngine::Color color);
 } // namespace UIUtils

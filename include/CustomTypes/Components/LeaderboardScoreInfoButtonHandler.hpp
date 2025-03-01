@@ -8,7 +8,7 @@
 #include <vector>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::CustomTypes::Components, LeaderboardScoreInfoButtonHandler, UnityEngine::MonoBehaviour,
-                      DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::ScoreInfoModal*, scoreInfoModal);
+                      DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::UI::Other::ScoreInfoModal>, scoreInfoModal);
                       DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapLevel*, beatmapLevel);
                       DECLARE_INSTANCE_FIELD(GlobalNamespace::BeatmapKey, beatmapKey);
 

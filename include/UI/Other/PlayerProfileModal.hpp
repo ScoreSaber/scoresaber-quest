@@ -16,14 +16,14 @@
 #include "Data/Player.hpp"
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, PlayerProfileModal, UnityEngine::MonoBehaviour,
-                      DECLARE_INSTANCE_FIELD(HMUI::ModalView*, modal);
-                      DECLARE_INSTANCE_FIELD(HMUI::ImageView*, pfpImage);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::UI::GridLayoutGroup*, badgeParent);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, headerText);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, globalRanking);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, performancePoints);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, averageRankedAccuracy);
-                      DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, totalScore);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::ModalView>, modal);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::ImageView>, pfpImage);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::GridLayoutGroup>, badgeParent);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, headerText);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, globalRanking);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, performancePoints);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, averageRankedAccuracy);
+                      DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, totalScore);
                       DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
                       DECLARE_INSTANCE_FIELD(ListW<UnityEngine::Coroutine*>, badgeRoutines);
 

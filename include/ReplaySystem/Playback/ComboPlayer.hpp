@@ -9,9 +9,9 @@
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::ReplaySystem::Playback, ComboPlayer, Il2CppObject,
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::ComboController*, _comboController);
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::ComboUIController*, _comboUIController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ComboController>, _comboController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ComboUIController>, _comboUIController);
     DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ComboController* comboController);
     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
     vector<Data::Private::NoteEvent> _sortedNoteEvents;

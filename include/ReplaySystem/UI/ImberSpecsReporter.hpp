@@ -22,14 +22,13 @@
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberSpecsReporter, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::UI", INTERFACES, 0, nullptr,
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::Playback::PosePlayer*, _posePlayer);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::SaberManager*, _saberManager);
+                                    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::SaberManager>, _saberManager);
                                     DECLARE_CTOR(ctor, ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer, GlobalNamespace::SaberManager* _saberManager);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    public
-                                    : void PosePlayer_DidUpdatePose(ScoreSaber::Data::Private::VRPoseGroup pose);
-                                    std::function<void(int, float, float)>
-                                        DidReport;
+                                    public:
+                                    void PosePlayer_DidUpdatePose(ScoreSaber::Data::Private::VRPoseGroup pose);
+                                    std::function<void(int, float, float)> DidReport;
 
 )
 

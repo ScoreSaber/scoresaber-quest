@@ -27,6 +27,7 @@ namespace ScoreSaber::ReplaySystem::Playback
                                         GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
                                         Zenject::DiContainer* container)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _audioInitData = audioInitData;
         _basicBeatmapObjectManager = basicBeatmapObjectManager;

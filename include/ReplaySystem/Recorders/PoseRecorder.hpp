@@ -20,8 +20,8 @@ using namespace UnityEngine;
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, PoseRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(AudioTimeSyncController*, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(PlayerTransforms*, _playerTransforms);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<PlayerTransforms>, _playerTransforms);
                                     DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, PlayerTransforms* playerTransforms);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Tick, &::Zenject::ITickable::Tick);
                                     std::vector<Data::Private::VRPoseGroup> _vrPoseGroup;

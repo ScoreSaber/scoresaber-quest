@@ -19,10 +19,10 @@
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, SpectateAreaController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::UI", INTERFACES, 0, nullptr,
                                     DECLARE_INSTANCE_FIELD_DEFAULT(int, _colorID, UnityEngine::Shader::PropertyToID("Color"));
-                                    DECLARE_INSTANCE_FIELD(Tweening::TimeTweeningManager*, _timeTweeningManager);
+                                    DECLARE_INSTANCE_FIELD(UnityW<Tweening::TimeTweeningManager>, _timeTweeningManager);
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::GameNoteController::Pool*, _gameNoteControllerPool);
 
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::GameNoteController*, _activeNote);
+                                    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::GameNoteController>, _activeNote);
                                     DECLARE_INSTANCE_FIELD(UnityEngine::Quaternion, _initialQuaternion);
                                     DECLARE_INSTANCE_FIELD(Tweening::Tween*, _movementTween);
                                     DECLARE_INSTANCE_FIELD(Tweening::Tween*, _statusTween);

@@ -19,14 +19,14 @@
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell, HMUI::TableCell,
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, rank);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, pp);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, country);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, weekly);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, name);
-    DECLARE_INSTANCE_FIELD(HMUI::ImageView*, flag);
-    DECLARE_INSTANCE_FIELD(HMUI::ImageView*, profile);
-    DECLARE_INSTANCE_FIELD(BSML::Backgroundable*, bg);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, rank);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, pp);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, country);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, weekly);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, name);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ImageView>, flag);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ImageView>, profile);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::Backgroundable>, bg);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, flagRoutine);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);

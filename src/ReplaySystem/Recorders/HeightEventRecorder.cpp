@@ -28,7 +28,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
     
     void HeightEventRecorder::Initialize()
     {
-        if(_playerHeightDetector != nullptr) {
+        if(_playerHeightDetector) {
             playerHeightDidChangeDelegate = {&HeightEventRecorder::PlayerHeightDetector_playerHeightDidChangeEvent, this};
             _playerHeightDetector->___playerHeightDidChangeEvent += playerHeightDidChangeDelegate;
         }
@@ -36,7 +36,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void HeightEventRecorder::Dispose()
     {
-        if(_playerHeightDetector != nullptr && playerHeightDidChangeDelegate) {
+        if(_playerHeightDetector && playerHeightDidChangeDelegate) {
             _playerHeightDetector->___playerHeightDidChangeEvent -= playerHeightDidChangeDelegate;
         }
     }

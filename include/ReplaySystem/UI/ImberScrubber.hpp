@@ -41,15 +41,15 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberScrubber,
 
                                     // "private" fields
 
-                                    DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::Components::AmeBar*, _bar);
-                                    DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::Components::AmeNode*, _mainNode);
-                                    DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::Components::AmeNode*, _loopNode);
-                                    DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::Components::AmeNode*, _failNode);
-                                    DECLARE_INSTANCE_FIELD(UnityEngine::Transform*, _parent);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::MainCamera*, _mainCamera);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::ReplaySystem::UI::Components::AmeBar>, _bar);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::ReplaySystem::UI::Components::AmeNode>, _mainNode);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::ReplaySystem::UI::Components::AmeNode>, _loopNode);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::ReplaySystem::UI::Components::AmeNode>, _failNode);
+                                    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::Transform>, _parent);
+                                    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::MainCamera>, _mainCamera);
                                     DECLARE_INSTANCE_FIELD(Zenject::DiContainer*, _container);
                                     DECLARE_INSTANCE_FIELD_DEFAULT(float, _minNodeDistance, 0.01f);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
                                     DECLARE_INSTANCE_FIELD_DEFAULT(float, _levelFailTime, 0.0f);
                                     DECLARE_INSTANCE_FIELD_DEFAULT(float, _maxPercent, 1.0f);
                                     DECLARE_INSTANCE_FIELD(bool, _allowPast);
@@ -71,9 +71,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberScrubber,
                                     DECLARE_INSTANCE_METHOD(ScoreSaber::ReplaySystem::UI::Components::AmeNode*, CreateSlideNode, UnityEngine::RectTransform* transform);
                                     DECLARE_INSTANCE_METHOD(ScoreSaber::ReplaySystem::UI::Components::AmeNode*, CreateTextNode, UnityEngine::RectTransform* transform, StringW initialText, UnityEngine::Color color);
 
-                                    public
-                                    : std::function<void(float)>
-                                        DidCalculateNewTime;
+                                    public:
+                                    std::function<void(float)> DidCalculateNewTime;
 
 )
 

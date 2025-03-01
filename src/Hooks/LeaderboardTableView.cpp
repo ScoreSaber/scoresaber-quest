@@ -23,10 +23,8 @@ MAKE_AUTO_HOOK_MATCH(LeaderboardTableView_CellForIdx,
                      &::GlobalNamespace::LeaderboardTableView::CellForIdx, UnityW<HMUI::TableCell>, GlobalNamespace::LeaderboardTableView* self,
                      HMUI::TableView* tableView, int row)
 {
-    HMUI::TableCell* tableCell =
-        LeaderboardTableView_CellForIdx(self, tableView, row);
-    LeaderboardTableCell* cell =
-        reinterpret_cast<LeaderboardTableCell*>(tableCell);
+    HMUI::TableCell* tableCell = LeaderboardTableView_CellForIdx(self, tableView, row);
+    LeaderboardTableCell* cell = il2cpp_utils::cast<LeaderboardTableCell>(tableCell);
 
     CellClicker* cellClicker = ScoreSaberLeaderboardView::_cellClickingImages[row]->gameObject->AddComponent<CellClicker*>();
     cellClicker->onClick = std::bind(&LeaderboardScoreInfoButtonHandler::ShowScoreInfoModal, ScoreSaberLeaderboardView::leaderboardScoreInfoButtonHandler, std::placeholders::_1);

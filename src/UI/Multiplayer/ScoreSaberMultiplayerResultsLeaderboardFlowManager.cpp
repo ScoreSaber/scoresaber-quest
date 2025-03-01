@@ -37,8 +37,10 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::Dispose()
     {
-        _multiplayerResultsViewController->___didActivateEvent -= didActivateDelegate;
-        _multiplayerResultsViewController->___didDeactivateEvent -= didDeactivateDelegate;
+        if(_multiplayerResultsViewController) {
+            _multiplayerResultsViewController->___didActivateEvent -= didActivateDelegate;
+            _multiplayerResultsViewController->___didDeactivateEvent -= didDeactivateDelegate;
+        }
         HandleMultiplayerLevelDidFinish = std::nullopt;
     }
 

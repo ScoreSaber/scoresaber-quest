@@ -13,6 +13,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void MultiplierPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
         _sortedMultiplierEvents = ReplayLoader::LoadedReplay->multiplierKeyframes;

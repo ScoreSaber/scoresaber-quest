@@ -34,9 +34,11 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::Dispose()
     {
-        _levelSelectionNavigationController->___didActivateEvent -= didActivateDelegate;
-        // the next one is missing in the pcvr version, so I'll leave it out here aswell
-        // _levelSelectionNavigationController->___didDeactivateEvent -= didDeactivateDelegate;
+        if(_levelSelectionNavigationController) {
+            _levelSelectionNavigationController->___didActivateEvent -= didActivateDelegate;
+            // the next one is missing in the pcvr version, so I'll leave it out here aswell
+            // _levelSelectionNavigationController->___didDeactivateEvent -= didDeactivateDelegate;
+        }
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didActivateEvent(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)

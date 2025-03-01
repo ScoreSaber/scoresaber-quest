@@ -21,10 +21,10 @@ using namespace GlobalNamespace;
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::UI::Multiplayer, ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::UI::Multiplayer", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD(MainFlowCoordinator*, _mainFlowCoordinator);
-                                    DECLARE_INSTANCE_FIELD(ServerPlayerListViewController*, _serverPlayerListViewController);
-                                    DECLARE_INSTANCE_FIELD(PlatformLeaderboardViewController*, _platformLeaderboardViewController);
-                                    DECLARE_INSTANCE_FIELD(LevelSelectionNavigationController*, _levelSelectionNavigationController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<MainFlowCoordinator>, _mainFlowCoordinator);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ServerPlayerListViewController>, _serverPlayerListViewController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<PlatformLeaderboardViewController>, _platformLeaderboardViewController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<LevelSelectionNavigationController>, _levelSelectionNavigationController);
                                     DECLARE_CTOR(ctor, MainFlowCoordinator* mainFlowCoordinator, ServerPlayerListViewController* serverPlayerListViewController, PlatformLeaderboardViewController* platformLeaderboardViewController, LevelSelectionNavigationController* levelSelectionNavigationController);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);

@@ -31,15 +31,15 @@ using namespace BSML::Helpers;
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
 
-    GlobalNamespace::PlayerDataModel* playerDataModel;
-    GlobalNamespace::MenuTransitionsHelper* menuTransitionsHelper;
+    SafePtrUnity<GlobalNamespace::PlayerDataModel> playerDataModel;
+    SafePtrUnity<GlobalNamespace::MenuTransitionsHelper> menuTransitionsHelper;
 
     std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
     GlobalNamespace::BeatmapKey CurrentBeatmapKey;
-    GlobalNamespace::BeatmapLevel* CurrentBeatmapLevel;
+    SafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     std::u16string CurrentPlayerName;
     std::string CurrentModifiers;
-    ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
+    SafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
 
     bool IsPlaying;
     
@@ -56,12 +56,12 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
 
     void StartReplay(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey)
     {
-        if (playerDataModel == nullptr)
+        if (!playerDataModel)
         {
             playerDataModel = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>();
         }
 
-        if (menuTransitionsHelper == nullptr)
+        if (!menuTransitionsHelper)
         {
             menuTransitionsHelper = UnityEngine::Object::FindObjectOfType<MenuTransitionsHelper*>();
         }

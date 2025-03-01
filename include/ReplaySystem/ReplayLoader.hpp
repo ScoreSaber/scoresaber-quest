@@ -13,10 +13,10 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
     extern std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
     extern GlobalNamespace::BeatmapKey CurrentBeatmapKey;
-    extern GlobalNamespace::BeatmapLevel* CurrentBeatmapLevel;
+    extern SafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     extern std::u16string CurrentPlayerName;
     extern std::string CurrentModifiers;
-    extern ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
+    extern SafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
 
     extern bool IsPlaying;
     void StartReplay(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey);

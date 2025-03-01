@@ -603,7 +603,7 @@ namespace WebUtils
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
         while(!www->isDone)
             co_yield nullptr;
-        auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
+        auto downloadHandlerTexture = il2cpp_utils::cast<UnityEngine::Networking::DownloadHandlerTexture>(www->get_downloadHandler());
         if(www->result != UnityEngine::Networking::UnityWebRequest::Result::Success)
         {
             ERROR("Failed to download image from url {:s} with error messages {:s} and {:s}", url, www->error, downloadHandlerTexture->GetErrorMsg());
@@ -621,8 +621,7 @@ namespace WebUtils
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
         while(!www->isDone)
             co_yield nullptr;
-        auto downloadHandler = reinterpret_cast<UnityEngine::Networking::DownloadHandler*>(www->get_downloadHandler());
-        auto gifDataArr = downloadHandler->GetData();
+        auto gifDataArr = www->downloadHandler->GetData();
         Gif gif(gifDataArr);
         int error = gif.Parse();
         co_yield nullptr;

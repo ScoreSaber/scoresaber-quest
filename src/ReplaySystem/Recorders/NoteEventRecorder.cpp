@@ -50,9 +50,12 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void NoteEventRecorder::Dispose()
     {
-        _scoreController->___scoringForNoteStartedEvent -= scoringForNoteStartedDelegate;
-        _scoreController->___scoringForNoteFinishedEvent -= scoringForNoteFinishedDelegate;
-        _beatmapObjectManager->___noteWasCutEvent -= handleNoteWasCutDelegate;
+        if(_scoreController) {
+            _scoreController->___scoringForNoteStartedEvent -= scoringForNoteStartedDelegate;
+            _scoreController->___scoringForNoteFinishedEvent -= scoringForNoteFinishedDelegate;
+        }
+        if(_beatmapObjectManager)
+            _beatmapObjectManager->___noteWasCutEvent -= handleNoteWasCutDelegate;
     }
 
     void NoteEventRecorder::ScoreController_scoringForNoteStartedEvent(ScoringElement* element)

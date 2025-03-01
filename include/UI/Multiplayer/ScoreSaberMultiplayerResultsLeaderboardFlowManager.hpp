@@ -21,9 +21,9 @@ using namespace GlobalNamespace;
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::UI::Multiplayer, ScoreSaberMultiplayerResultsLeaderboardFlowManager, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::UI::Multiplayer", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD(MainFlowCoordinator*, _mainFlowCoordinator);
-                                    DECLARE_INSTANCE_FIELD(MultiplayerResultsViewController*, _multiplayerResultsViewController);
-                                    DECLARE_INSTANCE_FIELD(PlatformLeaderboardViewController*, _platformLeaderboardViewController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<MainFlowCoordinator>, _mainFlowCoordinator);
+                                    DECLARE_INSTANCE_FIELD(UnityW<MultiplayerResultsViewController>, _multiplayerResultsViewController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<PlatformLeaderboardViewController>, _platformLeaderboardViewController);
                                     DECLARE_INSTANCE_FIELD(BeatmapKey, _lastCompletedBeatmapKey);
                                     DECLARE_CTOR(ctor, MainFlowCoordinator* mainFlowCoordinator, MultiplayerResultsViewController* multiplayerResultsViewController, PlatformLeaderboardViewController* platformLeaderboardViewController);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);

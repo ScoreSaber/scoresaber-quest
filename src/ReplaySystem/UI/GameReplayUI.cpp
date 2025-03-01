@@ -22,6 +22,7 @@ namespace ScoreSaber::ReplaySystem::UI
 {
     void GameReplayUI::ctor(GameplayCoreSceneSetupData* gameplayCoreSceneSetupData)
     {
+        INVOKE_CTOR();
         _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
     }
 

@@ -20,16 +20,14 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         Down,
     };
 
-    extern ScoreSaber::UI::Other::Banner* ScoreSaberBanner;
-    extern ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
-    extern std::vector<HMUI::ImageView*> _cellClickingImages;
+    extern SafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
+    extern SafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
+    extern std::vector<SafePtrUnity<HMUI::ImageView>> _cellClickingImages;
 
     void OnSoftRestart();
 
-    void EarlyDidActivate(PlatformLeaderboardViewController* self,
-                     bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
-    void DidActivate(PlatformLeaderboardViewController* self,
-                     bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
+    void EarlyDidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
+    void DidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy, bool screenSystemEnabling);
     void DidDeactivate();
     void ChangeScope(bool filterAroundCountry);
     void RefreshLeaderboard();

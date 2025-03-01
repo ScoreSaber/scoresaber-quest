@@ -95,7 +95,7 @@ namespace ScoreSaber::UI::Other {
     custom_types::Helpers::Coroutine GetSpriteAvatar(string url, function<void(Sprite*, int, string, CancellationToken)> onSuccess, function<void(string, int, CancellationToken)> onFailure, CancellationToken cancellationToken, int pos) {
         UnityWebRequest* www = UnityWebRequestTexture::GetTexture(url);
         co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-        auto handler = reinterpret_cast<DownloadHandlerTexture*>(www->downloadHandler);
+        auto handler = il2cpp_utils::cast<DownloadHandlerTexture>(www->downloadHandler);
 
         while (!www->isDone) {
             if (cancellationToken.IsCancellationRequested) {

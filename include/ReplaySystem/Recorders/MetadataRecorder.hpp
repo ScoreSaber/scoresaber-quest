@@ -22,11 +22,11 @@ using namespace GlobalNamespace;
     }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, MetadataRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(AudioTimeSyncController*, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(BeatmapObjectSpawnController::InitData*, _beatmapObjectSpawnControllerInitData);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(GameplayCoreSceneSetupData*, _gameplayCoreSceneSetupData);
                                     DECLARE_INSTANCE_FIELD_PRIVATE(BeatSaber::GameSettings::MainSettingsHandler*, _mainSettingsHandler);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GameEnergyCounter*, _gameEnergyCounter);
+                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GameEnergyCounter>, _gameEnergyCounter);
                                     DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GameEnergyCounter* gameEnergyCounter, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
                                     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);

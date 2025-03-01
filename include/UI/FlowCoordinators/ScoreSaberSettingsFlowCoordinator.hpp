@@ -10,4 +10,4 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::FlowCoordinators, ScoreSaberSettingsFlowCo
                       DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::FlowCoordinator::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
                       DECLARE_OVERRIDE_METHOD_MATCH(void, BackButtonWasPressed, &HMUI::FlowCoordinator::BackButtonWasPressed, HMUI::ViewController* topViewController);
 
-                      DECLARE_INSTANCE_FIELD_DEFAULT(ScoreSaber::UI::ViewControllers::MainSettingsViewController*, mainSettingsViewController, nullptr);)
+                      DECLARE_INSTANCE_FIELD_DEFAULT(UnityW<ScoreSaber::UI::ViewControllers::MainSettingsViewController>, mainSettingsViewController, nullptr);)

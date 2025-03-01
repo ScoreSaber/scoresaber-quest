@@ -18,6 +18,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter, Zenject::DiContainer* container)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _gameEnergyCounter = gameEnergyCounter;
         _gameEnergyUIPanel = container->TryResolve<GlobalNamespace::GameEnergyUIPanel*>();

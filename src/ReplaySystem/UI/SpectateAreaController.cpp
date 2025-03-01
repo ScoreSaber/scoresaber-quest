@@ -45,8 +45,9 @@ namespace ScoreSaber::ReplaySystem::UI
             return;
         }
 
-        if (_statusTween != nullptr) {
+        if (_statusTween) {
             _statusTween->Kill();
+            _statusTween = nullptr;
         }
 
         if (_activeNote == nullptr) {
@@ -85,8 +86,9 @@ namespace ScoreSaber::ReplaySystem::UI
             _despawned = false;
         }
 
-        if (_movementTween != nullptr) {
+        if (_movementTween) {
             _movementTween->Kill();
+            _movementTween = nullptr;
         }
         _activeNote->gameObject->SetActive(true);
         auto movementTweenDelegate = custom_types::MakeDelegate<System::Action_1<Vector3>*>(classof(System::Action_1<Vector3>*), (std::function<void(Vector3)>)[&](Vector3 val) {
@@ -103,23 +105,25 @@ namespace ScoreSaber::ReplaySystem::UI
             return;
         }
 
-        if (DidUpdatePlayerSpectatorPose != nullptr) {
+        if (DidUpdatePlayerSpectatorPose) {
             DidUpdatePlayerSpectatorPose(*pose, Quaternion::get_identity());
         }
     }
 
     void SpectateAreaController::Dismiss()
     {
-        if (_activeNote == nullptr) {
+        if (!_activeNote) {
             return;
         }
 
         _despawned = true;
-        if (_statusTween != nullptr) {
+        if (_statusTween) {
             _statusTween->Kill();
+            _statusTween = nullptr;
         }
-        if (_movementTween != nullptr) {
+        if (_movementTween) {
             _movementTween->Kill();
+            _movementTween = nullptr;
         }
         auto updateNoteScaleDelegate = custom_types::MakeDelegate<System::Action_1<Vector3>*>(classof(System::Action_1<Vector3>*), (std::function<void(Vector3)>)[&](Vector3 scale) { UpdateNoteScale(scale); });
         _statusTween = Tweening::Vector3Tween::New_ctor(Vector3::get_one(), Vector3::get_zero(), updateNoteScaleDelegate, 0.5f, EaseType::OutQuart, 0);
@@ -129,25 +133,27 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void SpectateAreaController::Tick()
     {
-        if (_activeNote != nullptr) {
+        if (_activeNote) {
             _activeNote->transform->Rotate(Vector3::get_up() * 0.5);
         }
     }
 
     void SpectateAreaController::UpdateNoteScale(Vector3 scale)
     {
-        if (_activeNote != nullptr) {
+        if (_activeNote) {
             _activeNote->transform->localScale = scale;
         }
     }
     void SpectateAreaController::DespawnActiveNote()
     {
         _despawned = true;
-        if (_statusTween != nullptr) {
+        if (_statusTween) {
             _statusTween->Kill();
+            _statusTween = nullptr;
         }
-        if (_movementTween != nullptr) {
+        if (_movementTween) {
             _movementTween->Kill();
+            _movementTween = nullptr;
         }
         _activeNote->gameObject->active = false;
     }
@@ -163,7 +169,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void SpectateAreaController::Dispose()
     {
-        if (_activeNote != nullptr) {
+        if (_timeTweeningManager && _activeNote) {
             _timeTweeningManager->KillAllTweens(_activeNote);
         }
     }

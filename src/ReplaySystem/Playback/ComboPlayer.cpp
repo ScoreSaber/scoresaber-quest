@@ -13,6 +13,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void ComboPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ComboController* comboController)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _comboController = comboController;
         // _comboUIController = comboUIController;
