@@ -137,7 +137,7 @@ namespace ScoreSaber::Services::LeaderboardService
                 for (auto& score : currentLeaderboard.scores)
                 {
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
-                    std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
+                    std::u16string formattedScore = FormatScore(((double)score.baseScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
                     std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 75);
                     INFO("score: {:d}, rank: {:d}", score.modifiedScore, score.rank);
