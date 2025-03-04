@@ -233,20 +233,20 @@ namespace ScoreSaber::UI::ViewControllers
             auto textVertical = CreateVerticalLayoutGroup(moreInfoModal->transform);
             textVertical->spacing = 1.0f;
             textVertical->padding = RectOffset::New_ctor(2, 2, 2, 2);
-            auto h1 = CreateText(textVertical->transform, "What is <color=#6772E5>PP</color>?", false);
+            auto h1 = CreateText(textVertical->transform, "What is <color=#6772E5>PP</color>?", FontStyles::Normal);
             h1->alignment = TMPro::TextAlignmentOptions::TopLeft;
             h1->fontSize = 4.0f;
             auto t1 = CreateText(textVertical->transform, "Performance Points (<color=#6772E5>PP</color>) are earned through playing ranked maps. Harder maps and higher\n"
                                                                 "scores will increase the amount of <color=#6772E5>PP</color> you receive from beating a map. Performance Points\n"
                                                                 "determine your rank on the ScoreSaber global leaderboards, the more <color=#6772E5>PP</color> you have the higher\n"
                                                                 "your rank will be.",
-                                 false);
+                                                                FontStyles::Normal);
             t1->alignment = TMPro::TextAlignmentOptions::TopLeft;
             t1->fontSize = 2.5f;
             t1->enableWordWrapping = true;
             t1->rectTransform->sizeDelta = {0, 0};
             Object::Destroy(t1->GetComponent<LayoutElement*>());
-            auto h2 = CreateText(textVertical->transform, "How Does Ranking Work?", false);
+            auto h2 = CreateText(textVertical->transform, "How Does Ranking Work?", FontStyles::Normal);
             h2->alignment = TMPro::TextAlignmentOptions::TopLeft;
             h2->fontSize = 4.0f;
             auto t2 = CreateText(textVertical->transform, "Ranked maps are maps passed through a ranking system that judges maps to make sure they\n"
@@ -254,7 +254,7 @@ namespace ScoreSaber::UI::ViewControllers
                                                                 "goes over the rules a map must follow to be ranked. The Quality Assurance Team votes to\n"
                                                                 "either speed up or slow down maps in queue based on whether the map meets their quality\n"
                                                                 "standards, however they cannot fully block a map that meets the criteria from being ranked.",
-                                 false);
+                                                                FontStyles::Normal);
             t2->alignment = TMPro::TextAlignmentOptions::TopLeft;
             t2->fontSize = 2.5f;
             t2->enableWordWrapping = true;

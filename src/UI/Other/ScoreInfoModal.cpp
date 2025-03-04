@@ -53,7 +53,7 @@ using namespace BSML::Lite;
     fitter##identifier->horizontalFit = horizontal
 
 #define CreateDefaultTextAndSetSize(identifier, size)                  \
-    identifier = CreateText(textVertical->transform, "", false); \
+    identifier = CreateText(textVertical->transform, "", FontStyles::Normal); \
     identifier->fontSize = size;
 
 std::string FormatNumber(int number)
@@ -274,7 +274,7 @@ namespace ScoreSaber::UI::Other
         nameHorizontal->childForceExpandWidth = false;
         nameHorizontal->spacing = 1.0f;
 
-        player = CreateText(nameVertical->transform, "", false);
+        player = CreateText(nameVertical->transform, "", FontStyles::Normal);
         player->overflowMode = TextOverflowModes::Ellipsis;
         player->alignment = TextAlignmentOptions::Left;
         player->fontSize = 4.0f;
