@@ -176,7 +176,7 @@ namespace ScoreSaber::CustomTypes::Components
             self->RefreshCells(true, true);
         }
 
-        if (self->didReloadDataEvent)
+        if (self->didReloadDataEvent != nullptr)
         {
             self->didReloadDataEvent->Invoke(self);
         }
