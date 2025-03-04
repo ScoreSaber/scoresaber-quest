@@ -106,6 +106,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         _cellClickingImages.clear();
     }
 
+    void ByeImages()
+    {
+        for (auto &holder : _ImageHolders) {
+            holder.ClearSprite();
+        }
+    }
+
     void EarlyDidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy,
                      bool screenSystemEnabling)
     {
@@ -269,6 +276,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         scopeSegmentedControl->SetData(array);
 
+        ByeImages();
+
         _activated = true;
     }
 
@@ -276,13 +285,6 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         ScoreSaberBanner->playerProfileModal->Hide();
         leaderboardScoreInfoButtonHandler->scoreInfoModal->Hide();
-    }
-
-    void ByeImages()
-    {
-        for (auto &holder : _ImageHolders) {
-            holder.ClearSprite();
-        }
     }
 
     void RefreshLeaderboard(BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, LeaderboardTableView* tableView,
@@ -499,7 +501,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 _platformLeaderboardViewController->_loadingControl->ShowLoading("");
                 ScoreSaberBanner->set_loading(true);
                 ScoreSaberBanner->set_prompt("Uploading score...", -1);
-                // ScoreSaberBanner->Prompt("Uploading Score", true, 5.0f, nullptr);
+                ByeImages();
             }
             else
             {
