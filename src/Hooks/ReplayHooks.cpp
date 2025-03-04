@@ -85,7 +85,8 @@ MAKE_AUTO_HOOK_MATCH(RelativeScoreAndImmediateRankCounter_UpdateRelativeScoreAnd
         {
             self->relativeScore = 1.0f;
             self->immediateRank = RankModel::Rank::SS;
-            self->relativeScoreOrImmediateRankDidChangeEvent->Invoke();
+            if(self->relativeScoreOrImmediateRankDidChangeEvent)
+                self->relativeScoreOrImmediateRankDidChangeEvent->Invoke();
             return;
         }
         RelativeScoreAndImmediateRankCounter_UpdateRelativeScoreAndImmediateRank(self, score, modifiedScore, maxPossibleScore, maxPossibleModifiedScore);
