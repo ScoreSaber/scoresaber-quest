@@ -124,9 +124,9 @@ namespace ScoreSaber::UI::Other {
             if (SpriteCache::cachedSprites.contains(url) && SpriteCache::cachedSprites[url].isAlive()) {
                 profileImage->gameObject->SetActive(true);
                 profileImage->sprite = SpriteCache::cachedSprites[url].ptr();
-                loadingIndicator->gameObject->active = false;
+                loadingIndicator->gameObject->SetActive(false);
             } else {
-                loadingIndicator->gameObject->active = true;
+                loadingIndicator->gameObject->SetActive(true);
 
                 using namespace std::placeholders;
                 BeginCoroutine(GetSpriteAvatar(url, bind(&ProfilePictureView::OnAvatarDownloadSuccess, this, _1, _2, _3, _4), bind(&ProfilePictureView::OnAvatarDownloadFailure, this, _1, _2, _3), cancellationToken, pos));
@@ -142,9 +142,9 @@ namespace ScoreSaber::UI::Other {
         if (cancellationToken.IsCancellationRequested) {
             return;
         }
-        profileImage->gameObject->active = true;
+        profileImage->gameObject->SetActive(true);
         profileImage->sprite = a;
-        loadingIndicator->gameObject->active = false;
+        loadingIndicator->gameObject->SetActive(false);
     }
 
     void ProfilePictureView::OnAvatarDownloadFailure(string error, int pos, CancellationToken cancellationToken) {

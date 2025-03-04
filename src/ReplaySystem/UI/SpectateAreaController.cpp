@@ -155,7 +155,7 @@ namespace ScoreSaber::ReplaySystem::UI
             _movementTween->Kill();
             _movementTween = nullptr;
         }
-        _activeNote->gameObject->active = false;
+        _activeNote->gameObject->SetActive(false);
     }
     std::optional<Vector3> SpectateAreaController::TryGetPose(StringW poseID)
     {
