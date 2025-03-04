@@ -159,7 +159,7 @@ namespace ScoreSaber::ReplaySystem::UI
         auto curvedCanvasSettigns = _watermarkObject->AddComponent<HMUI::CurvedCanvasSettings*>();
         curvedCanvasSettigns->SetRadius(0.0f);
 
-        auto curvedTextMeshPro = CreateText(canvasRectTransform, "Double click left trigger to open Replay menu", Vector2(0.0f, 0.0f));
+        auto curvedTextMeshPro = CreateText(canvasRectTransform, "Double click left trigger to open Replay menu", Vector2(0.0f, 0.0f), {100.0f, 50.0f});
         curvedTextMeshPro->alignment = TMPro::TextAlignmentOptions::Center;
         curvedTextMeshPro->fontSize = 4.0f;
         curvedTextMeshPro->color = Color(0.95f, 0.95f, 0.95f, 0.95f);
