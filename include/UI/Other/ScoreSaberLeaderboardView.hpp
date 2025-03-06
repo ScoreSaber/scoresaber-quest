@@ -9,6 +9,7 @@
 #include "Data/LeaderboardInfo.hpp"
 #include "Data/Score.hpp"
 #include "UI/Other/Banner.hpp"
+#include "Utils/SafePtr.hpp"
 
 using namespace GlobalNamespace;
 
@@ -20,9 +21,9 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         Down,
     };
 
-    extern SafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
-    extern SafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
-    extern std::vector<SafePtrUnity<HMUI::ImageView>> _cellClickingImages;
+    extern FixedSafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
+    extern FixedSafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
+    extern std::vector<FixedSafePtrUnity<HMUI::ImageView>> _cellClickingImages;
 
     void OnSoftRestart();
 

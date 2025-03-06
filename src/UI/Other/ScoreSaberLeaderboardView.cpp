@@ -63,20 +63,20 @@ using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
-    SafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
+    FixedSafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
 
-    SafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
+    FixedSafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
 
-    SafePtrUnity<PlatformLeaderboardViewController> _platformLeaderboardViewController;
+    FixedSafePtrUnity<PlatformLeaderboardViewController> _platformLeaderboardViewController;
 
-    SafePtrUnity<UnityEngine::UI::Button> _pageUpButton;
-    SafePtrUnity<UnityEngine::UI::Button> _pageDownButton;
+    FixedSafePtrUnity<UnityEngine::UI::Button> _pageUpButton;
+    FixedSafePtrUnity<UnityEngine::UI::Button> _pageDownButton;
 
     std::vector<ProfilePictureView> _ImageHolders;
 
-    std::vector<SafePtrUnity<HMUI::ImageView>> _cellClickingImages;
+    std::vector<FixedSafePtrUnity<HMUI::ImageView>> _cellClickingImages;
 
-    SafePtr<System::Threading::CancellationTokenSource> cancellationToken;
+    FixedSafePtr<System::Threading::CancellationTokenSource> cancellationToken;
 
     bool _activated = false;
 

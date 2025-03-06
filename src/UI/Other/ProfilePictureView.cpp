@@ -31,7 +31,7 @@ using namespace std;
 namespace ScoreSaber::UI::Other {
 
     namespace SpriteCache {
-        map<string, SafePtrUnity<Sprite>> cachedSprites;
+        map<string, FixedSafePtrUnity<Sprite>> cachedSprites;
         const int MaxSpriteCacheSize = 150;
         queue<string> spriteCacheQueue;
 
@@ -43,7 +43,7 @@ namespace ScoreSaber::UI::Other {
                 cachedSprites.erase(oldestUrl);
             }
 
-            // somehow the objects can be GCed, even when behind a SafePtrUnity
+            // somehow the objects can be GCed, even when behind a FixedSafePtrUnity
             vector<string> badSprites;
             for (auto &[key, value] : cachedSprites) {
                 if (!value.isAlive()) {
@@ -65,8 +65,8 @@ namespace ScoreSaber::UI::Other {
     }
 
     bool initializedGlobals = false;
-    SafePtrUnity<Sprite> nullSprite;
-    SafePtrUnity<Material> mat_UINoGlowRoundEdge;
+    FixedSafePtrUnity<Sprite> nullSprite;
+    FixedSafePtrUnity<Material> mat_UINoGlowRoundEdge;
 
     void ProfilePictureView::OnSoftRestart() {
         SpriteCache::cachedSprites.clear();

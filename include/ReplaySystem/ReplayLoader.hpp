@@ -6,17 +6,17 @@
 #include <GlobalNamespace/BeatmapLevel.hpp>
 #include <GlobalNamespace/LevelCompletionResults.hpp>
 #include <GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp>
-
 #include "ReplaySystem/Playback/NotePlayer.hpp"
+#include "Utils/SafePtr.hpp"
 
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
     extern std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
     extern GlobalNamespace::BeatmapKey CurrentBeatmapKey;
-    extern SafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
+    extern FixedSafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     extern std::u16string CurrentPlayerName;
     extern std::string CurrentModifiers;
-    extern SafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
+    extern FixedSafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
 
     extern bool IsPlaying;
     void StartReplay(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey);

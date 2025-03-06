@@ -10,6 +10,7 @@
 #include <custom-types/shared/coroutine.hpp>
 #include <beatsaber-hook/shared/utils/typedefs-wrappers.hpp>
 #include "Utils/OperatorOverloads.hpp"
+#include "Utils/SafePtr.hpp"
 
 using namespace HMUI;
 using namespace UnityEngine;
@@ -21,7 +22,7 @@ DEFINE_TYPE(ScoreSaber::CustomTypes::Components, CellClicker);
 namespace ScoreSaber::CustomTypes::Components {
     // copied from BSML to get the button click sound
     GlobalNamespace::Signal* getImageClickedSignal() {
-        static SafePtrUnity<GlobalNamespace::Signal> imageClickedSignal;
+        static FixedSafePtrUnity<GlobalNamespace::Signal> imageClickedSignal;
         if (!imageClickedSignal) {
             auto menuShockWave = Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>().front_or_default();
             imageClickedSignal = menuShockWave ? menuShockWave->_buttonClickEvents.back_or_default() : nullptr;

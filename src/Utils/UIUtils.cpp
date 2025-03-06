@@ -28,6 +28,7 @@
 #include <paper/shared/string_convert.hpp>
 #include "questui/ArrayUtil.hpp"
 #include "Utils/StrippedMethods.hpp"
+#include "Utils/SafePtr.hpp"
 
 #include "Sprites.hpp"
 #include "logging.hpp"
@@ -59,7 +60,7 @@ using namespace BSML::Lite;
 #define BeginCoroutine(method) BSML::SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 using HapticPresetSO = Libraries::HM::HMLib::VR::HapticPresetSO;
-static SafePtrUnity<HapticPresetSO> hapticFeedbackPresetSO;
+static FixedSafePtrUnity<HapticPresetSO> hapticFeedbackPresetSO;
 
 namespace UIUtils
 {
