@@ -71,6 +71,7 @@ void CreateLinkBoxes(Transform* parent, LinkBoxData data)
     bg->ApplyAlpha(1.0f);
 
     HMUI::ImageView* imageView = bg->gameObject->GetComponentInChildren<HMUI::ImageView*>();
+    imageView->_skew = 0.0f;
     imageView->_gradient = true;
     imageView->_gradientDirection = 1;
     imageView->color = Color::get_white();
