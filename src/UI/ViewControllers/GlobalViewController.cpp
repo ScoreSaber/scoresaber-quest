@@ -263,7 +263,7 @@ namespace ScoreSaber::UI::ViewControllers
             Object::Destroy(t2->GetComponent<LayoutElement*>());
 
             auto buttonHorizontal = CreateHorizontalLayoutGroup(textVertical->transform);
-            auto dismiss = CreateUIButton(buttonHorizontal->transform, "Dismiss", [&]() { moreInfoModal->Hide(true, nullptr); });
+            auto dismiss = CreateUIButton(buttonHorizontal->transform, "Dismiss", [this]() { moreInfoModal->Hide(true, nullptr); });
 
             auto moreInfo = CreateUIButton(buttonHorizontal->transform, "More Info", []() { StrippedMethods::UnityEngine::Application::OpenURL("https://wiki.scoresaber.com/ranking-system.html"); });
         }

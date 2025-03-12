@@ -8,6 +8,7 @@
 #include <custom-types/shared/delegate.hpp>
 #include <bsml/shared/BSML/MainThreadScheduler.hpp>
 #include "Utils/OperatorOverloads.hpp"
+#include "Utils/SafePtr.hpp"
 #include "logging.hpp"
 
 using namespace BSML;
@@ -32,7 +33,8 @@ namespace ScoreSaber::ReplaySystem::UI
         _resultsViewController->___continueButtonPressedEvent += continueButtonPressedDelegate;
         _resultsViewController->___restartButtonPressedEvent += restartButtonPressedDelegate;
 
-        Services::ReplayService::ReplaySerialized = [&](const std::vector<char> &v) { UploadDaemon_ReplaySerialized(v); };
+        FixedSafePtr<ResultsViewReplayButtonController> self(this);
+        Services::ReplayService::ReplaySerialized = [self](const std::vector<char> &v) { self->UploadDaemon_ReplaySerialized(v); };
     }
 
     void ResultsViewReplayButtonController::ResultsViewController_didActivateEvent(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -74,12 +76,14 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::WaitForReplay()
     {
-        il2cpp_utils::il2cpp_aware_thread([&](){
-            while(!_replayReady) {
+        FixedSafePtr<ResultsViewReplayButtonController> self(this);
+
+        il2cpp_utils::il2cpp_aware_thread([self](){
+            while(!self->_replayReady) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(25));
             }
-            MainThreadScheduler::Schedule([&]() {
-                watchReplayButton->interactable = true;
+            MainThreadScheduler::Schedule([self]() {
+                self->watchReplayButton->interactable = true;
             });
         }).detach();
     }
@@ -96,14 +100,15 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::ClickedReplayButton()
     {
-        il2cpp_utils::il2cpp_aware_thread([=, this](){
-            std::vector<std::string> modifiersVec = Services::UploadService::GetModifierList(_levelCompletionResults->gameplayModifiers, _levelCompletionResults->energy);
+        FixedSafePtr<ResultsViewReplayButtonController> self(this);
+        il2cpp_utils::il2cpp_aware_thread([self](){
+            std::vector<std::string> modifiersVec = Services::UploadService::GetModifierList(self->_levelCompletionResults->gameplayModifiers, self->_levelCompletionResults->energy);
             std::string modifiers;
             for(int i = 0; i < modifiersVec.size(); ++i) {
                 if(i > 0) modifiers += ',';
                 modifiers += modifiersVec[i];
             }
-            ReplayLoader::Load(_serializedReplay, _beatmapLevel, _beatmapKey, modifiers, ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name);
+            ReplayLoader::Load(self->_serializedReplay, self->_beatmapLevel, self->_beatmapKey, modifiers, ScoreSaber::Services::PlayerService::playerInfo.localPlayerData.name);
         }).detach();
         watchReplayButton->interactable = false;
     }

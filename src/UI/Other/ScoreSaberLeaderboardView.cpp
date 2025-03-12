@@ -45,6 +45,7 @@
 #include "Sprites.hpp"
 #include "UI/Other/ProfilePictureView.hpp"
 #include "Utils/MaxScoreCache.hpp"
+#include "Utils/SafePtr.hpp"
 #include "Utils/UIUtils.hpp"
 #include "logging.hpp"
 #include "questui/ArrayUtil.hpp"
@@ -232,7 +233,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                 _cellClickingImages.emplace_back(image);
             }
 
-            PlayerService::AuthenticateUser([&](PlayerService::LoginStatus loginStatus) {
+            PlayerService::AuthenticateUser([](PlayerService::LoginStatus loginStatus) {
                 MainThreadScheduler::Schedule([=]() {
                     switch (loginStatus)
                     {
@@ -331,16 +332,20 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         _currentLeaderboardRefreshId = refreshId;
 
-        il2cpp_utils::il2cpp_aware_thread([beatmapLevel, beatmapKey, scope, loadingControl, tableView, refreshId]() {
+        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+        FixedSafePtrUnity<LoadingControl> loadingControlSafe(loadingControl);
+        FixedSafePtrUnity<LeaderboardTableView> tableViewSafe(tableView);
+
+        il2cpp_utils::il2cpp_aware_thread([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             if (_currentLeaderboardRefreshId == refreshId)
             {
-                Helpers::GetDiContainer()->Resolve<Utils::MaxScoreCache*>()->GetMaxScore(beatmapLevel, beatmapKey,
+                Helpers::GetDiContainer()->Resolve<Utils::MaxScoreCache*>()->GetMaxScore(beatmapLevelSafe.ptr(), beatmapKey,
                     [=](int maxScore) {
                     LeaderboardService::GetLeaderboardData(maxScore,
-                        beatmapLevel, beatmapKey, scope, _leaderboardPage,
-                        [=](Data::InternalLeaderboard internalLeaderboard) {
-                        MainThreadScheduler::Schedule([=]() {
+                        beatmapLevelSafe.ptr(), beatmapKey, scope, _leaderboardPage,
+                        [beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore](Data::InternalLeaderboard internalLeaderboard) {
+                        MainThreadScheduler::Schedule([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore, internalLeaderboard]() {
                             if (_currentLeaderboardRefreshId != refreshId) {
                                 return; // we need to check this again, since some time may have passed due to waiting for leaderboard data
                             }
@@ -352,28 +357,28 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 {
                                     if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && playerScoreIndex == -1 && !_filterAroundCountry)
                                     {
-                                        SetErrorState(loadingControl, "You haven't set a score on this leaderboard", true);
+                                        SetErrorState(loadingControlSafe.ptr(), "You haven't set a score on this leaderboard", true);
                                     }
                                     else
                                     {
-                                        tableView->SetScores(internalLeaderboard.leaderboardItems.getPtr(), playerScoreIndex);
+                                        tableViewSafe->SetScores(internalLeaderboard.leaderboardItems.getPtr(), playerScoreIndex);
                                         for (int i = 0; i < internalLeaderboard.profilePictures.size(); ++i) {
                                             _ImageHolders[i].SetProfileImage(internalLeaderboard.profilePictures[i], i, cancellationToken->Token);
                                         }
-                                        loadingControl->ShowText("", false);
-                                        loadingControl->Hide();
-                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, beatmapLevel, beatmapKey, internalLeaderboard.leaderboard->leaderboardInfo.id, maxScore);
+                                        loadingControlSafe->ShowText("", false);
+                                        loadingControlSafe->Hide();
+                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, beatmapLevelSafe.ptr(), beatmapKey, internalLeaderboard.leaderboard->leaderboardInfo.id, maxScore);
                                     }
                                 }
                                 else
                                 {
                                     if (_leaderboardPage > 1)
                                     {
-                                        SetErrorState(loadingControl, "No scores on this page");
+                                        SetErrorState(loadingControlSafe.ptr(), "No scores on this page");
                                     }
                                     else
                                     {
-                                        SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
+                                        SetErrorState(loadingControlSafe.ptr(), "No scores on this leaderboard, be the first!");
                                     }
                                     ByeImages();
                                 }
@@ -382,11 +387,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             {
                                 if (internalLeaderboard.leaderboardItems->get_Item(0) != nullptr)
                                 {
-                                    SetErrorState(loadingControl, internalLeaderboard.leaderboardItems->get_Item(0)->playerName, false);
+                                    SetErrorState(loadingControlSafe.ptr(), internalLeaderboard.leaderboardItems->get_Item(0)->playerName, false);
                                 }
                                 else
                                 {
-                                    SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
+                                    SetErrorState(loadingControlSafe.ptr(), "No scores on this leaderboard, be the first! 0x1");
                                 }
                                 ByeImages();
                             }

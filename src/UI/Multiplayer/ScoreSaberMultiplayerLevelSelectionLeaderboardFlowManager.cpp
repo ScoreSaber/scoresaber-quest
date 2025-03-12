@@ -1,4 +1,5 @@
 #include "UI/Multiplayer/ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager.hpp"
+#include "Utils/SafePtr.hpp"
 
 #include <GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp>
 #include <GlobalNamespace/BeatmapKey.hpp>
@@ -110,10 +111,13 @@ namespace ScoreSaber::UI::Multiplayer
         if (_performingFirstActivation)
         {
             _performingFirstActivation = false;
-            il2cpp_utils::il2cpp_aware_thread([&] {
+
+            FixedSafePtr<ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager> self(this);
+
+            il2cpp_utils::il2cpp_aware_thread([self] {
                 std::this_thread::sleep_for(std::chrono::milliseconds(250));
-                MainThreadScheduler::Schedule([=, this]() {
-                    _platformLeaderboardViewController->Refresh(true, true);
+                MainThreadScheduler::Schedule([self]() {
+                    self->_platformLeaderboardViewController->Refresh(true, true);
                 });
             }).detach();
         }

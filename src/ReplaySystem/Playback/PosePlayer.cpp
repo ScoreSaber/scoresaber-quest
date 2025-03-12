@@ -49,7 +49,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         _mainCamera->enabled = false;
         _mainCamera->gameObject->SetActive(false);
-        _desktopCamera = Resources::FindObjectsOfTypeAll<Camera*>()->First([&](Camera* camera) {
+        _desktopCamera = Resources::FindObjectsOfTypeAll<Camera*>()->First([](Camera* camera) {
             return camera->name == "RecorderCamera";
         });
 

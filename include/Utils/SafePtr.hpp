@@ -389,7 +389,7 @@ struct FixedSafePtr {
         __SAFE_PTR_NULL_HANDLE_CHECK(internalHandle, internalHandle->instancePointer);
     }
 
-    T const* ptr() const {
+    T* const ptr() const {
         __SAFE_PTR_NULL_HANDLE_CHECK(internalHandle, internalHandle->instancePointer);
     }
 
@@ -488,7 +488,7 @@ struct FixedSafePtrUnity : public FixedSafePtr<T, true> {
         __SAFE_PTR_UNITY_NULL_HANDLE_CHECK(Parent::internalHandle->instancePointer);
     }
 
-    T const* ptr() const {
+    T* const ptr() const {
         __SAFE_PTR_UNITY_NULL_HANDLE_CHECK(Parent::internalHandle->instancePointer);
     }
 

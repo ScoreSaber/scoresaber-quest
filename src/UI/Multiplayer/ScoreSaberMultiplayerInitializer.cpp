@@ -33,7 +33,7 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerInitializer::GameServerLobbyFlowCoordinator_didSetupEvent()
     {
-        Services::PlayerService::AuthenticateUser([&](Services::PlayerService::LoginStatus loginStatus) {});
+        Services::PlayerService::AuthenticateUser([](Services::PlayerService::LoginStatus loginStatus) {});
         Other::ScoreSaberLeaderboardView::AllowReplayWatching(false);
     }
 

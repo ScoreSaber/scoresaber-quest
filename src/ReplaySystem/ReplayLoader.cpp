@@ -79,7 +79,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                                localPlayerSettings->environmentEffectsFilterDefaultPreset, localPlayerSettings->environmentEffectsFilterExpertPlusPreset,
                                                                localPlayerSettings->headsetHapticIntensity);
 
-        std::function<void(UnityW<StandardLevelScenesTransitionSetupDataSO>, LevelCompletionResults*)> ReplayEndCallback = [&](UnityW<StandardLevelScenesTransitionSetupDataSO> standardLevelSceneSetupData, LevelCompletionResults* levelCompletionResults) {
+        std::function<void(UnityW<StandardLevelScenesTransitionSetupDataSO>, LevelCompletionResults*)> ReplayEndCallback = [](UnityW<StandardLevelScenesTransitionSetupDataSO> standardLevelSceneSetupData, LevelCompletionResults* levelCompletionResults) {
             IsPlaying = false;
         };
 

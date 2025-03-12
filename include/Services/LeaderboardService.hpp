@@ -1,6 +1,7 @@
 #pragma once
 #include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
 #include <GlobalNamespace/BeatmapKey.hpp>
+#include <GlobalNamespace/BeatmapLevel.hpp>
 #include "Data/InternalLeaderboard.hpp"
 
 namespace ScoreSaber::Services::LeaderboardService

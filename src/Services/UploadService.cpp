@@ -23,6 +23,7 @@
 #include <UnityEngine/Application.hpp>
 #include <UnityEngine/Resources.hpp>
 #include "Utils/BeatmapUtils.hpp"
+#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
@@ -134,13 +135,15 @@ namespace ScoreSaber::Services::UploadService
 
     void Seven(BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, int modifiedScore, int multipliedScore, std::string uploadPacket, std::string replayFileName)
     {
-        il2cpp_utils::il2cpp_aware_thread([beatmapLevel, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
+        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+
+        il2cpp_utils::il2cpp_aware_thread([beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
 
             auto _maxScoreCache = BSML::Helpers::GetDiContainer()->Resolve<ScoreSaber::Utils::MaxScoreCache*>();
-            _maxScoreCache->GetMaxScore(beatmapLevel, beatmapKey, [beatmapLevel, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName](int maxScore) {
+            _maxScoreCache->GetMaxScore(beatmapLevelSafe.ptr(), beatmapKey, [beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName](int maxScore) {
                 LeaderboardService::GetLeaderboardData(maxScore,
-                    beatmapLevel, beatmapKey, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
+                    beatmapLevelSafe.ptr(), beatmapKey, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
                     bool ranked = true;
                     if (internalLeaderboard.leaderboard.has_value())
                     {

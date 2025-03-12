@@ -7,6 +7,7 @@
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Vector2.hpp>
 #include <bsml/shared/BSML-Lite.hpp>
+#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
 
@@ -66,41 +67,43 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::Initialize()
     {
-        _mainImberPanelView->DidClickLoop = [&]() {
-            MainImberPanelView_DidClickLoop();
+        FixedSafePtr<ImberManager> self(this);
+
+        _mainImberPanelView->DidClickLoop = [self]() {
+            self->MainImberPanelView_DidClickLoop();
         };
-        _mainImberPanelView->DidPositionJump = [&]() {
-            MainImberPanelView_DidPositionJump();
+        _mainImberPanelView->DidPositionJump = [self]() {
+            self->MainImberPanelView_DidPositionJump();
         };
-        _mainImberPanelView->DidClickRestart = [&]() {
-            MainImberPanelView_DidClickRestart();
+        _mainImberPanelView->DidClickRestart = [self]() {
+            self->MainImberPanelView_DidClickRestart();
         };
-        _mainImberPanelView->DidClickPausePlay = [&]() {
-            MainImberPanelView_DidClickPausePlay();
+        _mainImberPanelView->DidClickPausePlay = [self]() {
+            self->MainImberPanelView_DidClickPausePlay();
         };
-        _mainImberPanelView->DidTimeSyncChange = [&](float value) {
-            MainImberPanelView_DidTimeSyncChange(value);
+        _mainImberPanelView->DidTimeSyncChange = [self](float value) {
+            self->MainImberPanelView_DidTimeSyncChange(value);
         };
-        _mainImberPanelView->DidChangeVisiblity = [&](bool value) {
-            MainImberPanelView_DidChangeVisibility(value);
+        _mainImberPanelView->DidChangeVisiblity = [self](bool value) {
+            self->MainImberPanelView_DidChangeVisibility(value);
         };
-        _mainImberPanelView->HandDidSwitchEvent = [&](XR::XRNode value) {
-            MainImberPanelView_DidHandSwitchEvent(value);
+        _mainImberPanelView->HandDidSwitchEvent = [self](XR::XRNode value) {
+            self->MainImberPanelView_DidHandSwitchEvent(value);
         };
-        _mainImberPanelView->DidPositionPreviewChange = [&](std::string value) {
-            MainImberPanelView_DidPositionPreviewChange(value);
+        _mainImberPanelView->DidPositionPreviewChange = [self](std::string value) {
+            self->MainImberPanelView_DidPositionPreviewChange(value);
         };
-        _mainImberPanelView->DidPositionTabVisibilityChange = [&](bool value) {
-            MainImberPanelView_DidPositionTabVisibilityChange(value);
+        _mainImberPanelView->DidPositionTabVisibilityChange = [self](bool value) {
+            self->MainImberPanelView_DidPositionTabVisibilityChange(value);
         };
-        _spectateAreaController->DidUpdatePlayerSpectatorPose = [&](Vector3 position, Quaternion rotation) {
-            SpectateAreaController_DidUpdatePlayerSpectatorPose(position, rotation);
+        _spectateAreaController->DidUpdatePlayerSpectatorPose = [self](Vector3 position, Quaternion rotation) {
+            self->SpectateAreaController_DidUpdatePlayerSpectatorPose(position, rotation);
         };
-        _imberScrubber->DidCalculateNewTime = [&](float value) {
-            ImberScrubber_DidCalculateNewTime(value);
+        _imberScrubber->DidCalculateNewTime = [self](float value) {
+            self->ImberScrubber_DidCalculateNewTime(value);
         };
-        _imberSpecsReporter->DidReport = [&](int fps, float leftSaberSpeed, float rightSaberSpeed) {
-            ImberSpecsReporter_DidReport(fps, leftSaberSpeed, rightSaberSpeed);
+        _imberSpecsReporter->DidReport = [self](int fps, float leftSaberSpeed, float rightSaberSpeed) {
+            self->ImberSpecsReporter_DidReport(fps, leftSaberSpeed, rightSaberSpeed);
         };
         _didResumeDelegate = { &ImberManager::GamePause_didResumeEvent, this };
         _gamePause->___didResumeEvent += _didResumeDelegate;

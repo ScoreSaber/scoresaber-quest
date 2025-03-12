@@ -1,3 +1,4 @@
+#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 
 #include "Data/InternalLeaderboard.hpp"
@@ -91,13 +92,18 @@ namespace ScoreSaber::Services::LeaderboardService
             return;
         }
 
+        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+
+        int * const a = nullptr;
+        int *b = a;
+
         WebUtils::GetAsync(
-            url, [=](long code, std::string result) {
+            url, [beatmapLevelSafe, beatmapKey, scope, page, filterAroundCountry, maxMultipliedScore, finished](long code, std::string result) {
                 Data::InternalLeaderboard data;
                 switch (code)
                 {
                     case 200:
-                        data = ParseLeaderboardData(result, beatmapLevel, beatmapKey, scope, page, filterAroundCountry, maxMultipliedScore);
+                        data = ParseLeaderboardData(result, beatmapLevelSafe.ptr(), beatmapKey, scope, page, filterAroundCountry, maxMultipliedScore);
                         break;
                     case 404:
                         data = GetLeaderboardError("No scores on this leaderboard!");

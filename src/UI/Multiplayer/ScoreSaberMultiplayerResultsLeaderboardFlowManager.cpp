@@ -6,6 +6,7 @@
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include <custom-types/shared/delegate.hpp>
+#include "Utils/SafePtr.hpp"
 #include "hooks.hpp"
 #include <functional>
 
@@ -29,9 +30,11 @@ namespace ScoreSaber::UI::Multiplayer
 
         _multiplayerResultsViewController->___didActivateEvent += didActivateDelegate;
         _multiplayerResultsViewController->___didDeactivateEvent += didDeactivateDelegate;
-        HandleMultiplayerLevelDidFinish = [&](MultiplayerLevelScenesTransitionSetupDataSO * transitionSetupData, MultiplayerResultsData * results)
+
+        FixedSafePtr<ScoreSaberMultiplayerResultsLeaderboardFlowManager> self(this);
+        HandleMultiplayerLevelDidFinish = [self](MultiplayerLevelScenesTransitionSetupDataSO * transitionSetupData, MultiplayerResultsData * results)
         {
-            MultiplayerLevelDidFinish(transitionSetupData, results);
+            self->MultiplayerLevelDidFinish(transitionSetupData, results);
         };
     }
 

@@ -23,7 +23,7 @@ namespace TeamUtils
     void Download()
     {
         std::string url = "https://raw.githubusercontent.com/ScoreSaber/ScoreSaber-Team/main/team.json";
-        WebUtils::GetAsync(url, [&](long code, std::string result) {
+        WebUtils::GetAsync(url, [](long code, std::string result) {
             if (code == 200)
             {
                 ParseMembers(result);

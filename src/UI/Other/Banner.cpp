@@ -21,6 +21,7 @@
 #include <UnityEngine/UI/LayoutElement.hpp>
 #include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/WaitForSeconds.hpp>
+#include "Utils/SafePtr.hpp"
 #include "Utils/UIUtils.hpp"
 #include "logging.hpp"
 #include <custom-types/shared/delegate.hpp>
@@ -141,8 +142,9 @@ namespace ScoreSaber::UI::Other
         topText = CreateClickableText(infoVertical->transform, "");
         bottomText = CreateClickableText(infoVertical->transform, "");
 
-        topText->onClick += [&]() { OpenPlayerInfoModal(); };
-        bottomText->onClick += [&]() { OpenSongInBrowser(); };
+        FixedSafePtrUnity<Banner> self(this);
+        topText->onClick += [self]() { self->OpenPlayerInfoModal(); };
+        bottomText->onClick += [self]() { self->OpenSongInBrowser(); };
 
         auto loadingHorizontal = CreateHorizontalLayoutGroup(loadingVertical->transform);
         UIUtils::CreateLoadingIndicator(loadingHorizontal->transform);
@@ -315,10 +317,12 @@ namespace ScoreSaber::UI::Other
         promptText->text = text;
         if (dismissTime != -1)
         {
-            il2cpp_utils::il2cpp_aware_thread([dismissTime, this] {
+            FixedSafePtrUnity<Banner> self(this);
+            il2cpp_utils::il2cpp_aware_thread([dismissTime, self] {
                 std::this_thread::sleep_for(std::chrono::seconds(dismissTime));
-                MainThreadScheduler::Schedule([=, this]() {
-                    this->promptText->text = std::string();
+                MainThreadScheduler::Schedule([self]() {
+                    if(self)
+                        self->promptText->text = std::string();
                 });
             }).detach();
         }

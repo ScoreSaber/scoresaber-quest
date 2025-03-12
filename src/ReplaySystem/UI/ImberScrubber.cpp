@@ -12,6 +12,7 @@
 #include <VRUIControls/VRGraphicRaycaster.hpp>
 #include <bsml/shared/Helpers/utilities.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
+#include "Utils/SafePtr.hpp"
 #include "logging.hpp"
 #include "questui/ArrayUtil.hpp"
 #include "Utils/OperatorOverloads.hpp"
@@ -83,11 +84,12 @@ namespace ScoreSaber::ReplaySystem::UI
         _bar->set_endTime(_audioTimeSyncController->songEndTime);
         set_loopMode(_loopMode);
 
-        _mainNode->PositionDidChange = [&](float value) {
-            MainNode_PositionDidChange(value);
+        FixedSafePtr<ImberScrubber> self(this);
+        _mainNode->PositionDidChange = [self](float value) {
+            self->MainNode_PositionDidChange(value);
         };
-        _loopNode->PositionDidChange = [&](float value) {
-            LoopNode_PositionDidChange(value);
+        _loopNode->PositionDidChange = [self](float value) {
+            self->LoopNode_PositionDidChange(value);
         };
 
         _mainNode->name = "Imber Main Node";
@@ -216,8 +218,9 @@ namespace ScoreSaber::ReplaySystem::UI
         clickScrubRectTransform->anchorMax = Vector2(1.0f, 0.5f);
         clickScrubImage->color = Color::get_clear();
         auto clicker = clickScrubImage->gameObject->AddComponent<AmeClicker*>();
-        clicker->Setup([&](float value) {
-            ClickedBackground(value);
+        FixedSafePtr<ImberScrubber> self(this);
+        clicker->Setup([self](float value) {
+            self->ClickedBackground(value);
         });
         clickScrubImage->name = "Box Click Scrubber";
 

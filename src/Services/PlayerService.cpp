@@ -184,7 +184,7 @@ namespace ScoreSaber::Services::PlayerService
     {
         if (!fromMainThread)
         {
-            MainThreadScheduler::Schedule([=]() {
+            MainThreadScheduler::Schedule([]() {
                     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
             });
         }
@@ -193,11 +193,11 @@ namespace ScoreSaber::Services::PlayerService
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_loading(true);
         }
 
-        GetPlayerInfo(playerInfo.localPlayerData.id, true, [=](std::optional<Data::Player> playerData) {
+        GetPlayerInfo(playerInfo.localPlayerData.id, true, [](std::optional<Data::Player> playerData) {
             if (playerData.has_value())
             {
                 playerInfo.localPlayerData = playerData.value();
-                MainThreadScheduler::Schedule([=]() {
+                MainThreadScheduler::Schedule([]() {
                     ScoreSaber::UI::Other::ScoreSaberLeaderboardView::ScoreSaberBanner->set_ranking(playerInfo.localPlayerData.rank, playerInfo.localPlayerData.pp);
                 });
             }
