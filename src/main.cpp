@@ -67,7 +67,7 @@ extern "C" __attribute((visibility("default"))) void late_load() noexcept
     ScoreSaber::Data::Private::Settings::LoadSettings();
     TeamUtils::Download();
     
-    ScoreSaber::Services::FileService::EnsurePaths();0
+    ScoreSaber::Services::FileService::EnsurePaths();
 
     auto zenjector = Lapiz::Zenject::Zenjector::Get();
     zenjector->Install<ScoreSaber::MainInstaller*>(Lapiz::Zenject::Location::Menu);
