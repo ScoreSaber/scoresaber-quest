@@ -220,6 +220,14 @@ class Object;
 template <typename T>
 struct FixedSafePtrUnity;
 
+// Until we are sure everyone uses the fixed counting, cache enough elements and never actually ask the GC for new objects later on
+// This is a temporary solution until we can ensure that all SafePtrs are FixedSafePtrs
+
+void reserve_safe_ptrs(size_t count);
+void* alloc_safe_ptr(size_t sz);
+void free_safe_ptr(void* ptr);
+
+
 /// @brief Represents a C++ type that wraps a C# pointer that will be valid for the entire lifetime of this instance.
 /// This instance must be created at a time such that il2cpp_functions::Init is valid, or else it will throw a CreatedTooEarlyException
 /// @tparam T The type of the instance to wrap.
@@ -268,7 +276,10 @@ struct FixedSafePtr {
         // If our internal handle has 1 instance, we need to clean up the instance it points to.
         // Otherwise, some other SafePtr is currently holding a reference to this instance, so keep it around.
         if (internalHandle.count() <= 1) {
-            il2cpp_functions::Init();
+            internalHandle->instancePointer = nullptr;
+            free_safe_ptr(internalHandle.__internal_get());
+
+            /*il2cpp_functions::Init();
             #ifdef UNITY_2021
             il2cpp_functions::gc_free_fixed(internalHandle.__internal_get());
             #else
@@ -276,7 +287,7 @@ struct FixedSafePtr {
                 SAFE_ABORT_MSG("Cannot use SafePtr without GC functions!");
             }
             il2cpp_functions::GC_free(internalHandle.__internal_get());
-            #endif
+            #endif*/
         }
 
         // ensure we don't try to clear the same handle twice
@@ -427,7 +438,10 @@ struct FixedSafePtr {
 
     struct SafePointerWrapper {
         static SafePointerWrapper* New(T* instance) {
-            il2cpp_functions::Init();
+            static constexpr auto sz = sizeof(SafePointerWrapper);
+            auto* wrapper = reinterpret_cast<SafePointerWrapper*>(alloc_safe_ptr(sz));
+
+            /*il2cpp_functions::Init();
             // It should be safe to assume that gc_alloc_fixed returns a non-null pointer. If it does return null, we have a pretty big issue.
             static constexpr auto sz = sizeof(SafePointerWrapper);
 
@@ -444,7 +458,7 @@ struct FixedSafePtr {
                 #endif
             }
             auto* wrapper = reinterpret_cast<SafePointerWrapper*>(il2cpp_functions::GarbageCollector_AllocateFixed(sz, nullptr));
-            #endif
+            #endif*/
 
             CRASH_UNLESS(wrapper);
             wrapper->instancePointer = instance;
