@@ -40,6 +40,8 @@ struct FixedCounter {
             --itr->second;
         } else if (itr != addrRefCount.end()) {
             addrRefCount.erase(itr);
+        } else {
+            SAFE_ABORT_MSG("Tried to remove a non-existent address from FixedCounter!");
         }
     }
     /// @brief Gets the reference count of an address, or 0 if no such address exists.
@@ -70,13 +72,13 @@ struct FixedCountPointer {
     /// @param p The pointer to provide. May be null, which does nothing.
     explicit FixedCountPointer(T* p) : ptr(p) {
         if (p) {
-            Counter::add(p);
+            FixedCounter::add(p);
         }
     }
     /// @brief Copy constructor, copies and adds to the reference count for the held non-null pointer.
     FixedCountPointer(const FixedCountPointer<T>& other) : ptr(other.ptr) {
         if (ptr) {
-            Counter::add(ptr);
+            FixedCounter::add(ptr);
         }
     }
     /// @brief Move constructor moves the pointer and keeps the reference count the same.
@@ -87,14 +89,14 @@ struct FixedCountPointer {
     /// @brief Destructor, decreases the ref count for the held non-null pointer.
     ~FixedCountPointer() {
         if (ptr) {
-            Counter::remove(ptr);
+            FixedCounter::remove(ptr);
         }
     }
     /// @brief Gets the reference count held by this pointer.
     /// @return The reference count for this pointer, or 0 if the held pointer is null.
     size_t count() const {
         if (ptr) {
-            return Counter::get(ptr);
+            return FixedCounter::get(ptr);
         }
         return 0;
     }
@@ -103,11 +105,11 @@ struct FixedCountPointer {
     inline void emplace(T* val) {
         if (val != ptr) {
             if (ptr) {
-                Counter::remove(ptr);
+                FixedCounter::remove(ptr);
             }
             ptr = val;
             if (ptr) {
-                Counter::add(ptr);
+                FixedCounter::add(ptr);
             }
         }
     }
