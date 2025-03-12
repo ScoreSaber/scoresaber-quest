@@ -47,6 +47,7 @@
 #include "Utils/MaxScoreCache.hpp"
 #include "Utils/SafePtr.hpp"
 #include "Utils/UIUtils.hpp"
+#include "Utils/GCUtil.hpp"
 #include "logging.hpp"
 #include "questui/ArrayUtil.hpp"
 
@@ -336,16 +337,16 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         FixedSafePtrUnity<LoadingControl> loadingControlSafe(loadingControl);
         FixedSafePtrUnity<LeaderboardTableView> tableViewSafe(tableView);
 
-        il2cpp_utils::il2cpp_aware_thread([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId]() {
+        il2cpp_utils::il2cpp_aware_thread(gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             if (_currentLeaderboardRefreshId == refreshId)
             {
                 Helpers::GetDiContainer()->Resolve<Utils::MaxScoreCache*>()->GetMaxScore(beatmapLevelSafe.ptr(), beatmapKey,
-                    [=](int maxScore) {
+                gc_aware_function([=](int maxScore) {
                     LeaderboardService::GetLeaderboardData(maxScore,
                         beatmapLevelSafe.ptr(), beatmapKey, scope, _leaderboardPage,
-                        [beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore](Data::InternalLeaderboard internalLeaderboard) {
-                        MainThreadScheduler::Schedule([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore, internalLeaderboard]() {
+                        gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore](Data::InternalLeaderboard internalLeaderboard) {
+                        MainThreadScheduler::Schedule(gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore, internalLeaderboard]() {
                             if (_currentLeaderboardRefreshId != refreshId) {
                                 return; // we need to check this again, since some time may have passed due to waiting for leaderboard data
                             }
@@ -395,12 +396,12 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                                 }
                                 ByeImages();
                             }
-                        });
-                    },
+                        }));
+                    }),
                     _filterAroundCountry);
-                });
+                }));
             }
-        }).detach();
+        })).detach();
     }
 
     void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo)

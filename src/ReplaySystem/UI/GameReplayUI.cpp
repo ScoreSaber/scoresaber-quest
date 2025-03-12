@@ -41,7 +41,7 @@ namespace ScoreSaber::ReplaySystem::UI
         replayText += " - ";
         replayText += ReplaySystem::ReplayLoader::CurrentBeatmapLevel->songName;
         replayText += " (";
-        replayText += GetFriendlyDifficulty(ReplaySystem::ReplayLoader::CurrentBeatmapKey.difficulty);
+        replayText += GetFriendlyDifficulty(ReplaySystem::ReplayLoader::CurrentBeatmapKey->difficulty);
         replayText += ")";
         float timeScale = 1.0f;
         if (ReplaySystem::ReplayLoader::LoadedReplay->noteKeyframes.size() > 0)

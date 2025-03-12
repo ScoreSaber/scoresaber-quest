@@ -32,6 +32,7 @@
 #include <bsml/shared/Helpers/getters.hpp>
 #include "static.hpp"
 #include "Utils/MaxScoreCache.hpp"
+#include "Utils/GCUtil.hpp"
 #include <chrono>
 #include <thread>
 
@@ -137,13 +138,13 @@ namespace ScoreSaber::Services::UploadService
     {
         FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
 
-        il2cpp_utils::il2cpp_aware_thread([beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
+        il2cpp_utils::il2cpp_aware_thread(gc_aware_function([beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
 
             auto _maxScoreCache = BSML::Helpers::GetDiContainer()->Resolve<ScoreSaber::Utils::MaxScoreCache*>();
-            _maxScoreCache->GetMaxScore(beatmapLevelSafe.ptr(), beatmapKey, [beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName](int maxScore) {
+            _maxScoreCache->GetMaxScore(beatmapLevelSafe.ptr(), beatmapKey, gc_aware_function([beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName](int maxScore) {
                 LeaderboardService::GetLeaderboardData(maxScore,
-                    beatmapLevelSafe.ptr(), beatmapKey, PlatformLeaderboardsModel::ScoresScope::Global, 1, [=](Data::InternalLeaderboard internalLeaderboard) {
+                    beatmapLevelSafe.ptr(), beatmapKey, PlatformLeaderboardsModel::ScoresScope::Global, 1, gc_aware_function([=](Data::InternalLeaderboard internalLeaderboard) {
                     bool ranked = true;
                     if (internalLeaderboard.leaderboard.has_value())
                     {
@@ -229,10 +230,10 @@ namespace ScoreSaber::Services::UploadService
                     }
 
                     uploading = false;
-                },
+                }),
                 false);
-            });
-        }).detach();
+            }));
+        })).detach();
     }
 
     void SaveReplay(const std::vector<char>& replay, std::string replayFileName)

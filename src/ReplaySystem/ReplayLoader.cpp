@@ -13,6 +13,7 @@
 #include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include <GlobalNamespace/RecordingToolManager.hpp>
 #include "Utils/BeatmapUtils.hpp"
+#include "Utils/SafePtr.hpp"
 #include "Utils/WebUtils.hpp"
 
 #include "ReplaySystem/Playback/NotePlayer.hpp"
@@ -35,7 +36,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
     FixedSafePtrUnity<GlobalNamespace::MenuTransitionsHelper> menuTransitionsHelper;
 
     std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
-    GlobalNamespace::BeatmapKey CurrentBeatmapKey;
+    FixedSafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
     FixedSafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     std::u16string CurrentPlayerName;
     std::string CurrentModifiers;

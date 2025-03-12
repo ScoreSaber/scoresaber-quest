@@ -5,6 +5,7 @@
 #include <GlobalNamespace/LoadBeatmapLevelDataResult.hpp>
 #include "Utils/DelegateUtils.hpp"
 #include "Utils/SafePtr.hpp"
+#include "Utils/GCUtil.hpp"
 #include "bsml/shared/BSML/MainThreadScheduler.hpp"
 #include "logging.hpp"
 
@@ -24,39 +25,40 @@ namespace ScoreSaber::Utils {
     }
 
     void MaxScoreCache::GetMaxScore(BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, const function<void(int)> &callback) {
-        if(cache.contains(beatmapKey)) {
-            callback(cache[beatmapKey]);
+        FixedSafeValueType<BeatmapKey> beatmapKeySafe(beatmapKey);
+        if(cache.contains(beatmapKeySafe)) {
+            callback(cache[beatmapKeySafe]);
             return;
         }
 
         FixedSafePtr<MaxScoreCache> self(this);
         FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
 
-        MainThreadScheduler::Schedule([self, beatmapLevelSafe, beatmapKey, callback] {
-            DelegateHelper::ContinueWith(self->_beatmapLevelsModel->LoadBeatmapLevelDataAsync(beatmapKey.levelId, CancellationToken::get_None()), std::function(
-                [self, beatmapLevelSafe, beatmapKey, callback](LoadBeatmapLevelDataResult beatmapLevelDataResult) {
-                    MainThreadScheduler::Schedule([self, beatmapLevelSafe, beatmapKey, callback, beatmapLevelDataResult]() {
+        MainThreadScheduler::Schedule(gc_aware_function([self, beatmapLevelSafe, beatmapKeySafe, callback] {
+            DelegateHelper::ContinueWith(self->_beatmapLevelsModel->LoadBeatmapLevelDataAsync(beatmapKeySafe->levelId, CancellationToken::get_None()), std::function(gc_aware_function(
+                [self, beatmapLevelSafe, beatmapKeySafe, callback](LoadBeatmapLevelDataResult beatmapLevelDataResult) {
+                    MainThreadScheduler::Schedule(gc_aware_function([self, beatmapLevelSafe, beatmapKeySafe, callback, beatmapLevelDataResult]() {
                         DelegateHelper::ContinueWith(self->_beatmapDataLoader->LoadBeatmapDataAsync(
                             beatmapLevelDataResult.beatmapLevelData, // ::GlobalNamespace::IBeatmapLevelData *beatmapLevelData,
-                            beatmapKey, // ::GlobalNamespace::BeatmapKey beatmapKey,
+                            *beatmapKeySafe, // ::GlobalNamespace::BeatmapKey beatmapKey,
                             beatmapLevelSafe->beatsPerMinute, // float_t startBpm,
                             false, // bool loadingForDesignatedEnvironment,
                             nullptr, // ::GlobalNamespace::IEnvironmentInfo *environmentInfo,
                             nullptr, // ::GlobalNamespace::GameplayModifiers *gameplayModifiers,
                             nullptr, // ::GlobalNamespace::PlayerSpecificSettings *playerSpecificSettings,
                             false// bool enableBeatmapDataCaching
-                        ), std::function(
-                            [self, beatmapKey, callback](IReadonlyBeatmapData *beatmapData) {
+                        ), std::function(gc_aware_function(
+                            [self, beatmapKeySafe, callback](IReadonlyBeatmapData *beatmapData) {
                                 INFO("step D");
                                 int maxScore = ScoreModel::ComputeMaxMultipliedScoreForBeatmap(beatmapData);
                                 INFO("step E");
-                                self->cache[beatmapKey] = maxScore;
+                                self->cache[beatmapKeySafe] = maxScore;
                                 callback(maxScore);
                             }
-                        ));
-                    });
+                        )));
+                    }));
                 }
-            ));
-        });
+            )));
+        }));
     }
 }

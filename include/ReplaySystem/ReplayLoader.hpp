@@ -12,7 +12,7 @@
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
     extern std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
-    extern GlobalNamespace::BeatmapKey CurrentBeatmapKey;
+    extern FixedSafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
     extern FixedSafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     extern std::u16string CurrentPlayerName;
     extern std::string CurrentModifiers;
