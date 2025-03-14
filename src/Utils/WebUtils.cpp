@@ -607,6 +607,7 @@ namespace WebUtils
         if(www->result != UnityEngine::Networking::UnityWebRequest::Result::Success)
         {
             ERROR("Failed to download image from url {:s} with error messages {:s} and {:s}", url, www->error, downloadHandlerTexture->GetErrorMsg());
+            www->Dispose();
             co_return;
         }
         auto texture = downloadHandlerTexture->get_texture();
@@ -636,6 +637,7 @@ namespace WebUtils
         {
             INFO("Failed to read gif with error code {}", error);
         }
+        www->Dispose();
         co_return;
     }
 

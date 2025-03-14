@@ -64,6 +64,7 @@ namespace ScoreSaber::UI::Other
             ScoreSaber::Data::Player player(doc.GetObject());
             SetPlayerData(player);
         }
+        webRequest->Dispose();
         co_return;
     }
 

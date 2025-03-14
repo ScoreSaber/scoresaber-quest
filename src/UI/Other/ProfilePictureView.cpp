@@ -99,6 +99,7 @@ namespace ScoreSaber::UI::Other {
 
         while (!www->isDone) {
             if (cancellationToken.IsCancellationRequested) {
+                www->Dispose();
                 onFailure("Cancelled", pos, cancellationToken);
                 co_return;
             }
@@ -107,14 +108,17 @@ namespace ScoreSaber::UI::Other {
 
         if (www->result == UnityWebRequest::Result::ProtocolError || www->result == UnityWebRequest::Result::ConnectionError) {
             onFailure(www->error, pos, cancellationToken);
+            www->Dispose();
             co_return;
         }
         if (!System::String::IsNullOrEmpty(www->error)) {
             onFailure(www->error, pos, cancellationToken);
+            www->Dispose();
             co_return;
         }
 
-        Sprite* sprite = Sprite::Create(handler->texture, Rect(0, 0, handler->texture->width, handler->texture->height), Vector2::get_one() * 0.5f, 100.0f, 0u, SpriteMeshType::Tight, Vector4::get_zero(), false);
+        Sprite* sprite = BSML::Utilities::LoadSpriteFromTexture(handler->texture);
+        www->Dispose();
         onSuccess(sprite, pos, url, cancellationToken);
         co_return;
     }

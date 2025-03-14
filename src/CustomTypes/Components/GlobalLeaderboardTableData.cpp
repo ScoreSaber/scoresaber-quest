@@ -48,6 +48,7 @@ custom_types::Helpers::Coroutine GetDocument(ScoreSaber::CustomTypes::Components
 
         self->initialized = true;
     }
+    webRequest->Dispose();
     co_return;
 }
 
