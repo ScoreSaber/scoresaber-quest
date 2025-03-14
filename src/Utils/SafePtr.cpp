@@ -1,4 +1,7 @@
 #include "Utils/SafePtr.hpp"
+#include "logging.hpp"
+
+std::unordered_map<void*, void*> safePtrCache;
 
 std::unordered_map<void*, size_t> FixedCounter::addrRefCount;
 std::shared_mutex FixedCounter::mutex;
@@ -21,8 +24,10 @@ void* alloc_safe_ptr(size_t sz) {
 
     void* wrapper = cached_safe_ptr_wrappers.back();
     cached_safe_ptr_wrappers.pop_back();
+    INFO("Allocated SafePtr at {}", fmt::ptr(wrapper));
     return wrapper;
 }
 void free_safe_ptr(void* ptr) {
     cached_safe_ptr_wrappers.push_back(ptr);
+    INFO("Freed SafePtr at {}", fmt::ptr(ptr));
 }

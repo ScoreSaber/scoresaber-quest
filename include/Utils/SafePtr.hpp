@@ -1,6 +1,7 @@
 #pragma once
 
 #include <beatsaber-hook/shared/utils/typedefs-wrappers.hpp>
+#include "logging.hpp"
 
 // This file is a copy of the SafePtr classes from typedefs-wrapper.hpp with the changes from https://github.com/QuestPackageManager/beatsaber-hook/pull/33
 // TODO: delete this and use the original versions if the changes are (a) backported or (b) we move on to 1.40
@@ -17,6 +18,8 @@
     if (handle) return __VA_ARGS__;               \
     CRASH_UNLESS(false)
 #endif
+
+extern std::unordered_map<void*, void*> safePtrCache;
 
 /// @brief A thread-safe, static type that holds a mapping from addresses to reference counts.
 struct FixedCounter {
@@ -276,6 +279,13 @@ struct FixedSafePtr {
         // If our internal handle has 1 instance, we need to clean up the instance it points to.
         // Otherwise, some other SafePtr is currently holding a reference to this instance, so keep it around.
         if (internalHandle.count() <= 1) {
+            if(!safePtrCache.contains(internalHandle.__internal_get())) {
+                SAFE_ABORT_MSG("The object is not cached!");
+            }
+            if(safePtrCache[internalHandle.__internal_get()] != internalHandle->instancePointer) {
+                SAFE_ABORT_MSG("The object has been changed externally! (is {}, expected {})", fmt::ptr(safePtrCache[internalHandle.__internal_get()]), fmt::ptr(internalHandle->instancePointer));
+            }
+            safePtrCache.erase(internalHandle.__internal_get());
             internalHandle->instancePointer = nullptr;
             free_safe_ptr(internalHandle.__internal_get());
 
@@ -399,11 +409,25 @@ struct FixedSafePtr {
     }
 
     T* ptr() {
-        __SAFE_PTR_NULL_HANDLE_CHECK(internalHandle, internalHandle->instancePointer);
+        if(!internalHandle) throw NullHandleException();
+        if(!safePtrCache.contains(internalHandle.__internal_get())) {
+            SAFE_ABORT_MSG("The object is not cached!");
+        }
+        if(safePtrCache[internalHandle.__internal_get()] != internalHandle->instancePointer) {
+            SAFE_ABORT_MSG("The object has been changed externally! (is {}, expected {})", fmt::ptr(safePtrCache[internalHandle.__internal_get()]), fmt::ptr(internalHandle->instancePointer));
+        }
+        return internalHandle->instancePointer;
     }
 
     T* const ptr() const {
-        __SAFE_PTR_NULL_HANDLE_CHECK(internalHandle, internalHandle->instancePointer);
+        if(!internalHandle) throw NullHandleException();
+        if(!safePtrCache.contains(internalHandle.__internal_get())) {
+            SAFE_ABORT_MSG("The object is not cached!");
+        }
+        if(safePtrCache[internalHandle.__internal_get()] != internalHandle->instancePointer) {
+            SAFE_ABORT_MSG("The object has been changed externally! (is {}, expected {})", fmt::ptr(safePtrCache[internalHandle.__internal_get()]), fmt::ptr(internalHandle->instancePointer));
+        }
+        return internalHandle->instancePointer;
     }
 
     /// @brief Returns false if this is a defaultly constructed SafePtr,
@@ -462,6 +486,11 @@ struct FixedSafePtr {
 
             CRASH_UNLESS(wrapper);
             wrapper->instancePointer = instance;
+            
+            CRASH_UNLESS(!safePtrCache.contains(wrapper));
+            safePtrCache[wrapper] = instance;
+            INFO("Caching SafePtr {} to {}", fmt::ptr(wrapper), fmt::ptr(instance));
+
             return wrapper;
         }
         // Must be explicitly GC freed and allocated
