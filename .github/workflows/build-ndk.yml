@@ -15,7 +15,7 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-         - uses: actions/checkout@v2
+         - uses: actions/checkout@v3
            name: Checkout
            with:
               submodules: true
@@ -86,7 +86,7 @@ jobs:
               if-no-files-found: error
 
          - name: Upload qmod artifact
-           uses: actions/upload-artifact@v2
+           uses: actions/upload-artifact@v4
            with:
               name: ${{env.qmodName}}.qmod
               path: ./${{ env.qmodName }}.qmod
