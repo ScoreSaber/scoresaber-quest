@@ -42,7 +42,7 @@ jobs:
                  ${{ runner.os }}-
                      
          - name: QPM Rust Action
-           uses: Fernthedev/qpm-action@main
+           uses: Fernthedev/qpm-action@v1
            with:
               workflow_token: ${{secrets.GITHUB_TOKEN}}
 
