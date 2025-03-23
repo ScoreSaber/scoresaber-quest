@@ -79,7 +79,7 @@ jobs:
               echo ::set-output name=NAME::"${files[0]}"
 
          - name: Upload non-debug artifact
-           uses: actions/upload-artifact@v2
+           uses: actions/upload-artifact@v4
            with:
               name: ${{ steps.libname.outputs.NAME }}
               path: ./build/${{ steps.libname.outputs.NAME }}
