@@ -1,9 +1,9 @@
 
 #include "ReplaySystem/Playback/ScorePlayer.hpp"
-#include "GlobalNamespace/GameplayModifiersModelSO.hpp"
-#include "GlobalNamespace/ScoreModel.hpp"
+#include <GlobalNamespace/GameplayModifiersModelSO.hpp>
+#include <GlobalNamespace/ScoreModel.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "System/Action_2.hpp"
+#include <System/Action_2.hpp>
 #include "Utils/BeatmapUtils.hpp"
 
 #include "logging.hpp"
@@ -15,8 +15,9 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, ScorePlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void ScorePlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController, GlobalNamespace::IGameEnergyCounter* gameEnergyCounter)
+    void ScorePlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
         _gameEnergyCounter = gameEnergyCounter;
@@ -63,8 +64,8 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void ScorePlayer::UpdateMultiplier()
     {
-        float totalMultiplier = _scoreController->gameplayModifiersModel->GetTotalMultiplier(_scoreController->gameplayModifierParams, _gameEnergyCounter->get_energy());
-        _scoreController->prevMultiplierFromModifiers = totalMultiplier;
+        float totalMultiplier = _scoreController->_gameplayModifiersModel->GetTotalMultiplier(_scoreController->_gameplayModifierParams, _gameEnergyCounter->energy);
+        _scoreController->_prevMultiplierFromModifiers = totalMultiplier;
     }
 
     void ScorePlayer::UpdateScore(int newScore, optional<int> immediateMaxPossibleScore, float time)
@@ -75,14 +76,14 @@ namespace ScoreSaber::ReplaySystem::Playback
         } else {
             immediate = BeatmapUtils::OldMaxRawScoreForNumberOfNotes(CalculatePostNoteCountForTime(time));
         }
-        float multiplier = _scoreController->prevMultiplierFromModifiers;
+        float multiplier = _scoreController->_prevMultiplierFromModifiers;
 
         int newModifiedScore = GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(newScore, multiplier);
 
-        _scoreController->multipliedScore = newScore;
-        _scoreController->immediateMaxPossibleMultipliedScore = immediate;
-        _scoreController->modifiedScore = newModifiedScore;
-        _scoreController->immediateMaxPossibleModifiedScore = GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(immediate, multiplier);
+        _scoreController->_multipliedScore = newScore;
+        _scoreController->_immediateMaxPossibleMultipliedScore = immediate;
+        _scoreController->_modifiedScore = newModifiedScore;
+        _scoreController->_immediateMaxPossibleModifiedScore = GlobalNamespace::ScoreModel::GetModifiedScoreForGameplayModifiersScoreMultiplier(immediate, multiplier);
 
         if (_scoreController->scoreDidChangeEvent != nullptr) {
             _scoreController->scoreDidChangeEvent->Invoke(newScore, newModifiedScore);

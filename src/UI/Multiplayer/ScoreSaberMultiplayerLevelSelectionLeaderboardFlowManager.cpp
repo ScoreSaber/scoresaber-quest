@@ -1,13 +1,16 @@
 #include "UI/Multiplayer/ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager.hpp"
+#include "Utils/SafePtr.hpp"
 
-#include "GlobalNamespace/HMTask.hpp"
-#include "GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
-#include "System/Action.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "custom-types/shared/delegate.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include <GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp>
+#include <GlobalNamespace/BeatmapKey.hpp>
+#include <HMUI/ViewController.hpp>
+#include <System/Action.hpp>
+#include <UnityEngine/GameObject.hpp>
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
+
+using namespace BSML;
 
 DEFINE_TYPE(ScoreSaber::UI::Multiplayer, ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager);
 
@@ -23,18 +26,20 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::Initialize()
     {
-        didActivateDelegate = custom_types::MakeDelegate<LevelSelectionNavigationController::DidActivateDelegate*>((std::function<void(bool, bool, bool)>)[&](bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) { LevelSelectionNavigationController_didActivateEvent(firstActivation, addedToHierarchy, screenSystemEnabling); });
-        didDeactivateDelegate = custom_types::MakeDelegate<LevelSelectionNavigationController::DidDeactivateDelegate*>((std::function<void(bool, bool)>)[&](bool removedFromHierarchy, bool screenSystemDisabling) { LevelSelectionNavigationController_didDeactivateEvent(removedFromHierarchy, screenSystemDisabling); });
+        didActivateDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didActivateEvent, this };
+        didDeactivateDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didDeactivateEvent, this };
 
-        _levelSelectionNavigationController->add_didActivateEvent(didActivateDelegate);
-        _levelSelectionNavigationController->add_didDeactivateEvent(didDeactivateDelegate);
+        _levelSelectionNavigationController->___didActivateEvent += didActivateDelegate;
+        _levelSelectionNavigationController->___didDeactivateEvent += didDeactivateDelegate;
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::Dispose()
     {
-        _levelSelectionNavigationController->remove_didActivateEvent(didActivateDelegate);
-        // the next one is missing in the pcvr version, so I'll leave it out here aswell
-        // _levelSelectionNavigationController->remove_didDeactivateEvent(didDeactivateDelegate);
+        if(_levelSelectionNavigationController) {
+            _levelSelectionNavigationController->___didActivateEvent -= didActivateDelegate;
+            // the next one is missing in the pcvr version, so I'll leave it out here aswell
+            // _levelSelectionNavigationController->___didDeactivateEvent -= didDeactivateDelegate;
+        }
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didActivateEvent(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -47,11 +52,11 @@ namespace ScoreSaber::UI::Multiplayer
 
         _currentlyInMulti = true;
 
-        didChangeDifficultyBeatmapDelegate = custom_types::MakeDelegate<System::Action_2<LevelSelectionNavigationController*, IDifficultyBeatmap*>*>((std::function<void(LevelSelectionNavigationController*, IDifficultyBeatmap*)>)[&](LevelSelectionNavigationController * controller, IDifficultyBeatmap * beatmap) { LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent(controller, beatmap); });
-        didChangeLevelDetailContentDelegate = custom_types::MakeDelegate<System::Action_2<LevelSelectionNavigationController*, StandardLevelDetailViewController::ContentType>*>((std::function<void(LevelSelectionNavigationController*, StandardLevelDetailViewController::ContentType)>)[&](LevelSelectionNavigationController * controller, StandardLevelDetailViewController::ContentType contentType) { LevelSelectionNavigationController_didChangeLevelDetailContentEvent(controller, contentType); });
+        didChangeDifficultyBeatmapDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent, this };
+        didChangeLevelDetailContentDelegate = { &ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeLevelDetailContentEvent, this };
 
-        _levelSelectionNavigationController->add_didChangeDifficultyBeatmapEvent(didChangeDifficultyBeatmapDelegate);
-        _levelSelectionNavigationController->add_didChangeLevelDetailContentEvent(didChangeLevelDetailContentDelegate);
+        _levelSelectionNavigationController->___didChangeDifficultyBeatmapEvent += didChangeDifficultyBeatmapDelegate;
+        _levelSelectionNavigationController->___didChangeLevelDetailContentEvent += didChangeLevelDetailContentDelegate;
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didDeactivateEvent(bool removedFromHierarchy, bool screenSystemDisabling)
@@ -60,32 +65,26 @@ namespace ScoreSaber::UI::Multiplayer
             return;
 
         _currentlyInMulti = false;
-        _levelSelectionNavigationController->remove_didChangeDifficultyBeatmapEvent(didChangeDifficultyBeatmapDelegate);
-        _levelSelectionNavigationController->remove_didChangeLevelDetailContentEvent(didChangeLevelDetailContentDelegate);
+        _levelSelectionNavigationController->___didChangeDifficultyBeatmapEvent -= didChangeDifficultyBeatmapDelegate;
+        _levelSelectionNavigationController->___didChangeLevelDetailContentEvent -= didChangeLevelDetailContentDelegate;
     }
 
-    void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeLevelDetailContentEvent(LevelSelectionNavigationController* controller, StandardLevelDetailViewController::ContentType contentType)
+    void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeLevelDetailContentEvent(UnityW<LevelSelectionNavigationController> controller, StandardLevelDetailViewController::ContentType contentType)
     {
-        if (controller->get_selectedDifficultyBeatmap() == nullptr)
-        {
-            HideLeaderboard();
-            return;
-        }
-
         ShowLeaderboard();
     }
 
-    void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent(LevelSelectionNavigationController* controller, IDifficultyBeatmap* beatmap)
+    void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::LevelSelectionNavigationController_didChangeDifficultyBeatmapEvent(UnityW<LevelSelectionNavigationController> controller)
     {
         ShowLeaderboard();
     }
 
     void ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager::HideLeaderboard()
     {
-        if (_platformLeaderboardViewController->get_isInViewControllerHierarchy())
+        if (_platformLeaderboardViewController->isInViewControllerHierarchy)
         {
             auto currentFlowCoordinator = _mainFlowCoordinator->YoungestChildFlowCoordinatorOrSelf();
-            if (!il2cpp_utils::try_cast<MultiplayerLevelSelectionFlowCoordinator>(currentFlowCoordinator).has_value())
+            if (!currentFlowCoordinator.try_cast<MultiplayerLevelSelectionFlowCoordinator>().has_value())
                 return;
 
             currentFlowCoordinator->SetRightScreenViewController(nullptr, HMUI::ViewController::AnimationType::Out);
@@ -97,29 +96,31 @@ namespace ScoreSaber::UI::Multiplayer
         if (!InMulti())
             return;
 
-        auto selected = _levelSelectionNavigationController->get_selectedDifficultyBeatmap();
-        if (selected == nullptr)
-        {
+        if(!_levelSelectionNavigationController->beatmapKey.IsValid()) {
             HideLeaderboard();
             return;
         }
 
-        _platformLeaderboardViewController->SetData(selected);
+        auto beatmapKey = _levelSelectionNavigationController->beatmapKey;
+        _platformLeaderboardViewController->SetData(byref(beatmapKey));
         auto currentFlowCoordinator = _mainFlowCoordinator->YoungestChildFlowCoordinatorOrSelf();
         currentFlowCoordinator->SetRightScreenViewController(_platformLeaderboardViewController, HMUI::ViewController::AnimationType::In);
 
-        _serverPlayerListViewController->get_gameObject()->SetActive(false); // copied from pcvr version: This is a bandaid fix, first time startup it gets stuck while animating kinda like the issue we had before (TODO: Fix in 2024)
+        _serverPlayerListViewController->gameObject->SetActive(false); // copied from pcvr version: This is a bandaid fix, first time startup it gets stuck while animating kinda like the issue we had before (TODO: Fix in 2024)
 
         // Copied from the pcvr version, but still a bandaid
         if (_performingFirstActivation)
         {
             _performingFirstActivation = false;
-            HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[&] {
+
+            FixedSafePtr<ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager> self(this);
+
+            il2cpp_utils::il2cpp_aware_thread([self] {
                 std::this_thread::sleep_for(std::chrono::milliseconds(250));
-                QuestUI::MainThreadScheduler::Schedule([=]() {
-                    _platformLeaderboardViewController->Refresh(true, true);
+                MainThreadScheduler::Schedule([self]() {
+                    self->_platformLeaderboardViewController->Refresh(true, true);
                 });
-            }), nullptr)->Run();
+            }).detach();
         }
     }
 
@@ -129,6 +130,6 @@ namespace ScoreSaber::UI::Multiplayer
             return true;
 
         auto currentFlowCoordinator = _mainFlowCoordinator->YoungestChildFlowCoordinatorOrSelf();
-        return il2cpp_utils::try_cast<MultiplayerLevelSelectionFlowCoordinator>(currentFlowCoordinator).has_value();
+        return currentFlowCoordinator.try_cast<MultiplayerLevelSelectionFlowCoordinator>().has_value();
     }
 } // namespace ScoreSaber::UI::Multiplayer

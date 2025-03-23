@@ -1,7 +1,7 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
-#include "UnityEngine/Sprite.hpp"
+#include <UnityEngine/Sprite.hpp>
 #include <string>
 
 namespace TeamUtils

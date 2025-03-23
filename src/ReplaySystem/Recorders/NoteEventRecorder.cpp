@@ -1,20 +1,23 @@
 #include "ReplaySystem/Recorders/NoteEventRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/CutScoreBuffer.hpp"
-#include "GlobalNamespace/ISaberSwingRatingCounter.hpp"
-#include "GlobalNamespace/NoteController.hpp"
-#include "GlobalNamespace/NoteCutInfo.hpp"
-#include "GlobalNamespace/NoteData.hpp"
-#include "GlobalNamespace/ScoreController.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/CutScoreBuffer.hpp>
+#include <GlobalNamespace/ISaberSwingRatingCounter.hpp>
+#include <GlobalNamespace/NoteController.hpp>
+#include <GlobalNamespace/NoteCutInfo.hpp>
+#include <GlobalNamespace/NoteData.hpp>
+#include <GlobalNamespace/GoodCutScoringElement.hpp>
+#include <GlobalNamespace/IReadonlyCutScoreBuffer.hpp>
+#include <GlobalNamespace/ScoreController.hpp>
+#include <GlobalNamespace/ScoringElement.hpp>
+#include <System/Action_1.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Time.hpp>
+#include <UnityEngine/Vector3.hpp>
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 using namespace UnityEngine;
@@ -36,25 +39,23 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void NoteEventRecorder::Initialize()
     {
-        scoringForNoteStartedDelegate = custom_types::MakeDelegate<System::Action_1<ScoringElement*>*>((function<void(ScoringElement*)>)[&](ScoringElement* element) {ScoreController_scoringForNoteStartedEvent(element);});
-        scoringForNoteFinishedDelegate = custom_types::MakeDelegate<System::Action_1<ScoringElement*>*>((function<void(ScoringElement*)>)[&](ScoringElement* element) {ScoreController_scoringForNoteFinishedEvent(element);});
-        handleNoteWasCutDelegate = custom_types::MakeDelegate<BeatmapObjectManager::NoteWasCutDelegate*>(
-            (function<void(NoteController*, NoteCutInfo*)>)
-            [&](NoteController* noteController, NoteCutInfo* noteCutInfo) {
-                BadCutInfoCollector(noteController, noteCutInfo);
-            }
-        );
+        scoringForNoteStartedDelegate = { &NoteEventRecorder::ScoreController_scoringForNoteStartedEvent, this }; 
+        scoringForNoteFinishedDelegate = { &NoteEventRecorder::ScoreController_scoringForNoteFinishedEvent, this };
+        handleNoteWasCutDelegate = { &NoteEventRecorder::BadCutInfoCollector, this };
         
-        _scoreController->add_scoringForNoteStartedEvent(scoringForNoteStartedDelegate);
-        _scoreController->add_scoringForNoteFinishedEvent(scoringForNoteFinishedDelegate);
-        _beatmapObjectManager->add_noteWasCutEvent(handleNoteWasCutDelegate);
+        _scoreController->___scoringForNoteStartedEvent += scoringForNoteStartedDelegate;
+        _scoreController->___scoringForNoteFinishedEvent += scoringForNoteFinishedDelegate;
+        _beatmapObjectManager->___noteWasCutEvent += handleNoteWasCutDelegate;
     }
 
     void NoteEventRecorder::Dispose()
     {
-        _scoreController->remove_scoringForNoteStartedEvent(scoringForNoteStartedDelegate);
-        _scoreController->remove_scoringForNoteFinishedEvent(scoringForNoteFinishedDelegate);
-        _beatmapObjectManager->remove_noteWasCutEvent(handleNoteWasCutDelegate);
+        if(_scoreController) {
+            _scoreController->___scoringForNoteStartedEvent -= scoringForNoteStartedDelegate;
+            _scoreController->___scoringForNoteFinishedEvent -= scoringForNoteFinishedDelegate;
+        }
+        if(_beatmapObjectManager)
+            _beatmapObjectManager->___noteWasCutEvent -= handleNoteWasCutDelegate;
     }
 
     void NoteEventRecorder::ScoreController_scoringForNoteStartedEvent(ScoringElement* element)
@@ -81,7 +82,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
                                                (int)noteCutInfo.saberType, noteCutInfo.directionOK,
                                                noteCutInfo.saberSpeed, noteCutInfo.cutAngle,
                                                noteCutInfo.cutDistanceToCenter, noteCutInfo.cutDirDeviation,
-                                               goodCut->cutScoreBuffer->get_beforeCutSwingRating(), goodCut->cutScoreBuffer->get_afterCutSwingRating(),
+                                               goodCut->cutScoreBuffer->beforeCutSwingRating, goodCut->cutScoreBuffer->afterCutSwingRating,
                                                cutTime, Time::get_timeScale(), _audioTimeSyncController->timeScale,
                                                
                                                noteCutInfo.timeDeviation, VRRotation(noteCutInfo.worldRotation), VRRotation(noteCutInfo.inverseWorldRotation),
@@ -114,7 +115,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
         }
     }
 
-    void NoteEventRecorder::BadCutInfoCollector(NoteController* noteController, NoteCutInfo* noteCutInfo)
+    void NoteEventRecorder::BadCutInfoCollector(NoteController* noteController, ByRef<NoteCutInfo> noteCutInfo)
     {
         _collectedBadCutInfos.emplace(noteController->noteData, *noteCutInfo);
     }

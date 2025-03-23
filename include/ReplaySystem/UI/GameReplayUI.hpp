@@ -1,13 +1,13 @@
 #pragma once
 
-#include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
-#include "GlobalNamespace/GameplayModifiers.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/RectTransform.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "lapiz/shared/macros.hpp"
+#include <GlobalNamespace/GameplayCoreSceneSetupData.hpp>
+#include <GlobalNamespace/GameplayModifiers.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/RectTransform.hpp>
+#include <UnityEngine/Vector2.hpp>
+#include <TMPro/TextMeshProUGUI.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <lapiz/shared/macros.hpp>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI, GameReplayUI, UnityEngine::MonoBehaviour,
                       DECLARE_INSTANCE_FIELD(GlobalNamespace::GameplayCoreSceneSetupData*, _gameplayCoreSceneSetupData);

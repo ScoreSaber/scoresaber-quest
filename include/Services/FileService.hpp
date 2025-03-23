@@ -1,4 +1,7 @@
 #pragma once
+
+#include <string>
+
 namespace ScoreSaber::Services::FileService
 {
     void EnsurePaths();

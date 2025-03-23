@@ -28,7 +28,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
 
         shared_ptr<Metadata> metadata = ReadMetadata(inputStream, pointers.metadata);
 
-        INFO("Found replay with version %s", metadata->Version.c_str());
+        INFO("Found replay with version {:s}", metadata->Version.c_str());
         if (metadata->Version == "2.0.0") {
             return make_shared<ReplayFile>(metadata,
                                            ReadPoseKeyframes(inputStream, pointers.poseKeyframes),

@@ -3,11 +3,11 @@
 #include "static.hpp"
 #include "logging.hpp"
 
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
-#include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
-#include "beatsaber-hook/shared/rapidjson/include/rapidjson/stringbuffer.h"
-#include "beatsaber-hook/shared/rapidjson/include/rapidjson/writer.h"
-#include "beatsaber-hook/shared/utils/utils-functions.h"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
+#include <beatsaber-hook/shared/rapidjson/include/rapidjson/document.h>
+#include <beatsaber-hook/shared/rapidjson/include/rapidjson/stringbuffer.h>
+#include <beatsaber-hook/shared/rapidjson/include/rapidjson/writer.h>
+#include <beatsaber-hook/shared/utils/utils-functions.h>
 
 namespace ScoreSaber::Data::Private {
 

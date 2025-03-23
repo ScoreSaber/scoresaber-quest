@@ -1,11 +1,12 @@
 #include "UI/Multiplayer/ScoreSaberMultiplayerResultsLeaderboardFlowManager.hpp"
 
-#include "GlobalNamespace/GameServerLobbyFlowCoordinator.hpp"
-#include "GlobalNamespace/MenuTransitionsHelper.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
+#include <GlobalNamespace/GameServerLobbyFlowCoordinator.hpp>
+#include <GlobalNamespace/MenuTransitionsHelper.hpp>
+#include <HMUI/ViewController.hpp>
 #include "Services/PlayerService.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
+#include "Utils/SafePtr.hpp"
 #include "hooks.hpp"
 #include <functional>
 
@@ -24,43 +25,48 @@ namespace ScoreSaber::UI::Multiplayer
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::Initialize()
     {
-        didActivateDelegate = custom_types::MakeDelegate<MultiplayerResultsViewController::DidActivateDelegate*>((std::function<void(bool, bool, bool)>)[&](bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) { MultiplayerResultsViewController_didActivateEvent(firstActivation, addedToHierarchy, screenSystemEnabling); });
-        didDeactivateDelegate = custom_types::MakeDelegate<MultiplayerResultsViewController::DidDeactivateDelegate*>((std::function<void(bool, bool)>)[&](bool removedFromHierarchy, bool screenSystemDisabling) { MultiplayerResultsViewController_didDeactivateEvent(removedFromHierarchy, screenSystemDisabling); });
+        didActivateDelegate = { &ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didActivateEvent, this };
+        didDeactivateDelegate = { &ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didDeactivateEvent, this };
 
-        _multiplayerResultsViewController->add_didActivateEvent(didActivateDelegate);
-        _multiplayerResultsViewController->add_didDeactivateEvent(didDeactivateDelegate);
-        HandleMultiplayerLevelDidFinish = (std::function<void(MultiplayerLevelScenesTransitionSetupDataSO*, MultiplayerResultsData*)>)[&](MultiplayerLevelScenesTransitionSetupDataSO * transitionSetupData, MultiplayerResultsData * results)
+        _multiplayerResultsViewController->___didActivateEvent += didActivateDelegate;
+        _multiplayerResultsViewController->___didDeactivateEvent += didDeactivateDelegate;
+
+        FixedSafePtr<ScoreSaberMultiplayerResultsLeaderboardFlowManager> self(this);
+        HandleMultiplayerLevelDidFinish = [self](MultiplayerLevelScenesTransitionSetupDataSO * transitionSetupData, MultiplayerResultsData * results)
         {
-            MultiplayerLevelDidFinish(transitionSetupData, results);
+            self->MultiplayerLevelDidFinish(transitionSetupData, results);
         };
     }
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::Dispose()
     {
-        _multiplayerResultsViewController->remove_didActivateEvent(didActivateDelegate);
-        _multiplayerResultsViewController->remove_didDeactivateEvent(didDeactivateDelegate);
+        if(_multiplayerResultsViewController) {
+            _multiplayerResultsViewController->___didActivateEvent -= didActivateDelegate;
+            _multiplayerResultsViewController->___didDeactivateEvent -= didDeactivateDelegate;
+        }
         HandleMultiplayerLevelDidFinish = std::nullopt;
     }
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didActivateEvent(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         auto currentFlowCoordinator = _mainFlowCoordinator->YoungestChildFlowCoordinatorOrSelf();
-        if (!il2cpp_utils::try_cast<GameServerLobbyFlowCoordinator>(currentFlowCoordinator).has_value())
+        if (!currentFlowCoordinator.try_cast<GameServerLobbyFlowCoordinator>().has_value())
             return;
 
-        _platformLeaderboardViewController->SetData(_lastCompletedBeatmap);
+        _platformLeaderboardViewController->SetData(_lastCompletedBeatmapKey);
         currentFlowCoordinator->SetRightScreenViewController(_platformLeaderboardViewController, HMUI::ViewController::AnimationType::In);
     }
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerResultsViewController_didDeactivateEvent(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        if (removedFromHierarchy || screenSystemDisabling)
-            _lastCompletedBeatmap = nullptr;
+        // we can't really set this to null anymore
+        /*if (removedFromHierarchy || screenSystemDisabling)
+            _lastCompletedBeatmap = nullptr;*/
     }
 
     void ScoreSaberMultiplayerResultsLeaderboardFlowManager::MultiplayerLevelDidFinish(MultiplayerLevelScenesTransitionSetupDataSO* transitionSetupData, MultiplayerResultsData* results)
     {
-        _lastCompletedBeatmap = transitionSetupData->difficultyBeatmap;
+        _lastCompletedBeatmapKey = transitionSetupData->beatmapKey;
     }
 } // namespace ScoreSaber::UI::Multiplayer
 

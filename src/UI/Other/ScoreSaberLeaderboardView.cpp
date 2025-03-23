@@ -1,107 +1,91 @@
 
-#include "UI/Other/ScoreSaberLeaderboardView.hpp"
 
+#include <GlobalNamespace/LoadingControl.hpp>
+#include <GlobalNamespace/PlatformLeaderboardViewController.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsHandler.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
+#include <GlobalNamespace/StandardLevelDetailView.hpp>
+#include <GlobalNamespace/StandardLevelDetailViewController.hpp>
+#include <HMUI/CurvedCanvasSettingsHelper.hpp>
+#include <HMUI/CurvedTextMeshPro.hpp>
+#include <HMUI/IconSegmentedControl.hpp>
+#include <HMUI/ImageView.hpp>
+#include <HMUI/Screen.hpp>
+#include <HMUI/StackLayoutGroup.hpp>
+#include <HMUI/ViewController.hpp>
+#include <TMPro/TextMeshProUGUI.hpp>
+#include <System/String.hpp>
+#include <System/Action.hpp>
+#include <System/Threading/CancellationTokenSource.hpp>
+#include <UnityEngine/GameObject.hpp>
+#include <UnityEngine/Rect.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/SpriteMeshType.hpp>
+#include <UnityEngine/SpriteRenderer.hpp>
+#include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/Button.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
+#include <beatsaber-hook/shared/utils/hooking.hpp>
+#include <bsml/shared/Helpers/utilities.hpp>
+#include <custom-types/shared/delegate.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/BSML/FloatingScreen/FloatingScreen.hpp>
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
+#include <chrono>
+
+#include "UI/Other/ScoreSaberLeaderboardView.hpp"
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Score.hpp"
 #include "Data/Private/Settings.hpp"
-
-#include "GlobalNamespace/HMTask.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/LoadingControl.hpp"
-#include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsHandler.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_GetScoresCompletionHandler.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_GetScoresResult.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "GlobalNamespace/StandardLevelDetailView.hpp"
-#include "GlobalNamespace/StandardLevelDetailViewController.hpp"
-#include "Utils/BeatmapUtils.hpp"
-
 #include "Services/UploadService.hpp"
-
-#include "HMUI/CurvedCanvasSettingsHelper.hpp"
-#include "HMUI/CurvedTextMeshPro.hpp"
-#include "HMUI/IconSegmentedControl.hpp"
-#include "HMUI/IconSegmentedControl_DataItem.hpp"
-#include "HMUI/ImageView.hpp"
-#include "HMUI/Screen.hpp"
-#include "HMUI/StackLayoutGroup.hpp"
-#include "HMUI/ViewController_AnimationDirection.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
-
 #include "Services/LeaderboardService.hpp"
 #include "Services/PlayerService.hpp"
-
 #include "Sprites.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
-
-#include "UI/Other/PanelView.hpp"
 #include "UI/Other/ProfilePictureView.hpp"
-#include "System/Action.hpp"
-#include "System/Threading/CancellationTokenSource.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Rect.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
-#include "UnityEngine/SpriteRenderer.hpp"
-#include "UnityEngine/Texture2D.hpp"
-#include "UnityEngine/UI/Button.hpp"
-#include "Utils/StringUtils.hpp"
+#include "Utils/MaxScoreCache.hpp"
+#include "Utils/SafePtr.hpp"
 #include "Utils/UIUtils.hpp"
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "bsml/shared/Helpers/utilities.hpp"
-#include "custom-types/shared/delegate.hpp"
-#include "hooks.hpp"
+#include "Utils/GCUtil.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
-#include "questui/shared/QuestUI.hpp"
-#include <chrono>
+#include "questui/ArrayUtil.hpp"
 
 using namespace HMUI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
+using namespace BSML;
+using namespace BSML::Lite;
+using namespace BSML::Helpers;
 using namespace GlobalNamespace;
 using namespace ScoreSaber;
-using namespace StringUtils;
 using namespace ScoreSaber::CustomTypes;
-using namespace ScoreSaber::UI::FlowCoordinators;
 using namespace ScoreSaber::Services;
 using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
-    ScoreSaber::UI::Other::Banner* ScoreSaberBanner;
+    FixedSafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
 
-    ScoreSaber::UI::Other::PanelView* view;
-    ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler* leaderboardScoreInfoButtonHandler;
+    FixedSafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
 
-    PlatformLeaderboardViewController* _platformLeaderboardViewController;
+    FixedSafePtrUnity<PlatformLeaderboardViewController> _platformLeaderboardViewController;
 
-    UnityEngine::UI::Button* _pageUpButton;
-    UnityEngine::UI::Button* _pageDownButton;
+    FixedSafePtrUnity<UnityEngine::UI::Button> _pageUpButton;
+    FixedSafePtrUnity<UnityEngine::UI::Button> _pageDownButton;
 
     std::vector<ProfilePictureView> _ImageHolders;
 
-    std::vector<HMUI::ImageView*> _cellClickingImages;
+    std::vector<FixedSafePtrUnity<HMUI::ImageView>> _cellClickingImages;
 
-    SafePtr<System::Threading::CancellationTokenSource> cancellationToken;
+    FixedSafePtr<System::Threading::CancellationTokenSource> cancellationToken;
 
     bool _activated = false;
 
     int _lastCell = 0;
     int _leaderboardPage = 1;
     bool _filterAroundCountry = false;
-    std::string _currentLeaderboardRefreshId;
+    int _currentLeaderboardRefreshId = -1;
     
     bool _allowReplayWatching = true;
 
@@ -111,11 +95,10 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         int _lastCell = 0;
         int _leaderboardPage = 1;
         _filterAroundCountry = false;
-        _currentLeaderboardRefreshId.clear();
+        _currentLeaderboardRefreshId = -1;
         _allowReplayWatching = true;
 
         ScoreSaberBanner = nullptr;
-        view = nullptr;
         leaderboardScoreInfoButtonHandler = nullptr;
         _platformLeaderboardViewController = nullptr;
         _pageUpButton = nullptr;
@@ -123,6 +106,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         _ImageHolders.clear();
         _cellClickingImages.clear();
+    }
+
+    void ByeImages()
+    {
+        for (auto &holder : _ImageHolders) {
+            holder.ClearSprite();
+        }
     }
 
     void EarlyDidActivate(PlatformLeaderboardViewController* self, bool firstActivation, bool addedToHeirarchy,
@@ -138,7 +128,7 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         {
             INFO("PlatformLeaderboardViewController firstActivation");
 
-            StandardLevelDetailViewController* _standardLevelDetailViewController = ArrayUtil::First(Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>());
+            StandardLevelDetailViewController* _standardLevelDetailViewController = Resources::FindObjectsOfTypeAll<StandardLevelDetailViewController*>()->First();
 
             _platformLeaderboardViewController = self;
 
@@ -146,72 +136,72 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
             if (!_pageUpButton)
             {
-                _pageUpButton = QuestUI::BeatSaberUI::CreateUIButton(self->get_transform(), "", "SettingsButton", Vector2(-40.0f, 20.0f), Vector2(5.0f, 5.0f),
+                _pageUpButton = CreateUIButton(self->transform, "", "SettingsButton", Vector2(20.0f, -21.0f), Vector2(5.0f, 5.0f),
                                                                      [=]() {
                                                                          DirectionalButtonClicked(PageDirection::Up);
                                                                      });
 
-                QuestUI::BeatSaberUI::SetButtonSprites(_pageUpButton, Base64ToSprite(carat_up_inactive_base64),
+                SetButtonSprites(_pageUpButton.ptr(), Base64ToSprite(carat_up_inactive_base64),
                                                        Base64ToSprite(carat_up_base64));
 
-                RectTransform* rectTransform = reinterpret_cast<RectTransform*>(_pageUpButton->get_transform()->GetChild(0));
-                rectTransform->set_sizeDelta({10.0f, 10.0f});
+                auto rectTransform = _pageUpButton->transform->GetChild(0).cast<RectTransform>();
+                rectTransform->sizeDelta = {10.0f, 10.0f};
             }
 
             if (!_pageDownButton)
             {
-                _pageDownButton = QuestUI::BeatSaberUI::CreateUIButton(self->get_transform(), "", "SettingsButton", Vector2(-40.0f, -20.0f), Vector2(5.0f, 5.0f),
+                _pageDownButton = CreateUIButton(self->transform, "", "SettingsButton", Vector2(20.0f, -60.0f), Vector2(5.0f, 5.0f),
                                                                        [=]() {
                                                                            DirectionalButtonClicked(PageDirection::Down);
                                                                        });
 
-                QuestUI::BeatSaberUI::SetButtonSprites(_pageDownButton, Base64ToSprite(carat_down_inactive_base64),
+                SetButtonSprites(_pageDownButton.ptr(), Base64ToSprite(carat_down_inactive_base64),
                                                        Base64ToSprite(carat_down_base64));
-                RectTransform* rectTransform = reinterpret_cast<RectTransform*>(_pageDownButton->get_transform()->GetChild(0));
-                rectTransform->set_sizeDelta({10.0f, 10.0f});
+                auto rectTransform = _pageDownButton->transform->GetChild(0).cast<RectTransform>();
+                rectTransform->sizeDelta = {10.0f, 10.0f};
             }
 
             // RedBrumbler top panel
 
-            ScoreSaberBanner = ::ScoreSaber::UI::Other::Banner::Create(self->get_transform());
-            auto playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(self->get_transform());
+            ScoreSaberBanner = ::ScoreSaber::UI::Other::Banner::Create(self->transform);
+            auto playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(self->transform);
             ScoreSaberBanner->playerProfileModal = playerProfileModal;
 
             ScoreSaberBanner->Prompt("Signing into ScoreSaber...", false, 5.0f, nullptr);
             auto newGo = GameObject::New_ctor();
-            auto t = newGo->get_transform();
-            t->get_transform()->SetParent(self->get_transform(), false);
-            t->set_localScale({1, 1, 1});
+            auto t = newGo->transform;
+            t->transform->SetParent(self->transform, false);
+            t->localScale = {1, 1, 1};
 
             leaderboardScoreInfoButtonHandler = newGo->AddComponent<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*>();
             leaderboardScoreInfoButtonHandler->Setup();
             leaderboardScoreInfoButtonHandler->scoreInfoModal->playerProfileModal = playerProfileModal;
 
             // profile pictures
-            auto pfpVertical = CreateVerticalLayoutGroup(self->get_transform());
-            pfpVertical->get_rectTransform()->set_anchoredPosition(Vector2(-21, -1));
-            pfpVertical->set_spacing(-20.15);
+            auto pfpVertical = CreateVerticalLayoutGroup(self->transform);
+            pfpVertical->rectTransform->anchoredPosition = Vector2(-21, -1);
+            pfpVertical->spacing = -20.15;
 
             auto nullSprite = BSML::Utilities::ImageResources::GetBlankSprite();
 
             _ImageHolders.clear();
             for (int i = 0; i < 10; ++i) {
-                auto rowHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
-                rowHorizontal->set_childForceExpandHeight(true);
-                rowHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
+                auto rowHorizontal = CreateHorizontalLayoutGroup(pfpVertical->transform);
+                rowHorizontal->childForceExpandHeight = true;
+                rowHorizontal->childAlignment = TextAnchor::MiddleCenter;
 
-                auto rowStack = UIUtils::CreateStackLayoutGroup(rowHorizontal->get_transform());
+                auto rowStack = CreateStackLayoutGroup(rowHorizontal->transform);
                 
-                auto image = CreateImage(rowStack->get_transform(), nullSprite, {0.0f, 0.0f}, {4.75f, 4.75f});
-                image->set_preserveAspect(true);
-                auto imageLayout = image->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
-                imageLayout->set_preferredHeight(4.75f);
-                imageLayout->set_preferredWidth(4.75f);
+                auto image = CreateImage(rowStack->transform, nullSprite, {0.0f, 0.0f}, {4.75f, 4.75f});
+                image->preserveAspect = true;
+                auto imageLayout = image->gameObject->GetComponent<UnityEngine::UI::LayoutElement*>();
+                imageLayout->preferredHeight = 4.75f;
+                imageLayout->preferredWidth = 4.75f;
 
-                auto loadingIndicator = UIUtils::CreateLoadingIndicator(rowStack->get_transform());
-                auto loadingIndicatorLayout = loadingIndicator->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
-                loadingIndicatorLayout->set_preferredWidth(3.75f);
-                loadingIndicatorLayout->set_preferredHeight(3.75f);
+                auto loadingIndicator = UIUtils::CreateLoadingIndicator(rowStack->transform);
+                auto loadingIndicatorLayout = loadingIndicator->gameObject->GetComponent<UnityEngine::UI::LayoutElement*>();
+                loadingIndicatorLayout->preferredWidth = 3.75f;
+                loadingIndicatorLayout->preferredHeight = 3.75f;
                 // missing: set preserveAspect to true, but not sure where to set this (or if it is even needed, but the PC plugin does it)
                 loadingIndicator->SetActive(false);
 
@@ -220,56 +210,58 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
             }
 
             // cell clickers
-            auto clickVertical = CreateVerticalLayoutGroup(self->get_transform());
-            clickVertical->get_rectTransform()->set_anchoredPosition(Vector2(5, -1));
-            clickVertical->set_spacing(-20.25);
+            auto clickVertical = CreateVerticalLayoutGroup(self->transform);
+            clickVertical->rectTransform->anchoredPosition = Vector2(5, -1);
+            clickVertical->spacing = -20.25;
 
-            auto mat_UINoGlowRoundEdge = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return to_utf8(csstrtostr(x->get_name())) == "UINoGlowRoundEdge"; });
+            auto mat_UINoGlowRoundEdge = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x) { return Paper::StringConvert::from_utf16(x->name) == "UINoGlowRoundEdge"; });
 
             _cellClickingImages.clear();
             for (int i = 0; i < 10; ++i) {
-                auto rowHorizontal = CreateHorizontalLayoutGroup(clickVertical->get_transform());
-                rowHorizontal->set_childForceExpandHeight(true);
-                rowHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
+                auto rowHorizontal = CreateHorizontalLayoutGroup(clickVertical->transform);
+                rowHorizontal->childForceExpandHeight = true;
+                rowHorizontal->childAlignment = TextAnchor::MiddleCenter;
 
-                auto rowStack = UIUtils::CreateStackLayoutGroup(rowHorizontal->get_transform());
+                auto rowStack = CreateStackLayoutGroup(rowHorizontal->transform);
                 
-                auto image = CreateImage(rowStack->get_transform(), nullSprite, {0.0f, 0.0f}, {72.0f, 5.75f});
-                image->set_material(mat_UINoGlowRoundEdge);
-                image->set_preserveAspect(true);
-                auto imageLayout = image->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
-                imageLayout->set_preferredWidth(72.0f);
-                imageLayout->set_preferredHeight(5.75f);
+                auto image = CreateImage(rowStack->transform, nullSprite, {0.0f, 0.0f}, {72.0f, 5.75f});
+                image->material = mat_UINoGlowRoundEdge;
+                image->preserveAspect = true;
+                auto imageLayout = image->gameObject->GetComponent<UnityEngine::UI::LayoutElement*>();
+                imageLayout->preferredWidth = 72.0f;
+                imageLayout->preferredHeight = 5.75f;
 
                 _cellClickingImages.emplace_back(image);
             }
 
-            PlayerService::AuthenticateUser([&](PlayerService::LoginStatus loginStatus) {
-                switch (loginStatus)
-                {
-                    case PlayerService::LoginStatus::Success: {
-                        ScoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
-                                                 nullptr);
-                                                 INFO("Refresh 1");
-                        _platformLeaderboardViewController->Refresh(true, true);
-                        break;
+            PlayerService::AuthenticateUser([](PlayerService::LoginStatus loginStatus) {
+                MainThreadScheduler::Schedule([=]() {
+                    switch (loginStatus)
+                    {
+                        case PlayerService::LoginStatus::Success: {
+                            ScoreSaberBanner->Prompt("<color=#89fc81>Successfully signed in to ScoreSaber</color>", false, 5.0f,
+                                                    nullptr);
+                                                    INFO("Refresh 1");
+                            _platformLeaderboardViewController->Refresh(true, true);
+                            break;
+                        }
+                        case PlayerService::LoginStatus::Error: {
+                            ScoreSaberBanner->Prompt("<color=#fc8181>Authentication failed</color>", false, 5.0f, nullptr);
+                            break;
+                        }
                     }
-                    case PlayerService::LoginStatus::Error: {
-                        ScoreSaberBanner->Prompt("<color=#fc8181>Authentication failed</color>", false, 5.0f, nullptr);
-                        break;
-                    }
-                }
+                });
             });
         }
 
         // we have to set this up again, because locationFilterMode could have changed
-        Sprite* globalLeaderboardIcon = self->globalLeaderboardIcon;
-        Sprite* friendsLeaderboardIcon = self->friendsLeaderboardIcon;
-        Sprite* aroundPlayerLeaderboardIcon = self->aroundPlayerLeaderboardIcon;
+        Sprite* globalLeaderboardIcon = self->_globalLeaderboardIcon;
+        Sprite* friendsLeaderboardIcon = self->_friendsLeaderboardIcon;
+        Sprite* aroundPlayerLeaderboardIcon = self->_aroundPlayerLeaderboardIcon;
         Sprite* countryLeaderboardIcon = Base64ToSprite(country_base64);
-        countryLeaderboardIcon->get_textureRect().set_size({64.0f, 64.0f});
+        countryLeaderboardIcon->textureRect.size = {64.0f, 64.0f};
 
-        IconSegmentedControl* scopeSegmentedControl = self->scopeSegmentedControl;
+        IconSegmentedControl* scopeSegmentedControl = self->_scopeSegmentedControl;
 
         std::string mode = Settings::locationFilterMode;
         for (auto& c : mode)
@@ -286,6 +278,8 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         scopeSegmentedControl->SetData(array);
 
+        ByeImages();
+
         _activated = true;
     }
 
@@ -295,16 +289,9 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         leaderboardScoreInfoButtonHandler->scoreInfoModal->Hide();
     }
 
-    void ByeImages()
-    {
-        for (auto &holder : _ImageHolders) {
-            holder.ClearSprite();
-        }
-    }
-
-    void RefreshLeaderboard(IDifficultyBeatmap* difficultyBeatmap, LeaderboardTableView* tableView,
+    void RefreshLeaderboard(BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, LeaderboardTableView* tableView,
                             PlatformLeaderboardsModel::ScoresScope scope, LoadingControl* loadingControl,
-                            std::string refreshId)
+                            int refreshId)
     {
         if (ScoreSaber::Services::UploadService::uploading)
         {
@@ -317,11 +304,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
         }
 
         if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && !_filterAroundCountry) {
-            _pageUpButton->set_interactable(false);
-            _pageDownButton->set_interactable(false);
+            _pageUpButton->interactable = false;
+            _pageDownButton->interactable = false;
         } else {
-            _pageUpButton->set_interactable(true);
-            _pageDownButton->set_interactable(true);
+            _pageUpButton->interactable = true;
+            _pageDownButton->interactable = true;
         }
 
         ByeImages();
@@ -346,14 +333,20 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         _currentLeaderboardRefreshId = refreshId;
 
-        HMTask::New_ctor(custom_types::MakeDelegate<System::Action*>((std::function<void()>)[difficultyBeatmap, scope, loadingControl, tableView, refreshId]() {
+        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+        FixedSafePtrUnity<LoadingControl> loadingControlSafe(loadingControl);
+        FixedSafePtrUnity<LeaderboardTableView> tableViewSafe(tableView);
+
+        il2cpp_utils::il2cpp_aware_thread(gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             if (_currentLeaderboardRefreshId == refreshId)
             {
-                LeaderboardService::GetLeaderboardData(
-                    difficultyBeatmap, scope, _leaderboardPage,
-                    [=](Data::InternalLeaderboard internalLeaderboard) {
-                        QuestUI::MainThreadScheduler::Schedule([=]() {
+                Helpers::GetDiContainer()->Resolve<Utils::MaxScoreCache*>()->GetMaxScore(beatmapLevelSafe.ptr(), beatmapKey,
+                gc_aware_function([=](int maxScore) {
+                    LeaderboardService::GetLeaderboardData(maxScore,
+                        beatmapLevelSafe.ptr(), beatmapKey, scope, _leaderboardPage,
+                        gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore](Data::InternalLeaderboard internalLeaderboard) {
+                        MainThreadScheduler::Schedule(gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId, maxScore, internalLeaderboard]() {
                             if (_currentLeaderboardRefreshId != refreshId) {
                                 return; // we need to check this again, since some time may have passed due to waiting for leaderboard data
                             }
@@ -361,32 +354,32 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             {
                                 SetRankedStatus(internalLeaderboard.leaderboard->leaderboardInfo);
                                 int playerScoreIndex = GetPlayerScoreIndex(internalLeaderboard.leaderboard.value().scores);
-                                if (internalLeaderboard.leaderboardItems->get_Count() != 0)
+                                if (internalLeaderboard.leaderboardItems->Count != 0)
                                 {
                                     if (scope == PlatformLeaderboardsModel::ScoresScope::AroundPlayer && playerScoreIndex == -1 && !_filterAroundCountry)
                                     {
-                                        SetErrorState(loadingControl, "You haven't set a score on this leaderboard", true);
+                                        SetErrorState(loadingControlSafe.ptr(), "You haven't set a score on this leaderboard", true);
                                     }
                                     else
                                     {
-                                        tableView->SetScores(internalLeaderboard.leaderboardItems, playerScoreIndex);
+                                        tableViewSafe->SetScores(internalLeaderboard.leaderboardItems.getPtr(), playerScoreIndex);
                                         for (int i = 0; i < internalLeaderboard.profilePictures.size(); ++i) {
-                                            _ImageHolders[i].SetProfileImage(internalLeaderboard.profilePictures[i], i, cancellationToken->get_Token());
+                                            _ImageHolders[i].SetProfileImage(internalLeaderboard.profilePictures[i], i, cancellationToken->Token);
                                         }
-                                        loadingControl->ShowText(System::String::_get_Empty(), false);
-                                        loadingControl->Hide();
-                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, internalLeaderboard.leaderboard->leaderboardInfo.id);
+                                        loadingControlSafe->ShowText("", false);
+                                        loadingControlSafe->Hide();
+                                        leaderboardScoreInfoButtonHandler->set_scoreCollection(internalLeaderboard.leaderboard.value().scores, beatmapLevelSafe.ptr(), beatmapKey, internalLeaderboard.leaderboard->leaderboardInfo.id, maxScore);
                                     }
                                 }
                                 else
                                 {
                                     if (_leaderboardPage > 1)
                                     {
-                                        SetErrorState(loadingControl, "No scores on this page");
+                                        SetErrorState(loadingControlSafe.ptr(), "No scores on this page");
                                     }
                                     else
                                     {
-                                        SetErrorState(loadingControl, "No scores on this leaderboard, be the first!");
+                                        SetErrorState(loadingControlSafe.ptr(), "No scores on this leaderboard, be the first!");
                                     }
                                     ByeImages();
                                 }
@@ -395,19 +388,20 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
                             {
                                 if (internalLeaderboard.leaderboardItems->get_Item(0) != nullptr)
                                 {
-                                    SetErrorState(loadingControl, internalLeaderboard.leaderboardItems->get_Item(0)->get_playerName(), false);
+                                    SetErrorState(loadingControlSafe.ptr(), internalLeaderboard.leaderboardItems->get_Item(0)->playerName, false);
                                 }
                                 else
                                 {
-                                    SetErrorState(loadingControl, "No scores on this leaderboard, be the first! 0x1");
+                                    SetErrorState(loadingControlSafe.ptr(), "No scores on this leaderboard, be the first! 0x1");
                                 }
                                 ByeImages();
                             }
-                        });
-                    },
+                        }));
+                    }),
                     _filterAroundCountry);
+                }));
             }
-        }), nullptr)->Run();
+        })).detach();
     }
 
     void SetRankedStatus(Data::LeaderboardInfo leaderboardInfo)
@@ -480,11 +474,11 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
     {
         if (_leaderboardPage > 1)
         {
-            _pageUpButton->set_interactable(true);
+            _pageUpButton->interactable = true;
         }
         else
         {
-            _pageUpButton->set_interactable(false);
+            _pageUpButton->interactable = false;
         }
     }
 
@@ -507,13 +501,13 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
     void SetUploadState(bool state, bool success, std::string errorMessage)
     {
-        QuestUI::MainThreadScheduler::Schedule([=]() {
+        MainThreadScheduler::Schedule([=]() {
             if (state)
             {
-                _platformLeaderboardViewController->loadingControl->ShowLoading(System::String::_get_Empty());
+                _platformLeaderboardViewController->_loadingControl->ShowLoading("");
                 ScoreSaberBanner->set_loading(true);
                 ScoreSaberBanner->set_prompt("Uploading score...", -1);
-                // ScoreSaberBanner->Prompt("Uploading Score", true, 5.0f, nullptr);
+                ByeImages();
             }
             else
             {

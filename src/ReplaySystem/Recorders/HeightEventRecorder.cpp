@@ -1,14 +1,15 @@
 #include "ReplaySystem/Recorders/HeightEventRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/PlayerHeightDetector.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/PlayerHeightDetector.hpp>
+#include <System/Action_1.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Time.hpp>
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
+#include "Utils/DelegateUtils.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -27,16 +28,16 @@ namespace ScoreSaber::ReplaySystem::Recorders
     
     void HeightEventRecorder::Initialize()
     {
-        if(_playerHeightDetector != nullptr) {
-            playerHeightDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), (function<void(float)>)[&](float energy) {PlayerHeightDetector_playerHeightDidChangeEvent(energy);});
-            _playerHeightDetector->add_playerHeightDidChangeEvent(playerHeightDidChangeDelegate);
+        if(_playerHeightDetector) {
+            playerHeightDidChangeDelegate = {&HeightEventRecorder::PlayerHeightDetector_playerHeightDidChangeEvent, this};
+            _playerHeightDetector->___playerHeightDidChangeEvent += playerHeightDidChangeDelegate;
         }
     }
 
     void HeightEventRecorder::Dispose()
     {
-        if(_playerHeightDetector != nullptr && playerHeightDidChangeDelegate) {
-            _playerHeightDetector->remove_playerHeightDidChangeEvent(playerHeightDidChangeDelegate);
+        if(_playerHeightDetector && playerHeightDidChangeDelegate) {
+            _playerHeightDetector->___playerHeightDidChangeEvent -= playerHeightDidChangeDelegate;
         }
     }
 

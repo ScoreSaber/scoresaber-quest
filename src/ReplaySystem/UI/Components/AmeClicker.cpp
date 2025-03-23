@@ -1,9 +1,8 @@
 #include "ReplaySystem/UI/Components/AmeClicker.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Rect.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Rect.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -14,14 +13,14 @@ namespace ScoreSaber::ReplaySystem::UI::Components
 {
     void AmeClicker::Setup(std::function<void(float)> callback)
     {
-        _rect = get_transform()->GetComponent<RectTransform*>();
+        _rect = transform->GetComponent<RectTransform*>();
         _clickCallback = callback;
     }
     void AmeClicker::OnPointerClick(UnityEngine::EventSystems::PointerEventData* eventData)
     {
         Vector2 computedVector;
-        RectTransformUtility::ScreenPointToLocalPointInRectangle(_rect, eventData->get_position(), eventData->get_pressEventCamera(), &computedVector);
-        float maxX = _rect->get_rect().get_width() / 2.0f;
+        RectTransformUtility::ScreenPointToLocalPointInRectangle(_rect, eventData->position, eventData->pressEventCamera, byref(computedVector));
+        float maxX = _rect->rect.width / 2.0f;
         _clickCallback(Mathf::InverseLerp(-maxX, maxX, computedVector.x));
     }
 } // namespace ScoreSaber::ReplaySystem::UI::Components

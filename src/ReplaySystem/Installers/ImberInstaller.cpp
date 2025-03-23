@@ -8,11 +8,11 @@
 #include "ReplaySystem/UI/SpectateAreaController.hpp"
 #include "ReplaySystem/UI/VRControllerAccessor.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "Zenject/ConcreteBinderGeneric_1.hpp"
-#include "Zenject/ConcreteIdBinderGeneric_1.hpp"
-#include "Zenject/DiContainer.hpp"
-#include "Zenject/FromBinderNonGeneric.hpp"
-#include "lapiz/shared/utilities/ZenjectExtensions.hpp"
+#include <Zenject/ConcreteBinderGeneric_1.hpp>
+#include <Zenject/ConcreteIdBinderGeneric_1.hpp>
+#include <Zenject/DiContainer.hpp>
+#include <Zenject/FromBinderNonGeneric.hpp>
+#include <lapiz/shared/utilities/ZenjectExtensions.hpp>
 #include "logging.hpp"
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::Installers, ImberInstaller);
@@ -24,7 +24,7 @@ namespace ScoreSaber::ReplaySystem::Installers
     void ImberInstaller::InstallBindings()
     {
         if (ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying) {
-            auto container = get_Container();
+            auto container = Container;
             container->Bind<UI::VRControllerAccessor*>()->AsSingle();
             container->BindInterfacesTo<UI::ImberManager*>()->AsSingle();
             container->BindInterfacesAndSelfTo<UI::ImberScrubber*>()->AsSingle();

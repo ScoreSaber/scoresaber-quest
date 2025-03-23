@@ -1,5 +1,6 @@
 #include "Data/LeaderboardPlayer.hpp"
-#include "beatsaber-hook/shared/utils/utils.h"
+#include <beatsaber-hook/shared/utils/utils.h>
+#include "paper/shared/string_convert.hpp"
 
 namespace ScoreSaber::Data
 {
@@ -14,7 +15,7 @@ namespace ScoreSaber::Data
         auto nameItr = value.FindMember("name");
         if (nameItr != value.MemberEnd())
         {
-            name = std::make_optional(to_utf16(std::string(nameItr->value.GetString())));
+            name = std::make_optional(Paper::StringConvert::from_utf8(std::string(nameItr->value.GetString())));
         }
 
         profilePicture = value["profilePicture"].GetString();
@@ -42,21 +43,21 @@ namespace ScoreSaber::Data
 
         if (idItr != value.MemberEnd())
         {
-            id = std::make_optional(std::string(to_utf8(idItr->value.GetString())));
+            id = std::make_optional(std::string(Paper::StringConvert::from_utf16(idItr->value.GetString())));
         }
 
         auto nameItr = value.FindMember(u"name");
         if (nameItr != value.MemberEnd())
         {
-            name = std::make_optional(to_utf16(std::string(to_utf8(nameItr->value.GetString()))));
+            name = std::make_optional(Paper::StringConvert::from_utf8(std::string(Paper::StringConvert::from_utf16(nameItr->value.GetString()))));
         }
 
-        profilePicture = to_utf8(value[u"profilePicture"].GetString());
+        profilePicture = Paper::StringConvert::from_utf16(value[u"profilePicture"].GetString());
 
         auto countryItr = value.FindMember(u"country");
         if (!countryItr->value.IsNull())
         {
-            country = std::make_optional(std::string(to_utf8(countryItr->value.GetString())));
+            country = std::make_optional(std::string(Paper::StringConvert::from_utf16(countryItr->value.GetString())));
         }
 
         auto permissionsItr = value.FindMember(u"permissions");
@@ -67,7 +68,7 @@ namespace ScoreSaber::Data
 
         auto roleItr = value.FindMember(u"role");
         if (roleItr != value.MemberEnd() && roleItr->value.IsString())
-            role = std::make_optional(std::string(to_utf8(roleItr->value.GetString())));
+            role = std::make_optional(std::string(Paper::StringConvert::from_utf16(roleItr->value.GetString())));
     }
 
     LeaderboardPlayer::LeaderboardPlayer(rapidjson::GenericObject<true, rapidjson::Value> value)
@@ -81,7 +82,7 @@ namespace ScoreSaber::Data
         auto nameItr = value.FindMember("name");
         if (nameItr != value.MemberEnd())
         {
-            name = std::make_optional(to_utf16(std::string(nameItr->value.GetString())));
+            name = std::make_optional(Paper::StringConvert::from_utf8(std::string(nameItr->value.GetString())));
         }
 
         profilePicture = value["profilePicture"].GetString();
@@ -109,21 +110,21 @@ namespace ScoreSaber::Data
 
         if (idItr != value.MemberEnd())
         {
-            id = std::make_optional(std::string(to_utf8(idItr->value.GetString())));
+            id = std::make_optional(std::string(Paper::StringConvert::from_utf16(idItr->value.GetString())));
         }
 
         auto nameItr = value.FindMember(u"name");
         if (nameItr != value.MemberEnd())
         {
-            name = std::make_optional(to_utf16(std::string(to_utf8(nameItr->value.GetString()))));
+            name = std::make_optional(Paper::StringConvert::from_utf8(std::string(Paper::StringConvert::from_utf16(nameItr->value.GetString()))));
         }
 
-        profilePicture = to_utf8(value[u"profilePicture"].GetString());
+        profilePicture = Paper::StringConvert::from_utf16(value[u"profilePicture"].GetString());
 
         auto countryItr = value.FindMember(u"country");
         if (!countryItr->value.IsNull())
         {
-            country = std::make_optional(std::string(to_utf8(countryItr->value.GetString())));
+            country = std::make_optional(std::string(Paper::StringConvert::from_utf16(countryItr->value.GetString())));
         }
 
         auto permissionsItr = value.FindMember(u"permissions");
@@ -134,6 +135,6 @@ namespace ScoreSaber::Data
 
         auto roleItr = value.FindMember(u"role");
         if (roleItr != value.MemberEnd() && roleItr->value.IsString())
-            role = std::make_optional(std::string(to_utf8(roleItr->value.GetString())));
+            role = std::make_optional(std::string(Paper::StringConvert::from_utf16(roleItr->value.GetString())));
     }
 }

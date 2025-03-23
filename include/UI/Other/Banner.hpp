@@ -1,30 +1,31 @@
 #pragma once
 
-#include "CustomTypes/Components/ClickableText.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 
-#include "HMUI/ImageView.hpp"
-#include "HMUI/ModalView.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "UnityEngine/Color.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/Transform.hpp"
-#include "UnityEngine/UI/VerticalLayoutGroup.hpp"
-#include "custom-types/shared/coroutine.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include <HMUI/ImageView.hpp>
+#include <HMUI/ModalView.hpp>
+#include <TMPro/TextMeshProUGUI.hpp>
+#include <UnityEngine/Color.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/Transform.hpp>
+#include <UnityEngine/UI/VerticalLayoutGroup.hpp>
+#include <custom-types/shared/coroutine.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <paper/shared/string_convert.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
 #include <string_view>
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaber::UI::Other, Banner, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_METHOD(void, Update);
-    DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
-    DECLARE_INSTANCE_FIELD(HMUI::ImageView*, bgImage);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, topText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, bottomText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
-    DECLARE_INSTANCE_FIELD(UnityEngine::UI::VerticalLayoutGroup*, loadingVertical);
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, promptText);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::Backgroundable>, bg);
+    DECLARE_INSTANCE_FIELD(UnityW<HMUI::ImageView>, bgImage);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::ClickableText>, topText);
+    DECLARE_INSTANCE_FIELD(UnityW<BSML::ClickableText>, bottomText);
+    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::UI::Other::PlayerProfileModal>, playerProfileModal);
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>, loadingVertical);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, promptText);
 
     public
     :
@@ -48,9 +49,9 @@ DECLARE_CLASS_CODEGEN(
                 std::function<void()> callback);
 
     void set_topText(std::u16string_view newText);
-    void set_topText(std::string_view newText) { set_topText(to_utf16(newText)); };
+    void set_topText(std::string_view newText) { set_topText(Paper::StringConvert::from_utf8(newText)); };
     void set_bottomText(std::u16string_view newText);
-    void set_bottomText(std::string_view newText) { set_bottomText(to_utf16(newText)); };
+    void set_bottomText(std::string_view newText) { set_bottomText(Paper::StringConvert::from_utf8(newText)); };
 
     private
     : bool rainbow = false;

@@ -4,10 +4,6 @@
 
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
 
 #define GetStringValue(in, out)                                      \
     auto itr##out = value.FindMember(in);                            \
@@ -27,7 +23,7 @@ namespace TeamUtils
     void Download()
     {
         std::string url = "https://raw.githubusercontent.com/ScoreSaber/ScoreSaber-Team/main/team.json";
-        WebUtils::GetAsync(url, [&](long code, std::string result) {
+        WebUtils::GetAsync(url, [](long code, std::string result) {
             if (code == 200)
             {
                 ParseMembers(result);
@@ -104,31 +100,31 @@ namespace TeamUtils
 
     std::string TeamMember::get_profilePicture()
     {
-        return string_format("https://raw.githubusercontent.com/ScoreSaber/ScoreSaber-Team/main/images/%s", profilePicture.c_str());
+        return fmt::format("https://raw.githubusercontent.com/ScoreSaber/ScoreSaber-Team/main/images/{:s}", profilePicture);
     }
 
     std::string TeamMember::get_discord()
     {
-        return discord != "" ? string_format("https://discordapp.com/users/%s", discord.c_str()) : "";
+        return discord != "" ? fmt::format("https://discordapp.com/users/{:s}", discord) : "";
     }
 
     std::string TeamMember::get_github()
     {
-        return github != "" ? string_format("https://github.com/%s", github.c_str()) : "";
+        return github != "" ? fmt::format("https://github.com/{:s}", github) : "";
     }
 
     std::string TeamMember::get_twitch()
     {
-        return twitch != "" ? string_format("https://twitch.tv/%s", twitch.c_str()) : "";
+        return twitch != "" ? fmt::format("https://twitch.tv/{:s}", twitch) : "";
     }
 
     std::string TeamMember::get_twitter()
     {
-        return twitter != "" ? string_format("https://twitter.com/%s", twitter.c_str()) : "";
+        return twitter != "" ? fmt::format("https://twitter.com/{:s}", twitter) : "";
     }
 
     std::string TeamMember::get_youtube()
     {
-        return youtube != "" ? string_format("https://youtube.com/channel/%s", youtube.c_str()) : "";
+        return youtube != "" ? fmt::format("https://youtube.com/channel/{:s}", youtube) : "";
     }
 } // namespace TeamUtils

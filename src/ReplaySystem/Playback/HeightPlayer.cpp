@@ -1,9 +1,9 @@
 #include "ReplaySystem/Playback/HeightPlayer.hpp"
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "System/Action_1.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Transform.hpp"
+#include <System/Action_1.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Transform.hpp>
 #include "logging.hpp"
 #include <algorithm>
 
@@ -16,6 +16,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void HeightPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::PlayerHeightDetector* playerHeightDetector, GlobalNamespace::GameplayCoreSceneSetupData* gameplayCoreSceneSetupData)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _playerHeightDetector = playerHeightDetector;
         _sortedHeightEvents = ReplayLoader::LoadedReplay->heightKeyframes;
@@ -33,7 +34,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     void HeightPlayer::Tick()
     {
         optional<float> newHeight;
-        while (_nextIndex < _sortedHeightEvents.size() && _audioTimeSyncController->get_songEndTime() >= _sortedHeightEvents[_nextIndex].Time) {
+        while (_nextIndex < _sortedHeightEvents.size() && _audioTimeSyncController->songEndTime >= _sortedHeightEvents[_nextIndex].Time) {
             newHeight = _sortedHeightEvents[_nextIndex].Height;
             _nextIndex++;
         }

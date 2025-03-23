@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Data/Private/ReplayFile.hpp"
-#include "Zenject/DiContainer.hpp"
+#include <Zenject/DiContainer.hpp>
 
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/AudioTimeSyncController_InitData.hpp"
-#include "GlobalNamespace/IGamePause.hpp"
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/GamePause.hpp>
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include "ReplaySystem/UI/ImberScrubber.hpp"
@@ -13,13 +12,14 @@
 #include "ReplaySystem/UI/ImberUIPositionController.hpp"
 #include "ReplaySystem/UI/MainImberPanelView.hpp"
 #include "ReplaySystem/UI/SpectateAreaController.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Vector3.hpp"
-#include "UnityEngine/XR/XRNode.hpp"
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Vector3.hpp>
+#include <UnityEngine/XR/XRNode.hpp>
 
-#include "Zenject/IInitializable.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "lapiz/shared/macros.hpp"
+#include <Zenject/IInitializable.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <lapiz/shared/macros.hpp>
+#include "Utils/DelegateUtils.hpp"
 
 #define INTERFACES                                                         \
     {                                                                      \
@@ -29,12 +29,12 @@
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::UI", INTERFACES, 0, nullptr,
 
                                     DECLARE_INSTANCE_FIELD(float, _initialTimeScale);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::IGamePause*, _gamePause);
+                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::GamePause*, _gamePause);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberScrubber*, _imberScrubber);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberSpecsReporter*, _imberSpecsReporter);
-                                    DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::MainImberPanelView*, _mainImberPanelView);
+                                    DECLARE_INSTANCE_FIELD(UnityW<ScoreSaber::ReplaySystem::UI::MainImberPanelView>, _mainImberPanelView);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::SpectateAreaController*, _spectateAreaController);
-                                    DECLARE_INSTANCE_FIELD(GlobalNamespace::AudioTimeSyncController*, _audioTimeSyncController);
+                                    DECLARE_INSTANCE_FIELD(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::Playback::ReplayTimeSyncController*, _replayTimeSyncController);
                                     DECLARE_INSTANCE_FIELD(ScoreSaber::ReplaySystem::UI::ImberUIPositionController*, _imberUIPositionController);
                                     DECLARE_INSTANCE_FIELD(GlobalNamespace::AudioTimeSyncController::InitData*, _initData);
@@ -51,7 +51,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, 
                                                  GlobalNamespace::AudioTimeSyncController::InitData* initData,
                                                  ScoreSaber::ReplaySystem::Playback::PosePlayer* posePlayer);
 
-                                    DECLARE_OVERRIDE_METHOD(void, Initialize, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::Zenject::IInitializable::Initialize>::get());
+                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
 
                                     DECLARE_INSTANCE_METHOD(void, MainImberPanelView_DidHandSwitchEvent, UnityEngine::XR::XRNode hand);
                                     DECLARE_INSTANCE_METHOD(void, GamePause_didResumeEvent);
@@ -71,8 +71,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ImberManager, 
                                     DECLARE_INSTANCE_METHOD(void, MainImberPanelView_DidTimeSyncChange, float value);
                                     DECLARE_INSTANCE_METHOD(void, MainImberPanelView_DidChangeVisibility, bool value);
 
-                                    DECLARE_OVERRIDE_METHOD(void, Dispose, il2cpp_utils::il2cpp_type_check::MetadataGetter<&::System::IDisposable::Dispose>::get());
-                                    System::Action * _didResumeDelegate;
+                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+                                    DelegateUtils::DelegateW<System::Action> _didResumeDelegate;
                                     std::vector<std::string> _positions;
 
 )

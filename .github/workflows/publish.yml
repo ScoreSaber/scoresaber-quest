@@ -41,7 +41,7 @@ jobs:
                  ${{ runner.os }}-
 
          - name: QPM Rust Action
-           uses: Fernthedev/qpm-action@main
+           uses: Fernthedev/qpm-action@v1
            with:
               workflow_token: ${{secrets.GITHUB_TOKEN}}
    
@@ -74,11 +74,11 @@ jobs:
            run: |
               cd ${GITHUB_WORKSPACE}
               qpm qmod build
-              pwsh -Command ./build.ps1
+              pwsh -Command ./scripts/build.ps1
 
          - name: Create Qmod
            run: |
-              pwsh -Command ./createqmod.ps1 ${{env.qmodName}}
+              pwsh -Command ./scripts/createqmod.ps1 ${{env.qmodName}}
 
          # Commit the change to the package
          - name: Configure commit

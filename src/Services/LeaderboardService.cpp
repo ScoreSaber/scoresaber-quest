@@ -1,26 +1,21 @@
+#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 
 #include "Data/InternalLeaderboard.hpp"
 #include "Data/Private/Settings.hpp"
 
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
-#include "GlobalNamespace/BeatmapDifficulty.hpp"
-#include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
-#include "GlobalNamespace/GameplayModifierParamsSO.hpp"
-#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_LeaderboardScore.hpp"
-#include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
+#include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
+#include <GlobalNamespace/BeatmapDifficulty.hpp>
+#include <GlobalNamespace/BeatmapDifficultyMethods.hpp>
+#include <GlobalNamespace/GameplayModifierParamsSO.hpp>
+#include <GlobalNamespace/PlatformLeaderboardsModel.hpp>
 #include "Services/LeaderboardService.hpp"
-#include "Utils/BeatmapUtils.hpp"
 
 #include "Data/Leaderboard.hpp"
 #include "Utils/WebUtils.hpp"
 
-#include "Services/PlayerService.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 #include "logging.hpp"
 #include "static.hpp"
 
@@ -31,35 +26,12 @@ using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::Services::LeaderboardService
 {
-    std::string GetLeaderboardUrl(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry)
+    std::string GetLeaderboardUrl(BeatmapKey beatmapKey, PlatformLeaderboardsModel::ScoresScope scope, int page, bool filterAroundCountry)
     {
-        if (difficultyBeatmap == nullptr)
-        {
-            return "";
-        }
-
         std::string url = ScoreSaber::Static::BASE_URL + "/api/game/leaderboard";
-
-        GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel;
-
-        try
-        {
-            previewBeatmapLevel = reinterpret_cast<IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
-        }
-        catch (const std::exception& e)
-        {
-            return "";
-        }
-        if (previewBeatmapLevel == nullptr)
-        {
-            return "";
-        }
-
-        auto levelId = previewBeatmapLevel->get_levelID();
-        std::string levelHash = StringUtils::GetFormattedHash(levelId);
-
-        std::string gameMode = "Solo" + difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName;
-        int difficulty = BeatmapDifficultyMethods::DefaultRating(difficultyBeatmap->get_difficulty());
+        std::string levelHash = StringUtils::GetFormattedHash(beatmapKey.levelId);
+        std::string gameMode = "Solo" + beatmapKey.beatmapCharacteristic->serializedName;
+        int difficulty = BeatmapDifficultyMethods::DefaultRating(beatmapKey.difficulty);
         
         bool hasPage = true;
 
@@ -68,15 +40,15 @@ namespace ScoreSaber::Services::LeaderboardService
             switch (scope)
             {
                 case PlatformLeaderboardsModel::ScoresScope::Global: {
-                    url = string_format("%s/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                    url = fmt::format("{:s}/{:s}/mode/{:s}/difficulty/{:d}?page={:d}", url, levelHash, gameMode, difficulty, page);
                     break;
                 }
                 case PlatformLeaderboardsModel::ScoresScope::AroundPlayer: {
-                    url = string_format("%s/around-player/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                    url = fmt::format("{:s}/around-player/{:s}/mode/{:s}/difficulty/{:d}?page={:d}", url, levelHash, gameMode, difficulty, page);
                     break;
                 }
                 case PlatformLeaderboardsModel::ScoresScope::Friends: {
-                    url = string_format("%s/around-friends/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                    url = fmt::format("{:s}/around-friends/{:s}/mode/{:s}/difficulty/{:d}?page={:d}", url, levelHash, gameMode, difficulty, page);
                     break;
                 }
             }
@@ -89,12 +61,12 @@ namespace ScoreSaber::Services::LeaderboardService
                 c = tolower(c);
             }
             if(mode == "region") {
-                url = string_format("%s/around-region/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                url = fmt::format("{:s}/around-region/{:s}/mode/{:s}/difficulty/{:d}?page={:d}", url, levelHash, gameMode, difficulty, page);
             } else {
                 if(mode != "country") {
                     ERROR("Invalid location filter mode, falling back to country");
                 }
-                url = string_format("%s/around-country/%s/mode/%s/difficulty/%d?page=%d", url.c_str(), levelHash.c_str(), gameMode.c_str(), difficulty, page);
+                url = fmt::format("{:s}/around-country/{:s}/mode/{:s}/difficulty/{:d}?page={:d}", url, levelHash, gameMode, difficulty, page);
             }
         }
 
@@ -108,11 +80,11 @@ namespace ScoreSaber::Services::LeaderboardService
         return url;
     }
 
-    void GetLeaderboardData(IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope, int page,
+    void GetLeaderboardData(int maxMultipliedScore, BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, PlatformLeaderboardsModel::ScoresScope scope, int page,
                             std::function<void(Data::InternalLeaderboard)> finished,
                             bool filterAroundCountry)
     {
-        std::string url = GetLeaderboardUrl(difficultyBeatmap, scope, page, filterAroundCountry);
+        std::string url = GetLeaderboardUrl(beatmapKey, scope, page, filterAroundCountry);
 
         if (url == "")
         {
@@ -120,17 +92,18 @@ namespace ScoreSaber::Services::LeaderboardService
             return;
         }
 
-        auto [beatmapDataBasicInfo, readonlyBeatmapData] = BeatmapUtils::getBeatmapData(difficultyBeatmap);
+        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
 
-        int maxScore = BeatmapUtils::getMaxScore(readonlyBeatmapData);
+        int * const a = nullptr;
+        int *b = a;
 
         WebUtils::GetAsync(
-            url, [=](long code, std::string result) {
+            url, [beatmapLevelSafe, beatmapKey, scope, page, filterAroundCountry, maxMultipliedScore, finished](long code, std::string result) {
                 Data::InternalLeaderboard data;
                 switch (code)
                 {
                     case 200:
-                        data = ParseLeaderboardData(result, difficultyBeatmap, scope, page, filterAroundCountry, maxScore);
+                        data = ParseLeaderboardData(result, beatmapLevelSafe.ptr(), beatmapKey, scope, page, filterAroundCountry, maxMultipliedScore);
                         break;
                     case 404:
                         data = GetLeaderboardError("No scores on this leaderboard!");
@@ -145,16 +118,16 @@ namespace ScoreSaber::Services::LeaderboardService
 
     Data::InternalLeaderboard GetLeaderboardError(std::string error)
     {
-        auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
+        auto scores = ListW<LeaderboardTableView::ScoreData*>::New();
         scores->Add(LeaderboardTableView::ScoreData::New_ctor(0, error, 0, false));
         return Data::InternalLeaderboard(scores, {});
     }
 
-    Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, IDifficultyBeatmap* difficultyBeatmap, PlatformLeaderboardsModel::ScoresScope scope,
+    Data::InternalLeaderboard ParseLeaderboardData(std::string rawData, BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, PlatformLeaderboardsModel::ScoresScope scope,
                                                    int page, bool filterAroundCountry, int maxScore)
     {
-        auto scores = List<LeaderboardTableView::ScoreData*>::New_ctor();
-        auto modifiers = List<GameplayModifierParamsSO*>::New_ctor();
+        auto scores = ListW<LeaderboardTableView::ScoreData*>::New();
+        auto modifiers = ListW<GameplayModifierParamsSO*>::New();
         std::vector<std::string> profilePictures;
         Data::Leaderboard currentLeaderboard;
         rapidjson::Document doc;
@@ -170,14 +143,16 @@ namespace ScoreSaber::Services::LeaderboardService
                 for (auto& score : currentLeaderboard.scores)
                 {
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
-                    std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
+                    std::u16string formattedScore = FormatScore(((double)score.baseScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
                     std::u16string result = Resize(leaderboardPlayerInfo.name.value() + formattedScore + formattedPP, 75);
+                    INFO("score: {:d}, rank: {:d}", score.modifiedScore, score.rank);
                     scores->Add(LeaderboardTableView::ScoreData::New_ctor(score.modifiedScore, result, score.rank, false));
+                    INFO("it's added now");
                     profilePictures.push_back(leaderboardPlayerInfo.profilePicture);
                 }
 
-                if (scores->size == 0)
+                if (scores.size() == 0)
                 {
                     return GetLeaderboardError("No scores on this leaderboard!");
                 }

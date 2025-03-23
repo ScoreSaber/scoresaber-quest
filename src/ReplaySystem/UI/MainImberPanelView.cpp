@@ -1,13 +1,11 @@
 #include "ReplaySystem/UI/MainImberPanelView.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Vector2.hpp"
+#include <HMUI/ViewController.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Vector2.hpp>
 #include "assets.hpp"
-#include "bsml/shared/BSML.hpp"
+#include <bsml/shared/BSML.hpp>
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-// #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 #include <sstream>
 #include <iomanip>
 
@@ -23,7 +21,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     Transform* MainImberPanelView::get_Transform()
     {
-        return _floatingScreen->get_transform();
+        return _floatingScreen->transform;
     }
 
     void MainImberPanelView::set_visibility(bool value)
@@ -38,18 +36,18 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         if (fpsText != nullptr)
         {
-            fpsText->set_text(std::to_string(value));
+            fpsText->text = std::to_string(value);
             if (value > 0.85f * _targetFPS)
             {
-                fpsText->set_color(_goodColor);
+                fpsText->color = _goodColor;
             }
             else if (value > 0.6f * _targetFPS)
             {
-                fpsText->set_color(_ehColor);
+                fpsText->color = _ehColor;
             }
             else
             {
-                fpsText->set_color(_noColor);
+                fpsText->color = _noColor;
             }
         }
     }
@@ -59,8 +57,8 @@ namespace ScoreSaber::ReplaySystem::UI
         if (leftSpeedText != nullptr) {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(2) << value << " m/s";
-            leftSpeedText->set_text(ss.str());
-            leftSpeedText->set_color(value >= 2.0f ? _goodColor : _noColor);
+            leftSpeedText->text = ss.str();
+            leftSpeedText->color = value >= 2.0f ? _goodColor : _noColor;
         }
     }
 
@@ -69,8 +67,8 @@ namespace ScoreSaber::ReplaySystem::UI
         if (rightSpeedText != nullptr) {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(2) << value << " m/s";
-            rightSpeedText->set_text(ss.str());
-            rightSpeedText->set_color(value >= 2.0f ? _goodColor : _noColor);
+            rightSpeedText->text = ss.str();
+            rightSpeedText->color = value >= 2.0f ? _goodColor : _noColor;
         }
     }
 
@@ -147,23 +145,22 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         //getBase()->DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
         if (firstActivation) {
-            BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, get_transform(), this);
+            BSML::parse_and_construct(IncludedAssets::imber_panel_bsml, transform, this);
         }
-        didSelectDelegate = custom_types::MakeDelegate<System::Action_2<HMUI::SegmentedControl*, int>*>((std::function<void(HMUI::SegmentedControl*, int)>)[&](HMUI::SegmentedControl* segmentedControl, int idx) {
-            DidSelect(segmentedControl, idx);
-        });
-        tabSelector->textSegmentedControl->add_didSelectCellEvent(didSelectDelegate);
+        didSelectDelegate = { &MainImberPanelView::DidSelect, this };
+        tabSelector->textSegmentedControl->___didSelectCellEvent += didSelectDelegate;
         set_didParse(true);
         if (firstActivation)
         {
-            Vector3 localScale = tabSelector->get_transform()->get_localScale();
-            tabSelector->get_transform()->set_localScale({localScale.x * 0.9f, localScale.y * 0.9f, localScale.z * 0.9f});
+            Vector3 localScale = tabSelector->transform->localScale;
+            tabSelector->transform->localScale = {localScale.x * 0.9f, localScale.y * 0.9f, localScale.z * 0.9f};
         }
     }
 
     void MainImberPanelView::DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        tabSelector->textSegmentedControl->remove_didSelectCellEvent(didSelectDelegate);
+        if(tabSelector && UnityW<HMUI::SegmentedControl>::isAlive(tabSelector->textSegmentedControl))
+            tabSelector->textSegmentedControl->___didSelectCellEvent -= didSelectDelegate;
         //getBase()->DidDeactivate(removedFromHierarchy, screenSystemDisabling);
     }
 
@@ -171,11 +168,11 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         _floatingScreen = BSML::FloatingScreen::CreateFloatingScreen({60.0f, 45.0f}, false, defaultPosition.position, defaultPosition.rotation, 0.0f, false);
 
-        auto localScale = _floatingScreen->get_transform()->get_localScale();
-        _floatingScreen->GetComponent<Canvas*>()->set_sortingOrder(31);
-        _floatingScreen->get_transform()->set_localScale({localScale.x / 2.0f, localScale.y / 2.0f, localScale.z / 2.0f});
-        _floatingScreen->set_name("Imber Replay Panel (Screen)");
-        set_name("Imber Replay Panel (View)");
+        auto localScale = _floatingScreen->transform->localScale;
+        _floatingScreen->GetComponent<Canvas*>()->sortingOrder = 31;
+        _floatingScreen->transform->localScale = {localScale.x / 2.0f, localScale.y / 2.0f, localScale.z / 2.0f};
+        _floatingScreen->name = "Imber Replay Panel (Screen)";
+        name = "Imber Replay Panel (View)";
     }
 
     void MainImberPanelView::Setup(float initialSongTime, int targetFramerate, std::string defaultLocation, std::vector<std::string> _locations)
@@ -189,7 +186,7 @@ namespace ScoreSaber::ReplaySystem::UI
         }
     }
 
-    void MainImberPanelView::DidSelect(HMUI::SegmentedControl* segmentedControl, int selected)
+    void MainImberPanelView::DidSelect(UnityW<HMUI::SegmentedControl> segmentedControl, int selected)
     {
         int positionTabIndex = 2;
         if (_lastTab == 2 || selected == 2)

@@ -1,14 +1,11 @@
 #include "ReplaySystem/Recorders/PoseRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "UnityEngine/Time.hpp"
+#include <UnityEngine/Resources.hpp>
+#include <UnityEngine/Time.hpp>
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
 
 using namespace UnityEngine;
-using namespace QuestUI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 

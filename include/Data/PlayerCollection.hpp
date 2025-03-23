@@ -2,7 +2,7 @@
 
 #include "Data/Metadata.hpp"
 #include "Data/Player.hpp"
-#include "beatsaber-hook/shared/utils/typedefs.h"
+#include <beatsaber-hook/shared/utils/typedefs.h>
 
 namespace ScoreSaber::Data
 {

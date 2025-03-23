@@ -1,16 +1,17 @@
 #include "UI/ViewControllers/FAQViewController.hpp"
 
-#include "UnityEngine/Application.hpp"
-#include "UnityEngine/Color.hpp"
-#include "UnityEngine/RectOffset.hpp"
-#include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
-#include "UnityEngine/UI/LayoutElement.hpp"
-#include "UnityEngine/UI/VerticalLayoutGroup.hpp"
+#include <UnityEngine/Application.hpp>
+#include <UnityEngine/Color.hpp>
+#include <UnityEngine/RectOffset.hpp>
+#include <UnityEngine/UI/HorizontalLayoutGroup.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
+#include <UnityEngine/UI/VerticalLayoutGroup.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include "Utils/UIUtils.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/QuestUI.hpp"
-
+#include <bsml/shared/BSML-Lite.hpp>
+#include <bsml/shared/BSML/Components/Backgroundable.hpp>
+#include <paper/shared/string_convert.hpp>
+#include "Utils/StrippedMethods.hpp"
 #include "Sprites.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::ViewControllers, FAQViewController);
@@ -19,9 +20,9 @@ using namespace ScoreSaber;
 using namespace ScoreSaber::UI::ViewControllers;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
+using namespace BSML;
+using namespace BSML::Lite;
 
 // clickable text
 #define SCORESABER_LINK "https://scoresaber.com/"
@@ -55,52 +56,54 @@ struct LinkBoxData
 
 void CreateLinkBoxes(Transform* parent, LinkBoxData data)
 {
-    VerticalLayoutGroup* layoutGroup = BeatSaberUI::CreateVerticalLayoutGroup(parent);
-    layoutGroup->get_padding()->set_bottom(4);
-    layoutGroup->get_padding()->set_left(4);
-    layoutGroup->get_padding()->set_right(4);
-    layoutGroup->get_padding()->set_top(4);
+    VerticalLayoutGroup* layoutGroup = CreateVerticalLayoutGroup(parent);
+    layoutGroup->padding->bottom = 4;
+    layoutGroup->padding->left = 4;
+    layoutGroup->padding->right = 4;
+    layoutGroup->padding->top = 4;
 
     ContentSizeFitter* layoutGroupFitter = layoutGroup->GetComponent<ContentSizeFitter*>();
-    layoutGroupFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-    layoutGroupFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+    layoutGroupFitter->verticalFit = ContentSizeFitter::FitMode::PreferredSize;
+    layoutGroupFitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
 
-    QuestUI::Backgroundable* bg = layoutGroup->get_gameObject()->AddComponent<QuestUI::Backgroundable*>();
-    bg->ApplyBackgroundWithAlpha("title-gradient", 1.0f);
+    Backgroundable* bg = layoutGroup->gameObject->AddComponent<Backgroundable*>();
+    bg->ApplyBackground("title-gradient");
+    bg->ApplyAlpha(1.0f);
 
-    HMUI::ImageView* imageView = bg->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
-    imageView->gradient = true;
-    imageView->gradientDirection = 1;
-    imageView->set_color(Color::get_white());
-    imageView->set_color0(data.colora);
-    imageView->set_color1(data.colorb);
+    HMUI::ImageView* imageView = bg->gameObject->GetComponentInChildren<HMUI::ImageView*>();
+    imageView->_skew = 0.0f;
+    imageView->_gradient = true;
+    imageView->_gradientDirection = 1;
+    imageView->color = Color::get_white();
+    imageView->_color0 = data.colora;
+    imageView->_color1 = data.colorb;
 
     LayoutElement* layoutElement = layoutGroup->GetComponent<LayoutElement*>();
-    layoutElement->set_preferredWidth(40.0f);
-    layoutElement->set_preferredHeight(60.0f);
+    layoutElement->preferredWidth = 40.0f;
+    layoutElement->preferredHeight = 60.0f;
 
-    ScoreSaber::CustomTypes::Components::ClickableText* text = UIUtils::CreateClickableText(layoutGroup->get_transform(), to_utf16(data.mainText), [url = data.mainURL]() { Application::OpenURL(url); });
-    text->set_fontSize(6.5f);
-    text->set_alignment(TextAlignmentOptions::Center);
+    ClickableText* text = CreateClickableText(layoutGroup->transform, Paper::StringConvert::from_utf8(data.mainText), [url = data.mainURL]() { StrippedMethods::UnityEngine::Application::OpenURL(url); });
+    text->fontSize = 6.5f;
+    text->alignment = TextAlignmentOptions::Center;
 
-    BeatSaberUI::CreateUIButton(layoutGroup->get_transform(), "Discord", [url = data.discord]() { Application::OpenURL(url); });
-    BeatSaberUI::CreateUIButton(layoutGroup->get_transform(), "Twitter", [url = data.twitter]() { Application::OpenURL(url); });
-    BeatSaberUI::CreateUIButton(layoutGroup->get_transform(), "Patreon", [url = data.patreon]() { Application::OpenURL(url); });
+    CreateUIButton(layoutGroup->transform, "Discord", [url = data.discord]() { StrippedMethods::UnityEngine::Application::OpenURL(url); });
+    CreateUIButton(layoutGroup->transform, "Twitter", [url = data.twitter]() { StrippedMethods::UnityEngine::Application::OpenURL(url); });
+    CreateUIButton(layoutGroup->transform, "Patreon", [url = data.patreon]() { StrippedMethods::UnityEngine::Application::OpenURL(url); });
 
-    VerticalLayoutGroup* imageLayout = BeatSaberUI::CreateVerticalLayoutGroup(layoutGroup->get_transform());
+    VerticalLayoutGroup* imageLayout = CreateVerticalLayoutGroup(layoutGroup->transform);
 
     ContentSizeFitter* imageFitter = imageLayout->GetComponent<ContentSizeFitter*>();
-    imageFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
-    imageFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
+    imageFitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
+    imageFitter->verticalFit = ContentSizeFitter::FitMode::PreferredSize;
 
-    VerticalLayoutGroup* imageParent = BeatSaberUI::CreateVerticalLayoutGroup(imageLayout->get_transform());
+    VerticalLayoutGroup* imageParent = CreateVerticalLayoutGroup(imageLayout->transform);
 
     LayoutElement* imageElement = imageParent->GetComponent<LayoutElement*>();
-    imageElement->set_preferredWidth(20.0f);
-    imageElement->set_preferredHeight(20.0f);
+    imageElement->preferredWidth = 20.0f;
+    imageElement->preferredHeight = 20.0f;
 
-    HMUI::ImageView* image = BeatSaberUI::CreateImage(imageElement->get_transform(), data.icon, {0.0f, 0.0f}, {0.0f, 0.0f});
-    image->set_preserveAspect(true);
+    HMUI::ImageView* image = CreateImage(imageElement->transform, data.icon, {0.0f, 0.0f}, {0.0f, 0.0f});
+    image->preserveAspect = true;
 }
 
 namespace ScoreSaber::UI::ViewControllers
@@ -109,28 +112,29 @@ namespace ScoreSaber::UI::ViewControllers
     {
         if (firstActivation)
         {
-            VerticalLayoutGroup* vertical = BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
+            VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(transform);
             ContentSizeFitter* sizeFitter = vertical->GetComponent<ContentSizeFitter*>();
-            sizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
-            sizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-            vertical->set_spacing(2.0f);
+            sizeFitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
+            sizeFitter->verticalFit = ContentSizeFitter::FitMode::PreferredSize;
+            vertical->spacing = 2.0f;
 
-            auto headerHorizontal = CreateHorizontalLayoutGroup(vertical->get_transform());
-            headerHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
-            auto headerText = CreateText(headerHorizontal->get_transform(), "Links");
-            headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
-            headerText->set_fontSize(7.0f);
-            auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
-            headerBG->ApplyBackgroundWithAlpha("round-rect-panel", 0.5f);
+            auto headerHorizontal = CreateHorizontalLayoutGroup(vertical->transform);
+            headerHorizontal->childAlignment = TextAnchor::MiddleCenter;
+            auto headerText = CreateText(headerHorizontal->transform, "Links");
+            headerText->alignment = TMPro::TextAlignmentOptions::Center;
+            headerText->fontSize = 7.0f;
+            auto headerBG = headerHorizontal->gameObject->AddComponent<Backgroundable*>();
+            headerBG->ApplyBackground("round-rect-panel");
+            headerBG->ApplyAlpha(0.5f);
 
-            HorizontalLayoutGroup* horizontal = BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
+            HorizontalLayoutGroup* horizontal = CreateHorizontalLayoutGroup(vertical->transform);
 
             ContentSizeFitter* horizFitter = horizontal->GetComponent<ContentSizeFitter*>();
-            horizFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-            horizFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+            horizFitter->verticalFit = ContentSizeFitter::FitMode::PreferredSize;
+            horizFitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
 
             LayoutElement* horizontalElement = horizontal->GetComponent<LayoutElement*>();
-            horizontalElement->set_preferredWidth(90.0f);
+            horizontalElement->preferredWidth = 90.0f;
 
             LinkBoxData scoreSaber = {
                 "ScoreSaber",
@@ -152,8 +156,8 @@ namespace ScoreSaber::UI::ViewControllers
                 Color(0.05f, 0.0f, 0.05f, 1.0f),
                 Color(0.1f, 0.0f, 0.1f, 1.0f)};
 
-            CreateLinkBoxes(horizontal->get_transform(), scoreSaber);
-            CreateLinkBoxes(horizontal->get_transform(), bsmg);
+            CreateLinkBoxes(horizontal->transform, scoreSaber);
+            CreateLinkBoxes(horizontal->transform, bsmg);
         }
     }
 } // namespace ScoreSaber::UI::ViewControllers

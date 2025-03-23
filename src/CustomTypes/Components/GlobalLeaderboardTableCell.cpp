@@ -1,15 +1,18 @@
 #include "CustomTypes/Components/GlobalLeaderboardTableCell.hpp"
 
-#include "GlobalNamespace/SharedCoroutineStarter.hpp"
-#include "HMUI/ImageView.hpp"
-#include "HMUI/Touchable.hpp"
+#include <HMUI/ImageView.hpp>
+#include <HMUI/Touchable.hpp>
 
-#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
-#include "UnityEngine/Networking/UnityWebRequest.hpp"
-#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
-#include "UnityEngine/Sprite.hpp"
-#include "UnityEngine/SpriteMeshType.hpp"
-#include "UnityEngine/Texture2D.hpp"
+#include <UnityEngine/Networking/DownloadHandlerTexture.hpp>
+#include <UnityEngine/Networking/UnityWebRequest.hpp>
+#include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
+#include <UnityEngine/Sprite.hpp>
+#include <UnityEngine/SpriteMeshType.hpp>
+#include <UnityEngine/Texture2D.hpp>
+#include <UnityEngine/UI/ContentSizeFitter.hpp>
+#include <UnityEngine/UI/LayoutElement.hpp>
+#include <bsml/shared/BSML-Lite.hpp>
+#include <bsml/shared/BSML/SharedCoroutineStarter.hpp>
 
 #include "Sprites.hpp"
 #include "Utils/StringUtils.hpp"
@@ -18,9 +21,6 @@
 
 #include "logging.hpp"
 #include "main.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
-#include "questui/shared/QuestUI.hpp"
 
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell);
 
@@ -29,15 +29,13 @@ using namespace StringUtils;
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
+using namespace BSML;
+using namespace BSML::Lite;
 
 using LeaderboardType = ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType;
 
-#define BeginCoroutine(method)                                               \
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
-        custom_types::Helpers::CoroutineHelper::New(method));
+#define BeginCoroutine(method) SharedCoroutineStarter::StartCoroutine(custom_types::Helpers::CoroutineHelper::New(method))
 
 void GlobalLeaderboardTableCell::ctor()
 {
@@ -46,16 +44,16 @@ void GlobalLeaderboardTableCell::ctor()
 VerticalLayoutGroup* CreateHost(Transform* parent, Vector2 anchoredPos,
                                 Vector2 size)
 {
-    VerticalLayoutGroup* group = BeatSaberUI::CreateVerticalLayoutGroup(parent);
-    group->get_rectTransform()->set_anchoredPosition(anchoredPos);
+    VerticalLayoutGroup* group = CreateVerticalLayoutGroup(parent);
+    group->rectTransform->anchoredPosition = anchoredPos;
 
     LayoutElement* elem = group->GetComponent<LayoutElement*>();
-    elem->set_preferredHeight(size.y);
-    elem->set_preferredWidth(size.x);
+    elem->preferredHeight = size.y;
+    elem->preferredWidth = size.x;
 
     ContentSizeFitter* fitter = group->GetComponent<ContentSizeFitter*>();
-    fitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-    fitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+    fitter->verticalFit = ContentSizeFitter::FitMode::PreferredSize;
+    fitter->horizontalFit = ContentSizeFitter::FitMode::PreferredSize;
     return group;
 }
 
@@ -66,7 +64,7 @@ std::string flag_url(std::string_view COUNTRY)
     {
         c = tolower(c);
     }
-    auto url = string_format("https://github.com/hampusborgos/country-flags/raw/main/png250px/%s.png", country.c_str());
+    auto url = fmt::format("https://cdn.scoresaber.com/flags/{:s}.png", country);
     return url;
 }
 
@@ -75,7 +73,7 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     stopProfileRoutine();
     stopFlagRoutine();
 
-    profile->set_sprite(Base64ToSprite(oculus_base64));
+    profile->sprite = Base64ToSprite(oculus_base64);
 
     // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
     if (!player.profilePicture.ends_with("oculus.png"))
@@ -90,21 +88,22 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
         }
     }
 
-    this->name->set_text(player.name);
+    this->name->text = player.name;
 
     if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
-        this->rank->set_text(string_format("#%d", player.rank));
+        this->rank->text = fmt::format("#{:d}", player.rank);
     }
     else
     {
-        this->rank->set_text(string_format("#%d (#%d)", player.countryRank, player.rank));
+        this->rank->text = fmt::format("#{:d} (#{:d})", player.countryRank, player.rank);
     }
 
-    this->pp->set_text(string_format("<color=#6872e5>%.0fpp</color>", player.pp));
-    flag->set_sprite(Base64ToSprite(country_base64));
+    this->pp->text = fmt::format("<color=#6872e5>{:.0f}pp</color>", player.pp);
+    flag->sprite = Base64ToSprite(country_base64);
+
     flagRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(flag_url(player.country), flag));
-    this->country->set_text(player.country);
+    this->country->text = player.country;
 
     auto& histories = player.histories;
     auto length = histories.size();
@@ -126,17 +125,17 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     std::string result;
     if (weeklyChange > 0)
     {
-        result = string_format("<color=green>+%d</color>", weeklyChange);
+        result = fmt::format("<color=green>+{:d}</color>", weeklyChange);
     }
     else if (weeklyChange < 0)
     {
-        result = string_format("<color=red>%d</color>", weeklyChange);
+        result = fmt::format("<color=red>{:d}</color>", weeklyChange);
     }
     else
     {
-        result = string_format("%d", weeklyChange);
+        result = fmt::format("{:d}", weeklyChange);
     }
-    weekly->set_text(result);
+    weekly->text = result;
 
     playerId = player.id;
 }
@@ -145,65 +144,65 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 {
     auto cellGO = UnityEngine::GameObject::New_ctor();
     auto playerCell = cellGO->AddComponent<GlobalLeaderboardTableCell*>();
-    cellGO->set_name("GlobalLeaderboardTableCell");
+    cellGO->name = "GlobalLeaderboardTableCell";
 
     cellGO->AddComponent<HMUI::Touchable*>();
-    playerCell->set_interactable(false);
+    playerCell->interactable = false;
 
-    auto verticalLayoutGroup = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
-        playerCell->get_transform());
+    auto verticalLayoutGroup = CreateVerticalLayoutGroup(
+        playerCell->transform);
 
-    auto layout = verticalLayoutGroup->get_gameObject()->GetComponent<UnityEngine::UI::LayoutElement*>();
-    layout->set_preferredHeight(11.0f);
-    layout->set_preferredWidth(200.0f);
+    auto layout = verticalLayoutGroup->gameObject->GetComponent<UnityEngine::UI::LayoutElement*>();
+    layout->preferredHeight = 11.0f;
+    layout->preferredWidth = 200.0f;
 
-    Transform* t = playerCell->get_transform();
+    Transform* t = playerCell->transform;
 
-    playerCell->profile = UIUtils::CreateClickableImage(
-        CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->get_transform(),
-        Base64ToSprite(oculus_base64), {0.0f, 0.0f},
-        {10.0f, 10.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+    playerCell->profile = CreateClickableImage(
+        CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->transform,
+        Base64ToSprite(oculus_base64), std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell),
+        {0.0f, 0.0f}, {10.0f, 10.0f});
 
-    playerCell->name = UIUtils::CreateClickableText(
-        CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
-        u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+    playerCell->name = CreateClickableText(
+        CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->transform,
+        u"Username", FontStyles::Normal, {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
 
-    playerCell->name->set_overflowMode(TextOverflowModes::Ellipsis);
-    playerCell->name->set_alignment(TextAlignmentOptions::Left);
-    playerCell->name->set_fontSize(5.0f);
+    playerCell->name->overflowMode = TextOverflowModes::Ellipsis;
+    playerCell->name->alignment = TextAlignmentOptions::Left;
+    playerCell->name->fontSize = 5.0f;
 
-    playerCell->rank = BeatSaberUI::CreateText(
-        CreateHost(t, {-18.0f, -2.0f}, {40.0f, 8.0f})->get_transform(),
-        "#---", false,
+    playerCell->rank = CreateText(
+        CreateHost(t, {-18.0f, -2.0f}, {40.0f, 8.0f})->transform,
+        "#---", FontStyles::Normal,
         {0.0f, 0.0f});
 
-    playerCell->rank->set_alignment(TextAlignmentOptions::Left);
+    playerCell->rank->alignment = TextAlignmentOptions::Left;
 
-    playerCell->pp = BeatSaberUI::CreateText(
-        CreateHost(t, {27.0f, 0.0f}, {20.0f, 11.0f})->get_transform(),
-        "---<color=#6872e5>pp</color>", false, {0.0f, 0.0f});
+    playerCell->pp = CreateText(
+        CreateHost(t, {27.0f, 0.0f}, {20.0f, 11.0f})->transform,
+        "---<color=#6872e5>pp</color>", FontStyles::Normal, {0.0f, 0.0f});
 
-    playerCell->pp->set_fontSize(5.0f);
-    playerCell->pp->set_overflowMode(TextOverflowModes::Ellipsis);
+    playerCell->pp->fontSize = 5.0f;
+    playerCell->pp->overflowMode = TextOverflowModes::Ellipsis;
 
-    playerCell->flag = BeatSaberUI::CreateImage(
-        CreateHost(t, {19.42f, -1.65f}, {4.0f, 3.0f})->get_transform(),
+    playerCell->flag = CreateImage(
+        CreateHost(t, {19.42f, -1.65f}, {4.0f, 3.0f})->transform,
         Base64ToSprite(country_base64), {0.0f, 0.0f},
         {4.0, 3.0f});
 
-    playerCell->flag->set_preserveAspect(true);
+    playerCell->flag->preserveAspect = true;
 
-    playerCell->country = BeatSaberUI::CreateText(
-        CreateHost(t, {31.0f, -2.0f}, {17.0f, 0.0f})->get_transform(), "N/A", false, {0.0f, 0.0f});
-    playerCell->country->set_alignment(TextAlignmentOptions::Left);
-    playerCell->country->set_fontSize(3.5f);
+    playerCell->country = CreateText(
+        CreateHost(t, {31.0f, -2.0f}, {17.0f, 0.0f})->transform, "N/A", FontStyles::Normal, {0.0f, 0.0f});
+    playerCell->country->alignment = TextAlignmentOptions::Left;
+    playerCell->country->fontSize = 3.5f;
 
-    playerCell->weekly = BeatSaberUI::CreateText(
-        CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->get_transform(), "0", false,
+    playerCell->weekly = CreateText(
+        CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->transform, "0", FontStyles::Normal,
         {0.0f, 0.0f});
 
-    playerCell->weekly->set_alignment(TextAlignmentOptions::Right);
-    playerCell->weekly->set_fontSize(5.0f);
+    playerCell->weekly->alignment = TextAlignmentOptions::Right;
+    playerCell->weekly->fontSize = 5.0f;
 
     return playerCell;
 }
@@ -212,7 +211,7 @@ void GlobalLeaderboardTableCell::stopProfileRoutine()
 {
     if (profileRoutine)
     {
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(profileRoutine);
+        StopCoroutine(profileRoutine);
     }
     profileRoutine = nullptr;
 }
@@ -221,7 +220,7 @@ void GlobalLeaderboardTableCell::stopFlagRoutine()
 {
     if (flagRoutine)
     {
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(flagRoutine);
+        StopCoroutine(flagRoutine);
     }
     flagRoutine = nullptr;
 }

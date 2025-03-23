@@ -1,5 +1,5 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
 #include <string>
 
@@ -7,6 +7,7 @@ namespace ScoreSaber::Data
 {
     struct LeaderboardPlayer
     {
+        LeaderboardPlayer() = default;
         LeaderboardPlayer(const rapidjson::Value&& value);
         LeaderboardPlayer(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         LeaderboardPlayer(rapidjson::GenericObject<true, rapidjson::Value> value);

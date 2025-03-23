@@ -1,8 +1,8 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
-#include "custom-types/shared/coroutine.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
+#include <custom-types/shared/coroutine.hpp>
 
-#include "HMUI/ImageView.hpp"
+#include <HMUI/ImageView.hpp>
 
 #include <functional>
 #include <string>

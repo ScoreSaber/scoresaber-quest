@@ -1,5 +1,5 @@
 #include "Data/LeaderboardInfoCollection.hpp"
-#include "beatsaber-hook/shared/utils/utils-functions.h"
+#include <beatsaber-hook/shared/utils/utils-functions.h>
 
 inline rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> getdoc(std::u16string_view string)
 {
@@ -70,7 +70,7 @@ namespace ScoreSaber::Data
     }
 
     LeaderboardInfoCollection::LeaderboardInfoCollection(StringW string)
-        : LeaderboardInfoCollection(getdoc(csstrtostr(string))){};
+        : LeaderboardInfoCollection(getdoc(string)){};
 
     LeaderboardInfoCollection::LeaderboardInfoCollection(std::string_view string)
         : LeaderboardInfoCollection(getdoc(string)){};

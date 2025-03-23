@@ -1,12 +1,11 @@
 #pragma once
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
 
-#include "GlobalNamespace/OVRPlugin_Controller.hpp"
-#include "GlobalNamespace/OVRPlugin_SystemHeadset.hpp"
+#include <GlobalNamespace/OVRPlugin.hpp>
 #include "Data/Score.hpp"
-#include "beatsaber-hook/shared/utils/typedefs.h"
-#include "custom-types/shared/register.hpp"
-#include "custom-types/shared/types.hpp"
+#include <beatsaber-hook/shared/utils/typedefs.h>
+#include <custom-types/shared/register.hpp>
+#include <custom-types/shared/types.hpp>
 #include <string>
 #include <vector>
 

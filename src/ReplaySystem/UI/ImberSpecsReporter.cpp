@@ -1,11 +1,11 @@
 #include "ReplaySystem/UI/ImberSpecsReporter.hpp"
-#include "GlobalNamespace/Saber.hpp"
-#include "GlobalNamespace/SaberMovementData.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Vector2.hpp"
+#include <GlobalNamespace/Saber.hpp>
+#include <GlobalNamespace/SaberMovementData.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Vector2.hpp>
+#include "Utils/SafePtr.hpp"
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
@@ -22,15 +22,16 @@ namespace ScoreSaber::ReplaySystem::UI
     }
     void ImberSpecsReporter::Initialize()
     {
-        _posePlayer->AddCallback([&](ScoreSaber::Data::Private::VRPoseGroup pose) {
-            PosePlayer_DidUpdatePose(pose);
+        FixedSafePtr<ImberSpecsReporter> self(this);
+        _posePlayer->AddCallback([self](ScoreSaber::Data::Private::VRPoseGroup pose) {
+            self->PosePlayer_DidUpdatePose(pose);
         });
     }
     void ImberSpecsReporter::PosePlayer_DidUpdatePose(ScoreSaber::Data::Private::VRPoseGroup pose)
     {
         if (DidReport != nullptr)
         {
-            DidReport(pose.FPS, _saberManager->leftSaber->movementData->get_bladeSpeed(), _saberManager->rightSaber->movementData->get_bladeSpeed());
+            DidReport(pose.FPS, _saberManager->leftSaber->movementData->bladeSpeed, _saberManager->rightSaber->movementData->bladeSpeed);
         }
     }
     void ImberSpecsReporter::Dispose()

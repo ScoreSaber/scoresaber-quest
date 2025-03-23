@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "GlobalNamespace/NoteData.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <GlobalNamespace/NoteData.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Vector3.hpp>
 
 using namespace std;
 
@@ -88,7 +88,7 @@ namespace ScoreSaber::Data::Private
     {
         NoteID();
         NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection);
-        NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection, int GameplayType, int ScoringType, int CutDirectionAngleOffset);
+        NoteID(float Time, int LineLayer, int LineIndex, int ColorType, int CutDirection, int GameplayType, int ScoringType, float CutDirectionAngleOffset);
         float Time;
         int LineLayer;
         int LineIndex;

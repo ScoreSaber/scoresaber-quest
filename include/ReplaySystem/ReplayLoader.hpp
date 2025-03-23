@@ -2,24 +2,26 @@
 #include "Data/Private/ReplayFile.hpp"
 #include "Data/Private/ReplayReader.hpp"
 #include "Data/Score.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/LevelCompletionResults.hpp"
-#include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp"
-
+#include <GlobalNamespace/BeatmapKey.hpp>
+#include <GlobalNamespace/BeatmapLevel.hpp>
+#include <GlobalNamespace/LevelCompletionResults.hpp>
+#include <GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp>
 #include "ReplaySystem/Playback/NotePlayer.hpp"
+#include "Utils/SafePtr.hpp"
 
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
     extern std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
-    extern GlobalNamespace::IDifficultyBeatmap* CurrentLevel;
+    extern FixedSafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
+    extern FixedSafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     extern std::u16string CurrentPlayerName;
     extern std::string CurrentModifiers;
-    extern ScoreSaber::ReplaySystem::Playback::NotePlayer* NotePlayerInstance;
+    extern FixedSafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
 
     extern bool IsPlaying;
-    void StartReplay(GlobalNamespace::IDifficultyBeatmap* beatmap);
-    void Load(const std::vector<char> &replayData, GlobalNamespace::IDifficultyBeatmap* beatmap, std::string modifiers, std::u16string playerName);
-    void GetReplayData(GlobalNamespace::IDifficultyBeatmap* beatmap, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
+    void StartReplay(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey);
+    void Load(const std::vector<char> &replayData, GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, std::string modifiers, std::u16string playerName);
+    void GetReplayData(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, int leaderboardId, std::string replayFileName, ScoreSaber::Data::Score& score, const std::function<void(bool)>& finished);
 
     void OnSoftRestart();
 

@@ -1,6 +1,6 @@
 #include "ReplaySystem/Playback/MultiplierPlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
-#include "System/Action_2.hpp"
+#include <System/Action_2.hpp>
 #include "logging.hpp"
 #include <algorithm>
 
@@ -13,6 +13,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 {
     void MultiplierPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController)
     {
+        INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _scoreController = scoreController;
         _sortedMultiplierEvents = ReplayLoader::LoadedReplay->multiplierKeyframes;
@@ -37,10 +38,10 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
     void MultiplierPlayer::UpdateMultiplier(int multiplier, float progress)
     {
-        auto counter = _scoreController->scoreMultiplierCounter;
-        counter->multiplier = multiplier;
-        counter->multiplierIncreaseMaxProgress = multiplier * 2;
-        counter->multiplierIncreaseProgress = (int)(progress * (multiplier * 2));
+        auto counter = _scoreController->_scoreMultiplierCounter;
+        counter->_multiplier = multiplier;
+        counter->_multiplierIncreaseMaxProgress = multiplier * 2;
+        counter->_multiplierIncreaseProgress = (int)(progress * (multiplier * 2));
         if (_scoreController->multiplierDidChangeEvent != nullptr)
         {
             _scoreController->multiplierDidChangeEvent->Invoke(multiplier, progress);

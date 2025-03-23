@@ -10,7 +10,7 @@ namespace ScoreSaber::Services::ReplayService
 {
     vector<char> CurrentSerializedReplay;
     function<void(const vector<char>&)> ReplaySerialized;
-    ReplaySystem::Recorders::MainRecorder* recorder;
+    FixedSafePtr<ReplaySystem::Recorders::MainRecorder> recorder;
 
     void OnSoftRestart() {
         CurrentSerializedReplay.clear();

@@ -1,7 +1,7 @@
 #include "UI/ViewControllers/MainSettingsViewController.hpp"
 
 #include "Data/Private/Settings.hpp"
-#include "bsml/shared/BSML.hpp"
+#include <bsml/shared/BSML.hpp>
 #include "assets.hpp"
 #include "logging.hpp"
 
@@ -63,7 +63,7 @@ namespace ScoreSaber::UI::ViewControllers {
     void MainSettingsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         if (firstActivation) {
-            BSML::parse_and_construct(IncludedAssets::MainSettingsViewController_bsml, get_transform(), this);
+            BSML::parse_and_construct(IncludedAssets::MainSettingsViewController_bsml, transform, this);
         }
     }
 

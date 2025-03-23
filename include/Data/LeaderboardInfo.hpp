@@ -2,7 +2,7 @@
 
 #include "Data/Difficulty.hpp"
 #include "Data/Score.hpp"
-#include "beatsaber-hook/shared/utils/typedefs.h"
+#include <beatsaber-hook/shared/utils/typedefs.h>
 #include <optional>
 #include <vector>
 

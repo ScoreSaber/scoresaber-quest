@@ -1,22 +1,21 @@
 #pragma once
 
-#include "HMUI/CurvedTextMeshPro.hpp"
+#include <HMUI/CurvedTextMeshPro.hpp>
 #include "ReplaySystem/UI/Components/AmeNode.hpp"
-#include "UnityEngine/Camera.hpp"
-#include "UnityEngine/Material.hpp"
-#include "UnityEngine/MonoBehaviour.hpp"
-#include "UnityEngine/RectTransform.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "custom-types/shared/macros.hpp"
-#include "lapiz/shared/macros.hpp"
+#include <UnityEngine/Camera.hpp>
+#include <UnityEngine/Material.hpp>
+#include <UnityEngine/MonoBehaviour.hpp>
+#include <UnityEngine/RectTransform.hpp>
+#include <UnityEngine/Vector2.hpp>
+#include <custom-types/shared/macros.hpp>
+#include <lapiz/shared/macros.hpp>
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::UI::Components, AmeBar, UnityEngine::MonoBehaviour,
-                      DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _rectTransform);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _fillBarTransform);
-                      DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _endTimeText);
-                      DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _currentTimeText);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::RectTransform*, _otherTransform);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::Material*, _mainUIFontMaterial);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::RectTransform>, _rectTransform);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::RectTransform>, _fillBarTransform);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::CurvedTextMeshPro>, _endTimeText);
+                      DECLARE_INSTANCE_FIELD(UnityW<HMUI::CurvedTextMeshPro>, _currentTimeText);
+                      DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::RectTransform>, _otherTransform);
                       DECLARE_INSTANCE_METHOD(void, Setup, UnityEngine::RectTransform* fillBarTransform, UnityEngine::RectTransform* otherTransform);
                       DECLARE_INSTANCE_METHOD(void, RegisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);
                       DECLARE_INSTANCE_METHOD(void, UnregisterNode, ScoreSaber::ReplaySystem::UI::Components::AmeNode* node);

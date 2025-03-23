@@ -1,7 +1,7 @@
 #include "Data/Private/ReplayFile.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/Vector3.hpp"
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Quaternion.hpp>
+#include <UnityEngine/Vector3.hpp>
 
 namespace ScoreSaber::Data::Private
 {
@@ -105,7 +105,7 @@ namespace ScoreSaber::Data::Private
         CutDirection = _CutDirection;
     }
 
-    NoteID::NoteID(float _Time, int _LineLayer, int _LineIndex, int _ColorType, int _CutDirection, int _GameplayType, int _ScoringType, int _CutDirectionAngleOffset)
+    NoteID::NoteID(float _Time, int _LineLayer, int _LineIndex, int _ColorType, int _CutDirection, int _GameplayType, int _ScoringType, float _CutDirectionAngleOffset)
     {
         Time = _Time;
         LineLayer = _LineLayer;

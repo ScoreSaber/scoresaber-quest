@@ -1,10 +1,10 @@
 #include "ReplaySystem/Recorders/EnergyEventRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/GameEnergyCounter.hpp"
-#include "System/Action_1.hpp"
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/GameEnergyCounter.hpp>
+#include <System/Action_1.hpp>
 #include "logging.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
 
 using namespace UnityEngine;
@@ -24,16 +24,16 @@ namespace ScoreSaber::ReplaySystem::Recorders
 
     void EnergyEventRecorder::Initialize()
     {
-        if(_gameEnergyCounter != nullptr) {
-            gameEnergyDidChangeDelegate = custom_types::MakeDelegate<System::Action_1<float>*>(classof(System::Action_1<float>*), (function<void(float)>)[&](float energy) {GameEnergyCounter_gameEnergyDidChangeEvent(energy);});
-            _gameEnergyCounter->add_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
+        if(_gameEnergyCounter) {
+            gameEnergyDidChangeDelegate = { &EnergyEventRecorder::GameEnergyCounter_gameEnergyDidChangeEvent, this };
+            _gameEnergyCounter->___gameEnergyDidChangeEvent += gameEnergyDidChangeDelegate;
         }
     }
 
     void EnergyEventRecorder::Dispose()
     {
-        if(_gameEnergyCounter != nullptr && gameEnergyDidChangeDelegate) {
-            _gameEnergyCounter->remove_gameEnergyDidChangeEvent(gameEnergyDidChangeDelegate);
+        if(_gameEnergyCounter && gameEnergyDidChangeDelegate) {
+            _gameEnergyCounter->___gameEnergyDidChangeEvent -= gameEnergyDidChangeDelegate;
         }
     }
 

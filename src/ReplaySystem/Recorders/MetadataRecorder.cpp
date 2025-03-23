@@ -1,34 +1,23 @@
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
-#include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
-#include "GlobalNamespace/BeatmapDifficulty.hpp"
-#include "GlobalNamespace/BeatmapDifficultyMethods.hpp"
-#include "GlobalNamespace/BeatmapObjectSpawnController_InitData.hpp"
-#include "GlobalNamespace/EnvironmentInfoSO.hpp"
-#include "GlobalNamespace/FloatSO.hpp"
-#include "GlobalNamespace/GameEnergyCounter.hpp"
-#include "GlobalNamespace/GameplayCoreSceneSetupData.hpp"
-#include "GlobalNamespace/IBeatmapLevel.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/MainSettingsModelSO.hpp"
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"
-#include "GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp"
-#include "GlobalNamespace/Vector3SO.hpp"
 #include "Services/UploadService.hpp"
-#include "System/Action.hpp"
-#include "UnityEngine/Resources.hpp"
-#include "Utils/StringUtils.hpp"
-#include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
-#include "custom-types/shared/delegate.hpp"
+#include <BeatSaber/GameSettings/MainSettings.hpp>
+#include <GlobalNamespace/BeatmapLevel.hpp>
+#include <GlobalNamespace/AudioTimeSyncController.hpp>
+#include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
+#include <GlobalNamespace/BeatmapDifficulty.hpp>
+#include <GlobalNamespace/BeatmapDifficultyMethods.hpp>
+#include <GlobalNamespace/EnvironmentInfoSO.hpp>
+#include <GlobalNamespace/GameEnergyCounter.hpp>
+#include <GlobalNamespace/GameplayCoreSceneSetupData.hpp>
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
+#include <GlobalNamespace/SinglePlayerLevelSelectionFlowCoordinator.hpp>
+#include <System/Action.hpp>
+#include <custom-types/shared/delegate.hpp>
 #include <functional>
+#include "logging.hpp"
 
 using namespace UnityEngine;
-using namespace QuestUI;
 using namespace GlobalNamespace;
 using namespace ScoreSaber::Data::Private;
 
@@ -36,25 +25,26 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, MetadataRecorder);
 
 namespace ScoreSaber::ReplaySystem::Recorders
 {
-    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, IGameEnergyCounter* gameEnergyCounter)
+    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GameEnergyCounter* gameEnergyCounter, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler)
     {
         INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _beatmapObjectSpawnControllerInitData = beatmapObjectSpawnControllerInitData;
-        _mainSettingsModelSO = ArrayUtil::First(Resources::FindObjectsOfTypeAll<MainSettingsModelSO*>());
         _gameEnergyCounter = gameEnergyCounter;
         _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
+        _mainSettingsHandler = mainSettingsHandler;
     }
 
     void MetadataRecorder::Initialize()
     {
-        gameEnergyDidReach0Delegate = custom_types::MakeDelegate<System::Action*>((function<void()>)[&]() {GameEnergyCounter_gameEnergyDidReach0Event();});
-        _gameEnergyCounter->add_gameEnergyDidReach0Event(gameEnergyDidReach0Delegate);
+        gameEnergyDidReach0Delegate = { &MetadataRecorder::GameEnergyCounter_gameEnergyDidReach0Event, this };
+        _gameEnergyCounter->___gameEnergyDidReach0Event += gameEnergyDidReach0Delegate;
     }
 
     void MetadataRecorder::Dispose()
     {
-        _gameEnergyCounter->remove_gameEnergyDidReach0Event(gameEnergyDidReach0Delegate);
+        if(_gameEnergyCounter)
+            _gameEnergyCounter->___gameEnergyDidReach0Event -= gameEnergyDidReach0Delegate;
     }
 
     void MetadataRecorder::GameEnergyCounter_gameEnergyDidReach0Event()
@@ -64,19 +54,19 @@ namespace ScoreSaber::ReplaySystem::Recorders
     
     std::shared_ptr<Metadata> MetadataRecorder::Export()
     {
+        StringW csc;
         auto metadata = make_shared<Metadata>();
         metadata->Version = "3.0.0";
-        metadata->LevelID = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_level()->i_IPreviewBeatmapLevel()->get_levelID());
-        metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->difficultyBeatmap->get_difficulty());
-        metadata->Characteristic = static_cast<std::string>(_gameplayCoreSceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->serializedName);
-        metadata->Environment = static_cast<std::string>(_gameplayCoreSceneSetupData->environmentInfo->serializedName);
+        metadata->LevelID = (string)_gameplayCoreSceneSetupData->beatmapLevel->levelID;
+        metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->beatmapKey.difficulty);
+        metadata->Characteristic = (string)_gameplayCoreSceneSetupData->beatmapKey.beatmapCharacteristic->serializedName;
+        metadata->Environment = (string)_gameplayCoreSceneSetupData->environmentInfo->serializedName;
         metadata->Modifiers = ScoreSaber::Services::UploadService::GetModifierList(_gameplayCoreSceneSetupData->gameplayModifiers, -1);
         metadata->NoteSpawnOffset = _beatmapObjectSpawnControllerInitData->noteJumpValue;
         metadata->LeftHanded = _gameplayCoreSceneSetupData->playerSpecificSettings->leftHanded;
         metadata->InitialHeight = _gameplayCoreSceneSetupData->playerSpecificSettings->playerHeight;
-        metadata->RoomRotation = _mainSettingsModelSO->roomRotation->value;
-        metadata->RoomCenter = VRPosition(_mainSettingsModelSO->roomCenter->value.x, _mainSettingsModelSO->roomCenter->value.y,
-                                          _mainSettingsModelSO->roomCenter->value.z);
+        metadata->RoomRotation = _mainSettingsHandler->instance->roomRotation;
+        metadata->RoomCenter = VRPosition(_mainSettingsHandler->instance->roomCenter.x, _mainSettingsHandler->instance->roomCenter.y, _mainSettingsHandler->instance->roomCenter.z);
         metadata->FailTime = _failTime;
         return metadata;
     }

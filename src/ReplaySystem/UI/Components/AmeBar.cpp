@@ -1,17 +1,18 @@
 #include "ReplaySystem/UI/Components/AmeBar.hpp"
-#include "System/Single.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Mathf.hpp"
-#include "UnityEngine/Rect.hpp"
-#include "UnityEngine/RectTransformUtility.hpp"
-#include "UnityEngine/Resources.hpp"
+#include <System/Single.hpp>
+#include <UnityEngine/GameObject.hpp>
+#include <UnityEngine/Mathf.hpp>
+#include <UnityEngine/Rect.hpp>
+#include <UnityEngine/RectTransformUtility.hpp>
+#include <UnityEngine/Resources.hpp>
+#include <bsml/shared/Helpers/getters.hpp>
 #include "logging.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 #include <sstream>
 #include <iomanip>
 
 using namespace UnityEngine;
 using namespace GlobalNamespace;
+using namespace BSML::Helpers;
 
 DEFINE_TYPE(ScoreSaber::ReplaySystem::UI::Components, AmeBar);
 
@@ -19,51 +20,51 @@ namespace ScoreSaber::ReplaySystem::UI::Components
 {
     float AmeBar::get_barFill()
     {
-        return _fillBarTransform->get_anchorMax().x;
+        return _fillBarTransform->anchorMax.x;
     }
 
     void AmeBar::set_barFill(float value)
     {
-        _fillBarTransform->set_anchorMax(Vector2(Mathf::Lerp(-1.0f, 1.0f, value), _fillBarTransform->get_anchorMax().y));
+        _fillBarTransform->anchorMax = Vector2(Mathf::Lerp(-1.0f, 1.0f, value), _fillBarTransform->anchorMax.y);
     }
 
     void AmeBar::set_currentTime(float value)
     {
         std::stringstream ss;
         ss << int(value / 60) << ":" << std::setw(2) << std::setfill('0') << int(fmod(value, 60));
-        _currentTimeText->set_text(ss.str());
+        _currentTimeText->text = ss.str();
     }
 
     void AmeBar::set_endTime(float value)
     {
         std::stringstream ss;
         ss << int(value / 60) << ":" << std::setw(2) << std::setfill('0') << int(fmod(value, 60));
-        _endTimeText->set_text(ss.str());
+        _endTimeText->text = ss.str();
     }
 
     void AmeBar::Setup(UnityEngine::RectTransform* fillBarTransform, UnityEngine::RectTransform* otherTransform)
     {
         _otherTransform = otherTransform;
-        _rectTransform = get_transform()->GetComponent<RectTransform*>();
+        _rectTransform = transform->GetComponent<RectTransform*>();
         _fillBarTransform = fillBarTransform;
         _currentTimeText = CreateText();
-        _currentTimeText->get_rectTransform()->set_sizeDelta(fillBarTransform->get_sizeDelta());
-        _currentTimeText->get_rectTransform()->set_anchorMin(Vector2(0.0f, 0.5f));
-        _currentTimeText->set_alignment(TMPro::TextAlignmentOptions::Left);
+        _currentTimeText->rectTransform->sizeDelta = fillBarTransform->sizeDelta;
+        _currentTimeText->rectTransform->anchorMin = Vector2(0.0f, 0.5f);
+        _currentTimeText->alignment = TMPro::TextAlignmentOptions::Left;
         _currentTimeText->m_text = "0:00";
-        _currentTimeText->set_name("Current Time");
+        _currentTimeText->name = "Current Time";
 
         _endTimeText = CreateText();
-        _endTimeText->get_rectTransform()->set_sizeDelta(fillBarTransform->get_sizeDelta());
-        _endTimeText->get_rectTransform()->set_anchorMin(Vector2(0.0f, 0.5f));
-        _endTimeText->set_alignment(TMPro::TextAlignmentOptions::Right);
+        _endTimeText->rectTransform->sizeDelta = fillBarTransform->sizeDelta;
+        _endTimeText->rectTransform->anchorMin = Vector2(0.0f, 0.5f);
+        _endTimeText->alignment = TMPro::TextAlignmentOptions::Right;
         _endTimeText->m_text = "0:00";
-        _endTimeText->set_name("End Time");
+        _endTimeText->name = "End Time";
     }
 
     void AmeBar::RegisterNode(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node)
     {
-        node->AddCallback([=](ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
+        node->AddCallback([=, this](ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera) {
             DragCallback(node, x, camera);
         });
     }
@@ -75,18 +76,18 @@ namespace ScoreSaber::ReplaySystem::UI::Components
 
     float AmeBar::GetNodePercent(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node)
     {
-        return PercentForX(node->get_transform()->get_localPosition().x);
+        return PercentForX(node->transform->localPosition.x);
     }
 
     void AmeBar::AssignNodeToPercent(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, float percent)
     {
-        node->get_transform()->set_localPosition(Vector3(XForPercent(percent), node->get_transform()->get_localPosition().y, 0.0f));
+        node->transform->localPosition = Vector3(XForPercent(percent), node->transform->localPosition.y, 0.0f);
     }
 
     void AmeBar::DragCallback(ScoreSaber::ReplaySystem::UI::Components::AmeNode* node, UnityEngine::Vector2 x, UnityEngine::Camera* camera)
     {
         Vector2 computedVector;
-        RectTransformUtility::ScreenPointToLocalPointInRectangle(_rectTransform, x, camera, &computedVector);
+        RectTransformUtility::ScreenPointToLocalPointInRectangle(_rectTransform, x, camera, byref(computedVector));
         if (System::Single::IsNaN(computedVector.x) || System::Single::IsNaN(computedVector.y))
         {
             return;
@@ -101,32 +102,32 @@ namespace ScoreSaber::ReplaySystem::UI::Components
             return;
         }
 
-        node->get_transform()->set_localPosition(Vector3(computed, node->get_transform()->get_localPosition().y, 0.0f));
+        node->transform->localPosition = Vector3(computed, node->transform->localPosition.y, 0.0f);
         node->SendUpdatePositionCall(PercentForX(computed));
     }
 
     float AmeBar::XForPercent(float percent)
     {
-        float maxX = _rectTransform->get_rect().get_width();
+        float maxX = _rectTransform->rect.width;
         return Mathf::Lerp(-maxX, maxX, percent);
     }
 
     float AmeBar::PercentForX(float x)
     {
-        float maxX = _rectTransform->get_rect().get_width();
+        float maxX = _rectTransform->rect.width;
         return Mathf::InverseLerp(-maxX, maxX, x);
     }
 
     HMUI::CurvedTextMeshPro* AmeBar::CreateText()
     {
         GameObject* textGameObject = GameObject::New_ctor("AmeText");
-        textGameObject->get_transform()->SetParent(get_transform(), false);
+        textGameObject->transform->SetParent(transform, false);
         HMUI::CurvedTextMeshPro* curvedText = textGameObject->AddComponent<HMUI::CurvedTextMeshPro*>();
-        curvedText->set_font(QuestUI::BeatSaberUI::GetMainTextFont());
-        curvedText->set_fontSharedMaterial(QuestUI::BeatSaberUI::GetMainUIFontMaterial());
-        curvedText->set_text("");
-        curvedText->get_rectTransform()->set_anchorMin(Vector2::get_zero());
-        curvedText->get_rectTransform()->set_anchorMax(Vector2::get_one());
+        curvedText->font = GetMainTextFont();
+        curvedText->fontSharedMaterial = GetMainUIFontMaterial();
+        curvedText->text = "";
+        curvedText->rectTransform->anchorMin = Vector2::get_zero();
+        curvedText->rectTransform->anchorMax = Vector2::get_one();
         return curvedText;
     }
 
