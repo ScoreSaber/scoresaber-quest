@@ -101,7 +101,8 @@ namespace ScoreSaber::UI::Multiplayer
             return;
         }
 
-        _platformLeaderboardViewController->SetData(ByRef<BeatmapKey>(_levelSelectionNavigationController->beatmapKey));
+        auto beatmapKey = _levelSelectionNavigationController->beatmapKey;
+        _platformLeaderboardViewController->SetData(byref(beatmapKey));
         auto currentFlowCoordinator = _mainFlowCoordinator->YoungestChildFlowCoordinatorOrSelf();
         currentFlowCoordinator->SetRightScreenViewController(_platformLeaderboardViewController, HMUI::ViewController::AnimationType::In);
 
