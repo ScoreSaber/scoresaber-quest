@@ -1,5 +1,7 @@
 #include "ReplaySystem/Playback/EnergyPlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
+#include <GlobalNamespace/PlayerData.hpp>
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include <System/Action_1.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Playables/PlayableDirector.hpp>
@@ -16,11 +18,11 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, EnergyPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter, Zenject::DiContainer* container)
+    void EnergyPlayer::ctor(GlobalNamespace::GameEnergyCounter* gameEnergyCounter, GlobalNamespace::PlayerDataModel* playerDataModel, Zenject::DiContainer* container)
     {
         INVOKE_CTOR();
-        _audioTimeSyncController = audioTimeSyncController;
         _gameEnergyCounter = gameEnergyCounter;
+        _playerDataModel = playerDataModel;
         _gameEnergyUIPanel = container->TryResolve<GlobalNamespace::GameEnergyUIPanel*>();
         _sortedEnergyEvents = ReplayLoader::LoadedReplay->energyKeyframes;
     }
@@ -56,7 +58,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _gameEnergyCounter->energy = energy;
         _gameEnergyCounter->noFail = noFail;
 
-        if (_gameEnergyUIPanel != nullptr) {
+        if (_gameEnergyUIPanel != nullptr && !_playerDataModel->playerData->playerSpecificSettings->noTextsAndHuds) {
             _gameEnergyUIPanel->Init();
             auto director = _gameEnergyUIPanel->_playableDirector;
             director->Stop();
