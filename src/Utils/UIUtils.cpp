@@ -25,7 +25,7 @@
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
 #include <bsml/shared/BSML/SharedCoroutineStarter.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
-#include <paper/shared/string_convert.hpp>
+#include <paper2_scotland2/shared/string_convert.hpp>
 #include "questui/ArrayUtil.hpp"
 #include "Utils/StrippedMethods.hpp"
 #include "Utils/SafePtr.hpp"

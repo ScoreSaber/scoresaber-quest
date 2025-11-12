@@ -1,5 +1,5 @@
 #pragma once
-#include "paper/shared/logger.hpp"
+#include <paper2_scotland2/shared/logger.hpp>
 
 namespace ScoreSaber
 {

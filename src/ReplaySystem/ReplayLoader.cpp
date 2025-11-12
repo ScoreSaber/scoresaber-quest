@@ -94,7 +94,8 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                   byref(beatmapKey), // beatmapKey
                                                   beatmapLevel, // beatmapLevel
                                                   playerData->overrideEnvironmentSettings, // overrideEnvironmentSettings
-                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), // overrideColorScheme
+                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), // playerOverrideColorScheme
+                                                  playerData->colorSchemesSettings->ShouldOverrideLightshowColors(), // playerOverrideLightshowColors
                                                   beatmapLevel->GetColorScheme(beatmapKey.beatmapCharacteristic, beatmapKey.difficulty), // beatmapOverrideColorScheme
                                                   BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers), // gameplayModifiers
                                                   playerSettings, // playerSpecificSettings

@@ -19,41 +19,39 @@
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
 
-#define INTERFACES                   \
-    {                                \
-        classof(Zenject::ITickable*) \
-    }
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::Playback,
+        ReplayTimeSyncController,
+        System::Object,
+        Zenject::ITickable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioManagerSO>, _audioManagerSO);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController::InitData*, _audioInitData);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BasicBeatmapObjectManager*, _basicBeatmapObjectManager);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::NoteCutSoundEffectManager>, _noteCutSoundEffectManager);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapCallbacksController::InitData*, _callbackInitData);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapCallbacksController*, _beatmapObjectCallbackController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::ComboPlayer*, _comboPlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::EnergyPlayer*, _energyPlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::HeightPlayer*, _heightPlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::MultiplierPlayer*, _multiplierPlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::NotePlayer*, _notePlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::PosePlayer*, _posePlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::ScorePlayer*, _scorePlayer);
+    DECLARE_INSTANCE_FIELD_PRIVATE(bool, _paused);
 
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Playback, ReplayTimeSyncController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Playback", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioManagerSO>, _audioManagerSO);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController::InitData*, _audioInitData);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BasicBeatmapObjectManager*, _basicBeatmapObjectManager);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::NoteCutSoundEffectManager>, _noteCutSoundEffectManager);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapCallbacksController::InitData*, _callbackInitData);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapCallbacksController*, _beatmapObjectCallbackController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::ComboPlayer*, _comboPlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::EnergyPlayer*, _energyPlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::HeightPlayer*, _heightPlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::MultiplierPlayer*, _multiplierPlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::NotePlayer*, _notePlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::PosePlayer*, _posePlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreSaber::ReplaySystem::Playback::ScorePlayer*, _scorePlayer);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(bool, _paused);
+    DECLARE_CTOR(ctor,
+        GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
+        GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
+        GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
+        GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
+        GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
+        GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
+        Zenject::DiContainer* container);
 
-                                    DECLARE_CTOR(ctor,
-                                                 GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
-                                                 GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
-                                                 GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
-                                                 GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
-                                                 GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
-                                                 GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
-                                                 Zenject::DiContainer* container);
-
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Tick, &::Zenject::ITickable::Tick);
-                                    DECLARE_INSTANCE_METHOD(void, UpdateTimes);
-                                    DECLARE_INSTANCE_METHOD(void, OverrideTime, float time);
-                                    DECLARE_INSTANCE_METHOD(void, OverrideTimeScale, float timeScale);
-                                    DECLARE_INSTANCE_METHOD(void, CancelAllHitSounds);)
-
-#undef INTERFACES
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Tick, &::Zenject::ITickable::Tick);
+    DECLARE_INSTANCE_METHOD(void, UpdateTimes);
+    DECLARE_INSTANCE_METHOD(void, OverrideTime, float time);
+    DECLARE_INSTANCE_METHOD(void, OverrideTimeScale, float timeScale);
+    DECLARE_INSTANCE_METHOD(void, CancelAllHitSounds);
+};

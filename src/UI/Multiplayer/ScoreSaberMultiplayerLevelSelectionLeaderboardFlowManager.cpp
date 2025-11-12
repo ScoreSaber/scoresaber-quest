@@ -11,6 +11,7 @@
 #include <bsml/shared/BSML/MainThreadScheduler.hpp>
 
 using namespace BSML;
+using namespace GlobalNamespace;
 
 DEFINE_TYPE(ScoreSaber::UI::Multiplayer, ScoreSaberMultiplayerLevelSelectionLeaderboardFlowManager);
 

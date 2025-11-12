@@ -11,7 +11,7 @@
 #include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
 #include <bsml/shared/Helpers/utilities.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
-#include <paper/shared/string_convert.hpp>
+#include <paper2_scotland2/shared/string_convert.hpp>
 #include <custom-types/shared/coroutine.hpp>
 #include "questui/ArrayUtil.hpp"
 #include "Utils/OperatorOverloads.hpp"

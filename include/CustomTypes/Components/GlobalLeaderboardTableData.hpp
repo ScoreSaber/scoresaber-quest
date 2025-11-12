@@ -9,18 +9,12 @@
 #include <custom-types/shared/coroutine.hpp>
 #include <custom-types/shared/macros.hpp>
 
-#define GET_FIND_METHOD(mPtr) \
-    il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
-static std::vector<Il2CppClass*> GetInterfaces()
-{
-    return {classof(HMUI::TableView::IDataSource*)};
-}
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(
-    ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData,
-    Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "ScoreSaber",
-    GetInterfaces(), 0, nullptr,
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::CustomTypes::Components,
+        GlobalLeaderboardTableData,
+        UnityEngine::MonoBehaviour,
+        HMUI::TableView::IDataSource*) {
     DECLARE_INSTANCE_FIELD(StringW, reuseIdentifier);
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(UnityW<HMUI::TableView>, tableView);
@@ -47,8 +41,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
         int, NumberOfCells,
         &HMUI::TableView::IDataSource::NumberOfCells);
 
-    public
-    :
+public:
 
     enum LeaderboardType{
         Global,
@@ -60,4 +53,5 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     void set_LeaderboardType(LeaderboardType type);
     std::string get_LeaderboardURL();
     void StartRefresh();
-    custom_types::Helpers::Coroutine Refresh();)
+    custom_types::Helpers::Coroutine Refresh();
+};
