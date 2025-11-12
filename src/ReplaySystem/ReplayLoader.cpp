@@ -12,6 +12,7 @@
 #include <GlobalNamespace/PlayerDataModel.hpp>
 #include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include <GlobalNamespace/RecordingToolManager.hpp>
+#include <metacore/shared/game.hpp>
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/SafePtr.hpp"
 #include "Utils/WebUtils.hpp"
@@ -109,7 +110,8 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                   replayEndDelegate, // levelFinishedCallback
                                                   nullptr, // levelRestartedCallback
                                                   {false, {}} // recordingToolData (set to null)
-                                                  ); 
+                                                  );
+        MetaCore::Game::DisableScoreSubmissionOnce(MOD_ID);
         IsPlaying = true;
     }
 
