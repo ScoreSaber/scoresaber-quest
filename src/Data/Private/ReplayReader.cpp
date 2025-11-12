@@ -2,6 +2,7 @@
 
 #include "Utils/lzma/lzma.hpp"
 
+#include <optional>
 #include <stdlib.h>
 #include <string>
 
@@ -69,7 +70,8 @@ namespace ScoreSaber::Data::Private::ReplayReader
         if(version < semver::version::parse("3.1.0")) {
             return make_shared<Metadata>(version, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
                             ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
-                            ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream));
+                            ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream),
+                            nullopt, nullopt, nullopt);
         } else {
             return make_shared<Metadata>(version, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
                             ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
