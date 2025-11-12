@@ -17,7 +17,6 @@
 #include <bsml/shared/BSML-Lite.hpp>
 #include "Utils/UIUtils.hpp"
 #include "Utils/StrippedMethods.hpp"
-#include "Utils/SafePtr.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::ViewControllers, GlobalViewController);
 
@@ -29,7 +28,7 @@ using namespace BSML;
 using namespace BSML::Lite;
 
 custom_types::Helpers::Coroutine WaitForInit(
-    FixedSafePtrUnity<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>
+    SafePtrUnity<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>
         leaderboard,
     std::function<void()> callback)
 {

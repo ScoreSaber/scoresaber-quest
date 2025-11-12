@@ -17,8 +17,8 @@
 // create std::hash and std::equal_to for BeatmapKey so we can use it as a key in std::unordered_map
 namespace std {
     template<>
-    struct hash<FixedSafeValueType<GlobalNamespace::BeatmapKey>> {
-        size_t operator()(const FixedSafeValueType<GlobalNamespace::BeatmapKey> &key) const {
+    struct hash<SafeValueType<GlobalNamespace::BeatmapKey>> {
+        size_t operator()(const SafeValueType<GlobalNamespace::BeatmapKey> &key) const {
             auto hashA = key->beatmapCharacteristic->serializedName->GetHashCode();
             auto hashB = (int)key->difficulty;
             auto hashC = key->levelId->GetHashCode();
@@ -32,8 +32,8 @@ namespace std {
     };
 
     template<>
-    struct equal_to<FixedSafeValueType<GlobalNamespace::BeatmapKey>> {
-        bool operator()(const FixedSafeValueType<GlobalNamespace::BeatmapKey> &lhs, const FixedSafeValueType<GlobalNamespace::BeatmapKey> &rhs) const {
+    struct equal_to<SafeValueType<GlobalNamespace::BeatmapKey>> {
+        bool operator()(const SafeValueType<GlobalNamespace::BeatmapKey> &lhs, const SafeValueType<GlobalNamespace::BeatmapKey> &rhs) const {
             return GlobalNamespace::BeatmapKey::op_Equality(*lhs, *rhs);
         }
     };
@@ -46,8 +46,8 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::Utils, MaxScoreCache, Il2CppObject) {
 
     DECLARE_CTOR(ctor, GlobalNamespace::BeatmapDataLoader* beatmapDataLoader, GlobalNamespace::BeatmapLevelsModel* beatmapLevelsModel, GlobalNamespace::BeatmapLevelsEntitlementModel* beatmapLevelsEntitlementModel);
 
-    // the cache needs to store BeatmapKeys as FixedSafeValueType so GC cannot collect any of its members.
-    std::unordered_map<FixedSafeValueType<GlobalNamespace::BeatmapKey>, int> cache;
+    // the cache needs to store BeatmapKeys as SafeValueType so GC cannot collect any of its members.
+    std::unordered_map<SafeValueType<GlobalNamespace::BeatmapKey>, int> cache;
 public:
     void GetMaxScore(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, const std::function<void(int)> &callback);
 };

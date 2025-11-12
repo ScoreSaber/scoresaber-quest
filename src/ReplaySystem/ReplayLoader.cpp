@@ -33,15 +33,15 @@ using namespace BSML::Helpers;
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
 
-    FixedSafePtrUnity<GlobalNamespace::PlayerDataModel> playerDataModel;
-    FixedSafePtrUnity<GlobalNamespace::MenuTransitionsHelper> menuTransitionsHelper;
+    SafePtrUnity<GlobalNamespace::PlayerDataModel> playerDataModel;
+    SafePtrUnity<GlobalNamespace::MenuTransitionsHelper> menuTransitionsHelper;
 
     std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
-    FixedSafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
-    FixedSafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
+    SafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
+    SafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     std::u16string CurrentPlayerName;
     std::string CurrentModifiers;
-    FixedSafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
+    SafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
 
     bool IsPlaying;
     

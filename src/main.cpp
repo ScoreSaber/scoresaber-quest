@@ -1,5 +1,4 @@
 #include "main.hpp"
-#include "Utils/SafePtr.hpp"
 #include "hooks.hpp"
 #include "logging.hpp"
 
@@ -60,7 +59,6 @@ void soft_restart()
 extern "C" __attribute((visibility("default"))) void late_load() noexcept
 {
     il2cpp_functions::Init();
-    reserve_safe_ptrs(5000);
     BSML::Init();
     custom_types::Register::AutoRegister();
     Hooks::InstallHooks();

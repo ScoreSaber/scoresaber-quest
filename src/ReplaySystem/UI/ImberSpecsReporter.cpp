@@ -4,7 +4,6 @@
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Vector2.hpp>
-#include "Utils/SafePtr.hpp"
 #include "logging.hpp"
 
 using namespace UnityEngine;
@@ -22,7 +21,7 @@ namespace ScoreSaber::ReplaySystem::UI
     }
     void ImberSpecsReporter::Initialize()
     {
-        FixedSafePtr<ImberSpecsReporter> self(this);
+        SafePtr<ImberSpecsReporter> self(this);
         _posePlayer->AddCallback([self](ScoreSaber::Data::Private::VRPoseGroup pose) {
             self->PosePlayer_DidUpdatePose(pose);
         });

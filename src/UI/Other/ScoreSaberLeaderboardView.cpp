@@ -45,7 +45,6 @@
 #include "Sprites.hpp"
 #include "UI/Other/ProfilePictureView.hpp"
 #include "Utils/MaxScoreCache.hpp"
-#include "Utils/SafePtr.hpp"
 #include "Utils/UIUtils.hpp"
 #include "Utils/GCUtil.hpp"
 #include "logging.hpp"
@@ -65,20 +64,20 @@ using namespace ScoreSaber::Data::Private;
 
 namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 {
-    FixedSafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
+    SafePtrUnity<ScoreSaber::UI::Other::Banner> ScoreSaberBanner;
 
-    FixedSafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
+    SafePtrUnity<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler> leaderboardScoreInfoButtonHandler;
 
-    FixedSafePtrUnity<PlatformLeaderboardViewController> _platformLeaderboardViewController;
+    SafePtrUnity<PlatformLeaderboardViewController> _platformLeaderboardViewController;
 
-    FixedSafePtrUnity<UnityEngine::UI::Button> _pageUpButton;
-    FixedSafePtrUnity<UnityEngine::UI::Button> _pageDownButton;
+    SafePtrUnity<UnityEngine::UI::Button> _pageUpButton;
+    SafePtrUnity<UnityEngine::UI::Button> _pageDownButton;
 
     std::vector<ProfilePictureView> _ImageHolders;
 
-    std::vector<FixedSafePtrUnity<HMUI::ImageView>> _cellClickingImages;
+    std::vector<SafePtrUnity<HMUI::ImageView>> _cellClickingImages;
 
-    FixedSafePtr<System::Threading::CancellationTokenSource> cancellationToken;
+    SafePtr<System::Threading::CancellationTokenSource> cancellationToken;
 
     bool _activated = false;
 
@@ -333,9 +332,9 @@ namespace ScoreSaber::UI::Other::ScoreSaberLeaderboardView
 
         _currentLeaderboardRefreshId = refreshId;
 
-        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
-        FixedSafePtrUnity<LoadingControl> loadingControlSafe(loadingControl);
-        FixedSafePtrUnity<LeaderboardTableView> tableViewSafe(tableView);
+        SafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+        SafePtrUnity<LoadingControl> loadingControlSafe(loadingControl);
+        SafePtrUnity<LeaderboardTableView> tableViewSafe(tableView);
 
         il2cpp_utils::il2cpp_aware_thread(gc_aware_function([beatmapLevelSafe, beatmapKey, scope, loadingControlSafe, tableViewSafe, refreshId]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));

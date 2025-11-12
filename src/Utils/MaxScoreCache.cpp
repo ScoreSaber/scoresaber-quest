@@ -29,14 +29,14 @@ namespace ScoreSaber::Utils {
     }
 
     void MaxScoreCache::GetMaxScore(BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, const function<void(int)> &callback) {
-        FixedSafeValueType<BeatmapKey> beatmapKeySafe(beatmapKey);
+        SafeValueType<BeatmapKey> beatmapKeySafe(beatmapKey);
         if(cache.contains(beatmapKeySafe)) {
             callback(cache[beatmapKeySafe]);
             return;
         }
 
-        FixedSafePtr<MaxScoreCache> self(this);
-        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+        SafePtr<MaxScoreCache> self(this);
+        SafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
 
         MainThreadScheduler::Schedule(gc_aware_function([self, beatmapLevelSafe, beatmapKeySafe, callback] {
             DelegateHelper::ContinueWith(self->_beatmapLevelsEntitlementModel->GetLevelDataVersionAsync(beatmapKeySafe->levelId, CancellationToken::get_None()), std::function(gc_aware_function(

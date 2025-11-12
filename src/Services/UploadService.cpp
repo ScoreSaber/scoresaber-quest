@@ -23,7 +23,6 @@
 #include <UnityEngine/Application.hpp>
 #include <UnityEngine/Resources.hpp>
 #include "Utils/BeatmapUtils.hpp"
-#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "Utils/md5.h"
@@ -136,7 +135,7 @@ namespace ScoreSaber::Services::UploadService
 
     void Seven(BeatmapLevel* beatmapLevel, BeatmapKey beatmapKey, int modifiedScore, int multipliedScore, std::string uploadPacket, std::string replayFileName)
     {
-        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+        SafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
 
         il2cpp_utils::il2cpp_aware_thread(gc_aware_function([beatmapLevelSafe, beatmapKey, modifiedScore, multipliedScore, uploadPacket, replayFileName] {
             ScoreSaber::UI::Other::ScoreSaberLeaderboardView::SetUploadState(true, false);
