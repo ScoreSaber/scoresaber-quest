@@ -49,6 +49,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(
     DECLARE_INSTANCE_METHOD(void, TimeUpdate, float songTime);
     std::vector<Data::Private::NoteEvent> _sortedNoteEvents;
     std::vector<RecognizedNoteCutInfo> _recognizedNoteCutInfos;
+    std::shared_ptr<Data::Private::ReplayFile> _replayFile;
     // std::map<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> _recognizedNoteCutInfos;
     // System::Collections::Generic::Dictionary_2<GlobalNamespace::NoteCutInfo, ScoreSaber::Data::Private::NoteEvent> * _recognizedNoteCutInfos;
     void ProcessEvent(Data::Private::NoteEvent &activeEvent);

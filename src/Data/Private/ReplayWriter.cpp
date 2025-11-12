@@ -71,7 +71,7 @@ namespace ScoreSaber::Data::Private::ReplayWriter
     int WriteMetadata(std::shared_ptr<Metadata> metadata, stringstream& outputStream)
     {
         int bytesWritten = 0;
-        bytesWritten += WriteString(metadata->Version, outputStream);
+        bytesWritten += WriteString(metadata->Version.str(), outputStream);
         bytesWritten += WriteString(metadata->LevelID, outputStream);
         bytesWritten += WriteInt(metadata->Difficulty, outputStream);
         bytesWritten += WriteString(metadata->Characteristic, outputStream);
@@ -83,6 +83,9 @@ namespace ScoreSaber::Data::Private::ReplayWriter
         bytesWritten += WriteFloat(metadata->RoomRotation, outputStream);
         bytesWritten += WriteVRPosition(metadata->RoomCenter, outputStream);
         bytesWritten += WriteFloat(metadata->FailTime, outputStream);
+        bytesWritten += WriteString(metadata->GameVersion.value().str(), outputStream);
+        bytesWritten += WriteString(metadata->PluginVersion.value().str(), outputStream);
+        bytesWritten += WriteString(metadata->Platform.value(), outputStream);
         return bytesWritten;
     }
 

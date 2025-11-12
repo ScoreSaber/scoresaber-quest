@@ -37,6 +37,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         std::sort(_sortedNoteEvents.begin(), _sortedNoteEvents.end(), [](const auto& lhs, const auto& rhs) {
             return lhs.Time < rhs.Time;
         });
+        _replayFile = ReplayLoader::LoadedReplay;
     }
     void NotePlayer::Tick()
     {
@@ -126,7 +127,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             return false;
         }
         
-        if (id.ScoringType.has_value() && id.ScoringType.value() != (int)noteData->scoringType) {
+        if (!id.MatchesScoringType(noteData->scoringType, _replayFile->metadata->GameVersion)) {
             return false;
         }
         
