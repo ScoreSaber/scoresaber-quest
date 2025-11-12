@@ -88,7 +88,7 @@ namespace ScoreSaber::UI::ViewControllers
             teamAndContributorsNames.push_back("CAT");
             teamAndContributorsNames.push_back("CCT");
 
-            segmentedController->SetTexts(teamAndContributorsNames.getPtr()->i___System__Collections__Generic__IReadOnlyList_1_T_());
+            segmentedController->SetTexts(teamAndContributorsNames.getPtr()->i___System__Collections__Generic__IReadOnlyList_1_T_(), nullptr);
 
             creditTabs = Array<UnityW<GameObject>>::NewLength(teamAndContributorsNames.size());
 

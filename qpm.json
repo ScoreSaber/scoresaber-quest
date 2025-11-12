@@ -48,33 +48,29 @@
    "dependencies": [
       {
          "id": "beatsaber-hook",
-         "versionRange": "^5.1.9",
-         "additionalData": {
-            "extraFiles": [
-               "src/inline-hook"
-            ]
-         }
+         "versionRange": "^6.4.2",
+         "additionalData": {}
       },
       {
          "id": "scotland2",
-         "versionRange": "^0.1.4",
+         "versionRange": "^0.1.6",
          "additionalData": {
             "includeQmod": false
          }
       },
       {
          "id": "bs-cordl",
-         "versionRange": "^3700.0.0",
+         "versionRange": "^4008.0.0",
          "additionalData": {}
       },
       {
          "id": "custom-types",
-         "versionRange": "^0.17.10",
+         "versionRange": "^0.18.3",
          "additionalData": {}
       },
       {
          "id": "config-utils",
-         "versionRange": "^1.4.2",
+         "versionRange": "^2.0.3",
          "additionalData": {}
       },
       {
@@ -89,12 +85,12 @@
       },
       {
          "id": "lapiz",
-         "versionRange": "^0.2.12",
+         "versionRange": "^0.2.23",
          "additionalData": {}
       },
       {
          "id": "bsml",
-         "versionRange": "^0.4.43",
+         "versionRange": "^0.4.55",
          "additionalData": {}
       },
       {
@@ -103,8 +99,13 @@
          "additionalData": {}
       },
       {
-         "id": "paper",
-         "versionRange": "^3.6.4",
+         "id": "paper2_scotland2",
+         "versionRange": "^4.6.4",
+         "additionalData": {}
+      },
+      {
+         "id": "metacore",
+         "versionRange": "^1.4.0",
          "additionalData": {}
       }
    ],

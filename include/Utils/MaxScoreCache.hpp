@@ -39,15 +39,15 @@ namespace std {
     };
 }
 
-DECLARE_CLASS_CODEGEN(
-    ScoreSaber::Utils, MaxScoreCache, Il2CppObject,
+DECLARE_CLASS_CODEGEN(ScoreSaber::Utils, MaxScoreCache, Il2CppObject) {
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapDataLoader*, _beatmapDataLoader);
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevelsModel*, _beatmapLevelsModel);;
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevelsEntitlementModel*, _beatmapLevelsEntitlementModel);
 
-    DECLARE_CTOR(ctor, GlobalNamespace::BeatmapDataLoader* beatmapDataLoader, GlobalNamespace::BeatmapLevelsModel* beatmapLevelsModel);
+    DECLARE_CTOR(ctor, GlobalNamespace::BeatmapDataLoader* beatmapDataLoader, GlobalNamespace::BeatmapLevelsModel* beatmapLevelsModel, GlobalNamespace::BeatmapLevelsEntitlementModel* beatmapLevelsEntitlementModel);
 
     // the cache needs to store BeatmapKeys as FixedSafeValueType so GC cannot collect any of its members.
     std::unordered_map<FixedSafeValueType<GlobalNamespace::BeatmapKey>, int> cache;
 public:
     void GetMaxScore(GlobalNamespace::BeatmapLevel* beatmapLevel, GlobalNamespace::BeatmapKey beatmapKey, const std::function<void(int)> &callback);
-)
+};

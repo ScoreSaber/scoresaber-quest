@@ -11,7 +11,7 @@
 #include <System/IO/Path.hpp>
 #include <System/String.hpp>
 #include "logging.hpp"
-#include <paper/shared/string_convert.hpp>
+#include <paper2_scotland2/shared/string_convert.hpp>
 #include "Utils/StrippedMethods.hpp"
 
 static std::string color_prefix = "<color=";

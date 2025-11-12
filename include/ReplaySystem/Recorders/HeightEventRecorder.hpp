@@ -11,24 +11,20 @@
 #include <lapiz/shared/macros.hpp>
 #include <vector>
 
-using namespace GlobalNamespace;
-
-#define INTERFACES                                                        \
-    {                                                                     \
-        classof(System::IDisposable*), classof(Zenject::IInitializable*), \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, HeightEventRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<PlayerHeightDetector>, _playerHeightDetector);
-                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, Zenject::DiContainer* container);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    DECLARE_INSTANCE_METHOD(void, PlayerHeightDetector_playerHeightDidChangeEvent, float newHeight);
-                                    std::vector<Data::Private::HeightEvent> _heightKeyframes;
-                                    DelegateUtils::DelegateW<System::Action_1<float>> playerHeightDidChangeDelegate;
-                                    public:
-                                    std::vector<Data::Private::HeightEvent> Export();
-                                    )
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::Recorders,
+        HeightEventRecorder,
+        System::Object,
+        System::IDisposable*,
+        Zenject::IInitializable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::PlayerHeightDetector>, _playerHeightDetector);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, Zenject::DiContainer* container);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+    DECLARE_INSTANCE_METHOD(void, PlayerHeightDetector_playerHeightDidChangeEvent, float newHeight);
+    std::vector<Data::Private::HeightEvent> _heightKeyframes;
+    DelegateUtils::DelegateW<System::Action_1<float>> playerHeightDidChangeDelegate;
+public:
+    std::vector<Data::Private::HeightEvent> Export();
+};

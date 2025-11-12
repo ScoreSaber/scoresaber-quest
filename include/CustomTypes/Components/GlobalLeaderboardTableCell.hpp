@@ -3,7 +3,6 @@
 #include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
 #include "Data/Player.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
-
 #include <HMUI/ImageView.hpp>
 #include <HMUI/TableCell.hpp>
 #include <HMUI/TableView.hpp>
@@ -14,11 +13,7 @@
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
 #include <custom-types/shared/macros.hpp>
 
-#define GET_FIND_METHOD(mPtr) \
-    il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
-
-DECLARE_CLASS_CODEGEN(
-    ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell, HMUI::TableCell,
+DECLARE_CLASS_CODEGEN(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell, HMUI::TableCell) {
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, rank);
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, pp);
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, country);
@@ -33,12 +28,11 @@ DECLARE_CLASS_CODEGEN(
 
     DECLARE_CTOR(ctor);
 
-    public
-    : std::string playerId;
+public:
+    std::string playerId;
     static GlobalLeaderboardTableCell * CreateCell();
     void Refresh(ScoreSaber::Data::Player& player, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType leaderboardType);
     void stopProfileRoutine();
     void stopFlagRoutine();
     void OpenPlayerProfileModal();
-
-)
+};

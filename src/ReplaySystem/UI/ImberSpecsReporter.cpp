@@ -31,7 +31,7 @@ namespace ScoreSaber::ReplaySystem::UI
     {
         if (DidReport != nullptr)
         {
-            DidReport(pose.FPS, _saberManager->leftSaber->movementData->bladeSpeed, _saberManager->rightSaber->movementData->bladeSpeed);
+            DidReport(pose.FPS, _saberManager->leftSaber->movementDataForLogic->bladeSpeed, _saberManager->rightSaber->movementDataForLogic->bladeSpeed);
         }
     }
     void ImberSpecsReporter::Dispose()

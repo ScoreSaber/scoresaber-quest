@@ -10,7 +10,7 @@
 #include "Utils/UIUtils.hpp"
 #include <bsml/shared/BSML-Lite.hpp>
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
-#include <paper/shared/string_convert.hpp>
+#include <paper2_scotland2/shared/string_convert.hpp>
 #include "Utils/StrippedMethods.hpp"
 #include "Sprites.hpp"
 

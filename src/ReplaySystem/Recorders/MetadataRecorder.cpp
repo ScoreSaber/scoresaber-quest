@@ -1,7 +1,6 @@
 #include "ReplaySystem/Recorders/MetadataRecorder.hpp"
 #include "Data/Private/ReplayFile.hpp"
 #include "Services/UploadService.hpp"
-#include <BeatSaber/GameSettings/MainSettings.hpp>
 #include <GlobalNamespace/BeatmapLevel.hpp>
 #include <GlobalNamespace/AudioTimeSyncController.hpp>
 #include <GlobalNamespace/BeatmapCharacteristicSO.hpp>
@@ -25,14 +24,14 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Recorders, MetadataRecorder);
 
 namespace ScoreSaber::ReplaySystem::Recorders
 {
-    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GameEnergyCounter* gameEnergyCounter, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler)
+    void MetadataRecorder::ctor(AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GameEnergyCounter* gameEnergyCounter, GlobalNamespace::SettingsManager* settingsManager)
     {
         INVOKE_CTOR();
         _audioTimeSyncController = audioTimeSyncController;
         _beatmapObjectSpawnControllerInitData = beatmapObjectSpawnControllerInitData;
         _gameEnergyCounter = gameEnergyCounter;
         _gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
-        _mainSettingsHandler = mainSettingsHandler;
+        _settingsManager = settingsManager;
     }
 
     void MetadataRecorder::Initialize()
@@ -60,13 +59,13 @@ namespace ScoreSaber::ReplaySystem::Recorders
         metadata->LevelID = (string)_gameplayCoreSceneSetupData->beatmapLevel->levelID;
         metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->beatmapKey.difficulty);
         metadata->Characteristic = (string)_gameplayCoreSceneSetupData->beatmapKey.beatmapCharacteristic->serializedName;
-        metadata->Environment = (string)_gameplayCoreSceneSetupData->environmentInfo->serializedName;
+        metadata->Environment = (string)_gameplayCoreSceneSetupData->targetEnvironmentInfo->serializedName;
         metadata->Modifiers = ScoreSaber::Services::UploadService::GetModifierList(_gameplayCoreSceneSetupData->gameplayModifiers, -1);
         metadata->NoteSpawnOffset = _beatmapObjectSpawnControllerInitData->noteJumpValue;
         metadata->LeftHanded = _gameplayCoreSceneSetupData->playerSpecificSettings->leftHanded;
         metadata->InitialHeight = _gameplayCoreSceneSetupData->playerSpecificSettings->playerHeight;
-        metadata->RoomRotation = _mainSettingsHandler->instance->roomRotation;
-        metadata->RoomCenter = VRPosition(_mainSettingsHandler->instance->roomCenter.x, _mainSettingsHandler->instance->roomCenter.y, _mainSettingsHandler->instance->roomCenter.z);
+        metadata->RoomRotation = _settingsManager->settings.room.rotation;
+        metadata->RoomCenter = VRPosition(_settingsManager->settings.room.center.x, _settingsManager->settings.room.center.y, _settingsManager->settings.room.center.z);
         metadata->FailTime = _failTime;
         return metadata;
     }

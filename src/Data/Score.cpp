@@ -1,7 +1,7 @@
 #include "Data/Score.hpp"
 #include "Utils/StringUtils.hpp"
 #include <beatsaber-hook/shared/utils/utils.h>
-#include "paper/shared/string_convert.hpp"
+#include <paper2_scotland2/shared/string_convert.hpp>
 
 namespace ScoreSaber::Data
 {

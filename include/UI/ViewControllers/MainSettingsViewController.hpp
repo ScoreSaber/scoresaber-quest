@@ -6,7 +6,7 @@
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
 
-DECLARE_CLASS_CODEGEN(ScoreSaber::UI::ViewControllers, MainSettingsViewController, HMUI::ViewController,
+DECLARE_CLASS_CODEGEN(ScoreSaber::UI::ViewControllers, MainSettingsViewController, HMUI::ViewController) {
                       DECLARE_INSTANCE_METHOD(bool, get_showScorePP);
                       DECLARE_INSTANCE_METHOD(void, set_showScorePP, bool value);
                       DECLARE_INSTANCE_METHOD(bool, get_showLocalPlayerRank);
@@ -25,4 +25,4 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::ViewControllers, MainSettingsViewControlle
                       DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 
                       DECLARE_CTOR(ctor);
-)
+};

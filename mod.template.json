@@ -7,7 +7,7 @@
    "version": "${version}",
    "coverImage": "logo.jpg",
    "packageId": "com.beatgames.beatsaber",
-   "packageVersion": "1.37.0_9064817954",
+   "packageVersion": "1.40.8_7379",
    "description": "Allows you to upload scores to an online leaderboard at https://scoresaber.com. Earn PP from ranked maps and compare scores with others.",
    "modFiles": [],
    "lateModFiles": [

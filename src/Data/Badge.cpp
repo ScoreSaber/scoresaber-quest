@@ -1,6 +1,6 @@
 #include "Data/Badge.hpp"
 #include <beatsaber-hook/shared/utils/utils.h>
-#include "paper/shared/string_convert.hpp"
+#include <paper2_scotland2/shared/string_convert.hpp>
 
 namespace ScoreSaber::Data
 {

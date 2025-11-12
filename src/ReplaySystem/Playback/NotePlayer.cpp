@@ -105,7 +105,7 @@ namespace ScoreSaber::ReplaySystem::Playback
                                                             noteController->inverseWorldRotation,
                                                             noteTransform->rotation,
                                                             noteTransform->position,
-                                                            il2cpp_utils::try_cast<GlobalNamespace::ISaberMovementData>(correctSaber->movementData).value_or(nullptr));
+                                                            il2cpp_utils::try_cast<GlobalNamespace::ISaberMovementData>(correctSaber->movementDataForLogic).value_or(nullptr));
             _recognizedNoteCutInfos.emplace_back(noteCutInfo, activeEvent);
             noteController->SendNoteWasCutEvent(byref(noteCutInfo));
             return true;
