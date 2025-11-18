@@ -15,7 +15,7 @@
 #include <UnityEngine/Application.hpp>
 #include <custom-types/shared/delegate.hpp>
 #include <functional>
-#include "Utils/semver.hpp"
+#include "Utils/Versions.hpp"
 #include "logging.hpp"
 
 using namespace UnityEngine;
@@ -57,7 +57,7 @@ namespace ScoreSaber::ReplaySystem::Recorders
     {
         StringW csc;
         auto metadata = make_shared<Metadata>();
-        metadata->Version = semver::version::parse("3.1.0");
+        metadata->Version = version("3.1.0");
         metadata->LevelID = (string)_gameplayCoreSceneSetupData->beatmapLevel->levelID;
         metadata->Difficulty = BeatmapDifficultyMethods::DefaultRating(_gameplayCoreSceneSetupData->beatmapKey.difficulty);
         metadata->Characteristic = (string)_gameplayCoreSceneSetupData->beatmapKey.beatmapCharacteristic->serializedName;
@@ -69,12 +69,8 @@ namespace ScoreSaber::ReplaySystem::Recorders
         metadata->RoomRotation = _settingsManager->settings.room.rotation;
         metadata->RoomCenter = VRPosition(_settingsManager->settings.room.center.x, _settingsManager->settings.room.center.y, _settingsManager->settings.room.center.z);
         metadata->FailTime = _failTime;
-        string gameVersion = (string)Application::get_version();
-        if(gameVersion.find_first_of('_') != string::npos) {
-            gameVersion = gameVersion.substr(0, gameVersion.find_first_of('_'));
-        }
-        metadata->GameVersion = semver::version::parse(gameVersion);
-        metadata->PluginVersion = semver::version::parse(VERSION);
+        metadata->GameVersion = version((string)Application::get_version());
+        metadata->PluginVersion = version(VERSION);
         metadata->Platform = "Quest";
         return metadata;
     }

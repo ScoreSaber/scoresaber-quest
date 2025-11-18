@@ -9,7 +9,7 @@
 #include <UnityEngine/Quaternion.hpp>
 #include <UnityEngine/Vector3.hpp>
 
-#include "Utils/semver.hpp"
+#include "Utils/Versions.hpp"
 
 using namespace std;
 
@@ -110,7 +110,7 @@ namespace ScoreSaber::Data::Private
         std::optional<int> ScoringType;
         std::optional<float> CutDirectionAngleOffset;
 
-        bool MatchesScoringType(GlobalNamespace::NoteData_ScoringType comparedScoringType, optional<semver::version> gameVersion) const;
+        bool MatchesScoringType(GlobalNamespace::NoteData_ScoringType comparedScoringType, optional<version> gameVersion) const;
     };
 
     struct EnergyEvent
@@ -152,9 +152,9 @@ namespace ScoreSaber::Data::Private
     struct Metadata
     {
         Metadata();
-        Metadata(semver::version Version, string LevelID, int Difficulty, string Characteristic, string Environment, vector<string> Modifiers, float NoteSpawnOffset,
-                 bool LeftHanded, float InitialHeight, float RoomRotation, VRPosition RoomCenter, float FailTime, optional<semver::version> GameVersion, optional<semver::version> PluginVersion, optional<string> Platform);
-        semver::version Version;
+        Metadata(version Version, string LevelID, int Difficulty, string Characteristic, string Environment, vector<string> Modifiers, float NoteSpawnOffset,
+                 bool LeftHanded, float InitialHeight, float RoomRotation, VRPosition RoomCenter, float FailTime, optional<version> GameVersion, optional<version> PluginVersion, optional<string> Platform);
+        version Version;
         string LevelID;
         int Difficulty;
         string Characteristic;
@@ -166,8 +166,8 @@ namespace ScoreSaber::Data::Private
         float RoomRotation;
         VRPosition RoomCenter;
         float FailTime;
-        optional<semver::version> GameVersion;
-        optional<semver::version> PluginVersion;
+        optional<version> GameVersion;
+        optional<version> PluginVersion;
         optional<string> Platform;
     };
 

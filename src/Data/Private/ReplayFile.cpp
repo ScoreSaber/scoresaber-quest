@@ -3,14 +3,14 @@
 #include <UnityEngine/Quaternion.hpp>
 #include <UnityEngine/Vector3.hpp>
 
-#include "Utils/semver.hpp"
+#include "Utils/Versions.hpp"
 
 using namespace GlobalNamespace;
 
 namespace ScoreSaber::Data::Private
 {
     namespace RelevantGameVersions {
-        const auto Version_1_40 = semver::version::parse("1.40.0");
+        const auto Version_1_40 = version("1.40.0");
     };
 
 
@@ -127,7 +127,7 @@ namespace ScoreSaber::Data::Private
 
     NoteID::NoteID(){};
 
-    bool NoteID::MatchesScoringType(GlobalNamespace::NoteData_ScoringType comparedScoringType, optional<semver::version> gameVersion) const
+    bool NoteID::MatchesScoringType(GlobalNamespace::NoteData_ScoringType comparedScoringType, optional<version> gameVersion) const
     {
         if (ScoringType) {
             if(!gameVersion || gameVersion < RelevantGameVersions::Version_1_40) {
@@ -194,8 +194,8 @@ namespace ScoreSaber::Data::Private
 
     VRPoseGroup::VRPoseGroup(){};
 
-    Metadata::Metadata(semver::version _Version, string _LevelID, int _Difficulty, string _Characteristic, string _Environment, vector<string> _Modifiers,
-                       float _NoteSpawnOffset, bool _LeftHanded, float _InitialHeight, float _RoomRotation, VRPosition _RoomCenter, float _FailTime, optional<semver::version> _GameVersion, optional<semver::version> _PluginVersion, optional<string> _Platform)
+    Metadata::Metadata(version _Version, string _LevelID, int _Difficulty, string _Characteristic, string _Environment, vector<string> _Modifiers,
+                       float _NoteSpawnOffset, bool _LeftHanded, float _InitialHeight, float _RoomRotation, VRPosition _RoomCenter, float _FailTime, optional<version> _GameVersion, optional<version> _PluginVersion, optional<string> _Platform)
     {
         Version = _Version;
         LevelID = _LevelID;

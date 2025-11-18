@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string>
 
-#include "Utils/semver.hpp"
+#include "Utils/Versions.hpp"
 #include "logging.hpp"
 #include "static.hpp"
 
@@ -27,7 +27,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
         shared_ptr<Metadata> metadata = ReadMetadata(inputStream, pointers.metadata);
 
         INFO("Found replay with version {:s}", metadata->Version.str());
-        if (metadata->Version == semver::version::parse("2.0.0")) {
+        if (metadata->Version == version("2.0.0")) {
             return make_shared<ReplayFile>(metadata,
                                            ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
                                            ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
@@ -36,7 +36,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
                                            ReadComboKeyframes(inputStream, pointers.comboKeyframes),
                                            ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
                                            ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
-        } else if (metadata->Version <= semver::version::parse("3.1.0")) {
+        } else if (metadata->Version <= version("3.1.0")) {
             return make_shared<ReplayFile>(metadata,
                                            ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
                                            ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
@@ -65,19 +65,21 @@ namespace ScoreSaber::Data::Private::ReplayReader
     {
         inputStream.seekg(offset);
 
-        semver::version version = semver::version::parse(ReadString(inputStream));
+        version ver = version(ReadString(inputStream));
 
-        if(version < semver::version::parse("3.1.0")) {
-            return make_shared<Metadata>(version, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
+        INFO("found version {:s}", ver.str());
+
+        if(ver < version("3.1.0")) {
+            return make_shared<Metadata>(ver, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
                             ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
                             ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream),
                             nullopt, nullopt, nullopt);
         } else {
-            return make_shared<Metadata>(version, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
+            return make_shared<Metadata>(ver, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
                             ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
                             ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream),
-                            semver::version::parse(ReadString(inputStream)),
-                            semver::version::parse(ReadString(inputStream)), ReadString(inputStream));
+                            version(ReadString(inputStream)),
+                            version(ReadString(inputStream)), ReadString(inputStream));
         }
     }
 
