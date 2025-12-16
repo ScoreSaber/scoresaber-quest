@@ -29,6 +29,7 @@
 #include "logging.hpp"
 #include <custom-types/shared/delegate.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
+#include <metacore/shared/game.hpp>
 #include "static.hpp"
 #include "Utils/MaxScoreCache.hpp"
 #include "Utils/GCUtil.hpp"
@@ -110,6 +111,12 @@ namespace ScoreSaber::Services::UploadService
             }
 
             ReplayService::WriteSerializedReplay();
+
+            if(MetaCore::Game::IsScoreSubmissionDisabled()) {
+                INFO("Score submission is disabled, not uploading score");
+                return;
+            }
+
             // Continue to upload phase
             Six(beatmapLevel, beatmapKey, levelCompletionResults);
         }
