@@ -109,9 +109,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Finish, &GlobalNam
                      GlobalNamespace::StandardLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::LevelCompletionResults* levelCompletionResults)
 {
-    if(!MetaCore::Game::IsScoreSubmissionDisabled()) {
-        ScoreSaber::Services::UploadService::Three(self, levelCompletionResults);
-    }
+    ScoreSaber::Services::UploadService::Three(self, levelCompletionResults);
     StandardLevelScenesTransitionSetupDataSO_Finish(self, levelCompletionResults);
 }
 
@@ -119,8 +117,6 @@ MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Finish, &Global
                      GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO* self,
                      GlobalNamespace::MultiplayerResultsData* multiplayerResultsData)
 {
-    if(!MetaCore::Game::IsScoreSubmissionDisabled()) {
-        ScoreSaber::Services::UploadService::Four(self, multiplayerResultsData);
-    }
+    ScoreSaber::Services::UploadService::Four(self, multiplayerResultsData);
     MultiplayerLevelScenesTransitionSetupDataSO_Finish(self, multiplayerResultsData);
 }
