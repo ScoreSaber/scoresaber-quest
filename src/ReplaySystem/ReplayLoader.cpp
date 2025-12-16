@@ -91,6 +91,9 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
 
         auto _environmentsListModel = Helpers::GetDiContainer()->Resolve<GlobalNamespace::EnvironmentsListModel*>();
 
+        MetaCore::Game::DisableScoreSubmissionOnce(MOD_ID);
+        MetaCore::Game::DisableScoreSubmissionOnce("Replay"); // hacky way to prevent BL from submitting scores during replay
+        
         menuTransitionsHelper->StartStandardLevel("Replay", // gameMode
                                                   byref(beatmapKey), // beatmapKey
                                                   beatmapLevel, // beatmapLevel
@@ -111,7 +114,6 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                   nullptr, // levelRestartedCallback
                                                   {false, {}} // recordingToolData (set to null)
                                                   );
-        MetaCore::Game::DisableScoreSubmissionOnce(MOD_ID);
         IsPlaying = true;
     }
 
