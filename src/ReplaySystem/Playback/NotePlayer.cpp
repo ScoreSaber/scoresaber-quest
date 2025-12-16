@@ -14,8 +14,7 @@
 #include <UnityEngine/Transform.hpp>
 #include "logging.hpp"
 #include <algorithm>
-#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
-#include "metacore/shared/internals.hpp"
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -138,12 +137,8 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         return true;
     }
-
     void NotePlayer::TimeUpdate(float newTime)
     {
-        INFO("NotePlayer::TimeUpdate newTime: {}", newTime);
-        _nextIndex = FindNextEventIndex(newTime, _sortedNoteEvents);
-
         MetaCore::Internals::notesLeftBadCut = 0;
         MetaCore::Internals::notesRightBadCut = 0;
         MetaCore::Internals::notesLeftMissed = 0;
@@ -156,9 +151,9 @@ namespace ScoreSaber::ReplaySystem::Playback
         // MetaCore::Internals::rightMissedFixedScore = 0;
         MetaCore::Internals::leftMissedMaxScore = 0;
         MetaCore::Internals::rightMissedMaxScore = 0;
-
-        for (int i = 0; i < _sortedNoteEvents.size(); i++) {
-            auto& noteEvent = _sortedNoteEvents[i];
+        for (int c = 0; c < _sortedNoteEvents.size(); c++)
+        {
+            auto& noteEvent = _sortedNoteEvents[c];
             if (noteEvent.Time > newTime) {
                 if (noteEvent.EventType == NoteEventType::BadCut) {
                     if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
@@ -179,9 +174,14 @@ namespace ScoreSaber::ReplaySystem::Playback
                     MetaCore::Internals::remainingNotesRight++;
                 }
             }
+            if (_sortedNoteEvents[c].Time > newTime)
+            {
+                _nextIndex = c;
+                return;
+            }
         }
+        _nextIndex = _sortedNoteEvents.size();
     }
-
     static bool operator==(const GlobalNamespace::NoteCutInfo& lhs, const GlobalNamespace::NoteCutInfo& rhs)
     {
         return lhs.noteData == rhs.noteData;

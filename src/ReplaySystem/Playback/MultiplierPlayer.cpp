@@ -2,8 +2,7 @@
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <System/Action_2.hpp>
 #include "logging.hpp"
-#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
-#include "metacore/shared/internals.hpp"
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -22,25 +21,20 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void MultiplierPlayer::TimeUpdate(float newTime)
     {
-        INFO("MultiplierPlayer::TimeUpdate newTime: {}", newTime);
-
-        int index = FindNextEventIndex(newTime, _sortedMultiplierEvents);
-
-        if (index == 0)
+        for (int c = 0; c < _sortedMultiplierEvents.size(); c++)
         {
-            UpdateMultiplier(1, 0.0f);
-            return;
+            // TODO: this has potential to have problems if _sortedMultiplierEvents[c].Time is within an epsilon of newTime, potentially applying combo changes twice or not at all
+            if (_sortedMultiplierEvents[c].Time > newTime)
+            {
+                int multiplier = c != 0 ? _sortedMultiplierEvents[c - 1].Multiplier : 1;
+                float progress = c != 0 ? _sortedMultiplierEvents[c - 1].NextMultiplierProgress : 0.0f;
+                UpdateMultiplier(multiplier, progress);
+                return;
+            }
         }
-
-        if (index < _sortedMultiplierEvents.size())
-        {
-            const auto& ev = _sortedMultiplierEvents[index - 1];
-            UpdateMultiplier(ev.Multiplier, ev.NextMultiplierProgress);
-        }
-        else
-        {
-            const auto& last = _sortedMultiplierEvents.back();
-            UpdateMultiplier(last.Multiplier, last.NextMultiplierProgress);
+        if (_sortedMultiplierEvents.size() > 0) {
+            auto lastEvent = _sortedMultiplierEvents[_sortedMultiplierEvents.size() - 1];
+            UpdateMultiplier(lastEvent.Multiplier, lastEvent.NextMultiplierProgress);
         }
     }
 

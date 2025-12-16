@@ -8,7 +8,7 @@
 #include "System/Collections/Generic/HashSet_1.hpp"
 #include "logging.hpp"
 #include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
-#include "metacore/shared/internals.hpp"
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;

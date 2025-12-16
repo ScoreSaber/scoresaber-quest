@@ -4,8 +4,7 @@
 #include <System/Action_1.hpp>
 #include <UnityEngine/Animator.hpp>
 #include <UnityEngine/Resources.hpp>
-#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
-#include "metacore/shared/internals.hpp"
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -27,16 +26,16 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void ComboPlayer::TimeUpdate(float newTime)
     {
-        INFO("ComboPlayer::TimeUpdate newTime: {}", newTime);
-
-        int combo = FindLastEventBeforeOrAt(
-            newTime,
-            _sortedComboEvents,
-            0,
-            [](const ComboEvent& e) { return e.Combo; }
-        );
-
-        UpdateCombo(newTime, combo);
+        for (int c = 0; c < _sortedComboEvents.size(); c++)
+        {
+            // TODO: this has potential to have problems if _sortedComboEvents[c].Time is within an epsilon of newTime, potentially applying combo twice or not at all
+            if (_sortedComboEvents[c].Time > newTime)
+            {
+                UpdateCombo(newTime, c != 0 ? _sortedComboEvents[c - 1].Combo : 0);
+                return;
+            }
+        }
+        UpdateCombo(newTime, _sortedComboEvents[_sortedComboEvents.size() - 1].Combo);
     }
 
 
