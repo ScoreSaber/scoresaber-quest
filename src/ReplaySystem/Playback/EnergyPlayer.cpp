@@ -41,9 +41,9 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         UpdateEnergy(0.5f);
         auto lastEvent = _sortedEnergyEvents[_sortedEnergyEvents.size() - 1];
-        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::getStaticF_Epsilon())
+        if (newTime >= lastEvent.Time)
         {
-            UpdateEnergy(0.0f);
+            UpdateEnergy(lastEvent.Energy);
 
         }
     }
