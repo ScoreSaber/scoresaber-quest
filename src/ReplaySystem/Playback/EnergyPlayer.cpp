@@ -9,7 +9,7 @@
 #include <UnityEngine/UI/Image.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include "logging.hpp"
-#include <algorithm>
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -44,6 +44,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::getStaticF_Epsilon())
         {
             UpdateEnergy(0.0f);
+
         }
     }
 
@@ -68,6 +69,24 @@ namespace ScoreSaber::ReplaySystem::Playback
         if (_gameEnergyCounter->gameEnergyDidChangeEvent != nullptr)
         {
             _gameEnergyCounter->gameEnergyDidChangeEvent->Invoke(energy);
+        }
+        
+        // forgive me
+        MetaCore::Internals::health = energy;
+
+        MetaCore::Internals::wallsHit = 0;
+
+        float lastEnergy = 0.5f;
+        for (const auto& ev : _sortedEnergyEvents)
+        {
+            if (ev.Time > MetaCore::Internals::audioTimeSyncController->_songTime)
+            {
+                break;
+            }
+            if (ev.Energy < lastEnergy) // weve lost energy by any means so just set wallhit for ui to be correct
+            {
+                MetaCore::Internals::wallsHit = 1; // just needs to be > 0 for ui to be correct (will implement precalculation later)
+            }
         }
         return;
     }

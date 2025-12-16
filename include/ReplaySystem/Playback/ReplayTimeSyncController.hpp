@@ -44,7 +44,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(
         GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
         GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
         GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
-        GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
+        GlobalNamespace::NoteCutSoundEffectManager* noteCutSoundEffectManager,
         GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
         GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
         Zenject::DiContainer* container);

@@ -3,13 +3,13 @@
 #include <GlobalNamespace/IBeatmapLevelData.hpp>
 #include <GlobalNamespace/ScoreModel.hpp>
 #include <GlobalNamespace/LoadBeatmapLevelDataResult.hpp>
-#include "GlobalNamespace/zzzz__BeatmapLevelDataVersion_def.hpp"
-#include "GlobalNamespace/zzzz__BeatmapLevelsEntitlementModel_def.hpp"
-#include "System/Threading/zzzz__CancellationToken_def.hpp"
+#include <GlobalNamespace/zzzz__BeatmapLevelDataVersion_def.hpp>
+#include <GlobalNamespace/zzzz__BeatmapLevelsEntitlementModel_def.hpp>
+#include <System/Threading/zzzz__CancellationToken_def.hpp>
 #include "Utils/DelegateUtils.hpp"
 #include "Utils/SafePtr.hpp"
 #include "Utils/GCUtil.hpp"
-#include "bsml/shared/BSML/MainThreadScheduler.hpp"
+#include <bsml/shared/BSML/MainThreadScheduler.hpp>
 #include "logging.hpp"
 
 using namespace GlobalNamespace;

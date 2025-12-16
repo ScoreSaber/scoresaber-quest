@@ -1,8 +1,10 @@
 #include "ReplaySystem/Playback/ComboPlayer.hpp"
+#include "Data/Private/ReplayFile.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <System/Action_1.hpp>
 #include <UnityEngine/Animator.hpp>
 #include <UnityEngine/Resources.hpp>
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -20,7 +22,9 @@ namespace ScoreSaber::ReplaySystem::Playback
         _comboUIController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::ComboUIController*>()->First();
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         _sortedComboEvents = ReplayLoader::LoadedReplay->comboKeyframes;
+        highestCombo = 0;
     }
+
     void ComboPlayer::TimeUpdate(float newTime)
     {
         for (int c = 0; c < _sortedComboEvents.size(); c++)
@@ -34,6 +38,8 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         UpdateCombo(newTime, _sortedComboEvents[_sortedComboEvents.size() - 1].Combo);
     }
+
+
     void ComboPlayer::UpdateCombo(float time, int combo)
     {
         auto previousComboEvents = std::vector<NoteEvent>();
@@ -45,15 +51,60 @@ namespace ScoreSaber::ReplaySystem::Playback
             }
         }
         int cutOrMissRecorded = 0;
+        int bombsHitL = 0;
+        int bombsHitR = 0;
+
+        int leftCombo = 0;
+        int rightCombo = 0;
+
+        int leftHighest = 0;
+        int rightHighest = 0;
+
         for (int c = 0; c < previousComboEvents.size(); c++)
         {
             if (previousComboEvents[c].EventType == NoteEventType::BadCut || previousComboEvents[c].EventType == NoteEventType::GoodCut || previousComboEvents[c].EventType == NoteEventType::Miss)
             {
                 cutOrMissRecorded++;
             }
+            else if (previousComboEvents[c].EventType == NoteEventType::Bomb)
+            {
+                if (previousComboEvents[c].SaberType == 0) {
+                    bombsHitL++;
+                }
+                else {
+                    bombsHitR++;
+                }
+            }
+
+            if (previousComboEvents[c].EventType == NoteEventType::GoodCut)
+            {
+                if (previousComboEvents[c].SaberType == 0)
+                {
+                    leftCombo++;
+                    leftHighest = std::max(leftHighest, leftCombo);
+                }
+                else
+                {
+                    rightCombo++;
+                    rightHighest = std::max(rightHighest, rightCombo);
+                }
+            }
+            else if (
+                previousComboEvents[c].EventType == NoteEventType::BadCut ||
+                previousComboEvents[c].EventType == NoteEventType::Miss
+            )
+            {
+                if (previousComboEvents[c].SaberType == 0)
+                    leftCombo = 0;
+                else
+                    rightCombo = 0;
+            }
         }
+
         _comboController->_combo = combo;
-        _comboController->_maxCombo = cutOrMissRecorded;
+        highestCombo = std::max(highestCombo, combo);
+        _comboController->_maxCombo = highestCombo;
+
         if (_comboController->comboDidChangeEvent != nullptr)
         {
             _comboController->comboDidChangeEvent->Invoke(combo);
@@ -78,5 +129,15 @@ namespace ScoreSaber::ReplaySystem::Playback
             _comboUIController->_animator->SetTrigger(_comboUIController->_comboLostId);
             _comboUIController->_fullComboLost = true;
         }
+
+
+        MetaCore::Internals::combo = combo;
+        MetaCore::Internals::highestCombo = highestCombo;
+        MetaCore::Internals::leftCombo = leftCombo;
+        MetaCore::Internals::rightCombo = rightCombo;
+        MetaCore::Internals::highestLeftCombo = leftHighest;
+        MetaCore::Internals::highestRightCombo = rightHighest;
+        MetaCore::Internals::bombsLeftHit = bombsHitL;
+        MetaCore::Internals::bombsRightHit = bombsHitR; 
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

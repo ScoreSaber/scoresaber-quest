@@ -2,7 +2,7 @@
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <System/Action_2.hpp>
 #include "logging.hpp"
-#include <algorithm>
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -18,6 +18,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _scoreController = scoreController;
         _sortedMultiplierEvents = ReplayLoader::LoadedReplay->multiplierKeyframes;
     }
+
     void MultiplierPlayer::TimeUpdate(float newTime)
     {
         for (int c = 0; c < _sortedMultiplierEvents.size(); c++)
@@ -36,6 +37,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             UpdateMultiplier(lastEvent.Multiplier, lastEvent.NextMultiplierProgress);
         }
     }
+
     void MultiplierPlayer::UpdateMultiplier(int multiplier, float progress)
     {
         auto counter = _scoreController->_scoreMultiplierCounter;
@@ -46,5 +48,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         {
             _scoreController->multiplierDidChangeEvent->Invoke(multiplier, progress);
         }
+        MetaCore::Internals::multiplier = multiplier;
+        MetaCore::Internals::multiplierProgress = progress;
     }
 } // namespace ScoreSaber::ReplaySystem::Playback
