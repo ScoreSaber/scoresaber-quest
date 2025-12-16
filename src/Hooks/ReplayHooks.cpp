@@ -34,6 +34,7 @@
 #include <Zenject/MemoryPoolIdInitialSizeMaxSizeBinder_1.hpp>
 #include <Zenject/MemoryPool_1.hpp>
 #include <Zenject/SceneContext.hpp>
+#include "GlobalNamespace/FlyingScoreSpawner.hpp"
 #include "logging.hpp"
 
 using namespace UnityEngine;
@@ -184,4 +185,17 @@ MAKE_AUTO_HOOK_ORIG_MATCH(ScoreController_LateUpdate, &ScoreController::LateUpda
             self->scoreDidChangeEvent->Invoke(self->multipliedScore, self->modifiedScore);
         }
     }
+}
+
+
+// fixes scores doubling up in one position when note cuts are done on the same frame (time)
+MAKE_AUTO_HOOK_MATCH(FlyingScoreSpawner_SpawnFlyingScoreNextFrame, &GlobalNamespace::FlyingScoreSpawner::SpawnFlyingScoreNextFrame, void, GlobalNamespace::FlyingScoreSpawner* self, GlobalNamespace::IReadonlyCutScoreBuffer* cutScoreBuffer, UnityEngine::Color color)
+{
+    if (!ScoreSaber::ReplaySystem::ReplayLoader::IsPlaying)
+    {
+        FlyingScoreSpawner_SpawnFlyingScoreNextFrame(self, cutScoreBuffer, color);
+        return;
+    }
+    self->SpawnFlyingScore(cutScoreBuffer, color);
+    return;
 }

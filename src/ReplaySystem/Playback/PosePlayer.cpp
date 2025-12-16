@@ -18,6 +18,7 @@
 #include <GlobalNamespace/SaberManager.hpp>
 #include <UnityEngine/Vector3.hpp>
 #include "logging.hpp"
+#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
 
 using namespace UnityEngine;
 using namespace UnityEngine::SpatialTracking;
@@ -157,13 +158,8 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void PosePlayer::TimeUpdate(float newTime)
     {
-        for (int c = 0; c < _sortedPoses.size(); c++) {
-            if (_sortedPoses[c].Time > newTime) {
-                _nextIndex = c;
-                return;
-            }
-        }
-        _nextIndex = _sortedPoses.size();
+        INFO("PosePlayer::TimeUpdate newTime: {}", newTime);
+        _nextIndex = FindNextEventIndex(newTime, _sortedPoses);
     }
 
     void PosePlayer::SetSpectatorOffset(Vector3 value) {

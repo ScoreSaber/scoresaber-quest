@@ -9,7 +9,8 @@
 #include <UnityEngine/UI/Image.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include "logging.hpp"
-#include <algorithm>
+#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
+#include "metacore/shared/internals.hpp"
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -29,22 +30,22 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void EnergyPlayer::TimeUpdate(float newTime)
     {
-        for (int c = 0; c < _sortedEnergyEvents.size(); c++)
-        {
-            // TODO: this has potential to have problems if _sortedEnergyEvents[c].Time is within an epsilon of newTime, potentially applying energy changes twice or not at all
-            if (_sortedEnergyEvents[c].Time > newTime)
-            {
-                float energy = c != 0 ? _sortedEnergyEvents[c - 1].Energy : 0.5f;
-                UpdateEnergy(energy);
-                return;
-            }
-        }
-        UpdateEnergy(0.5f);
-        auto lastEvent = _sortedEnergyEvents[_sortedEnergyEvents.size() - 1];
-        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::getStaticF_Epsilon())
+        INFO("EnergyPlayer::TimeUpdate newTime: {}", newTime);
+
+        const auto& last = _sortedEnergyEvents.back();
+        if (newTime >= last.Time && last.Energy <= Mathf::getStaticF_Epsilon())
         {
             UpdateEnergy(0.0f);
+            return;
         }
+
+        float energy = FindLastEventBeforeOrAt(
+            newTime,
+            _sortedEnergyEvents,
+            0.5f,
+            [](const auto& e) { return e.Energy; });
+
+        UpdateEnergy(energy);
     }
 
     void EnergyPlayer::UpdateEnergy(float energy)
@@ -68,6 +69,24 @@ namespace ScoreSaber::ReplaySystem::Playback
         if (_gameEnergyCounter->gameEnergyDidChangeEvent != nullptr)
         {
             _gameEnergyCounter->gameEnergyDidChangeEvent->Invoke(energy);
+        }
+        
+        // forgive me
+        MetaCore::Internals::health = energy;
+
+        MetaCore::Internals::wallsHit = 0;
+
+        float lastEnergy = 0.5f;
+        for (const auto& ev : _sortedEnergyEvents)
+        {
+            if (ev.Time > MetaCore::Internals::audioTimeSyncController->_songTime)
+            {
+                break;
+            }
+            if (ev.Energy < lastEnergy) // weve lost energy by any means so just set wallhit for ui to be correct
+            {
+                MetaCore::Internals::wallsHit = 1; // just needs to be > 0 for ui to be correct (will implement precalculation later)
+            }
         }
         return;
     }

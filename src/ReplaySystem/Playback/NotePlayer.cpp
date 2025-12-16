@@ -14,6 +14,8 @@
 #include <UnityEngine/Transform.hpp>
 #include "logging.hpp"
 #include <algorithm>
+#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
+#include "metacore/shared/internals.hpp"
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -136,18 +138,50 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         return true;
     }
+
     void NotePlayer::TimeUpdate(float newTime)
     {
-        for (int c = 0; c < _sortedNoteEvents.size(); c++)
-        {
-            if (_sortedNoteEvents[c].Time > newTime)
-            {
-                _nextIndex = c;
-                return;
+        INFO("NotePlayer::TimeUpdate newTime: {}", newTime);
+        _nextIndex = FindNextEventIndex(newTime, _sortedNoteEvents);
+
+        MetaCore::Internals::notesLeftBadCut = 0;
+        MetaCore::Internals::notesRightBadCut = 0;
+        MetaCore::Internals::notesLeftMissed = 0;
+        MetaCore::Internals::notesRightMissed = 0;
+        MetaCore::Internals::notesLeftCut = 0;
+        MetaCore::Internals::notesRightCut = 0;
+        MetaCore::Internals::remainingNotesLeft = 0;
+        MetaCore::Internals::remainingNotesRight = 0;
+        // MetaCore::Internals::leftMissedFixedScore = 0; // chains or something but not important rn
+        // MetaCore::Internals::rightMissedFixedScore = 0;
+        MetaCore::Internals::leftMissedMaxScore = 0;
+        MetaCore::Internals::rightMissedMaxScore = 0;
+
+        for (int i = 0; i < _sortedNoteEvents.size(); i++) {
+            auto& noteEvent = _sortedNoteEvents[i];
+            if (noteEvent.Time > newTime) {
+                if (noteEvent.EventType == NoteEventType::BadCut) {
+                    if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
+                        MetaCore::Internals::notesLeftBadCut++;
+                    } else if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorB) {
+                        MetaCore::Internals::notesRightBadCut++;
+                    }
+                } else if (noteEvent.EventType == NoteEventType::Miss) {
+                    if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
+                        MetaCore::Internals::notesLeftMissed++;
+                    } else if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorB) {
+                        MetaCore::Internals::notesRightMissed++;
+                    }
+                }
+                if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
+                    MetaCore::Internals::remainingNotesLeft++;
+                } else if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorB) {
+                    MetaCore::Internals::remainingNotesRight++;
+                }
             }
         }
-        _nextIndex = _sortedNoteEvents.size();
     }
+
     static bool operator==(const GlobalNamespace::NoteCutInfo& lhs, const GlobalNamespace::NoteCutInfo& rhs)
     {
         return lhs.noteData == rhs.noteData;

@@ -23,7 +23,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(
         ScoreSaber::ReplaySystem::Playback,
         ReplayTimeSyncController,
         System::Object,
-        Zenject::ITickable*) {
+        Zenject::ITickable*, Zenject::IInitializable*) {
     DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
     DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioManagerSO>, _audioManagerSO);
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController::InitData*, _audioInitData);
@@ -50,6 +50,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(
         Zenject::DiContainer* container);
 
     DECLARE_OVERRIDE_METHOD_MATCH(void, Tick, &::Zenject::ITickable::Tick);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
     DECLARE_INSTANCE_METHOD(void, UpdateTimes);
     DECLARE_INSTANCE_METHOD(void, OverrideTime, float time);
     DECLARE_INSTANCE_METHOD(void, OverrideTimeScale, float timeScale);
