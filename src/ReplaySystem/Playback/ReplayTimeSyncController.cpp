@@ -8,8 +8,8 @@
 #include <UnityEngine/GameObject.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Time.hpp>
-#include "GlobalNamespace/NoteCutSoundEffect.hpp"
-#include "GlobalNamespace/NoteCutSoundEffectManager.hpp"
+#include <GlobalNamespace/NoteCutSoundEffect.hpp>
+#include <GlobalNamespace/NoteCutSoundEffectManager.hpp>
 #include "logging.hpp"
 
 using namespace UnityEngine;

@@ -34,7 +34,7 @@
 #include <Zenject/MemoryPoolIdInitialSizeMaxSizeBinder_1.hpp>
 #include <Zenject/MemoryPool_1.hpp>
 #include <Zenject/SceneContext.hpp>
-#include "GlobalNamespace/FlyingScoreSpawner.hpp"
+#include <GlobalNamespace/FlyingScoreSpawner.hpp>
 #include "logging.hpp"
 
 using namespace UnityEngine;

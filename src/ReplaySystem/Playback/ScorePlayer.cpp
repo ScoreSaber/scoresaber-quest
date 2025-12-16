@@ -7,7 +7,6 @@
 #include "Utils/BeatmapUtils.hpp"
 #include "System/Collections/Generic/HashSet_1.hpp"
 #include "logging.hpp"
-#include "ReplaySystem/Playback/TimeUpdateUtils.hpp"
 #include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
@@ -47,22 +46,23 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void ScorePlayer::TimeUpdate(float newTime)
     {
-        INFO("ScorePlayer::TimeUpdate newTime: {}", newTime);
         ScorePlayer::UpdateMultiplier();
 
-        _nextIndex = FindNextEventIndex(newTime, _sortedScoreEvents);
-
-        if (_nextIndex > 0)
-        {
-            const auto& ev = _sortedScoreEvents[_nextIndex - 1];
-            UpdateScore(ev.Score, ev.ImmediateMaxPossibleScore, newTime);
+        _nextIndex = _sortedScoreEvents.size();
+        for (int c = 0; c < _sortedScoreEvents.size(); c++) {
+            if (_sortedScoreEvents[c].Time > newTime) {
+                _nextIndex = c;
+                break;
+            }
         }
-        else
-        {
+
+        if (_nextIndex > 0) {
+            auto scoreEvent = _sortedScoreEvents[_nextIndex - 1];
+            UpdateScore(scoreEvent.Score, scoreEvent.ImmediateMaxPossibleScore, newTime);
+        } else {
             UpdateScore(0, 0, newTime);
         }
     }
-
 
     void ScorePlayer::UpdateMultiplier()
     {
