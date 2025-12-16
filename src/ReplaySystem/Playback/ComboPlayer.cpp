@@ -22,6 +22,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _comboUIController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::ComboUIController*>()->First();
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         _sortedComboEvents = ReplayLoader::LoadedReplay->comboKeyframes;
+        highestCombo = 0;
     }
 
     void ComboPlayer::TimeUpdate(float newTime)
@@ -75,35 +76,35 @@ namespace ScoreSaber::ReplaySystem::Playback
                 }
             }
 
-
             if (previousComboEvents[c].EventType == NoteEventType::GoodCut)
             {
                 if (previousComboEvents[c].SaberType == 0)
                 {
                     leftCombo++;
-                    if (leftHighest < leftCombo) {
-                        leftHighest = leftCombo;
-                    }
+                    leftHighest = std::max(leftHighest, leftCombo);
                 }
                 else
                 {
                     rightCombo++;
-                    if (rightHighest < rightCombo) {
-                        rightHighest = rightCombo;
-                    }
+                    rightHighest = std::max(rightHighest, rightCombo);
                 }
             }
-            else{
-                if (previousComboEvents[c].SaberType == 0) {
+            else if (
+                previousComboEvents[c].EventType == NoteEventType::BadCut ||
+                previousComboEvents[c].EventType == NoteEventType::Miss
+            )
+            {
+                if (previousComboEvents[c].SaberType == 0)
                     leftCombo = 0;
-                }
-                else {
+                else
                     rightCombo = 0;
-                }
             }
         }
+
         _comboController->_combo = combo;
-        _comboController->_maxCombo = cutOrMissRecorded;
+        highestCombo = std::max(highestCombo, combo);
+        _comboController->_maxCombo = highestCombo;
+
         if (_comboController->comboDidChangeEvent != nullptr)
         {
             _comboController->comboDidChangeEvent->Invoke(combo);
@@ -131,7 +132,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 
 
         MetaCore::Internals::combo = combo;
-        MetaCore::Internals::highestCombo = cutOrMissRecorded == 0 ? 0 : std::max(combo, cutOrMissRecorded);
+        MetaCore::Internals::highestCombo = highestCombo;
         MetaCore::Internals::leftCombo = leftCombo;
         MetaCore::Internals::rightCombo = rightCombo;
         MetaCore::Internals::highestLeftCombo = leftHighest;

@@ -22,7 +22,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     void ReplayTimeSyncController::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
                                         GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
                                         GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
-                                        GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
+                                        GlobalNamespace::NoteCutSoundEffectManager* noteCutSoundEffectManager,
                                         GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
                                         GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
                                         Zenject::DiContainer* container)
@@ -31,7 +31,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _audioTimeSyncController = audioTimeSyncController;
         _audioInitData = audioInitData;
         _basicBeatmapObjectManager = basicBeatmapObjectManager;
-        _noteCutSoundEffectManager = _noteCutSoundEffectManager;
+        _noteCutSoundEffectManager = noteCutSoundEffectManager;
         _callbackInitData = callbackInitData;
         _beatmapObjectCallbackController = beatmapObjectCallbackController;
 
@@ -49,14 +49,6 @@ namespace ScoreSaber::ReplaySystem::Playback
     void ReplayTimeSyncController::Tick()
     {
         // Potential input?
-    }
-
-    void ReplayTimeSyncController::Initialize()
-    {
-        if(!_noteCutSoundEffectManager){
-            INFO("Finding NoteCutSoundEffectManager via Resources");
-            _noteCutSoundEffectManager = UnityEngine::Object::FindObjectsOfType<GlobalNamespace::NoteCutSoundEffectManager*>()->FirstOrDefault(); // weird that this fixes it, why isnt it being injected?
-        }
     }
 
     void ReplayTimeSyncController::UpdateTimes()

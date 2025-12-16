@@ -23,7 +23,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(
         ScoreSaber::ReplaySystem::Playback,
         ReplayTimeSyncController,
         System::Object,
-        Zenject::ITickable*, Zenject::IInitializable*) {
+        Zenject::ITickable*) {
     DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
     DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioManagerSO>, _audioManagerSO);
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::AudioTimeSyncController::InitData*, _audioInitData);
@@ -44,13 +44,12 @@ DECLARE_CLASS_CODEGEN_INTERFACES(
         GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
         GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
         GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
-        GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
+        GlobalNamespace::NoteCutSoundEffectManager* noteCutSoundEffectManager,
         GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
         GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
         Zenject::DiContainer* container);
 
     DECLARE_OVERRIDE_METHOD_MATCH(void, Tick, &::Zenject::ITickable::Tick);
-    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
     DECLARE_INSTANCE_METHOD(void, UpdateTimes);
     DECLARE_INSTANCE_METHOD(void, OverrideTime, float time);
     DECLARE_INSTANCE_METHOD(void, OverrideTimeScale, float timeScale);
