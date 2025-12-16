@@ -9,6 +9,7 @@
 #include <GlobalNamespace/SaberType.hpp>
 #include <GlobalNamespace/SaberTypeObject.hpp>
 #include <GlobalNamespace/ScoringElement.hpp>
+#include "Data/Private/ReplayFile.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Transform.hpp>
@@ -137,8 +138,10 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         return true;
     }
+    
     void NotePlayer::TimeUpdate(float newTime)
     {
+        // reset
         MetaCore::Internals::notesLeftBadCut = 0;
         MetaCore::Internals::notesRightBadCut = 0;
         MetaCore::Internals::notesLeftMissed = 0;
@@ -147,41 +150,58 @@ namespace ScoreSaber::ReplaySystem::Playback
         MetaCore::Internals::notesRightCut = 0;
         MetaCore::Internals::remainingNotesLeft = 0;
         MetaCore::Internals::remainingNotesRight = 0;
-        // MetaCore::Internals::leftMissedFixedScore = 0; // chains or something but not important rn
-        // MetaCore::Internals::rightMissedFixedScore = 0;
-        MetaCore::Internals::leftMissedMaxScore = 0;
-        MetaCore::Internals::rightMissedMaxScore = 0;
+
+        bool checkedNextIndex = false;
+
         for (int c = 0; c < _sortedNoteEvents.size(); c++)
         {
-            auto& noteEvent = _sortedNoteEvents[c];
-            if (noteEvent.Time > newTime) {
-                if (noteEvent.EventType == NoteEventType::BadCut) {
-                    if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
+            auto& e = _sortedNoteEvents[c];
+            if(e.EventType == NoteEventType::Bomb || e.EventType == NoteEventType::None) continue;
+            if (e.Time <= newTime)
+            {
+                if (e.EventType == NoteEventType::BadCut)
+                {
+                    if (e.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA)
+                    {
                         MetaCore::Internals::notesLeftBadCut++;
-                    } else if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorB) {
+                    }
+                    else
+                    {
                         MetaCore::Internals::notesRightBadCut++;
                     }
-                } else if (noteEvent.EventType == NoteEventType::Miss) {
-                    if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
+                }
+                else if (e.EventType == NoteEventType::Miss)
+                {
+                    if (e.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA)
+                    {
                         MetaCore::Internals::notesLeftMissed++;
-                    } else if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorB) {
+                    }
+                    else
+                    {
                         MetaCore::Internals::notesRightMissed++;
                     }
                 }
-                if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA) {
+            }
+            else
+            {
+                if (!checkedNextIndex)
+                {
+                    _nextIndex = c;
+                    checkedNextIndex = true;
+                }
+
+                if (e.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA)
+                {
                     MetaCore::Internals::remainingNotesLeft++;
-                } else if (noteEvent.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorB) {
+                }
+                else
+                {
                     MetaCore::Internals::remainingNotesRight++;
                 }
             }
-            if (_sortedNoteEvents[c].Time > newTime)
-            {
-                _nextIndex = c;
-                return;
-            }
         }
-        _nextIndex = _sortedNoteEvents.size();
     }
+
     static bool operator==(const GlobalNamespace::NoteCutInfo& lhs, const GlobalNamespace::NoteCutInfo& rhs)
     {
         return lhs.noteData == rhs.noteData;
