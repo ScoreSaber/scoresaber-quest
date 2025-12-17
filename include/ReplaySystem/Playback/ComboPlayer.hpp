@@ -16,7 +16,4 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::ReplaySystem::Playback, ComboPlayer, Il2CppObj
     vector<Data::Private::NoteEvent> _sortedNoteEvents;
     vector<Data::Private::ComboEvent> _sortedComboEvents;
     void UpdateCombo(float time, int combo);
-
-    private:
-    int highestCombo = 0;
 };
