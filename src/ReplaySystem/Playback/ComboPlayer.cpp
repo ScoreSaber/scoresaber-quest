@@ -22,7 +22,6 @@ namespace ScoreSaber::ReplaySystem::Playback
         _comboUIController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::ComboUIController*>()->First();
         _sortedNoteEvents = ReplayLoader::LoadedReplay->noteKeyframes;
         _sortedComboEvents = ReplayLoader::LoadedReplay->comboKeyframes;
-        highestCombo = 0;
     }
 
     void ComboPlayer::TimeUpdate(float newTime)
@@ -59,6 +58,9 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         int leftHighest = 0;
         int rightHighest = 0;
+        int highestCombo = 0;
+
+        int comboCounter = 0;
 
         for (int c = 0; c < previousComboEvents.size(); c++)
         {
@@ -78,6 +80,7 @@ namespace ScoreSaber::ReplaySystem::Playback
 
             if (previousComboEvents[c].EventType == NoteEventType::GoodCut)
             {
+                comboCounter++;
                 if (previousComboEvents[c].SaberType == 0)
                 {
                     leftCombo++;
@@ -91,18 +94,20 @@ namespace ScoreSaber::ReplaySystem::Playback
             }
             else if (
                 previousComboEvents[c].EventType == NoteEventType::BadCut ||
-                previousComboEvents[c].EventType == NoteEventType::Miss
+                previousComboEvents[c].EventType == NoteEventType::Miss ||
+                previousComboEvents[c].EventType == NoteEventType::Bomb
             )
             {
+                comboCounter = 0;
                 if (previousComboEvents[c].SaberType == 0)
                     leftCombo = 0;
                 else
                     rightCombo = 0;
             }
+            highestCombo = std::max(highestCombo, comboCounter);
         }
 
         _comboController->_combo = combo;
-        highestCombo = std::max(highestCombo, combo);
         _comboController->_maxCombo = highestCombo;
 
         if (_comboController->comboDidChangeEvent != nullptr)
@@ -129,7 +134,6 @@ namespace ScoreSaber::ReplaySystem::Playback
             _comboUIController->_animator->SetTrigger(_comboUIController->_comboLostId);
             _comboUIController->_fullComboLost = true;
         }
-
 
         MetaCore::Internals::combo = combo;
         MetaCore::Internals::highestCombo = highestCombo;
