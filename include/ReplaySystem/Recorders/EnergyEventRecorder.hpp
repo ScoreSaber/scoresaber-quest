@@ -11,24 +11,20 @@
 #include <vector>
 #include "Utils/DelegateUtils.hpp"
 
-using namespace GlobalNamespace;
-
-#define INTERFACES                                                        \
-    {                                                                     \
-        classof(System::IDisposable*), classof(Zenject::IInitializable*), \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, EnergyEventRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GameEnergyCounter>, _gameEnergyCounter);
-                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, GameEnergyCounter* gameEnergyCounter);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    DECLARE_INSTANCE_METHOD(void, GameEnergyCounter_gameEnergyDidChangeEvent, float energy);
-                                    std::vector<Data::Private::EnergyEvent> _energyKeyframes;
-                                    DelegateUtils::DelegateW<System::Action_1<float>> gameEnergyDidChangeDelegate;
-                                    public:
-                                    std::vector<Data::Private::EnergyEvent> Export();
-                                    )
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::Recorders,
+        EnergyEventRecorder,
+        System::Object,
+        System::IDisposable*,
+        Zenject::IInitializable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::GameEnergyCounter>, _gameEnergyCounter);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+    DECLARE_INSTANCE_METHOD(void, GameEnergyCounter_gameEnergyDidChangeEvent, float energy);
+    std::vector<Data::Private::EnergyEvent> _energyKeyframes;
+    DelegateUtils::DelegateW<System::Action_1<float>> gameEnergyDidChangeDelegate;
+public:
+    std::vector<Data::Private::EnergyEvent> Export();
+};

@@ -1,7 +1,7 @@
 #include "Data/LeaderboardInfo.hpp"
 #include <beatsaber-hook/shared/utils/utils.h>
 #include <beatsaber-hook/shared/utils/utils-functions.h>
-#include "paper/shared/string_convert.hpp"
+#include <paper2_scotland2/shared/string_convert.hpp>
 
 inline rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> getdoc(std::u16string_view string)
 {

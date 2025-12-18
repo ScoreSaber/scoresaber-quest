@@ -1,4 +1,3 @@
-
 #include "ReplaySystem/Playback/ReplayTimeSyncController.hpp"
 #include <GlobalNamespace/CallbacksInTime.hpp>
 #include <GlobalNamespace/BurstSliderGameNoteController.hpp>
@@ -9,7 +8,8 @@
 #include <UnityEngine/GameObject.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Time.hpp>
-
+#include <GlobalNamespace/NoteCutSoundEffect.hpp>
+#include <GlobalNamespace/NoteCutSoundEffectManager.hpp>
 #include "logging.hpp"
 
 using namespace UnityEngine;
@@ -22,7 +22,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     void ReplayTimeSyncController::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController,
                                         GlobalNamespace::AudioTimeSyncController::InitData* audioInitData,
                                         GlobalNamespace::BasicBeatmapObjectManager* basicBeatmapObjectManager,
-                                        GlobalNamespace::NoteCutSoundEffectManager* _noteCutSoundEffectManager,
+                                        GlobalNamespace::NoteCutSoundEffectManager* noteCutSoundEffectManager,
                                         GlobalNamespace::BeatmapCallbacksController::InitData* callbackInitData,
                                         GlobalNamespace::BeatmapCallbacksController* beatmapObjectCallbackController,
                                         Zenject::DiContainer* container)
@@ -31,7 +31,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _audioTimeSyncController = audioTimeSyncController;
         _audioInitData = audioInitData;
         _basicBeatmapObjectManager = basicBeatmapObjectManager;
-        _noteCutSoundEffectManager = _noteCutSoundEffectManager;
+        _noteCutSoundEffectManager = noteCutSoundEffectManager;
         _callbackInitData = callbackInitData;
         _beatmapObjectCallbackController = beatmapObjectCallbackController;
 
@@ -53,14 +53,15 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void ReplayTimeSyncController::UpdateTimes()
     {
-        _comboPlayer->TimeUpdate(_audioTimeSyncController->songTime);
-        _energyPlayer->TimeUpdate(_audioTimeSyncController->songTime); // needs to be run before the ScorePlayer
-        if(_heightPlayer)
+        if(_heightPlayer){
             _heightPlayer->TimeUpdate(_audioTimeSyncController->songTime);
+        }
+        _energyPlayer->TimeUpdate(_audioTimeSyncController->songTime); // needs to be run before the ScorePlayer
+        _comboPlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _multiplierPlayer->TimeUpdate(_audioTimeSyncController->songTime);
-        _notePlayer->TimeUpdate(_audioTimeSyncController->songTime);
-        _posePlayer->TimeUpdate(_audioTimeSyncController->songTime);
         _scorePlayer->TimeUpdate(_audioTimeSyncController->songTime);
+        _posePlayer->TimeUpdate(_audioTimeSyncController->songTime);
+        _notePlayer->TimeUpdate(_audioTimeSyncController->songTime);
     }
 
     void ReplayTimeSyncController::OverrideTime(float time)
@@ -69,70 +70,22 @@ namespace ScoreSaber::ReplaySystem::Playback
         {
             return;
         }
-        // TODO: Cancel hitsounds
 
         CancelAllHitSounds();
-
-        auto gameNotePoolItems = _basicBeatmapObjectManager->_basicGameNotePoolContainer->activeItems;
-        for (int i = 0; i < gameNotePoolItems->Count; i++)
-        {
-            auto item = gameNotePoolItems->get_Item(i);
-            item->Hide(false);
-            item->Pause(false);
-            item->enabled = true;
-            item->gameObject->SetActive(true);
-            item->Dissolve(0.0f);
-        }
-        auto sliderHeadPoolItems = _basicBeatmapObjectManager->_burstSliderHeadGameNotePoolContainer->activeItems;
-        for (int i = 0; i < sliderHeadPoolItems->Count; i++)
-        {
-            auto item = sliderHeadPoolItems->get_Item(i);
-            item->Hide(false);
-            item->Pause(false);
-            item->enabled = true;
-            item->gameObject->SetActive(true);
-            item->Dissolve(0.0f);
-        }
-        auto sliderNotePoolItems = _basicBeatmapObjectManager->_burstSliderGameNotePoolContainer->activeItems;
-        for (int i = 0; i < sliderNotePoolItems->Count; i++)
-        {
-            auto item = sliderNotePoolItems->get_Item(i);
-            item->Hide(false);
-            item->Pause(false);
-            item->enabled = true;
-            item->gameObject->SetActive(true);
-            item->Dissolve(0.0f);
-        }
-        auto bombNotePoolItems = _basicBeatmapObjectManager->_bombNotePoolContainer->activeItems;
-        for (int i = 0; i < bombNotePoolItems->Count; i++)
-        {
-            auto item = bombNotePoolItems->get_Item(i);
-            item->Hide(false);
-            item->Pause(false);
-            item->enabled = true;
-            item->gameObject->SetActive(true);
-            item->Dissolve(0.0f);
-        }
-
-        auto obstacleNotePool = _basicBeatmapObjectManager->activeObstacleControllers;
-        for (int i = 0; i < obstacleNotePool->Count; i++)
-        {
-            auto item = obstacleNotePool->get_Item(i);
-            item->Hide(false);
-            item->Pause(false);
-            item->enabled = true;
-            item->gameObject->SetActive(true);
-            item->Dissolve(0.0f);
-        }
         auto previousState = _audioTimeSyncController->state;
+
         _audioTimeSyncController->Pause();
-        _audioTimeSyncController->SeekTo(time / _audioTimeSyncController->timeScale);
-        if (previousState == GlobalNamespace::AudioTimeSyncController::State::Playing)
-        {
-            _audioTimeSyncController->Resume();
+
+        ListW<GlobalNamespace::IBeatmapObjectController*> allBmObj = _basicBeatmapObjectManager->_allBeatmapObjects;
+
+        for (auto bmObj : allBmObj) {
+            bmObj->Pause(false);
+            bmObj->Hide(false);
+            ((UnityEngine::Component*) bmObj)->gameObject->active = true;
+            bmObj->Dissolve(0.0f);
         }
+        
         _callbackInitData->startFilterTime = time;
-        _beatmapObjectCallbackController->_startFilterTime = time;
         auto callbacks = _beatmapObjectCallbackController->_callbacksInTimes;
 
         auto itr = callbacks->GetEnumerator();
@@ -145,8 +98,17 @@ namespace ScoreSaber::ReplaySystem::Playback
             }
         }
 
+        _beatmapObjectCallbackController->_prevSongTime = time - 0.01;
+        _beatmapObjectCallbackController->_songTime = time;
+        _beatmapObjectCallbackController->_startFilterTime = time;
+        _audioTimeSyncController->SeekTo(time / _audioTimeSyncController->timeScale);
         _audioTimeSyncController->_songTime = time;
         _audioTimeSyncController->Update();
+        
+        if (previousState == GlobalNamespace::AudioTimeSyncController::State::Playing)
+        {
+            _audioTimeSyncController->Resume();
+        }
         UpdateTimes();
     }
 
@@ -163,17 +125,17 @@ namespace ScoreSaber::ReplaySystem::Playback
 
     void ReplayTimeSyncController::CancelAllHitSounds()
     {
-        // auto noteCutPool = _noteCutSoundEffectManager->noteCutSoundEffectPoolContainer;
-        // auto noteCutPoolItems = noteCutPool->activeItems;
-        // for (int i = 0; i < noteCutPoolItems->Count; i++)
-        // {
-        //     auto effect = noteCutPoolItems->get_Item(i);
-        //     if (effect->isActiveAndEnabled)
-        //     {
-        //         effect->StopPlayingAndFinish();
-        //     }
-        // }
-        // _noteCutSoundEffectManager->prevNoteATime = -1.0f;
-        // _noteCutSoundEffectManager->prevNoteBTime = -1.0f;
+        auto noteCutPool = _noteCutSoundEffectManager->_noteCutSoundEffectPoolContainer;
+        auto noteCutPoolItems = noteCutPool->activeItems;
+        for (int i = 0; i < noteCutPoolItems->Count; i++)
+        {
+            auto effect = noteCutPoolItems->get_Item(i);
+            if (effect->isActiveAndEnabled)
+            {
+                effect->StopPlayingAndFinish();
+            }
+        }
+        _noteCutSoundEffectManager->_prevNoteATime = -1.0f;
+        _noteCutSoundEffectManager->_prevNoteBTime = -1.0f;
     }
 } // namespace ScoreSaber::ReplaySystem::Playback

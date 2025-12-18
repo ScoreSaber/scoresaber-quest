@@ -1,5 +1,7 @@
 #include "ReplaySystem/Playback/EnergyPlayer.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
+#include <GlobalNamespace/PlayerData.hpp>
+#include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include <System/Action_1.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Playables/PlayableDirector.hpp>
@@ -7,7 +9,7 @@
 #include <UnityEngine/UI/Image.hpp>
 #include <UnityEngine/Mathf.hpp>
 #include "logging.hpp"
-#include <algorithm>
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -16,11 +18,11 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, EnergyPlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void EnergyPlayer::ctor(GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameEnergyCounter* gameEnergyCounter, Zenject::DiContainer* container)
+    void EnergyPlayer::ctor(GlobalNamespace::GameEnergyCounter* gameEnergyCounter, GlobalNamespace::PlayerDataModel* playerDataModel, Zenject::DiContainer* container)
     {
         INVOKE_CTOR();
-        _audioTimeSyncController = audioTimeSyncController;
         _gameEnergyCounter = gameEnergyCounter;
+        _playerDataModel = playerDataModel;
         _gameEnergyUIPanel = container->TryResolve<GlobalNamespace::GameEnergyUIPanel*>();
         _sortedEnergyEvents = ReplayLoader::LoadedReplay->energyKeyframes;
     }
@@ -39,9 +41,10 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         UpdateEnergy(0.5f);
         auto lastEvent = _sortedEnergyEvents[_sortedEnergyEvents.size() - 1];
-        if (newTime >= lastEvent.Time && lastEvent.Energy <= Mathf::getStaticF_Epsilon())
+        if (newTime >= lastEvent.Time)
         {
-            UpdateEnergy(0.0f);
+            UpdateEnergy(lastEvent.Energy);
+
         }
     }
 
@@ -56,7 +59,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _gameEnergyCounter->energy = energy;
         _gameEnergyCounter->noFail = noFail;
 
-        if (_gameEnergyUIPanel != nullptr) {
+        if (_gameEnergyUIPanel != nullptr && !_playerDataModel->playerData->playerSpecificSettings->noTextsAndHuds) {
             _gameEnergyUIPanel->Init();
             auto director = _gameEnergyUIPanel->_playableDirector;
             director->Stop();
@@ -66,6 +69,24 @@ namespace ScoreSaber::ReplaySystem::Playback
         if (_gameEnergyCounter->gameEnergyDidChangeEvent != nullptr)
         {
             _gameEnergyCounter->gameEnergyDidChangeEvent->Invoke(energy);
+        }
+        
+        // forgive me
+        MetaCore::Internals::health = energy;
+
+        MetaCore::Internals::wallsHit = 0;
+
+        float lastEnergy = 0.5f;
+        for (const auto& ev : _sortedEnergyEvents)
+        {
+            if (ev.Time > MetaCore::Internals::audioTimeSyncController->_songTime)
+            {
+                break;
+            }
+            if (ev.Energy < lastEnergy) // weve lost energy by any means so just set wallhit for ui to be correct
+            {
+                MetaCore::Internals::wallsHit = 1; // just needs to be > 0 for ui to be correct (will implement precalculation later)
+            }
         }
         return;
     }

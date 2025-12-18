@@ -157,8 +157,8 @@ namespace ScoreSaber::CustomTypes::Components
         self->_visibleCells->Clear();
         if (self->dataSource != nullptr)
         {
-            self->_numberOfCells = self->dataSource->NumberOfCells();
-            self->_cellSize = self->dataSource->CellSize();
+            self->UpdateCachedData();
+            self->_cellSize = self->dataSource->CellSize(-1);
         }
         else
         {
@@ -166,7 +166,7 @@ namespace ScoreSaber::CustomTypes::Components
             self->_cellSize = 1.0f;
         }
 
-        self->scrollView->_fixedCellSize = self->cellSize;
+        self->scrollView->_fixedCellSize = self->cellSize + self->spacing;
         self->RefreshContentSize();
         if (!self->gameObject->activeInHierarchy)
         {

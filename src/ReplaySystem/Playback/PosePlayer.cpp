@@ -1,7 +1,7 @@
 #include "ReplaySystem/Playback/PosePlayer.hpp"
 #include <GlobalNamespace/Saber.hpp>
+#include <GlobalNamespace/SettingsManager.hpp>
 #include <GlobalNamespace/VRController.hpp>
-#include <BeatSaber/GameSettings/MainSettings.hpp>
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <UnityEngine/Component.hpp>
 #include <UnityEngine/GameObject.hpp>
@@ -27,7 +27,7 @@ DEFINE_TYPE(ScoreSaber::ReplaySystem::Playback, PosePlayer);
 
 namespace ScoreSaber::ReplaySystem::Playback
 {
-    void PosePlayer::ctor(GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController)
+    void PosePlayer::ctor(GlobalNamespace::MainCamera* mainCamera, GlobalNamespace::SaberManager* saberManager, GlobalNamespace::IReturnToMenuController* returnToMenuController, GlobalNamespace::PlayerTransforms* playerTransforms, GlobalNamespace::SettingsManager* settingsManager, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController)
     {
         INVOKE_CTOR();
         _mainCamera = mainCamera;
@@ -36,7 +36,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         _returnToMenuController = returnToMenuController;
         _spectatorOffset = Vector3(0, 0, -2);
         _playerTransforms = playerTransforms;
-        _mainSettingsHandler = mainSettingsHandler;
+        _settingsManager = settingsManager;
         _audioTimeSyncController = audioTimeSyncController;
     }
     void PosePlayer::Initialize()
@@ -64,8 +64,8 @@ namespace ScoreSaber::ReplaySystem::Playback
 
         GameObject* spectatorObject = GameObject::New_ctor("SpectatorParent");
         _spectatorCamera = UnityEngine::Object::Instantiate(_desktopCamera);
-        spectatorObject->transform->position = Vector3(_mainSettingsHandler->instance->roomCenter.x + _spectatorOffset.x, _mainSettingsHandler->instance->roomCenter.y + _spectatorOffset.y, _mainSettingsHandler->instance->roomCenter.z + _spectatorOffset.z);
-        Quaternion rotation = Quaternion::Euler(0.0f, _mainSettingsHandler->instance->roomRotation, 0.0f);
+        spectatorObject->transform->position = Vector3(_settingsManager->settings.room.center.x + _spectatorOffset.x, _settingsManager->settings.room.center.y + _spectatorOffset.y, _settingsManager->settings.room.center.z + _spectatorOffset.z);
+        Quaternion rotation = Quaternion::Euler(0.0f, _settingsManager->settings.room.rotation, 0.0f);
         spectatorObject->transform->rotation = rotation;
         _spectatorCamera->stereoTargetEye = StereoTargetEyeMask::Both;
 
@@ -167,7 +167,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     }
 
     void PosePlayer::SetSpectatorOffset(Vector3 value) {
-        _spectatorCamera->transform->parent->position = Vector3(_mainSettingsHandler->instance->roomCenter.x + value.x, _mainSettingsHandler->instance->roomCenter.y + value.y, _mainSettingsHandler->instance->roomCenter.z + value.z);
+        _spectatorCamera->transform->parent->position = Vector3(_settingsManager->settings.room.center.x + value.x, _settingsManager->settings.room.center.y + value.y, _settingsManager->settings.room.center.z + value.z);
         _spectatorOffset = value;
     }
 

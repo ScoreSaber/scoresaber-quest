@@ -5,8 +5,9 @@
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <System/Action_2.hpp>
 #include "Utils/BeatmapUtils.hpp"
-
+#include "System/Collections/Generic/HashSet_1.hpp"
 #include "logging.hpp"
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -27,6 +28,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             return lhs.Time < rhs.Time;
         });
     }
+
     void ScorePlayer::Tick()
     {
         optional<int> recentMultipliedScore;
@@ -66,6 +68,7 @@ namespace ScoreSaber::ReplaySystem::Playback
     {
         float totalMultiplier = _scoreController->_gameplayModifiersModel->GetTotalMultiplier(_scoreController->_gameplayModifierParams, _gameEnergyCounter->energy);
         _scoreController->_prevMultiplierFromModifiers = totalMultiplier;
+        MetaCore::Internals::multiplier = totalMultiplier;
     }
 
     void ScorePlayer::UpdateScore(int newScore, optional<int> immediateMaxPossibleScore, float time)
@@ -88,7 +91,26 @@ namespace ScoreSaber::ReplaySystem::Playback
         if (_scoreController->scoreDidChangeEvent != nullptr) {
             _scoreController->scoreDidChangeEvent->Invoke(newScore, newModifiedScore);
         }
+
+        _scoreController->____playerHeadAndObstacleInteraction->____intersectingObstacles->Clear();
+
+        // this sucks but metacore expects left/right scores separately
+        // will figure out proper calculations, and probably make a full util for updating metacore values later
+        MetaCore::Internals::songMaxScore = immediate;
+        
+        auto splitScore = [](int total) -> std::pair<int, int> {
+            return {total / 2, total - total / 2};
+        };
+        
+        auto [leftScore, rightScore] = splitScore(newModifiedScore);
+        MetaCore::Internals::leftScore = leftScore;
+        MetaCore::Internals::rightScore = rightScore;
+
+        auto [leftMaxScore, rightMaxScore] = splitScore(immediate);
+        MetaCore::Internals::leftMaxScore = leftMaxScore;
+        MetaCore::Internals::rightMaxScore = rightMaxScore;
     }
+    
     int ScorePlayer::CalculatePostNoteCountForTime(float time)
     {
         int count = 0;

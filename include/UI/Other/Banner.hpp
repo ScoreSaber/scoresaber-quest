@@ -11,13 +11,12 @@
 #include <UnityEngine/UI/VerticalLayoutGroup.hpp>
 #include <custom-types/shared/coroutine.hpp>
 #include <custom-types/shared/macros.hpp>
-#include <paper/shared/string_convert.hpp>
+#include <paper2_scotland2/shared/string_convert.hpp>
 #include <bsml/shared/BSML/Components/Backgroundable.hpp>
 #include <bsml/shared/BSML-Lite.hpp>
 #include <string_view>
 
-DECLARE_CLASS_CODEGEN(
-    ScoreSaber::UI::Other, Banner, UnityEngine::MonoBehaviour,
+DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, Banner, UnityEngine::MonoBehaviour) {
     DECLARE_INSTANCE_METHOD(void, Update);
     DECLARE_INSTANCE_FIELD(UnityW<BSML::Backgroundable>, bg);
     DECLARE_INSTANCE_FIELD(UnityW<HMUI::ImageView>, bgImage);
@@ -27,8 +26,7 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::UI::VerticalLayoutGroup>, loadingVertical);
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, promptText);
 
-    public
-    :
+public:
 
     static ScoreSaber::UI::Other::Banner * Create(UnityEngine::Transform * parent);
     void Setup();
@@ -53,8 +51,8 @@ DECLARE_CLASS_CODEGEN(
     void set_bottomText(std::u16string_view newText);
     void set_bottomText(std::string_view newText) { set_bottomText(Paper::StringConvert::from_utf8(newText)); };
 
-    private
-    : bool rainbow = false;
+private:
+    bool rainbow = false;
     bool wasRainbow = false;
     float colorAngle = 0.0f;
     int scoreboardId;
@@ -62,5 +60,4 @@ DECLARE_CLASS_CODEGEN(
     custom_types::Helpers::Coroutine SetPrompt(
         std::string status, bool loadingIndicator, float dismiss,
         std::function<void()> callback);
-
-)
+};

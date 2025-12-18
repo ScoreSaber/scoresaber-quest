@@ -1,7 +1,7 @@
 #pragma once
 #include "Utils/StringUtils.hpp"
 #include <beatsaber-hook/shared/config/rapidjson-utils.hpp>
-#include "paper/shared/string_convert.hpp"
+#include <paper2_scotland2/shared/string_convert.hpp>
 
 #include <iostream>
 #include <string>

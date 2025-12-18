@@ -3,8 +3,16 @@
 #include <UnityEngine/Quaternion.hpp>
 #include <UnityEngine/Vector3.hpp>
 
+#include "Utils/Versions.hpp"
+
+using namespace GlobalNamespace;
+
 namespace ScoreSaber::Data::Private
 {
+    namespace RelevantGameVersions {
+        const auto Version_1_40 = version("1.40.0");
+    };
+
 
     UnityEngine::Vector3 VRVector3(Data::Private::VRPosition pose)
     {
@@ -119,6 +127,37 @@ namespace ScoreSaber::Data::Private
 
     NoteID::NoteID(){};
 
+    bool NoteID::MatchesScoringType(GlobalNamespace::NoteData_ScoringType comparedScoringType, optional<version> gameVersion) const
+    {
+        if (ScoringType) {
+            if(!gameVersion || gameVersion < RelevantGameVersions::Version_1_40) {
+                switch(ScoringType.value()) {
+                    case ScoringType_pre1_40::Ignore: return comparedScoringType == NoteData_ScoringType::Ignore;
+                    case ScoringType_pre1_40::NoScore: return comparedScoringType == NoteData_ScoringType::NoScore;
+                    case ScoringType_pre1_40::Normal: return comparedScoringType == NoteData_ScoringType::Normal;
+                    case ScoringType_pre1_40::SliderHead:
+                        if (comparedScoringType == NoteData_ScoringType::ArcHeadArcTail) return true;
+                        if (comparedScoringType == NoteData_ScoringType::ChainLinkArcHead) return true;
+                        return comparedScoringType == NoteData_ScoringType::ArcHead;
+                    case ScoringType_pre1_40::SliderTail:
+                        if (comparedScoringType == NoteData_ScoringType::ArcHeadArcTail) return true;
+                        if (comparedScoringType == NoteData_ScoringType::ChainHeadArcTail) return true;
+                        return comparedScoringType == NoteData_ScoringType::ArcTail;
+                    case ScoringType_pre1_40::BurstSliderHead:
+                        if (comparedScoringType == NoteData_ScoringType::ChainHeadArcTail) return true;
+                        return comparedScoringType == NoteData_ScoringType::ChainHead;
+                    case ScoringType_pre1_40::BurstSliderElement:
+                        if (comparedScoringType == NoteData_ScoringType::ChainLinkArcHead) return true;
+                        return comparedScoringType == NoteData_ScoringType::ChainLink;
+                }
+            }
+
+            // if it's none of the special versions handled above the scoring types should be compatible to our current scoring type.
+            return ScoringType.value() == (int)comparedScoringType;
+        }
+        return true;
+    }
+
     EnergyEvent::EnergyEvent(float _Energy, float _Time)
     {
         Energy = _Energy;
@@ -155,8 +194,8 @@ namespace ScoreSaber::Data::Private
 
     VRPoseGroup::VRPoseGroup(){};
 
-    Metadata::Metadata(string _Version, string _LevelID, int _Difficulty, string _Characteristic, string _Environment, vector<string> _Modifiers,
-                       float _NoteSpawnOffset, bool _LeftHanded, float _InitialHeight, float _RoomRotation, VRPosition _RoomCenter, float _FailTime)
+    Metadata::Metadata(version _Version, string _LevelID, int _Difficulty, string _Characteristic, string _Environment, vector<string> _Modifiers,
+                       float _NoteSpawnOffset, bool _LeftHanded, float _InitialHeight, float _RoomRotation, VRPosition _RoomCenter, float _FailTime, optional<version> _GameVersion, optional<version> _PluginVersion, optional<string> _Platform)
     {
         Version = _Version;
         LevelID = _LevelID;
@@ -170,6 +209,9 @@ namespace ScoreSaber::Data::Private
         RoomRotation = _RoomRotation;
         RoomCenter = _RoomCenter;
         FailTime = _FailTime;
+        GameVersion = _GameVersion;
+        PluginVersion = _PluginVersion;
+        Platform = _Platform;
     }
 
     Metadata::Metadata(){};

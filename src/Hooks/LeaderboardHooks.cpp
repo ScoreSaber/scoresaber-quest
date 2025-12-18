@@ -14,6 +14,7 @@
 #include <GlobalNamespace/MenuTransitionsHelper.hpp>
 #include <UnityEngine/GameObject.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
+#include <metacore/shared/game.hpp>
 
 #include "hooks.hpp"
 #include "UI/Other/ScoreSaberLeaderboardView.hpp"

@@ -2,13 +2,11 @@
 
 #include "Utils/lzma/lzma.hpp"
 
-#include <codecvt>
-#include <locale>
+#include <optional>
 #include <stdlib.h>
 #include <string>
 
-#include "Services/PlayerService.hpp"
-
+#include "Utils/Versions.hpp"
 #include "logging.hpp"
 #include "static.hpp"
 
@@ -28,8 +26,8 @@ namespace ScoreSaber::Data::Private::ReplayReader
 
         shared_ptr<Metadata> metadata = ReadMetadata(inputStream, pointers.metadata);
 
-        INFO("Found replay with version {:s}", metadata->Version.c_str());
-        if (metadata->Version == "2.0.0") {
+        INFO("Found replay with version {:s}", metadata->Version.str());
+        if (metadata->Version == version("2.0.0")) {
             return make_shared<ReplayFile>(metadata,
                                            ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
                                            ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
@@ -38,7 +36,7 @@ namespace ScoreSaber::Data::Private::ReplayReader
                                            ReadComboKeyframes(inputStream, pointers.comboKeyframes),
                                            ReadMultiplierKeyframes(inputStream, pointers.multiplierKeyframes),
                                            ReadEnergyKeyframes(inputStream, pointers.energyKeyframes));
-        } else if (metadata->Version == "3.0.0") {
+        } else if (metadata->Version <= version("3.1.0")) {
             return make_shared<ReplayFile>(metadata,
                                            ReadPoseKeyframes(inputStream, pointers.poseKeyframes),
                                            ReadHeightKeyframes(inputStream, pointers.heightKeyframes),
@@ -66,9 +64,23 @@ namespace ScoreSaber::Data::Private::ReplayReader
     shared_ptr<Metadata> ReadMetadata(stringstream& inputStream, int offset)
     {
         inputStream.seekg(offset);
-        return make_shared<Metadata>(ReadString(inputStream), ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
+
+        version ver = version(ReadString(inputStream));
+
+        INFO("found version {:s}", ver.str());
+
+        if(ver < version("3.1.0")) {
+            return make_shared<Metadata>(ver, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
                             ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
-                            ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream));
+                            ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream),
+                            nullopt, nullopt, nullopt);
+        } else {
+            return make_shared<Metadata>(ver, ReadString(inputStream), ReadInt(inputStream), ReadString(inputStream),
+                            ReadString(inputStream), ReadStringArray(inputStream), ReadFloat(inputStream), ReadBool(inputStream),
+                            ReadFloat(inputStream), ReadFloat(inputStream), ReadVRPosition(inputStream), ReadFloat(inputStream),
+                            version(ReadString(inputStream)),
+                            version(ReadString(inputStream)), ReadString(inputStream));
+        }
     }
 
     vector<VRPoseGroup> ReadPoseKeyframes(stringstream& inputStream, int offset)

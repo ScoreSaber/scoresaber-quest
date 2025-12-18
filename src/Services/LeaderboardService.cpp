@@ -1,4 +1,3 @@
-#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 
 #include "Data/InternalLeaderboard.hpp"
@@ -92,7 +91,7 @@ namespace ScoreSaber::Services::LeaderboardService
             return;
         }
 
-        FixedSafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
+        SafePtr<BeatmapLevel> beatmapLevelSafe(beatmapLevel);
 
         int * const a = nullptr;
         int *b = a;

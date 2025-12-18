@@ -11,34 +11,29 @@
 #include <vector>
 #include "Utils/DelegateUtils.hpp"
 
-using namespace UnityEngine;
-using namespace GlobalNamespace;
-
-#define INTERFACES                                                        \
-    {                                                                     \
-        classof(System::IDisposable*), classof(Zenject::IInitializable*), \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, ScoreEventRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<ScoreController>, _scoreController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<ComboController>, _comboController);
-                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, ScoreController* scoreController, ComboController* comboController);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    DECLARE_INSTANCE_METHOD(void, ComboController_comboDidChangeEvent, int combo);
-                                    DECLARE_INSTANCE_METHOD(void, ScoreController_scoreDidChangeEvent, int rawScore, int score);
-                                    DECLARE_INSTANCE_METHOD(void, ScoreController_multiplierDidChangeEvent, int multiplier, float nextMultiplierProgress);
-                                    std::vector<Data::Private::ScoreEvent> _scoreKeyFrames;
-                                    std::vector<Data::Private::ComboEvent> _comboKeyFrames;
-                                    std::vector<Data::Private::MultiplierEvent> _multiplierKeyFrames;
-                                    DelegateUtils::DelegateW<System::Action_1<int>> comboDidChangeDelegate;
-                                    DelegateUtils::DelegateW<System::Action_2<int, int>> scoreDidChangeDelegate;
-                                    DelegateUtils::DelegateW<System::Action_2<int, float>> multiplierDidChangeDelegate;
-                                    public:
-                                    std::vector<Data::Private::ScoreEvent> ExportScoreKeyframes();
-                                    std::vector<Data::Private::ComboEvent> ExportComboKeyframes();
-                                    std::vector<Data::Private::MultiplierEvent> ExportMultiplierKeyframes();
-                                    )
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+    ScoreSaber::ReplaySystem::Recorders,
+    ScoreEventRecorder,
+    System::Object,
+    System::IDisposable*,
+    Zenject::IInitializable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ScoreController>, _scoreController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ComboController>, _comboController);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController, GlobalNamespace::ComboController* comboController);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+    DECLARE_INSTANCE_METHOD(void, ComboController_comboDidChangeEvent, int combo);
+    DECLARE_INSTANCE_METHOD(void, ScoreController_scoreDidChangeEvent, int rawScore, int score);
+    DECLARE_INSTANCE_METHOD(void, ScoreController_multiplierDidChangeEvent, int multiplier, float nextMultiplierProgress);
+    std::vector<Data::Private::ScoreEvent> _scoreKeyFrames;
+    std::vector<Data::Private::ComboEvent> _comboKeyFrames;
+    std::vector<Data::Private::MultiplierEvent> _multiplierKeyFrames;
+    DelegateUtils::DelegateW<System::Action_1<int>> comboDidChangeDelegate;
+    DelegateUtils::DelegateW<System::Action_2<int, int>> scoreDidChangeDelegate;
+    DelegateUtils::DelegateW<System::Action_2<int, float>> multiplierDidChangeDelegate;
+public:
+    std::vector<Data::Private::ScoreEvent> ExportScoreKeyframes();
+    std::vector<Data::Private::ComboEvent> ExportComboKeyframes();
+    std::vector<Data::Private::MultiplierEvent> ExportMultiplierKeyframes();
+};

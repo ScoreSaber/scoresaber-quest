@@ -13,24 +13,22 @@
 #include <custom-types/shared/macros.hpp>
 #include <lapiz/shared/macros.hpp>
 
-#define INTERFACES                                                        \
-    {                                                                     \
-        classof(System::IDisposable*), classof(Zenject::IInitializable*), \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, MainRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(PoseRecorder*, _poseRecorder);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(MetadataRecorder*, _metadataRecorder);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(NoteEventRecorder*, _noteEventRecorder);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreEventRecorder*, _scoreEventRecorder);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(HeightEventRecorder*, _heightEventRecorder);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(EnergyEventRecorder*, _energyEventRecorder);
-                                    DECLARE_CTOR(ctor, PoseRecorder* poseRecorder, MetadataRecorder* metadataRecorder, NoteEventRecorder* noteEventRecorder, ScoreEventRecorder* scoreEventRecorder, HeightEventRecorder* heightEventRecorder, EnergyEventRecorder* energyEventRecorder);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    public:
-                                    std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> ExportCurrentReplay();
-                                    void StopRecording();
-                                    )
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::Recorders,
+        MainRecorder,
+        System::Object,
+        System::IDisposable*,
+        Zenject::IInitializable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(PoseRecorder*, _poseRecorder);
+    DECLARE_INSTANCE_FIELD_PRIVATE(MetadataRecorder*, _metadataRecorder);
+    DECLARE_INSTANCE_FIELD_PRIVATE(NoteEventRecorder*, _noteEventRecorder);
+    DECLARE_INSTANCE_FIELD_PRIVATE(ScoreEventRecorder*, _scoreEventRecorder);
+    DECLARE_INSTANCE_FIELD_PRIVATE(HeightEventRecorder*, _heightEventRecorder);
+    DECLARE_INSTANCE_FIELD_PRIVATE(EnergyEventRecorder*, _energyEventRecorder);
+    DECLARE_CTOR(ctor, PoseRecorder* poseRecorder, MetadataRecorder* metadataRecorder, NoteEventRecorder* noteEventRecorder, ScoreEventRecorder* scoreEventRecorder, HeightEventRecorder* heightEventRecorder, EnergyEventRecorder* energyEventRecorder);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+public:
+    std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> ExportCurrentReplay();
+    void StopRecording();
+};

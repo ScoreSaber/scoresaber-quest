@@ -2,7 +2,7 @@
 
 #include "Data/Private/ReplayFile.hpp"
 #include "Utils/DelegateUtils.hpp"
-#include <BeatSaber/GameSettings/MainSettingsHandler.hpp>
+#include <GlobalNamespace/SettingsManager.hpp>
 #include <GlobalNamespace/AudioTimeSyncController.hpp>
 #include <GlobalNamespace/BeatmapObjectSpawnController.hpp>
 #include <GlobalNamespace/GameplayCoreSceneSetupData.hpp>
@@ -14,27 +14,23 @@
 #include <lapiz/shared/macros.hpp>
 #include "Utils/DelegateUtils.hpp"
 
-using namespace GlobalNamespace;
-
-#define INTERFACES                                                        \
-    {                                                                     \
-        classof(System::IDisposable*), classof(Zenject::IInitializable*), \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, MetadataRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(BeatmapObjectSpawnController::InitData*, _beatmapObjectSpawnControllerInitData);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GameplayCoreSceneSetupData*, _gameplayCoreSceneSetupData);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(BeatSaber::GameSettings::MainSettingsHandler*, _mainSettingsHandler);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GameEnergyCounter>, _gameEnergyCounter);
-                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GameEnergyCounter* gameEnergyCounter, BeatSaber::GameSettings::MainSettingsHandler* mainSettingsHandler);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    DECLARE_INSTANCE_METHOD(void, GameEnergyCounter_gameEnergyDidReach0Event);
-                                    float _failTime;
-                                    DelegateUtils::DelegateW<System::Action> gameEnergyDidReach0Delegate;
-                                    public:
-                                    std::shared_ptr<Data::Private::Metadata> Export();
-                                    )
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::Recorders,
+        MetadataRecorder,
+        System::Object,
+        System::IDisposable*,
+        Zenject::IInitializable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapObjectSpawnController::InitData*, _beatmapObjectSpawnControllerInitData);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::GameplayCoreSceneSetupData*, _gameplayCoreSceneSetupData);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::SettingsManager*, _settingsManager);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::GameEnergyCounter>, _gameEnergyCounter);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::GameplayCoreSceneSetupData* gameplayCoreSceneSetupData, GlobalNamespace::BeatmapObjectSpawnController::InitData* beatmapObjectSpawnControllerInitData, GlobalNamespace::GameEnergyCounter* gameEnergyCounter, GlobalNamespace::SettingsManager* settingsManager);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+    DECLARE_INSTANCE_METHOD(void, GameEnergyCounter_gameEnergyDidReach0Event);
+    float _failTime;
+    DelegateUtils::DelegateW<System::Action> gameEnergyDidReach0Delegate;
+public:
+    std::shared_ptr<Data::Private::Metadata> Export();
+};

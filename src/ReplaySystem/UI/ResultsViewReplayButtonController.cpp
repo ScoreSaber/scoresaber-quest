@@ -8,7 +8,6 @@
 #include <custom-types/shared/delegate.hpp>
 #include <bsml/shared/BSML/MainThreadScheduler.hpp>
 #include "Utils/OperatorOverloads.hpp"
-#include "Utils/SafePtr.hpp"
 #include "logging.hpp"
 
 using namespace BSML;
@@ -33,7 +32,7 @@ namespace ScoreSaber::ReplaySystem::UI
         _resultsViewController->___continueButtonPressedEvent += continueButtonPressedDelegate;
         _resultsViewController->___restartButtonPressedEvent += restartButtonPressedDelegate;
 
-        FixedSafePtr<ResultsViewReplayButtonController> self(this);
+        SafePtr<ResultsViewReplayButtonController> self(this);
         Services::ReplayService::ReplaySerialized = [self](const std::vector<char> &v) { self->UploadDaemon_ReplaySerialized(v); };
     }
 
@@ -76,7 +75,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::WaitForReplay()
     {
-        FixedSafePtr<ResultsViewReplayButtonController> self(this);
+        SafePtr<ResultsViewReplayButtonController> self(this);
 
         il2cpp_utils::il2cpp_aware_thread([self](){
             while(!self->_replayReady) {
@@ -100,7 +99,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ResultsViewReplayButtonController::ClickedReplayButton()
     {
-        FixedSafePtr<ResultsViewReplayButtonController> self(this);
+        SafePtr<ResultsViewReplayButtonController> self(this);
         il2cpp_utils::il2cpp_aware_thread([self](){
             std::vector<std::string> modifiersVec = Services::UploadService::GetModifierList(self->_levelCompletionResults->gameplayModifiers, self->_levelCompletionResults->energy);
             std::string modifiers;

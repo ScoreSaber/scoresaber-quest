@@ -14,32 +14,29 @@
 #include <vector>
 #include "Utils/DelegateUtils.hpp"
 
-#define INTERFACES                                                         \
-    {                                                                      \
-        classof(Zenject::IInitializable*), classof(::System::IDisposable*) \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::UI, ResultsViewReplayButtonController, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, System::Object, "ScoreSaber::ReplaySystem::UI::ResultsViewReplayButtonController", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ResultsViewController>, _resultsViewController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevel*, _beatmapLevel);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapKey, _beatmapKey);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::LevelCompletionResults*, _levelCompletionResults);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<UnityEngine::UI::Button>, watchReplayButton);
-                                    DECLARE_CTOR(ctor, GlobalNamespace::ResultsViewController* resultsViewController);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_didActivateEvent, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
-                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_restartButtonPressedEvent, UnityW<GlobalNamespace::ResultsViewController> obj);
-                                    DECLARE_INSTANCE_METHOD(void, ResultsViewController_continueButtonPressedEvent, UnityW<GlobalNamespace::ResultsViewController> obj);
-                                    DECLARE_INSTANCE_METHOD(void, WaitForReplay);
-                                    DECLARE_INSTANCE_METHOD(void, ClickedReplayButton);
-                                    std::vector<char> _serializedReplay;
-                                    volatile bool _replayReady = false;
-                                    DelegateUtils::DelegateW<HMUI::ViewController::DidActivateDelegate> didActivateDelegate;
-                                    DelegateUtils::DelegateW<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>> continueButtonPressedDelegate;
-                                    DelegateUtils::DelegateW<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>> restartButtonPressedDelegate;
-                                    void UploadDaemon_ReplaySerialized(const std::vector<char> &serializedReplay);
-
-);
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::UI,
+        ResultsViewReplayButtonController,
+        System::Object,
+        Zenject::IInitializable*,
+        System::IDisposable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ResultsViewController>, _resultsViewController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapLevel*, _beatmapLevel);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapKey, _beatmapKey);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::LevelCompletionResults*, _levelCompletionResults);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<UnityEngine::UI::Button>, watchReplayButton);
+    DECLARE_CTOR(ctor, GlobalNamespace::ResultsViewController* resultsViewController);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+    DECLARE_INSTANCE_METHOD(void, ResultsViewController_didActivateEvent, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+    DECLARE_INSTANCE_METHOD(void, ResultsViewController_restartButtonPressedEvent, UnityW<GlobalNamespace::ResultsViewController> obj);
+    DECLARE_INSTANCE_METHOD(void, ResultsViewController_continueButtonPressedEvent, UnityW<GlobalNamespace::ResultsViewController> obj);
+    DECLARE_INSTANCE_METHOD(void, WaitForReplay);
+    DECLARE_INSTANCE_METHOD(void, ClickedReplayButton);
+    std::vector<char> _serializedReplay;
+    volatile bool _replayReady = false;
+    DelegateUtils::DelegateW<HMUI::ViewController::DidActivateDelegate> didActivateDelegate;
+    DelegateUtils::DelegateW<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>> continueButtonPressedDelegate;
+    DelegateUtils::DelegateW<System::Action_1<UnityW<GlobalNamespace::ResultsViewController>>> restartButtonPressedDelegate;
+    void UploadDaemon_ReplaySerialized(const std::vector<char> &serializedReplay);
+};

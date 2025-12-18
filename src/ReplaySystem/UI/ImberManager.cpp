@@ -7,7 +7,6 @@
 #include <UnityEngine/RectTransformUtility.hpp>
 #include <UnityEngine/Vector2.hpp>
 #include <bsml/shared/BSML-Lite.hpp>
-#include "Utils/SafePtr.hpp"
 #include "Utils/StringUtils.hpp"
 #include "logging.hpp"
 
@@ -67,7 +66,7 @@ namespace ScoreSaber::ReplaySystem::UI
 
     void ImberManager::Initialize()
     {
-        FixedSafePtr<ImberManager> self(this);
+        SafePtr<ImberManager> self(this);
 
         _mainImberPanelView->DidClickLoop = [self]() {
             self->MainImberPanelView_DidClickLoop();

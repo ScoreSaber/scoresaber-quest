@@ -21,7 +21,6 @@
 #include <UnityEngine/UI/LayoutElement.hpp>
 #include <UnityEngine/UI/ContentSizeFitter.hpp>
 #include <UnityEngine/WaitForSeconds.hpp>
-#include "Utils/SafePtr.hpp"
 #include "Utils/UIUtils.hpp"
 #include "logging.hpp"
 #include <custom-types/shared/delegate.hpp>
@@ -142,7 +141,7 @@ namespace ScoreSaber::UI::Other
         topText = CreateClickableText(infoVertical->transform, "");
         bottomText = CreateClickableText(infoVertical->transform, "");
 
-        FixedSafePtrUnity<Banner> self(this);
+        SafePtrUnity<Banner> self(this);
         topText->onClick += [self]() { self->OpenPlayerInfoModal(); };
         bottomText->onClick += [self]() { self->OpenSongInBrowser(); };
 
@@ -317,7 +316,7 @@ namespace ScoreSaber::UI::Other
         promptText->text = text;
         if (dismissTime != -1)
         {
-            FixedSafePtrUnity<Banner> self(this);
+            SafePtrUnity<Banner> self(this);
             il2cpp_utils::il2cpp_aware_thread([dismissTime, self] {
                 std::this_thread::sleep_for(std::chrono::seconds(dismissTime));
                 MainThreadScheduler::Schedule([self]() {

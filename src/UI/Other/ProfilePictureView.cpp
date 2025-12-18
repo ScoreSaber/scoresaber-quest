@@ -11,7 +11,7 @@
 #include <UnityEngine/Networking/UnityWebRequestTexture.hpp>
 #include <bsml/shared/Helpers/utilities.hpp>
 #include <bsml/shared/Helpers/getters.hpp>
-#include <paper/shared/string_convert.hpp>
+#include <paper2_scotland2/shared/string_convert.hpp>
 #include <custom-types/shared/coroutine.hpp>
 #include "questui/ArrayUtil.hpp"
 #include "Utils/OperatorOverloads.hpp"
@@ -31,7 +31,7 @@ using namespace std;
 namespace ScoreSaber::UI::Other {
 
     namespace SpriteCache {
-        map<string, FixedSafePtrUnity<Sprite>> cachedSprites;
+        map<string, SafePtrUnity<Sprite>> cachedSprites;
         const int MaxSpriteCacheSize = 150;
         queue<string> spriteCacheQueue;
 
@@ -43,7 +43,7 @@ namespace ScoreSaber::UI::Other {
                 cachedSprites.erase(oldestUrl);
             }
 
-            // somehow the objects can be GCed, even when behind a FixedSafePtrUnity
+            // somehow the objects can be GCed, even when behind a SafePtrUnity
             vector<string> badSprites;
             for (auto &[key, value] : cachedSprites) {
                 if (!value.isAlive()) {
@@ -65,8 +65,8 @@ namespace ScoreSaber::UI::Other {
     }
 
     bool initializedGlobals = false;
-    FixedSafePtrUnity<Sprite> nullSprite;
-    FixedSafePtrUnity<Material> mat_UINoGlowRoundEdge;
+    SafePtrUnity<Sprite> nullSprite;
+    SafePtrUnity<Material> mat_UINoGlowRoundEdge;
 
     void ProfilePictureView::OnSoftRestart() {
         SpriteCache::cachedSprites.clear();

@@ -12,6 +12,7 @@
 #include <GlobalNamespace/PlayerDataModel.hpp>
 #include <GlobalNamespace/PlayerSpecificSettings.hpp>
 #include <GlobalNamespace/RecordingToolManager.hpp>
+#include <metacore/shared/game.hpp>
 #include "Utils/BeatmapUtils.hpp"
 #include "Utils/SafePtr.hpp"
 #include "Utils/WebUtils.hpp"
@@ -32,15 +33,15 @@ using namespace BSML::Helpers;
 namespace ScoreSaber::ReplaySystem::ReplayLoader
 {
 
-    FixedSafePtrUnity<GlobalNamespace::PlayerDataModel> playerDataModel;
-    FixedSafePtrUnity<GlobalNamespace::MenuTransitionsHelper> menuTransitionsHelper;
+    SafePtrUnity<GlobalNamespace::PlayerDataModel> playerDataModel;
+    SafePtrUnity<GlobalNamespace::MenuTransitionsHelper> menuTransitionsHelper;
 
     std::shared_ptr<ScoreSaber::Data::Private::ReplayFile> LoadedReplay;
-    FixedSafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
-    FixedSafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
+    SafeValueType<GlobalNamespace::BeatmapKey> CurrentBeatmapKey;
+    SafePtr<GlobalNamespace::BeatmapLevel> CurrentBeatmapLevel;
     std::u16string CurrentPlayerName;
     std::string CurrentModifiers;
-    FixedSafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
+    SafePtr<ScoreSaber::ReplaySystem::Playback::NotePlayer> NotePlayerInstance;
 
     bool IsPlaying;
     
@@ -90,11 +91,15 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
 
         auto _environmentsListModel = Helpers::GetDiContainer()->Resolve<GlobalNamespace::EnvironmentsListModel*>();
 
+        MetaCore::Game::DisableScoreSubmissionOnce(MOD_ID);
+        MetaCore::Game::DisableScoreSubmissionOnce("Replay"); // hacky way to prevent BL from submitting scores during replay
+        
         menuTransitionsHelper->StartStandardLevel("Replay", // gameMode
                                                   byref(beatmapKey), // beatmapKey
                                                   beatmapLevel, // beatmapLevel
                                                   playerData->overrideEnvironmentSettings, // overrideEnvironmentSettings
-                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), // overrideColorScheme
+                                                  playerData->colorSchemesSettings->GetOverrideColorScheme(), // playerOverrideColorScheme
+                                                  playerData->colorSchemesSettings->ShouldOverrideLightshowColors(), // playerOverrideLightshowColors
                                                   beatmapLevel->GetColorScheme(beatmapKey.beatmapCharacteristic, beatmapKey.difficulty), // beatmapOverrideColorScheme
                                                   BeatmapUtils::GetModifiersFromStrings(LoadedReplay->metadata->Modifiers), // gameplayModifiers
                                                   playerSettings, // playerSpecificSettings
@@ -108,7 +113,7 @@ namespace ScoreSaber::ReplaySystem::ReplayLoader
                                                   replayEndDelegate, // levelFinishedCallback
                                                   nullptr, // levelRestartedCallback
                                                   {false, {}} // recordingToolData (set to null)
-                                                  ); 
+                                                  );
         IsPlaying = true;
     }
 

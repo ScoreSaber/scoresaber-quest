@@ -16,33 +16,27 @@
 #include <map>
 #include "Utils/DelegateUtils.hpp"
 
-using namespace UnityEngine;
-using namespace GlobalNamespace;
-
-
-#define INTERFACES                                                        \
-    {                                                                     \
-        classof(System::IDisposable*), classof(Zenject::IInitializable*), \
-    }
-
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::ReplaySystem::Recorders, NoteEventRecorder, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, Il2CppObject, "ScoreSaber::ReplaySystem::Recorders", INTERFACES, 0, nullptr,
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<AudioTimeSyncController>, _audioTimeSyncController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<ScoreController>, _scoreController);
-                                    DECLARE_INSTANCE_FIELD_PRIVATE(BeatmapObjectManager*, _beatmapObjectManager);
-                                    DECLARE_CTOR(ctor, AudioTimeSyncController* audioTimeSyncController, ScoreController* scoreController, BeatmapObjectManager* beatmapObjectManager);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
-                                    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-                                    DECLARE_INSTANCE_METHOD(void, ScoreController_scoringForNoteStartedEvent, ScoringElement* element);
-                                    DECLARE_INSTANCE_METHOD(void, ScoreController_scoringForNoteFinishedEvent, ScoringElement* element);
-                                    DECLARE_INSTANCE_METHOD(void, BadCutInfoCollector, NoteController* noteController, ByRef<NoteCutInfo> noteCutInfo);
-                                    std::vector<Data::Private::NoteEvent> _noteKeyframes;
-                                    std::map<NoteData*, NoteCutInfo> _collectedBadCutInfos;
-                                    std::map<GoodCutScoringElement*, float> _scoringStartInfo;
-                                    DelegateUtils::DelegateW<System::Action_1<ScoringElement*>> scoringForNoteStartedDelegate;
-                                    DelegateUtils::DelegateW<System::Action_1<ScoringElement*>> scoringForNoteFinishedDelegate;
-                                    DelegateUtils::DelegateW<BeatmapObjectManager::NoteWasCutDelegate> handleNoteWasCutDelegate;
-                                    public:
-                                    std::vector<Data::Private::NoteEvent> Export();
-                                    )
-
-#undef INTERFACES
+DECLARE_CLASS_CODEGEN_INTERFACES(
+        ScoreSaber::ReplaySystem::Recorders,
+        NoteEventRecorder,
+        System::Object,
+        System::IDisposable*,
+        Zenject::IInitializable*) {
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::AudioTimeSyncController>, _audioTimeSyncController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(UnityW<GlobalNamespace::ScoreController>, _scoreController);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatmapObjectManager*, _beatmapObjectManager);
+    DECLARE_CTOR(ctor, GlobalNamespace::AudioTimeSyncController* audioTimeSyncController, GlobalNamespace::ScoreController* scoreController, GlobalNamespace::BeatmapObjectManager* beatmapObjectManager);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
+    DECLARE_INSTANCE_METHOD(void, ScoreController_scoringForNoteStartedEvent, GlobalNamespace::ScoringElement* element);
+    DECLARE_INSTANCE_METHOD(void, ScoreController_scoringForNoteFinishedEvent, GlobalNamespace::ScoringElement* element);
+    DECLARE_INSTANCE_METHOD(void, BadCutInfoCollector, GlobalNamespace::NoteController* noteController, ByRef<GlobalNamespace::NoteCutInfo> noteCutInfo);
+    std::vector<Data::Private::NoteEvent> _noteKeyframes;
+    std::map<GlobalNamespace::NoteData*, GlobalNamespace::NoteCutInfo> _collectedBadCutInfos;
+    std::map<GlobalNamespace::GoodCutScoringElement*, float> _scoringStartInfo;
+    DelegateUtils::DelegateW<System::Action_1<GlobalNamespace::ScoringElement*>> scoringForNoteStartedDelegate;
+    DelegateUtils::DelegateW<System::Action_1<GlobalNamespace::ScoringElement*>> scoringForNoteFinishedDelegate;
+    DelegateUtils::DelegateW<GlobalNamespace::BeatmapObjectManager::NoteWasCutDelegate> handleNoteWasCutDelegate;
+public:
+    std::vector<Data::Private::NoteEvent> Export();
+};

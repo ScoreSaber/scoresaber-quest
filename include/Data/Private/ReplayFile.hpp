@@ -9,6 +9,8 @@
 #include <UnityEngine/Quaternion.hpp>
 #include <UnityEngine/Vector3.hpp>
 
+#include "Utils/Versions.hpp"
+
 using namespace std;
 
 namespace ScoreSaber::Data::Private
@@ -84,6 +86,16 @@ namespace ScoreSaber::Data::Private
         Bomb
     };
 
+    enum ScoringType_pre1_40 {
+        Ignore = -1,
+        NoScore,
+        Normal,
+        SliderHead,
+        SliderTail,
+        BurstSliderHead,
+        BurstSliderElement
+    };
+
     struct NoteID
     {
         NoteID();
@@ -97,6 +109,8 @@ namespace ScoreSaber::Data::Private
         std::optional<int> GameplayType;
         std::optional<int> ScoringType;
         std::optional<float> CutDirectionAngleOffset;
+
+        bool MatchesScoringType(GlobalNamespace::NoteData_ScoringType comparedScoringType, optional<version> gameVersion) const;
     };
 
     struct EnergyEvent
@@ -138,9 +152,9 @@ namespace ScoreSaber::Data::Private
     struct Metadata
     {
         Metadata();
-        Metadata(string Version, string LevelID, int Difficulty, string Characteristic, string Environment, vector<string> Modifiers, float NoteSpawnOffset,
-                 bool LeftHanded, float InitialHeight, float RoomRotation, VRPosition RoomCenter, float FailTime);
-        string Version;
+        Metadata(version Version, string LevelID, int Difficulty, string Characteristic, string Environment, vector<string> Modifiers, float NoteSpawnOffset,
+                 bool LeftHanded, float InitialHeight, float RoomRotation, VRPosition RoomCenter, float FailTime, optional<version> GameVersion, optional<version> PluginVersion, optional<string> Platform);
+        version Version;
         string LevelID;
         int Difficulty;
         string Characteristic;
@@ -152,6 +166,9 @@ namespace ScoreSaber::Data::Private
         float RoomRotation;
         VRPosition RoomCenter;
         float FailTime;
+        optional<version> GameVersion;
+        optional<version> PluginVersion;
+        optional<string> Platform;
     };
 
     struct NoteEvent

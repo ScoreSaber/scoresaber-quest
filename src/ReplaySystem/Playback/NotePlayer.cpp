@@ -9,11 +9,13 @@
 #include <GlobalNamespace/SaberType.hpp>
 #include <GlobalNamespace/SaberTypeObject.hpp>
 #include <GlobalNamespace/ScoringElement.hpp>
+#include "Data/Private/ReplayFile.hpp"
 #include "ReplaySystem/ReplayLoader.hpp"
 #include <UnityEngine/Mathf.hpp>
 #include <UnityEngine/Transform.hpp>
 #include "logging.hpp"
 #include <algorithm>
+#include <metacore/shared/internals.hpp>
 
 using namespace UnityEngine;
 using namespace ScoreSaber::Data::Private;
@@ -37,6 +39,7 @@ namespace ScoreSaber::ReplaySystem::Playback
         std::sort(_sortedNoteEvents.begin(), _sortedNoteEvents.end(), [](const auto& lhs, const auto& rhs) {
             return lhs.Time < rhs.Time;
         });
+        _replayFile = ReplayLoader::LoadedReplay;
     }
     void NotePlayer::Tick()
     {
@@ -105,7 +108,7 @@ namespace ScoreSaber::ReplaySystem::Playback
                                                             noteController->inverseWorldRotation,
                                                             noteTransform->rotation,
                                                             noteTransform->position,
-                                                            il2cpp_utils::try_cast<GlobalNamespace::ISaberMovementData>(correctSaber->movementData).value_or(nullptr));
+                                                            il2cpp_utils::try_cast<GlobalNamespace::ISaberMovementData>(correctSaber->movementDataForLogic).value_or(nullptr));
             _recognizedNoteCutInfos.emplace_back(noteCutInfo, activeEvent);
             noteController->SendNoteWasCutEvent(byref(noteCutInfo));
             return true;
@@ -126,7 +129,7 @@ namespace ScoreSaber::ReplaySystem::Playback
             return false;
         }
         
-        if (id.ScoringType.has_value() && id.ScoringType.value() != (int)noteData->scoringType) {
+        if (!id.MatchesScoringType(noteData->scoringType, _replayFile->metadata->GameVersion)) {
             return false;
         }
         
@@ -135,18 +138,70 @@ namespace ScoreSaber::ReplaySystem::Playback
         }
         return true;
     }
+    
     void NotePlayer::TimeUpdate(float newTime)
     {
+        // reset
+        MetaCore::Internals::notesLeftBadCut = 0;
+        MetaCore::Internals::notesRightBadCut = 0;
+        MetaCore::Internals::notesLeftMissed = 0;
+        MetaCore::Internals::notesRightMissed = 0;
+        MetaCore::Internals::notesLeftCut = 0;
+        MetaCore::Internals::notesRightCut = 0;
+        MetaCore::Internals::remainingNotesLeft = 0;
+        MetaCore::Internals::remainingNotesRight = 0;
+
+        bool checkedNextIndex = false;
+
         for (int c = 0; c < _sortedNoteEvents.size(); c++)
         {
-            if (_sortedNoteEvents[c].Time > newTime)
+            auto& e = _sortedNoteEvents[c];
+            if(e.EventType == NoteEventType::Bomb || e.EventType == NoteEventType::None) continue;
+            if (e.Time <= newTime)
             {
-                _nextIndex = c;
-                return;
+                if (e.EventType == NoteEventType::BadCut)
+                {
+                    if (e.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA)
+                    {
+                        MetaCore::Internals::notesLeftBadCut++;
+                    }
+                    else
+                    {
+                        MetaCore::Internals::notesRightBadCut++;
+                    }
+                }
+                else if (e.EventType == NoteEventType::Miss)
+                {
+                    if (e.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA)
+                    {
+                        MetaCore::Internals::notesLeftMissed++;
+                    }
+                    else
+                    {
+                        MetaCore::Internals::notesRightMissed++;
+                    }
+                }
+            }
+            else
+            {
+                if (!checkedNextIndex)
+                {
+                    _nextIndex = c;
+                    checkedNextIndex = true;
+                }
+
+                if (e.TheNoteID.ColorType == (int)GlobalNamespace::ColorType::ColorA)
+                {
+                    MetaCore::Internals::remainingNotesLeft++;
+                }
+                else
+                {
+                    MetaCore::Internals::remainingNotesRight++;
+                }
             }
         }
-        _nextIndex = _sortedNoteEvents.size();
     }
+
     static bool operator==(const GlobalNamespace::NoteCutInfo& lhs, const GlobalNamespace::NoteCutInfo& rhs)
     {
         return lhs.noteData == rhs.noteData;
