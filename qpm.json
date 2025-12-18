@@ -6,7 +6,7 @@
   "info": {
     "name": "ScoreSaber",
     "id": "scoresaber",
-    "version": "1.0.0",
+    "version": "2.5.0",
     "url": null,
     "additionalData": {
       "overrideSoName": "libscoresaber.so",
